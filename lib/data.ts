@@ -167,11 +167,27 @@ const normalizePropertyStatus = (value: unknown): Property["status"] => {
   return "selling"
 }
 
+// Ask about the ONE table the query will actually hit. An information_schema
+// scan filtered by schema list cannot answer that: lib/db.ts points search_path
+// at "<tenant_schema>, <DEFAULT_SCHEMA>" per request, and name resolution is
+// first-match, but a schema-list filter returns the UNION across both — so a
+// column present only in the shared copy is reported present for a tenant whose
+// own copy lacks it. to_regclass resolves the bare name exactly as the real
+// query will, then pg_attribute describes that relation and no other. NULL from
+// to_regclass (no such table anywhere on the path) yields no rows, i.e. the
+// empty set callers already expect.
+//
+// Both directions of getting this wrong fail silently: callers use the set to
+// decide which optional columns to reference, so a foreign column reported
+// present produces SQL naming a column we do not have, and a real column
+// reported absent just degrades the query with no error raised.
 const getTableColumns = async (tableName: string) => {
   const rows = await query<{ column_name: string }>(
-    `SELECT column_name
-     FROM information_schema.columns
-     WHERE table_name = $1`,
+    `SELECT a.attname AS column_name
+     FROM pg_attribute a
+     WHERE a.attrelid = to_regclass($1)
+       AND a.attnum > 0
+       AND NOT a.attisdropped`,
     [tableName],
   )
   return new Set(rows.map((row) => row.column_name))
@@ -2037,12 +2053,16 @@ export async function getDashboardAnalyticsData(
           ? "type"
           : null
 
+  // Existence has to be asked search_path-relative, the same way the COUNT below
+  // resolves the unqualified name — lib/db.ts gives each request
+  // "<tenant_schema>, <DEFAULT_SCHEMA>", so a literal 'public' answers for a
+  // table this query may never touch, and answers "no" for everything once
+  // DB_SCHEMA is set to anything other than "public". A wrong "no" raises no
+  // error: it just short-circuits to landingPageCount 0, so a tenant with landing
+  // pages sees an empty dashboard metric rather than a failure.
   const landingPageTableExists = await query<{ exists: number }>(
     `SELECT 1 AS exists
-     FROM information_schema.tables
-     WHERE table_schema = 'public'
-       AND table_name = 'freehold_site_project_landing_pages'
-     LIMIT 1`,
+     WHERE to_regclass('freehold_site_project_landing_pages') IS NOT NULL`,
   )
 
   const [landingTotals] =

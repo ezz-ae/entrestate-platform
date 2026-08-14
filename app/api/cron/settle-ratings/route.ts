@@ -19,9 +19,15 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 export async function GET(req: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Fail closed: no secret configured means the route refuses. proxy.ts lists
+  // /api/cron/ under PUBLIC_API_PREFIXES, so the edge wall never sees this
+  // request — this check is the only gate there is. The old `if (secret && ...)`
+  // form disabled itself whenever CRON_SECRET was unset, which handed anyone a
+  // five-minute invocation (maxDuration below) that runs the points-db DDL.
+  const cronSecret = process.env.CRON_SECRET?.trim()
+  const authHeader = req.headers.get('authorization') || ''
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
   }
 
   // The account's own measured days-to-qualify, from its closed history. Falls

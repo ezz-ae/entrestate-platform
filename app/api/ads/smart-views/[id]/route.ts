@@ -37,7 +37,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // A FAILED REBUILD KEEPS THE OLD SHEET. Yesterday's answer with yesterday's
     // timestamp on it is worth more than an empty screen, and the timestamp is
     // what stops it being mistaken for today's.
-    if (rows) {
+    //
+    // Zero rows counts as failed, matching app/api/cron/smart-views: buildRows
+    // returns [] when Meta is not configured, and [] is truthy, so writing it
+    // replaced a good sheet with nothing and stamped it fresh. The cron half of
+    // this rule is worthless without this one — an on-open rebuild fires the
+    // moment anyone views the page and would erase exactly what the cron kept.
+    if (rows && rows.length > 0) {
       const builtAt = await putSheet(id, rows)
       if (builtAt) sheet = { builtAt, rows }
     }

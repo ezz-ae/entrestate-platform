@@ -101,12 +101,25 @@ const ensureLandingTable = async () => {
   await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS template text`)
 }
 
+// Probed with to_regclass rather than a literal schema: lib/db.ts sets
+// search_path per request ("<tenant_schema>, <DEFAULT_SCHEMA>" on a tenant
+// host), and ensureLandingTable() above writes through that same unqualified
+// name — so a hardcoded 'public' describes a DIFFERENT table than the INSERT
+// below actually targets, and describes nothing at all once DB_SCHEMA moves off
+// "public". A schema-list filter is wrong in the opposite direction, unioning
+// the tenant's columns with the shared copy's; to_regclass picks the same
+// first-match relation the INSERT will.
+//
+// Nothing throws on a mismatch: this set gates which columns the INSERT
+// includes, so a column read as "not there" makes the page silently save
+// without its SEO/pixel/template fields.
 const getLandingColumns = async () => {
   const rows = await query<{ column_name: string }>(
-    `SELECT column_name
-     FROM information_schema.columns
-     WHERE table_schema = 'public'
-       AND table_name = 'freehold_site_project_landing_pages'`,
+    `SELECT a.attname AS column_name
+     FROM pg_attribute a
+     WHERE a.attrelid = to_regclass('freehold_site_project_landing_pages')
+       AND a.attnum > 0
+       AND NOT a.attisdropped`,
   )
   return new Set(rows.map((row) => row.column_name))
 }

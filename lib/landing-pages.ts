@@ -233,12 +233,25 @@ const toDate = (value: unknown) => {
   return Number.isNaN(date.getTime()) ? null : date
 }
 
+// to_regclass, not a literal schema and not a schema list: lib/db.ts points each
+// connection's search_path at "<tenant_schema>, <DEFAULT_SCHEMA>", so the only
+// correct question is which columns THIS request would actually resolve to.
+// A hardcoded 'public' misses the tenant's own copy entirely (and misses
+// everything once DB_SCHEMA is set to anything but "public"); a schema-list
+// filter overshoots the other way, unioning the tenant's columns with the shared
+// copy's. to_regclass resolves the bare name first-match, exactly as the real
+// query does, and pg_attribute then describes that one relation.
+//
+// Either error is silent: the probe feeds conditional SQL, so a missing column
+// reads as "optional column absent" and degrades the query, while a phantom
+// column produces SQL naming something this table does not have.
 const getTableColumns = async (tableName: string) => {
   const rows = await query<{ column_name: string }>(
-    `SELECT column_name
-     FROM information_schema.columns
-     WHERE table_schema = 'public'
-       AND table_name = $1`,
+    `SELECT a.attname AS column_name
+     FROM pg_attribute a
+     WHERE a.attrelid = to_regclass($1)
+       AND a.attnum > 0
+       AND NOT a.attisdropped`,
     [tableName],
   )
   return new Set(rows.map((row) => row.column_name))

@@ -54,9 +54,21 @@ export async function signupTenant(input: {
   if (!created.ok) return { ok: false, reason: created.reason }
   const tenant = created.tenant
 
-  // Private catalogue copy — non-fatal (idempotent; lazy DDL covers the rest,
-  // and an operator retry can finish it).
-  await provisionTenantSchema(tenant.schemaName).catch(() => {})
+  // Private catalogue copy — still non-fatal (idempotent; lazy DDL covers the
+  // rest, and an operator retry can finish it), but never silent. Swallowing
+  // the error is how a workspace goes live with an EMPTY catalogue: signup
+  // returns 200, the claim token mints a working session, and the broker lands
+  // on a blank product with nothing anywhere saying why. There is no
+  // re-provision route either — POST /api/wl/tenants rejects the subdomain as
+  // taken long before it reaches provisioning — so this log is the only trace a
+  // misconfigured database will ever leave.
+  await provisionTenantSchema(tenant.schemaName).catch((err) => {
+    console.error(
+      '[tenancy] catalogue provisioning failed — workspace is live with an empty catalogue',
+      tenant.schemaName,
+      err,
+    )
+  })
 
   // The owner account lives INSIDE the tenant schema: their users table,
   // their roster, their login.

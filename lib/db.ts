@@ -9,7 +9,38 @@ const schema = process.env.DB_SCHEMA || "public"
 /** The non-tenant schema — control plane, shared catalogue, Freehold itself. */
 export const DEFAULT_SCHEMA = schema
 
+// Two env vars name the same thing and `||` picks a winner without saying so.
+// If a deploy carries a stale NEON_DATABASE_URL next to a freshly corrected
+// DATABASE_URL, every read and write lands in the old database while
+// /api/health still reports db: true — health only proves *a* connection
+// opened, never which one — so the corrected DATABASE_URL looks applied and
+// isn't.
+//
+// This warns rather than throws, deliberately. Setting both is a documented,
+// supported configuration (.env.example calls NEON_DATABASE_URL an optional
+// alias; docs/WHITE-LABEL.md has the operator set one and seed with the other),
+// so refusing to start would break working deployments. A strict string compare
+// also cannot tell a real disagreement from the same database reached two ways
+// — a -pooler host beside the direct host, or one URL carrying ?sslmode= and
+// the other not — and those must not be fatal. Once per process, at first use.
+let connectionSourceWarned = false
+function warnOnAmbiguousConnectionSource(): void {
+  if (connectionSourceWarned) return
+  const neon = process.env.NEON_DATABASE_URL
+  const database = process.env.DATABASE_URL
+  if (neon && database && neon !== database) {
+    connectionSourceWarned = true
+    // The values are credentials; name the variables, never their contents.
+    console.warn(
+      "[db] NEON_DATABASE_URL and DATABASE_URL are both set to different values. " +
+      "NEON_DATABASE_URL wins; DATABASE_URL is ignored. If that is not what you " +
+      "intended, unset one — /api/health cannot tell you which database you reached.",
+    )
+  }
+}
+
 const getConnectionString = () => {
+  warnOnAmbiguousConnectionSource()
   if (!rawConnectionString) {
     throw new Error("Missing NEON_DATABASE_URL or DATABASE_URL environment variable")
   }
@@ -40,9 +71,28 @@ function getPool(): Pool {
     clientSchema.set(client, schema)
   })
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPool.pgPool = pool
-  }
+  // Required now that the pool outlives the request. pg's Pool is an
+  // EventEmitter and emits 'error' when an IDLE client dies — Neon closing an
+  // idle connection, a network reset, an admin disconnect. An 'error' emission
+  // with no listener is an uncaught exception, which takes the process down.
+  // The pool discards the dead client and opens a fresh one on the next
+  // checkout, so logging is the whole job here.
+  pool.on('error', (err) => {
+    console.error('[db] idle client error', err)
+  })
+
+  // The memo must never be environment-gated. getPool() runs on every single
+  // checkout (see acquireClient), so gating it to non-production means the
+  // cache above never hits in production: each query builds a throwaway Pool,
+  // pays a fresh TLS handshake, and abandons it — nothing in lib/ or app/ ever
+  // calls pool.end(), so the discarded pools hold their sockets until the
+  // process dies. The dev-only guard looks like the familiar Next HMR idiom
+  // (memoise on globalThis so hot reload doesn't leak pools), which is exactly
+  // why someone will try to put it back; that idiom caches in dev *as well as*
+  // production, not instead of it. This hurts most when the database is shared
+  // with another product, because the churn and the connection slots it burns
+  // are spent on someone else's compute.
+  globalForPool.pgPool = pool
   return pool
 }
 

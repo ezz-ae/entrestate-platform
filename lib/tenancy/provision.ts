@@ -15,7 +15,7 @@
  * shared (fallback).
  */
 
-import { query, runWithDefaultSchema, DEFAULT_SCHEMA } from '@/lib/db'
+import { query, runWithDefaultSchema, withTransaction, DEFAULT_SCHEMA } from '@/lib/db'
 
 /** Catalogue tables a tenant gets a private, editable copy of at signup. */
 const CATALOG_COPY_TABLES = [
@@ -26,9 +26,11 @@ const CATALOG_COPY_TABLES = [
 const SAFE_IDENT = /^[a-z0-9_]{1,63}$/
 
 /**
- * Copy the shared catalogue into `schemaName`. Idempotent: tables already
- * present in the tenant schema are left untouched; catalogue tables missing
- * from the shared schema (e.g. an unseeded fresh database) are skipped.
+ * Copy the shared catalogue into `schemaName`. Idempotent: tables that already
+ * hold tenant rows are left untouched; catalogue tables missing from the shared
+ * schema (e.g. an unseeded fresh database) are skipped. An existing but EMPTY
+ * tenant table is treated as un-provisioned and copied into — see the guard
+ * below for why existence alone cannot mean "done".
  * Runs pinned to the default schema so it can see both sides.
  */
 export async function provisionTenantSchema(schemaName: string): Promise<void> {
@@ -45,13 +47,42 @@ export async function provisionTenantSchema(schemaName: string): Promise<void> {
         `SELECT to_regclass($1)::text AS reg`,
         [`${schemaName}.${table}`],
       )
-      if (dst?.reg) continue // already provisioned — never clobber tenant data
+      // The destination EXISTING is not proof it was provisioned. The app's
+      // lazy DDL (ensureProjectsTable in lib/data.ts, and the equivalent in
+      // lib/freehold/project-profile.ts) creates these tables empty on the
+      // tenant's first page view, so a request that beats provisioning leaves a
+      // real but empty table here. Skipping on existence would then skip it
+      // forever — there is no re-provision route, since POST /api/wl/tenants
+      // 400s on "taken" before it ever calls back in — and the tenant would
+      // live out its trial on a blank catalogue. So the guard is EMPTINESS, not
+      // existence: rows present means the tenant has data of their own, which
+      // we never clobber.
+      const dstExists = Boolean(dst?.reg)
       // Identifiers are validated against SAFE_IDENT above, so quoting them
-      // into DDL is safe. LIKE INCLUDING ALL carries defaults, constraints
-      // and indexes; the row copy runs in the same implicit transaction per
-      // statement and the whole loop is idempotent on retry.
-      await query(`CREATE TABLE "${schemaName}"."${table}" (LIKE "${DEFAULT_SCHEMA}"."${table}" INCLUDING ALL)`)
-      await query(`INSERT INTO "${schemaName}"."${table}" SELECT * FROM "${DEFAULT_SCHEMA}"."${table}"`)
+      // into DDL is safe. The whole copy runs in one transaction because these
+      // used to be separate autocommit statements — each query() checks out and
+      // releases its own connection, so a timeout landing between the CREATE
+      // and the INSERT left behind exactly the empty table the guard above now
+      // has to clean up after.
+      await withTransaction(async (q) => {
+        if (dstExists) {
+          const seeded = await q<{ one: number }>(
+            `SELECT 1 AS one FROM "${schemaName}"."${table}" LIMIT 1`,
+          )
+          if (seeded.length) return // tenant's own rows — leave them alone
+          // An empty destination is dropped and rebuilt rather than filled in
+          // place: the shared table has grown columns through ALTER TABLE ADD
+          // COLUMN over the years, so its physical column order no longer
+          // matches the one a fresh CREATE TABLE produces, and `SELECT *`
+          // copies positionally. Recreating with LIKE below restores that
+          // guarantee. The DROP is inside the transaction, so a failure any
+          // time after it rolls the table back into place.
+          await q(`DROP TABLE IF EXISTS "${schemaName}"."${table}"`)
+        }
+        // LIKE INCLUDING ALL carries defaults, constraints and indexes.
+        await q(`CREATE TABLE "${schemaName}"."${table}" (LIKE "${DEFAULT_SCHEMA}"."${table}" INCLUDING ALL)`)
+        await q(`INSERT INTO "${schemaName}"."${table}" SELECT * FROM "${DEFAULT_SCHEMA}"."${table}"`)
+      })
     }
   })
 }

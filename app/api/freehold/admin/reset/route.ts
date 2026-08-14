@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { requireSession } from '@/lib/freehold/api-auth'
-import { query } from '@/lib/db'
+import { query, resolveActiveSchema, DEFAULT_SCHEMA } from '@/lib/db'
+import { tenantSubdomainFromHost } from '@/lib/tenancy/config'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -39,17 +41,40 @@ const DEMO_TABLES = [
   'freehold_site_google_entities',
 ]
 
-async function purge(tables: string[]): Promise<Record<string, number | string>> {
+// The sequence behind the FH-#### lead codes (created in lib/data.ts).
+const LEAD_SEQUENCE = 'freehold_site_lead_seq'
+
+// Every destructive statement in this route is schema-qualified, and that is a
+// privilege boundary rather than a style preference. lib/db.ts runs a tenant
+// request with search_path "<tenant_schema>, <DEFAULT_SCHEMA>" and the app
+// creates its tables LAZILY, so for any table a tenant has not created yet an
+// unqualified `DELETE FROM freehold_site_leads` falls through to the DEFAULT
+// schema and deletes ITS rows — on a deployment with a shared default schema
+// that is a trial customer's own 'ceo' account reaching the vendor's data. The
+// sequence restart is worse than the deletes: lead_code is a STORED generated
+// column over LEAD_SEQUENCE (lib/data.ts), so restarting a shared sequence
+// mints duplicate FH-#### codes that persist long after this request, even when
+// every DELETE matched nothing. Do not "simplify" these back to bare names.
+//
+// Both halves are ours — object names come from the allow-lists above, the
+// schema from resolveActiveSchema() — but quotes are doubled anyway so a later
+// edit that widens either source cannot turn this into an injection point.
+const qualify = (schemaName: string, object: string) =>
+  `"${schemaName.replace(/"/g, '""')}"."${object.replace(/"/g, '""')}"`
+
+async function purge(schemaName: string, tables: string[]): Promise<Record<string, number | string>> {
   const result: Record<string, number | string> = {}
   for (const table of tables) {
+    const target = qualify(schemaName, table)
     try {
-      // Table names come from a fixed allow-list above — never user input.
-      const rows = await query<{ count: string }>(`SELECT count(*)::text AS count FROM ${table}`)
+      const rows = await query<{ count: string }>(`SELECT count(*)::text AS count FROM ${target}`)
       const before = Number(rows[0]?.count ?? 0)
-      await query(`DELETE FROM ${table}`)
+      await query(`DELETE FROM ${target}`)
       result[table] = before
     } catch {
-      // Table may not exist on this database yet — skip silently.
+      // Table may not exist in THIS schema yet — skip silently. Before the
+      // qualification above this branch was mostly unreachable: the miss
+      // resolved against the default schema and "succeeded" there instead.
       result[table] = 'skipped'
     }
   }
@@ -68,7 +93,8 @@ async function purge(tables: string[]): Promise<Record<string, number | string>>
  *   AI conversations, notebook outputs, ad requests and campaign mirrors.
  *
  * Never touches: projects/inventory, area & developer profiles, landing pages,
- * microsites, web content, team accounts or API keys.
+ * microsites, web content, team accounts or API keys — and never anything
+ * outside the schema this request resolves to.
  */
 export async function POST(req: Request) {
   const auth = await requireSession(RESET_ROLES)
@@ -85,12 +111,40 @@ export async function POST(req: Request) {
   const scope = body.scope === 'all-demo' ? 'all-demo' : 'leads'
   const tables = scope === 'all-demo' ? [...DEMO_TABLES, ...LEAD_TABLES] : LEAD_TABLES
 
+  // Resolve the schema this request actually writes to BEFORE touching
+  // anything. resolveActiveSchema() fails closed on an unknown or suspended
+  // tenant host; a reset is the last operation that should proceed on a guess.
+  let activeSchema: string
   try {
-    const cleared = await purge(tables)
-    // Restart lead numbering so the first new lead is FH-0001 again.
+    activeSchema = await resolveActiveSchema()
+  } catch (err) {
+    console.error('[admin/reset] could not resolve the active schema', err)
+    return NextResponse.json(
+      { error: 'Reset refused: the data schema for this request could not be resolved.' },
+      { status: 409 },
+    )
+  }
+
+  // A tenant host landing on the shared/default schema means the tenant's own
+  // schema was NOT resolved — the request would otherwise wipe the schema every
+  // other tenant (and the vendor) reads from. There is no safe reading of that
+  // combination, so refuse the whole operation instead of clearing anything.
+  const onTenantHost = tenantSubdomainFromHost((await headers()).get('host')) !== null
+  if (onTenantHost && activeSchema === DEFAULT_SCHEMA) {
+    return NextResponse.json(
+      { error: 'Reset refused: this tenant resolves to the shared schema.' },
+      { status: 409 },
+    )
+  }
+
+  try {
+    const cleared = await purge(activeSchema, tables)
+    // Restart lead numbering so the first new lead is FH-0001 again — qualified
+    // for the same reason as the deletes, and more urgently: an unqualified
+    // restart hits the shared sequence and duplicates other tenants' codes.
     try {
-      await query(`ALTER SEQUENCE IF EXISTS freehold_site_lead_seq RESTART WITH 1`)
-    } catch { /* sequence may not exist yet */ }
+      await query(`ALTER SEQUENCE IF EXISTS ${qualify(activeSchema, LEAD_SEQUENCE)} RESTART WITH 1`)
+    } catch { /* sequence may not exist in this schema yet */ }
 
     return NextResponse.json({ ok: true, scope, cleared })
   } catch (err) {
