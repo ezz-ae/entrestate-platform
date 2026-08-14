@@ -1,7 +1,38 @@
-# Freehold Intelligence — working conventions
+# Entrestate — working conventions
 
 Next.js 16 / TypeScript real-estate operating system. Public site + management
 system + Meta/Google ads machine + CRM. Three languages (EN/AR/RU) everywhere.
+
+Sold as three products on one system: **Lead Machine**, **Listing-to-Landing**,
+**Meta for Realtors**. One deployment serves the vendor's own hosts and every
+customer instance at `{customer}.entrestate.com`, isolated schema-per-tenant.
+
+## THIS REPO IS NOT FREEHOLD — read this before your first command
+
+This code began as a fork of `ezz-ae/ORE`, which is **Freehold's live
+deployment**: real campaigns, real spend, real sales, running right now under a
+client contract. The two are now permanently separate and must stay that way.
+
+| | repo | Vercel project | domains |
+|---|---|---|---|
+| **This repo** | `ezz-ae/entrestate-platform` | `entrestate` | entrestate.com + `*.entrestate.com` |
+| **The client** | `ezz-ae/ORE` | `freehold` | freeholdproperty.ae, fhp.ae |
+
+**Never push, merge, open a PR against, or deploy `ezz-ae/ORE`.** Nothing in
+this repository is a reason to touch it. If a change looks like it belongs
+there, it does not — it belongs here, and the client takes it as an upstream
+merge on their own schedule, by their own decision.
+
+Check before you push. `git remote -v` must say `entrestate-platform`:
+
+```
+git remote -v | grep -q entrestate-platform || echo "WRONG REPO — STOP"
+```
+
+The tenancy code is written so this repository's own behaviour is opt-in:
+`NEXT_PUBLIC_TENANT_BASE_DOMAIN` is unset on the Freehold deployment, and every
+vendor rule (see `lib/tenancy/vendor-host.ts`) returns `pass` without it. That
+is a safety net, not permission — the rule above still stands.
 
 ## The gauntlet — run before every merge
 
