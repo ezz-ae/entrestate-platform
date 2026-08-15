@@ -32,7 +32,7 @@ export default function LeadMachinePage() {
       <Section className="pb-16 pt-16 lg:pb-24 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
           <div>
-            <Eyebrow>For brokerages and developers&rsquo; sales teams</Eyebrow>
+            <Eyebrow>Lead Machine · lead generation for real-estate companies</Eyebrow>
             <div className="mt-5 max-w-[44rem]">
               <Display>Your brokerage, on rails.</Display>
             </div>

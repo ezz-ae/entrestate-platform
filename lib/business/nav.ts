@@ -20,17 +20,17 @@ export const PRODUCTS: NavItem[] = [
   {
     href: '/business/lead-machine',
     label: 'Lead Machine',
-    blurb: 'The complete system, on your own address, for a company and its agents.',
+    blurb: 'Makes leads from your listings, then works them to the deal — the whole system, your brand.',
   },
   {
     href: '/business/listing-to-landing',
     label: 'Listing-to-Landing',
-    blurb: 'Your public website and inventory network, with the management desk behind it.',
+    blurb: 'Your public website, run properly — with the desk and CRM behind it.',
   },
   {
     href: '/business/meta-for-realtors',
     label: 'Meta for Realtors',
-    blurb: 'Meta advertising run properly, for one agent, without a marketing team.',
+    blurb: 'The ads part alone, for one agent — pick a listing, set a budget, it runs.',
   },
 ]
 

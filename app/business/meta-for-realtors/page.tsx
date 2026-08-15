@@ -22,7 +22,7 @@ export default function MetaForRealtorsPage() {
       <Section className="pb-20 pt-16 lg:pb-28 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
-            <Eyebrow>For individual agents</Eyebrow>
+            <Eyebrow>Meta for Realtors · Meta ads for one agent</Eyebrow>
             <div className="mt-5 max-w-[44rem]">
               <Display>Ads like you hired a team.</Display>
             </div>

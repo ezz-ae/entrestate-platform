@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Section, Band, Eyebrow, Display, H2, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
 import {
-  Browser, Phone, Chat, MiniCampaigns, MiniReport, HeroVisual,
+  Browser, Phone, Chat, MiniCampaigns, MiniCRM, MiniReport, HeroVisual,
   FeatureTile, TileGrid, PunchGrid, StatBand, NextStep,
 } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
@@ -130,27 +130,74 @@ export default function BusinessHome() {
         </div>
       </Section>
 
-      {/* ── Products ────────────────────────────────────────────────────── */}
+      {/* ── Products — one taught first, then the two smaller doors.
+             A name alone teaches nothing ("Lead Machine" reads as jargon on
+             first contact), so every product introduces ITSELF: name, then a
+             plain what-it-does line, then who it is for — in that order. ── */}
       <Section className="pb-20 lg:pb-28">
-        <SectionHeading eyebrow="Products" title="One system. Three ways in." />
-        <div className="mt-12 grid grid-cols-1 gap-px lg:grid-cols-3">
+        <SectionHeading eyebrow="Products" title="Start with the one that fits." />
+
+        {/* The main product, alone — one important thing at a time. */}
+        <Link
+          href={PRODUCTS[0].href}
+          className="group mt-12 block bg-[#0C0E11] p-8 outline outline-1 outline-[#D4AF37]/25 transition hover:bg-[#101317] lg:p-12"
+        >
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
+            <div>
+              <Eyebrow>For real-estate companies</Eyebrow>
+              <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <span className="font-serif text-[2rem] leading-tight text-white lg:text-[2.5rem]">
+                  {PRODUCTS[0].label}
+                </span>
+                <span aria-hidden className="text-[#D4AF37] opacity-0 transition group-hover:opacity-100">→</span>
+              </div>
+              <p className="mt-2 text-[1.125rem] leading-snug text-[#D4AF37]">
+                Makes leads from your listings. Works them to the deal.
+              </p>
+              <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+                Not a tool you bolt on — the operation itself, installed under your name. Your
+                listings become pages, pages carry ads, ads bring leads, and the CRM works every
+                one of them.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {['Inventory', 'Pages', 'Ads', 'CRM', 'Reports'].map((c) => (
+                  <span
+                    key={c}
+                    className="rounded-full bg-white/[0.05] px-3 py-1 text-[0.75rem] text-[#A8AEB6] ring-1 ring-white/[0.07]"
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-8 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A9099]">
+                Self-serve · 14-day trial · no card
+              </div>
+            </div>
+            <div className="hidden lg:block">
+              <Browser title="app.yourbrokerage.ae/crm">
+                <MiniCRM />
+              </Browser>
+            </div>
+          </div>
+        </Link>
+
+        {/* The two narrower doors — each opens with who it is for, so the
+            reader routes themselves in one glance. */}
+        <p className="mt-10 text-[0.875rem] text-[#6E747C]">Only need part of it?</p>
+        <div className="mt-4 grid grid-cols-1 gap-px lg:grid-cols-2">
           {[
             {
-              ...PRODUCTS[0],
-              who: 'Companies with agents',
-              body: 'The whole platform under your name — inventory, ads, pages, CRM, the month-end report.',
-              how: 'Self-serve · 14-day trial',
-            },
-            {
               ...PRODUCTS[1],
-              who: 'Companies that need a public face',
-              body: 'Your public website and a landing page for every listing, with the desk behind it.',
+              what: 'Your public website, run properly.',
+              who: 'For companies whose first problem is their public face',
+              body: 'A site and a landing page for every listing — enquiries land in the CRM, owned.',
               how: 'Set up with you, on request',
             },
             {
               ...PRODUCTS[2],
-              who: 'Individual agents',
-              body: 'Campaigns built, launched, watched and corrected on Meta. No agency, no Ads Manager.',
+              what: 'The ads part, for one agent.',
+              who: 'For a single agent with listings to push',
+              body: 'Pick a listing, set a budget — it runs the Meta campaign and reports in plain words.',
               how: 'Tokens · pay as you run ads',
             },
           ].map((p) => (
@@ -164,7 +211,8 @@ export default function BusinessHome() {
                 <div className="text-[1.25rem] font-semibold leading-snug text-white">{p.label}</div>
                 <span aria-hidden className="text-[#D4AF37] opacity-0 transition group-hover:opacity-100">→</span>
               </div>
-              <p className="mt-3.5 flex-1 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{p.body}</p>
+              <p className="mt-1 text-[0.9375rem] leading-snug text-[#D4AF37]">{p.what}</p>
+              <p className="mt-3 flex-1 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{p.body}</p>
               <div className="mt-6 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A9099]">
                 {p.how}
               </div>

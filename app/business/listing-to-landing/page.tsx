@@ -23,7 +23,7 @@ export default function ListingToLandingPage() {
       <Section className="pb-16 pt-16 lg:pb-24 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
-            <Eyebrow>Your public face</Eyebrow>
+            <Eyebrow>Listing-to-Landing · your public website, run properly</Eyebrow>
             <Display className="mt-5">A website that sells, not sits.</Display>
             <Lede className="mt-6 max-w-[42ch]">
               Your public site, a landing page for every listing, and the desk that runs it all

@@ -29,7 +29,7 @@ const PLANS: Plan[] = [
     who: 'For brokerages',
     basis: 'Monthly, per workspace',
     price: null,
-    line: 'The complete platform, on your own address.',
+    line: 'Makes leads from your listings, then works them to the deal.',
     includes: [
       'Inventory, pages, ads, CRM, reports',
       'Your brand, your address, your own database',
