@@ -37,7 +37,7 @@ export default function ContactPage() {
           <div className="flex flex-col gap-5">
             <Holder className="flex-1">
               <H3>Write directly</H3>
-              <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+              <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
                 Know your question already? Email{' '}
                 <TextLink href={`mailto:${BRAND.email}`}>
                   <Mono>{BRAND.email}</Mono>
@@ -46,7 +46,7 @@ export default function ContactPage() {
               </p>
               <div className="mt-8">
                 <H3>What helps</H3>
-                <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+                <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
                   How many agents, how many projects, and where a lead lands today.
                 </p>
               </div>
@@ -54,7 +54,7 @@ export default function ContactPage() {
 
             <Holder tone="gold">
               <H3>Start the trial instead</H3>
-              <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+              <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
                 The workspace exists within a minute. Open the desk, click around, come back with
                 questions. <TextLink href="/signup">Start one</TextLink>.
               </p>

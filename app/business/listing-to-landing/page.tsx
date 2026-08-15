@@ -35,7 +35,7 @@ export default function ListingToLandingPage() {
                 See the platform
               </ButtonLink>
             </div>
-            <p className="mt-5 font-mono text-[11px] text-[#6E747C]">
+            <p className="mt-5 font-mono text-[11px] text-[#64748B]">
               Set up with our team, on request. Your own domain.
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function ListingToLandingPage() {
       {/* ── The scene ────────────────────────────────────────────────────── */}
       <GlowBand>
         <Eyebrow>Sold out, overnight</Eyebrow>
-        <p className="mt-6 max-w-[46ch] font-serif text-[1.6rem] leading-[1.4] tracking-[-0.01em] text-white sm:text-[1.9rem]">
+        <p className="mt-6 max-w-[46ch] font-sans font-semibold text-[1.6rem] leading-[1.4] tracking-[-0.01em] text-white sm:text-[1.9rem]">
           A project sells out at midnight. The page stays live with a SOLD OUT badge — buyers
           still land, the link never dies.
         </p>

@@ -56,7 +56,7 @@ export function Grid({
 
 export function Eyebrow({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`font-mono text-[11px] uppercase tracking-[0.18em] text-[#8A9099] ${className}`}>
+    <div className={`font-mono text-[11px] uppercase tracking-[0.18em] text-[#7C8B9D] ${className}`}>
       {children}
     </div>
   )
@@ -65,7 +65,7 @@ export function Eyebrow({ children, className = '' }: { children: ReactNode; cla
 export function Display({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h1
-      className={`font-serif text-[2.6rem] leading-[1.08] tracking-[-0.02em] text-white sm:text-[3.4rem] lg:text-[4rem] ${className}`}
+      className={`font-sans font-semibold text-[2.6rem] leading-[1.08] tracking-[-0.02em] text-white sm:text-[3.4rem] lg:text-[4rem] ${className}`}
     >
       {children}
     </h1>
@@ -75,7 +75,7 @@ export function Display({ children, className = '' }: { children: ReactNode; cla
 export function H2({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h2
-      className={`font-serif text-[1.9rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2.4rem] ${className}`}
+      className={`font-sans font-semibold text-[1.9rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2.4rem] ${className}`}
     >
       {children}
     </h2>
@@ -90,20 +90,20 @@ export function H3({ children, className = '' }: { children: ReactNode; classNam
 
 export function Lede({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`text-[1.125rem] leading-[1.65] text-[#A8AEB6] sm:text-[1.1875rem] ${className}`}>
+    <p className={`text-[1.125rem] leading-[1.65] text-[#9FB0C2] sm:text-[1.1875rem] ${className}`}>
       {children}
     </p>
   )
 }
 
 export function P({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <p className={`text-[0.9375rem] leading-[1.75] text-[#9BA1A9] ${className}`}>{children}</p>
+  return <p className={`text-[0.9375rem] leading-[1.75] text-[#94A3B8] ${className}`}>{children}</p>
 }
 
 /** A value, a field name, a route — anything the reader might need to quote. */
 export function Mono({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`font-mono text-[0.85em] text-[#C9CDD3] ${className}`} dir="ltr">
+    <span className={`font-mono text-[0.85em] text-[#CBD5E1] ${className}`} dir="ltr">
       {children}
     </span>
   )
@@ -139,7 +139,7 @@ export function PageHeader({
         <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-5 border-t border-white/[0.07] pt-7">
           {meta.map(({ k, v }) => (
             <div key={k}>
-              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6E747C]">{k}</dt>
+              <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#64748B]">{k}</dt>
               <dd className="mt-1.5 text-[0.9375rem] text-white">{v}</dd>
             </div>
           ))}
@@ -183,10 +183,10 @@ export function Card({
   className?: string
 }) {
   return (
-    <div className={`bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07] ${className}`}>
+    <div className={`bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07] ${className}`}>
       {kicker ? <Eyebrow className="mb-3">{kicker}</Eyebrow> : null}
       {title ? <H3 className="mb-3">{title}</H3> : null}
-      <div className="text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{children}</div>
+      <div className="text-[0.9375rem] leading-[1.7] text-[#94A3B8]">{children}</div>
     </div>
   )
 }
@@ -205,15 +205,15 @@ export function SpecTable({
   return (
     <div className="overflow-hidden outline outline-1 outline-white/[0.07]">
       {caption ? (
-        <div className="border-b border-white/[0.07] bg-[#0C0E11] px-6 py-3.5">
+        <div className="border-b border-white/[0.07] bg-[#0F131A] px-6 py-3.5">
           <Eyebrow>{caption}</Eyebrow>
         </div>
       ) : null}
       <dl className="divide-y divide-white/[0.06]">
         {rows.map(({ k, v }) => (
-          <div key={k} className="grid grid-cols-1 gap-1.5 bg-[#0A0C0F] px-6 py-4 sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-8">
-            <dt className="text-[0.875rem] font-medium text-[#C9CDD3]">{k}</dt>
-            <dd className="text-[0.875rem] leading-[1.65] text-[#8F959D]">{v}</dd>
+          <div key={k} className="grid grid-cols-1 gap-1.5 bg-[#0F131A] px-6 py-4 sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-8">
+            <dt className="text-[0.875rem] font-medium text-[#CBD5E1]">{k}</dt>
+            <dd className="text-[0.875rem] leading-[1.65] text-[#94A3B8]">{v}</dd>
           </div>
         ))}
       </dl>
@@ -236,11 +236,11 @@ export function Guardrail({
   items: ReactNode[]
 }) {
   return (
-    <div className="border-l-2 border-[#D4AF37] bg-[#0E1013] py-6 pl-7 pr-6">
-      <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#D4AF37]">{title}</div>
+    <div className="border-l-2 border-[#3B82F6] bg-[#0E1013] py-6 pl-7 pr-6">
+      <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#3B82F6]">{title}</div>
       <ul className="mt-4 space-y-3">
         {items.map((item, i) => (
-          <li key={i} className="flex gap-3 text-[0.9375rem] leading-[1.7] text-[#A8AEB6]">
+          <li key={i} className="flex gap-3 text-[0.9375rem] leading-[1.7] text-[#9FB0C2]">
             <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#4A5058]" />
             <span>{item}</span>
           </li>
@@ -260,12 +260,12 @@ export function Steps({
     <ol className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
       {steps.map((s, i) => (
         <li key={s.title} className="grid grid-cols-[2.5rem_1fr] gap-x-5 py-7 sm:grid-cols-[3.5rem_1fr] sm:gap-x-8">
-          <div className="font-mono text-[0.8125rem] tabular-nums text-[#D4AF37]" dir="ltr">
+          <div className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
             {String(i + 1).padStart(2, '0')}
           </div>
           <div>
             <H3>{s.title}</H3>
-            <div className="mt-2.5 max-w-[68ch] text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{s.body}</div>
+            <div className="mt-2.5 max-w-[68ch] text-[0.9375rem] leading-[1.7] text-[#94A3B8]">{s.body}</div>
             {s.detail ? (
               <div className="mt-4 border-l border-white/10 pl-5 text-[0.875rem] leading-[1.7] text-[#7C838B]">
                 {s.detail}
@@ -280,11 +280,11 @@ export function Steps({
 
 export function Stat({ value, label, note }: { value: string; label: string; note?: string }) {
   return (
-    <div className="bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07]">
+    <div className="bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07]">
       <div className="font-mono text-[2rem] leading-none tabular-nums text-white" dir="ltr">
         {value}
       </div>
-      <div className="mt-3 text-[0.875rem] font-medium text-[#C9CDD3]">{label}</div>
+      <div className="mt-3 text-[0.875rem] font-medium text-[#CBD5E1]">{label}</div>
       {note ? <div className="mt-1.5 text-[0.8125rem] leading-relaxed text-[#7C838B]">{note}</div> : null}
     </div>
   )
@@ -294,7 +294,7 @@ export function Stat({ value, label, note }: { value: string; label: string; not
 export function Callout({ children }: { children: ReactNode }) {
   return (
     <div className="border-y border-white/[0.07] py-10">
-      <p className="font-serif text-[1.5rem] leading-[1.45] tracking-[-0.01em] text-white sm:text-[1.75rem]">
+      <p className="font-sans font-semibold text-[1.5rem] leading-[1.45] tracking-[-0.01em] text-white sm:text-[1.75rem]">
         {children}
       </p>
     </div>
@@ -307,7 +307,7 @@ export function TextLink({ href, children }: { href: string; children: ReactNode
   return (
     <Link
       href={href}
-      className="text-white underline decoration-[#D4AF37]/50 underline-offset-[5px] transition hover:decoration-[#D4AF37]"
+      className="text-white underline decoration-[#3B82F6]/50 underline-offset-[5px] transition hover:decoration-[#3B82F6]"
     >
       {children}
     </Link>
@@ -327,7 +327,7 @@ export function ButtonLink({
     'inline-flex items-center gap-2 px-6 py-3 text-[0.875rem] font-semibold transition'
   const styles =
     variant === 'primary'
-      ? 'bg-[#D4AF37] text-black hover:bg-[#E5C351]'
+      ? 'bg-[#3B82F6] text-black hover:bg-[#60A5FA]'
       : 'text-white outline outline-1 outline-white/20 hover:outline-white/40'
   return (
     <Link href={href} className={`${base} ${styles}`}>
@@ -347,15 +347,15 @@ export function NextPages({ items }: { items: Array<{ href: string; label: strin
           <Link
             key={i.href}
             href={i.href}
-            className="group bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#101317]"
+            className="group bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
           >
             <div className="flex items-baseline justify-between gap-4">
               <H3>{i.label}</H3>
-              <span aria-hidden className="text-[#D4AF37] opacity-0 transition group-hover:opacity-100">
+              <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">
                 →
               </span>
             </div>
-            <p className="mt-2.5 text-[0.875rem] leading-[1.65] text-[#8F959D]">{i.blurb}</p>
+            <p className="mt-2.5 text-[0.875rem] leading-[1.65] text-[#94A3B8]">{i.blurb}</p>
           </Link>
         ))}
       </div>

@@ -23,7 +23,7 @@ export default function CrmDayGuide() {
     <DocsShell href="/business/docs/crm-day">
       <ArticleMeta category="CRM & brokers" read="5 min read" />
 
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
         The CRM is built to answer three questions all day long: who needs a call now, what is
         each lead worth, and what happened last. This guide walks one working day through it.
       </p>
@@ -44,7 +44,7 @@ export default function CrmDayGuide() {
         <Browser title="app.yourcompany.com/crm">
           <MiniCRM />
         </Browser>
-        <figcaption className="mt-4 text-[0.8125rem] leading-relaxed text-[#6E747C]">
+        <figcaption className="mt-4 text-[0.8125rem] leading-relaxed text-[#64748B]">
           The pipeline: every open lead, its stage, its value in AED, and how long it has waited.
         </figcaption>
       </figure>

@@ -106,15 +106,15 @@ export default function PricingPage() {
               key={p.name}
               className={`flex flex-col p-8 outline outline-1 ${
                 p.featured
-                  ? 'bg-[#0E1013] outline-[#D4AF37]/40'
-                  : 'bg-[#0C0E11] outline-white/[0.07]'
+                  ? 'bg-[#0E1013] outline-[#3B82F6]/40'
+                  : 'bg-[#0F131A] outline-white/[0.07]'
               }`}
             >
               <Eyebrow>{p.who}</Eyebrow>
               <H3 className="mt-4 !text-[1.25rem]">{p.name}</H3>
-              <p className="mt-2.5 text-[0.9375rem] leading-[1.65] text-[#9BA1A9]">{p.line}</p>
+              <p className="mt-2.5 text-[0.9375rem] leading-[1.65] text-[#94A3B8]">{p.line}</p>
               <div className="mt-6 border-y border-white/[0.07] py-4">
-                <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#D4AF37]">
+                <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#3B82F6]">
                   {p.basis}
                 </div>
                 <div className="mt-2 text-[0.9375rem] text-white">
@@ -123,7 +123,7 @@ export default function PricingPage() {
               </div>
               <ul className="mt-6 flex-1 space-y-3">
                 {p.includes.map((i) => (
-                  <li key={i} className="flex gap-3 text-[0.875rem] leading-[1.6] text-[#9BA1A9]">
+                  <li key={i} className="flex gap-3 text-[0.875rem] leading-[1.6] text-[#94A3B8]">
                     <span aria-hidden className="mt-[0.6em] h-px w-2.5 shrink-0 bg-[#4A5058]" />
                     <span>{i}</span>
                   </li>

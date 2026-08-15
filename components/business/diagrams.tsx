@@ -9,11 +9,11 @@
  * The site is dark-only, so fixed colours are safe.
  */
 
-const INK = '#0C0E11'
+const INK = '#0F131A'
 const LINE = 'rgba(255,255,255,0.14)'
 const TXT = '#E8EAED'
-const DIM = '#8A9099'
-const GOLD = '#D4AF37'
+const DIM = '#7C8B9D'
+const GOLD = '#3B82F6'
 
 function Arrow({ id }: { id: string }) {
   return (

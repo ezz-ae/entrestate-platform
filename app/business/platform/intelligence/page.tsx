@@ -53,7 +53,7 @@ export default function IntelligencePage() {
       </Section>
 
       {/* Refusals first — the discipline is the pitch. */}
-      <Band className="bg-[#090B0E]">
+      <Band className="bg-[#0A0E14]">
         <SectionHeading eyebrow="Refused" title="What it will not do" />
         <div className="mt-10">
           <PunchGrid
@@ -88,7 +88,7 @@ export default function IntelligencePage() {
             {ASKS.map((q) => (
               <p
                 key={q}
-                className="rounded-2xl bg-white/[0.04] px-5 py-3.5 text-[0.9375rem] leading-[1.6] text-[#C9CDD3] ring-1 ring-white/[0.06]"
+                className="rounded-2xl bg-white/[0.04] px-5 py-3.5 text-[0.9375rem] leading-[1.6] text-[#CBD5E1] ring-1 ring-white/[0.06]"
               >
                 &ldquo;{q}&rdquo;
               </p>

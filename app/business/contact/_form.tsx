@@ -20,7 +20,7 @@ const INTERESTS = [
 ]
 
 const field =
-  'w-full rounded-none border border-white/[0.12] bg-[#0C0E11] px-4 py-3 text-[0.9375rem] text-white outline-none transition placeholder:text-[#5C636B] focus:border-[#D4AF37]/60'
+  'w-full rounded-none border border-white/[0.12] bg-[#0F131A] px-4 py-3 text-[0.9375rem] text-white outline-none transition placeholder:text-[#5C636B] focus:border-[#3B82F6]/60'
 
 export function ContactForm() {
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle')
@@ -68,12 +68,12 @@ export function ContactForm() {
 
   if (state === 'sent') {
     return (
-      <div className="border border-[#D4AF37]/40 bg-[#0E1013] p-8">
-        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#D4AF37]">Received</div>
+      <div className="border border-[#3B82F6]/40 bg-[#0E1013] p-8">
+        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#3B82F6]">Received</div>
         <p className="mt-4 text-[1.0625rem] leading-[1.65] text-white">
           Thank you — that has reached us.
         </p>
-        <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+        <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
           Someone will reply within one working day. If it is urgent, the direct address opposite
           reaches the same people faster than a form ever will.
         </p>
@@ -85,13 +85,13 @@ export function ContactForm() {
     <form onSubmit={submit} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="c-name" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+          <label htmlFor="c-name" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
             Your name
           </label>
           <input id="c-name" name="name" required autoComplete="name" className={field} placeholder="Sara Al Marri" />
         </div>
         <div>
-          <label htmlFor="c-company" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+          <label htmlFor="c-company" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
             Company
           </label>
           <input id="c-company" name="company" autoComplete="organization" className={field} placeholder="Skyline Properties" />
@@ -100,13 +100,13 @@ export function ContactForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="c-phone" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+          <label htmlFor="c-phone" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
             Phone
           </label>
           <input id="c-phone" name="phone" required autoComplete="tel" dir="ltr" className={field} placeholder="+971 50 000 0000" />
         </div>
         <div>
-          <label htmlFor="c-email" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+          <label htmlFor="c-email" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
             Email
           </label>
           <input id="c-email" name="email" type="email" autoComplete="email" dir="ltr" className={field} placeholder="you@company.ae" />
@@ -114,12 +114,12 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="c-interest" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+        <label htmlFor="c-interest" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
           Subject
         </label>
         <select id="c-interest" name="interest" className={field} defaultValue="">
           {INTERESTS.map((i) => (
-            <option key={i.label} value={i.value} className="bg-[#0C0E11]">
+            <option key={i.label} value={i.value} className="bg-[#0F131A]">
               {i.label}
             </option>
           ))}
@@ -127,7 +127,7 @@ export function ContactForm() {
       </div>
 
       <div>
-        <label htmlFor="c-message" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A9099]">
+        <label htmlFor="c-message" className="mb-2 block font-mono text-[10px] uppercase tracking-[0.16em] text-[#7C8B9D]">
           Anything useful to know
         </label>
         <textarea
@@ -144,12 +144,12 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={state === 'sending'}
-        className="inline-flex items-center gap-2 bg-[#D4AF37] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#E5C351] disabled:opacity-60"
+        className="inline-flex items-center gap-2 bg-[#3B82F6] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#60A5FA] disabled:opacity-60"
       >
         {state === 'sending' ? 'Sending…' : 'Send'}
         <span aria-hidden>→</span>
       </button>
-      <p className="text-[0.8125rem] text-[#6E747C]">
+      <p className="text-[0.8125rem] text-[#64748B]">
         Your details are used to answer you. They are not sold, and not added to a marketing list.
       </p>
     </form>

@@ -23,7 +23,7 @@ export default function LeadFlowGuide() {
     <DocsShell href="/business/docs/lead-flow">
       <ArticleMeta category="CRM & brokers" read="5 min read" />
 
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
         Every enquiry your company receives — whichever door it came through — lands in the same
         inbox, passes the same duplicate check, and ends up owned by one person. This guide walks
         the four doors first, then what happens to every lead after it arrives.
@@ -47,7 +47,7 @@ export default function LeadFlowGuide() {
             <Chat />
           </Phone>
         </div>
-        <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-[#6E747C]">
+        <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-[#64748B]">
           A new enquiry, answered, tagged by language and handed an owner — the moment it lands.
         </figcaption>
       </figure>

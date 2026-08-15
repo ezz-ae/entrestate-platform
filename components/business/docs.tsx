@@ -39,7 +39,7 @@ export function DocsShell({
   const heading = title ?? guide?.label ?? 'Learn'
   return (
     <div className="mx-auto w-full max-w-[1180px] px-6 pb-20 pt-10 lg:px-10 lg:pb-28 lg:pt-14">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-[#8F959D]">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-[#94A3B8]">
         <Link href={DOCS_HOME} className="transition hover:text-white">
           Learn
         </Link>
@@ -54,7 +54,7 @@ export function DocsShell({
             <span aria-hidden className="text-[#4A5058]">
               /
             </span>
-            <span className="text-[#C9CDD3]">{heading}</span>
+            <span className="text-[#CBD5E1]">{heading}</span>
           </>
         ) : null}
       </nav>
@@ -66,7 +66,7 @@ export function DocsShell({
               if (!items.length) return null
               return (
                 <div key={category}>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6E747C]">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#64748B]">
                     {category}
                   </div>
                   <ul className="mt-2.5 space-y-0.5">
@@ -79,8 +79,8 @@ export function DocsShell({
                             aria-current={current ? 'page' : undefined}
                             className={`block border-l py-1.5 pl-4 text-[0.875rem] leading-snug transition ${
                               current
-                                ? 'border-[#D4AF37] text-white'
-                                : 'border-white/[0.08] text-[#8F959D] hover:border-white/[0.2] hover:text-white'
+                                ? 'border-[#3B82F6] text-white'
+                                : 'border-white/[0.08] text-[#94A3B8] hover:border-white/[0.2] hover:text-white'
                             }`}
                           >
                             {g.label}
@@ -95,7 +95,7 @@ export function DocsShell({
           </nav>
         </aside>
         <article className="mt-2 min-w-0 max-w-[46rem] lg:mt-0">
-          <h1 className="font-serif text-[2rem] leading-[1.12] tracking-[-0.015em] text-white sm:text-[2.5rem]">
+          <h1 className="font-sans font-semibold text-[2rem] leading-[1.12] tracking-[-0.015em] text-white sm:text-[2.5rem]">
             {heading}
           </h1>
           {children}
@@ -110,8 +110,8 @@ export function DocsShell({
 /** The line under the h1: which branch this guide belongs to, and how long it takes. */
 export function ArticleMeta({ category, read }: { category: string; read: string }) {
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#6E747C]">
-      <span className="text-[#8A9099]">{category}</span>
+    <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#64748B]">
+      <span className="text-[#7C8B9D]">{category}</span>
       <span aria-hidden className="h-px w-4 bg-white/[0.15]" />
       <span>{read}</span>
     </div>
@@ -125,13 +125,13 @@ export function OnPage({ items }: { items: Array<{ id: string; label: string }> 
       aria-label="On this page"
       className="mt-8 rounded-xl bg-white/[0.02] px-6 py-5 ring-1 ring-white/[0.07]"
     >
-      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6E747C]">On this page</div>
+      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#64748B]">On this page</div>
       <ul className="mt-3 space-y-1.5">
         {items.map((i) => (
           <li key={i.id}>
             <a
               href={`#${i.id}`}
-              className="text-[0.875rem] leading-snug text-[#9BA1A9] transition hover:text-white"
+              className="text-[0.875rem] leading-snug text-[#94A3B8] transition hover:text-white"
             >
               {i.label}
             </a>
@@ -159,12 +159,12 @@ export function Step({
       id={id}
       className="grid scroll-mt-24 grid-cols-[2.5rem_1fr] gap-x-4 border-t border-white/[0.06] py-7 first:border-t-0 sm:gap-x-6"
     >
-      <div className="font-mono text-[0.8125rem] tabular-nums text-[#D4AF37]" dir="ltr">
+      <div className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
         {String(n).padStart(2, '0')}
       </div>
       <div className="min-w-0">
         <h2 className="text-[1.0625rem] font-semibold leading-snug text-white">{title}</h2>
-        <div className="mt-2.5 space-y-3 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">{children}</div>
+        <div className="mt-2.5 space-y-3 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">{children}</div>
       </div>
     </section>
   )
@@ -174,8 +174,8 @@ export function Step({
 export function DocNote({ title = 'Note', children }: { title?: string; children: ReactNode }) {
   return (
     <aside className="my-8 rounded-xl bg-white/[0.03] px-6 py-5 ring-1 ring-white/[0.07]">
-      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#D4AF37]">{title}</div>
-      <div className="mt-2 text-[0.9375rem] leading-[1.7] text-[#A8AEB6]">{children}</div>
+      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#3B82F6]">{title}</div>
+      <div className="mt-2 text-[0.9375rem] leading-[1.7] text-[#9FB0C2]">{children}</div>
     </aside>
   )
 }
@@ -188,12 +188,12 @@ export function FAQItem({ q, children }: { q: string; children: ReactNode }) {
         {q}
         <span
           aria-hidden
-          className="shrink-0 text-[#D4AF37] transition-transform duration-200 group-open:rotate-45"
+          className="shrink-0 text-[#3B82F6] transition-transform duration-200 group-open:rotate-45"
         >
           +
         </span>
       </summary>
-      <div className="mt-3 max-w-[60ch] text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{children}</div>
+      <div className="mt-3 max-w-[60ch] text-[0.9375rem] leading-[1.7] text-[#94A3B8]">{children}</div>
     </details>
   )
 }
@@ -215,17 +215,17 @@ export function GuideCard({
       className={`group block rounded-2xl bg-white/[0.02] p-6 ring-1 ring-white/[0.07] transition hover:bg-white/[0.04] hover:ring-white/[0.12] ${className}`}
     >
       {showCategory ? (
-        <div className="mb-2 font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#6E747C]">
+        <div className="mb-2 font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#64748B]">
           {guide.category}
         </div>
       ) : null}
       <div className="flex items-baseline justify-between gap-4">
         <div className="text-[1rem] font-semibold leading-snug text-white">{guide.label}</div>
-        <span aria-hidden className="shrink-0 text-[#D4AF37] opacity-0 transition group-hover:opacity-100">
+        <span aria-hidden className="shrink-0 text-[#3B82F6] opacity-0 transition group-hover:opacity-100">
           →
         </span>
       </div>
-      <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#8F959D]">{guide.blurb}</p>
+      <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#94A3B8]">{guide.blurb}</p>
     </Link>
   )
 }
@@ -238,7 +238,7 @@ export function RelatedRow({ hrefs }: { hrefs: string[] }) {
   if (!items.length) return null
   return (
     <div className="mt-14 border-t border-white/[0.07] pt-8">
-      <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#8A9099]">Related guides</div>
+      <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#7C8B9D]">Related guides</div>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((g) => (
           <GuideCard key={g.href} guide={g} showCategory />

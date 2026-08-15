@@ -32,7 +32,7 @@ export default function TeamRolesGuide() {
     <DocsShell href="/business/docs/team-roles">
       <ArticleMeta category="CRM & brokers" read="4 min read" />
 
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
         Seven kinds of seat, each with its own view of the system. What a person can see and do
         follows from their role — and it is enforced where the records live, not by hiding menu
         items, so a shared link behaves exactly the way the menu does.

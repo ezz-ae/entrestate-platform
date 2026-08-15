@@ -21,7 +21,7 @@ export default function LandingPagesGuide() {
   return (
     <DocsShell href="/business/docs/landing-pages">
       <ArticleMeta category="Inventory & pages" read="5 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
         Every listing can carry its own page — built from the listing&rsquo;s record, published
         under your address, and checked by a gate before any campaign is allowed to point at it.
         This guide walks from the first click to the moment an ad is allowed to send people there.

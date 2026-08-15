@@ -23,7 +23,7 @@ export function Browser({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-xl bg-[#0A0C0F] ring-1 ring-white/[0.08] shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ${className}`}
+      className={`overflow-hidden rounded-xl bg-[#0F131A] ring-1 ring-white/[0.08] shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ${className}`}
     >
       <div className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
         <div className="flex shrink-0 gap-1.5" aria-hidden>
@@ -32,11 +32,11 @@ export function Browser({
           <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
         </div>
         <div className="mx-auto flex min-w-0 max-w-[280px] flex-1 items-center justify-center gap-1.5 rounded-md bg-white/[0.05] px-3 py-1 ring-1 ring-white/[0.05]">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#6E747C" strokeWidth="2.5" aria-hidden>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" aria-hidden>
             <rect x="5" y="11" width="14" height="9" rx="2" />
             <path d="M8 11V8a4 4 0 018 0v3" />
           </svg>
-          <span className="truncate font-mono text-[10px] text-[#8A9099]" dir="ltr">
+          <span className="truncate font-mono text-[10px] text-[#7C8B9D]" dir="ltr">
             {title}
           </span>
         </div>
@@ -108,7 +108,7 @@ export function Chat({
   title?: string
 }) {
   return (
-    <div className="relative bg-[#0A0D10]">
+    <div className="relative bg-[#0B0F16]">
       <div className="flex items-center gap-2.5 border-b border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
         <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#1DA85A]/20 font-mono text-[9px] text-[#3FD07F]">
           MV
@@ -119,7 +119,7 @@ export function Chat({
         </div>
       </div>
       {chip ? (
-        <div className="absolute right-2.5 top-12 z-10 rounded-full bg-[#D4AF37]/10 px-2 py-0.5 font-mono text-[8.5px] text-[#D4AF37] ring-1 ring-[#D4AF37]/25">
+        <div className="absolute right-2.5 top-12 z-10 rounded-full bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-[8.5px] text-[#3B82F6] ring-1 ring-[#3B82F6]/25">
           {chip}
         </div>
       ) : null}
@@ -128,7 +128,7 @@ export function Chat({
           if (m.from === 'system')
             return (
               <div key={i} className="flex justify-center py-0.5">
-                <span className="rounded-full bg-white/[0.05] px-2.5 py-0.5 font-mono text-[8.5px] text-[#8A9099] ring-1 ring-white/[0.06]">
+                <span className="rounded-full bg-white/[0.05] px-2.5 py-0.5 font-mono text-[8.5px] text-[#7C8B9D] ring-1 ring-white/[0.06]">
                   {m.text}
                 </span>
               </div>
@@ -141,7 +141,7 @@ export function Chat({
                 className={`max-w-[82%] rounded-xl px-2.5 py-1.5 text-[10.5px] leading-[1.5] ring-1 ${
                   outbound
                     ? 'rounded-br-sm bg-[#123D2C] text-[#D9E5DE] ring-[#1DA85A]/20'
-                    : 'rounded-bl-sm bg-white/[0.06] text-[#C9CDD3] ring-white/[0.06]'
+                    : 'rounded-bl-sm bg-white/[0.06] text-[#CBD5E1] ring-white/[0.06]'
                 }`}
               >
                 {m.text}
@@ -163,14 +163,14 @@ export function Chat({
 
 /* Shared row/label styles for the minis: dense, truncated, tabular. */
 const cell = 'truncate text-[10px] leading-tight'
-const faint = 'text-[#6E747C]'
+const faint = 'text-[#64748B]'
 
 function MiniHeader({ label, right }: { label: string; right?: string }) {
   return (
     <div className="flex items-baseline justify-between border-b border-white/[0.06] px-3 py-2">
-      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8A9099]">{label}</span>
+      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#7C8B9D]">{label}</span>
       {right ? (
-        <span className="font-mono text-[9px] tabular-nums text-[#6E747C]" dir="ltr">
+        <span className="font-mono text-[9px] tabular-nums text-[#64748B]" dir="ltr">
           {right}
         </span>
       ) : null}
@@ -214,14 +214,14 @@ export function MiniCRM() {
     },
   ]
   return (
-    <div className="bg-[#0A0D10]">
+    <div className="bg-[#0B0F16]">
       <MiniHeader label="Pipeline" right="9 open · AED 17.9M" />
       <div className="grid grid-cols-4 gap-1.5 p-2">
         {cols.map((c) => (
           <div key={c.name} className="min-w-0">
             <div className="mb-1.5 flex items-baseline justify-between px-0.5">
-              <span className="truncate text-[9px] font-medium text-[#C9CDD3]">{c.name}</span>
-              <span className="font-mono text-[8px] tabular-nums text-[#6E747C]">{c.leads.length}</span>
+              <span className="truncate text-[9px] font-medium text-[#CBD5E1]">{c.name}</span>
+              <span className="font-mono text-[8px] tabular-nums text-[#64748B]">{c.leads.length}</span>
             </div>
             <div className="space-y-1.5">
               {c.leads.map((l) => (
@@ -232,8 +232,8 @@ export function MiniCRM() {
                       <span
                         className={`shrink-0 rounded-sm px-1 font-mono text-[7px] uppercase ${
                           l.heat === 'hot'
-                            ? 'bg-[#D4AF37]/15 text-[#D4AF37]'
-                            : 'bg-white/[0.06] text-[#8A9099]'
+                            ? 'bg-[#3B82F6]/15 text-[#3B82F6]'
+                            : 'bg-white/[0.06] text-[#7C8B9D]'
                         }`}
                       >
                         {l.heat}
@@ -242,7 +242,7 @@ export function MiniCRM() {
                   </div>
                   <div className={`${cell} ${faint} mt-0.5 text-[8.5px]`}>{l.project}</div>
                   <div className="mt-1 flex items-baseline justify-between gap-1">
-                    <span className="truncate font-mono text-[8.5px] tabular-nums text-[#C9CDD3]" dir="ltr">
+                    <span className="truncate font-mono text-[8.5px] tabular-nums text-[#CBD5E1]" dir="ltr">
                       {l.value}
                     </span>
                     <span className="shrink-0 font-mono text-[7.5px] text-[#565C64]">{l.when}</span>
@@ -265,7 +265,7 @@ export function MiniCampaigns() {
     { name: 'Palm penthouse', on: false, spend: 'AED 380', bar: 'w-[7%]', leads: 2, cpl: 'AED 190' },
   ]
   return (
-    <div className="bg-[#0A0D10]">
+    <div className="bg-[#0B0F16]">
       <MiniHeader label="Campaigns" right="today · AED 9,220" />
       <div className="divide-y divide-white/[0.05]">
         <div className="grid grid-cols-[minmax(0,1fr)_30px_74px_28px_50px] items-center gap-2 px-3 py-1.5">
@@ -278,33 +278,33 @@ export function MiniCampaigns() {
         {rows.map((r) => (
           <div key={r.name}>
             <div className="grid grid-cols-[minmax(0,1fr)_30px_74px_28px_50px] items-center gap-2 px-3 py-2">
-              <span className="truncate text-[10px] text-[#C9CDD3]">{r.name}</span>
+              <span className="truncate text-[10px] text-[#CBD5E1]">{r.name}</span>
               <span
                 className={`justify-self-start rounded-full px-1.5 py-px font-mono text-[7px] uppercase ring-1 ${
                   r.on
                     ? 'bg-[#28C840]/10 text-[#3FD07F] ring-[#28C840]/25'
-                    : 'bg-white/[0.05] text-[#6E747C] ring-white/[0.08]'
+                    : 'bg-white/[0.05] text-[#64748B] ring-white/[0.08]'
                 }`}
               >
                 {r.on ? 'On' : 'Off'}
               </span>
               <span className="min-w-0" dir="ltr">
-                <span className="block truncate font-mono text-[9px] tabular-nums text-[#C9CDD3]">{r.spend}</span>
+                <span className="block truncate font-mono text-[9px] tabular-nums text-[#CBD5E1]">{r.spend}</span>
                 <span className="mt-1 block h-1 overflow-hidden rounded-full bg-white/[0.07]">
-                  <span className={`block h-full rounded-full bg-[#D4AF37]/70 ${r.bar}`} />
+                  <span className={`block h-full rounded-full bg-[#3B82F6]/70 ${r.bar}`} />
                 </span>
               </span>
               <span className="font-mono text-[9.5px] tabular-nums text-white" dir="ltr">
                 {r.leads}
               </span>
-              <span className="truncate font-mono text-[9px] tabular-nums text-[#8A9099]" dir="ltr">
+              <span className="truncate font-mono text-[9px] tabular-nums text-[#7C8B9D]" dir="ltr">
                 {r.cpl}
               </span>
             </div>
             {r.name === 'Creekside One launch' ? (
               <div className="flex items-center gap-1.5 px-3 pb-2">
-                <span aria-hidden className="h-1 w-1 rounded-full bg-[#D4AF37]" />
-                <span className="truncate font-mono text-[8.5px] text-[#D4AF37]" dir="ltr">
+                <span aria-hidden className="h-1 w-1 rounded-full bg-[#3B82F6]" />
+                <span className="truncate font-mono text-[8.5px] text-[#3B82F6]" dir="ltr">
                   budget moved +AED 120 → Creekside ad — rule: cost/lead &lt; AED 90
                 </span>
               </div>
@@ -326,7 +326,7 @@ export function MiniInventory() {
     { name: 'Al Warsan 1BR', where: 'resale · Al Warsan', price: 'AED 450K', score: 41, dead: true, tint: 'from-[#22262B]' },
   ]
   return (
-    <div className="bg-[#0A0D10]">
+    <div className="bg-[#0B0F16]">
       <MiniHeader label="Inventory" right="6 of 214 units" />
       <div className="grid grid-cols-3 gap-1.5 p-2">
         {units.map((u) => (
@@ -337,7 +337,7 @@ export function MiniInventory() {
             <div className={`h-9 w-full bg-gradient-to-br ${u.tint} to-[#0B0E12]`} aria-hidden />
             <span
               className={`absolute right-1 top-1 rounded-sm px-1 font-mono text-[7.5px] tabular-nums ${
-                u.dead ? 'bg-black/50 text-[#8A9099]' : 'bg-black/50 text-[#D4AF37]'
+                u.dead ? 'bg-black/50 text-[#7C8B9D]' : 'bg-black/50 text-[#3B82F6]'
               }`}
               dir="ltr"
             >
@@ -347,7 +347,7 @@ export function MiniInventory() {
               <div className="truncate text-[9px] font-medium text-white">{u.name}</div>
               <div className={`${cell} ${faint} mt-0.5 text-[8px]`}>{u.where}</div>
               <div className="mt-1 flex items-baseline justify-between gap-1">
-                <span className="truncate font-mono text-[8.5px] tabular-nums text-[#C9CDD3]" dir="ltr">
+                <span className="truncate font-mono text-[8.5px] tabular-nums text-[#CBD5E1]" dir="ltr">
                   {u.price}
                 </span>
               </div>
@@ -366,7 +366,7 @@ export function MiniInventory() {
 
 export function MiniPage() {
   return (
-    <div className="relative bg-[#0A0D10]">
+    <div className="relative bg-[#0B0F16]">
       <span className="absolute right-2 top-2 z-10 rounded-full bg-[#28C840]/10 px-2 py-0.5 font-mono text-[8px] text-[#3FD07F] ring-1 ring-[#28C840]/25">
         gate: passed ✓
       </span>
@@ -374,7 +374,7 @@ export function MiniPage() {
       <div className="px-3.5 py-3">
         <div className="text-[12px] font-semibold text-white">Marina Vista — 2 Bedroom</div>
         <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-          <span className="font-mono text-[11px] tabular-nums text-[#D4AF37]" dir="ltr">
+          <span className="font-mono text-[11px] tabular-nums text-[#3B82F6]" dir="ltr">
             AED 1.9M
           </span>
           <span className={`${faint} font-mono text-[8.5px] tabular-nums`} dir="ltr">
@@ -383,7 +383,7 @@ export function MiniPage() {
         </div>
         <div className="mt-3 space-y-1.5">
           {['Your name', 'WhatsApp number'].map((ph) => (
-            <div key={ph} className="rounded-md bg-white/[0.04] px-2.5 py-1.5 text-[9.5px] text-[#6E747C] ring-1 ring-white/[0.07]">
+            <div key={ph} className="rounded-md bg-white/[0.04] px-2.5 py-1.5 text-[9.5px] text-[#64748B] ring-1 ring-white/[0.07]">
               {ph}
             </div>
           ))}
@@ -415,14 +415,14 @@ export function MiniReport() {
     { name: 'JVC townhouses', spend: 'AED 7,400', leads: 43, deals: 0 },
   ]
   return (
-    <div className="bg-[#0A0D10]">
+    <div className="bg-[#0B0F16]">
       <MiniHeader label="Month report" right="May" />
       <div className="grid grid-cols-[auto_1fr] items-end gap-x-5 px-3.5 pt-3">
         <div>
-          <div className="font-serif text-[1.5rem] leading-none tabular-nums text-white" dir="ltr">
+          <div className="font-sans font-semibold text-[1.5rem] leading-none tabular-nums text-white" dir="ltr">
             AED 38,400
           </div>
-          <div className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.12em] text-[#8A9099]" dir="ltr">
+          <div className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.12em] text-[#7C8B9D]" dir="ltr">
             spend / 3 deals
           </div>
         </div>
@@ -431,9 +431,9 @@ export function MiniReport() {
             <div key={f.label} className="grid grid-cols-[38px_1fr_auto] items-center gap-2">
               <span className="font-mono text-[7.5px] uppercase text-[#565C64]">{f.label}</span>
               <span className="block h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-                <span className={`block h-full rounded-full bg-[#D4AF37]/70 ${f.bar}`} />
+                <span className={`block h-full rounded-full bg-[#3B82F6]/70 ${f.bar}`} />
               </span>
-              <span className="font-mono text-[8.5px] tabular-nums text-[#C9CDD3]" dir="ltr">
+              <span className="font-mono text-[8.5px] tabular-nums text-[#CBD5E1]" dir="ltr">
                 {f.value}
               </span>
             </div>
@@ -443,14 +443,14 @@ export function MiniReport() {
       <div className="mt-3 divide-y divide-white/[0.05] border-t border-white/[0.06]">
         {items.map((it) => (
           <div key={it.name} className="grid grid-cols-[minmax(0,1fr)_72px_36px_34px] items-baseline gap-2 px-3.5 py-1.5">
-            <span className="truncate text-[9.5px] text-[#C9CDD3]">{it.name}</span>
-            <span className="font-mono text-[8.5px] tabular-nums text-[#8A9099]" dir="ltr">
+            <span className="truncate text-[9.5px] text-[#CBD5E1]">{it.name}</span>
+            <span className="font-mono text-[8.5px] tabular-nums text-[#7C8B9D]" dir="ltr">
               {it.spend}
             </span>
-            <span className="font-mono text-[8.5px] tabular-nums text-[#8A9099]" dir="ltr">
+            <span className="font-mono text-[8.5px] tabular-nums text-[#7C8B9D]" dir="ltr">
               {it.leads} ld
             </span>
-            <span className={`font-mono text-[8.5px] tabular-nums ${it.deals > 0 ? 'text-[#D4AF37]' : 'text-[#565C64]'}`} dir="ltr">
+            <span className={`font-mono text-[8.5px] tabular-nums ${it.deals > 0 ? 'text-[#3B82F6]' : 'text-[#565C64]'}`} dir="ltr">
               {it.deals} dl
             </span>
           </div>
@@ -470,15 +470,15 @@ export interface LedgerRow {
 
 export function Ledger({ rows, className = '' }: { rows: LedgerRow[]; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-lg bg-[#0A0D10] ring-1 ring-white/[0.07] ${className}`}>
+    <div className={`overflow-hidden rounded-lg bg-[#0B0F16] ring-1 ring-white/[0.07] ${className}`}>
       <MiniHeader label="Decision log" right="written before spend" />
       <div className="divide-y divide-white/[0.05]" dir="ltr">
         {rows.map((r, i) => (
           <div key={i} className="flex items-baseline gap-3 px-3.5 py-2 font-mono">
             <span className="shrink-0 text-[9px] tabular-nums text-[#565C64]">{r.time}</span>
-            <span className="min-w-0 flex-1 truncate text-[10px] text-[#A8AEB6]">{r.event}</span>
+            <span className="min-w-0 flex-1 truncate text-[10px] text-[#9FB0C2]">{r.event}</span>
             {r.amount ? (
-              <span className="shrink-0 text-[10px] tabular-nums text-[#D4AF37]">{r.amount}</span>
+              <span className="shrink-0 text-[10px] tabular-nums text-[#3B82F6]">{r.amount}</span>
             ) : null}
           </div>
         ))}
@@ -501,10 +501,10 @@ export function StatBand({
       <div className={`mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-px bg-white/[0.07] sm:grid-cols-2 ${cols}`}>
         {items.map((s) => (
           <div key={s.label} className="bg-[#07090C] px-6 py-10 lg:px-10 lg:py-14">
-            <div className="font-serif text-[2.6rem] leading-none tracking-[-0.02em] text-white sm:text-[3.2rem]" dir="ltr">
+            <div className="font-sans font-semibold text-[2.6rem] leading-none tracking-[-0.02em] text-white sm:text-[3.2rem]" dir="ltr">
               {s.value}
             </div>
-            <div className="mt-3.5 text-[0.875rem] font-medium text-[#C9CDD3]">{s.label}</div>
+            <div className="mt-3.5 text-[0.875rem] font-medium text-[#CBD5E1]">{s.label}</div>
             {s.note ? <div className="mt-1 text-[0.8125rem] text-[#7C838B]">{s.note}</div> : null}
           </div>
         ))}
@@ -527,12 +527,12 @@ export function StepRail({
   return (
     <ol className={`grid grid-cols-1 gap-px bg-white/[0.07] ${cols}`}>
       {steps.map((s, i) => (
-        <li key={s.title} className="bg-[#0C0E11] p-7">
-          <div className="font-mono text-[0.9375rem] tabular-nums text-[#D4AF37]" dir="ltr">
+        <li key={s.title} className="bg-[#0F131A] p-7">
+          <div className="font-mono text-[0.9375rem] tabular-nums text-[#3B82F6]" dir="ltr">
             {String(s.n ?? i + 1).padStart(2, '0')}
           </div>
           <div className="mt-4 text-[0.9375rem] font-semibold text-white">{s.title}</div>
-          <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#8F959D]">{s.body}</p>
+          <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#94A3B8]">{s.body}</p>
         </li>
       ))}
     </ol>
@@ -541,9 +541,9 @@ export function StepRail({
 
 export function PunchCard({ title, body }: { title: string; body?: string }) {
   return (
-    <div className="bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07]">
-      <span aria-hidden className="block h-0.5 w-6 bg-[#D4AF37]" />
-      <div className="mt-5 font-serif text-[1.35rem] leading-[1.25] tracking-[-0.01em] text-white">{title}</div>
+    <div className="bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07]">
+      <span aria-hidden className="block h-0.5 w-6 bg-[#3B82F6]" />
+      <div className="mt-5 font-sans font-semibold text-[1.35rem] leading-[1.25] tracking-[-0.01em] text-white">{title}</div>
       {body ? <p className="mt-2.5 text-[0.8125rem] leading-[1.6] text-[#7C838B]">{body}</p> : null}
     </div>
   )
@@ -728,26 +728,26 @@ export function FeatureTile({
 }) {
   const inner = (
     <>
-      <span className="text-[#D4AF37]">
+      <span className="text-[#3B82F6]">
         <Glyph name={icon} />
       </span>
       <div className="mt-5 text-[0.9375rem] font-semibold text-white">{title}</div>
-      <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#8F959D]">{body}</p>
+      <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#94A3B8]">{body}</p>
     </>
   )
   if (href)
     return (
       <Link
         href={href}
-        className="group block bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#101317]"
+        className="group block bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
       >
         {inner}
-        <span className="mt-3 inline-block text-[#D4AF37] opacity-0 transition group-hover:opacity-100" aria-hidden>
+        <span className="mt-3 inline-block text-[#3B82F6] opacity-0 transition group-hover:opacity-100" aria-hidden>
           →
         </span>
       </Link>
     )
-  return <div className="bg-[#0C0E11] p-7 outline outline-1 outline-white/[0.07]">{inner}</div>
+  return <div className="bg-[#0F131A] p-7 outline outline-1 outline-white/[0.07]">{inner}</div>
 }
 
 export function TileGrid({ children, cols = 4 }: { children: ReactNode; cols?: 2 | 3 | 4 }) {
@@ -760,11 +760,11 @@ export function TileGrid({ children, cols = 4 }: { children: ReactNode; cols?: 2
 export function Chapter({ n, total, label }: { n: number; total: number; label: string }) {
   return (
     <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em]">
-      <span className="tabular-nums text-[#D4AF37]" dir="ltr">
+      <span className="tabular-nums text-[#3B82F6]" dir="ltr">
         {String(n).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </span>
       <span aria-hidden className="h-px w-8 bg-white/[0.15]" />
-      <span className="text-[#8A9099]">{label}</span>
+      <span className="text-[#7C8B9D]">{label}</span>
     </div>
   )
 }
@@ -786,20 +786,20 @@ export function NextStep({
     <section className="mx-auto w-full max-w-[1180px] px-6 pb-20 pt-6 lg:px-10 lg:pb-28">
       <Link
         href={href}
-        className="group flex items-center justify-between gap-6 bg-[#0C0E11] px-7 py-9 outline outline-1 outline-white/[0.07] transition hover:bg-[#101317] sm:px-10 sm:py-11"
+        className="group flex items-center justify-between gap-6 bg-[#0F131A] px-7 py-9 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926] sm:px-10 sm:py-11"
       >
         <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#6E747C]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#64748B]">
             {progress ? `Next · ${progress}` : 'Next'}
           </div>
-          <div className="mt-2.5 font-serif text-[1.55rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2rem]">
+          <div className="mt-2.5 font-sans font-semibold text-[1.55rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2rem]">
             {label}
           </div>
-          <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#8F959D]">{note}</p>
+          <p className="mt-2 text-[0.875rem] leading-[1.6] text-[#94A3B8]">{note}</p>
         </div>
         <span
           aria-hidden
-          className="shrink-0 text-[2rem] leading-none text-[#D4AF37] transition-transform duration-200 group-hover:translate-x-2 sm:text-[2.6rem]"
+          className="shrink-0 text-[2rem] leading-none text-[#3B82F6] transition-transform duration-200 group-hover:translate-x-2 sm:text-[2.6rem]"
         >
           →
         </span>

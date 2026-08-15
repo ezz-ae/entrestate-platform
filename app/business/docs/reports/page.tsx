@@ -21,7 +21,7 @@ export default function ReportsGuide() {
   return (
     <DocsShell href="/business/docs/reports">
       <ArticleMeta category="Finance" read="5 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#9BA1A9]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
         The finance screens answer three questions: what came in, what went out, and what each
         lead and each deal actually cost. Every figure is computed from your own records — deals,
         campaigns, the expense ledger — and a number that has not been recorded yet shows as a

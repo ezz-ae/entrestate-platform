@@ -90,7 +90,7 @@ export function Keyword({
 /** One line under the Keyword. Fourteen words or fewer — the writer's law. */
 export function KeywordSub({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`mt-3 max-w-[40ch] text-[1.0625rem] leading-[1.55] text-[#9BA1A9] ${className}`}>
+    <p className={`mt-3 max-w-[40ch] text-[1.0625rem] leading-[1.55] text-[#94A3B8] ${className}`}>
       {children}
     </p>
   )
@@ -129,7 +129,7 @@ export function LearnMore({
       className={`group mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[0.875rem] font-medium text-white ring-1 ring-white/[0.14] transition hover:bg-white/[0.04] hover:ring-white/[0.3] ${className}`}
     >
       {label}
-      <span aria-hidden className="text-[#D4AF37] transition-transform duration-200 group-hover:translate-x-1">
+      <span aria-hidden className="text-[#3B82F6] transition-transform duration-200 group-hover:translate-x-1">
         →
       </span>
     </Link>
@@ -164,13 +164,13 @@ export function DownloadCard({
       <div aria-hidden className={`pointer-events-none absolute inset-0 ${TONE_WASH.gold}`} />
       <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="font-serif text-[1.55rem] leading-[1.2] tracking-[-0.015em] text-white sm:text-[1.9rem]">
+          <div className="font-sans font-semibold text-[1.55rem] leading-[1.2] tracking-[-0.015em] text-white sm:text-[1.9rem]">
             {title}
           </div>
           <ul className="mt-4 space-y-1.5">
             {lines.map((line) => (
-              <li key={line} className="flex gap-3 text-[0.9375rem] leading-[1.6] text-[#9BA1A9]">
-                <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#D4AF37]/60" />
+              <li key={line} className="flex gap-3 text-[0.9375rem] leading-[1.6] text-[#94A3B8]">
+                <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#3B82F6]/60" />
                 <span>{line}</span>
               </li>
             ))}
@@ -180,7 +180,7 @@ export function DownloadCard({
           <a
             href={href}
             download
-            className="inline-flex items-center gap-2 rounded-full bg-[#D4AF37] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#E5C351]"
+            className="inline-flex items-center gap-2 rounded-full bg-[#3B82F6] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#60A5FA]"
           >
             Download
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
