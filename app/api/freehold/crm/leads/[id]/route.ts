@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { brokerOwnerKeys } from '@/lib/freehold/lead-access'
-import { query } from '@/lib/db'
+import { query, ensureOnce } from '@/lib/db'
 import { ensureLeadsTable, ensureLeadActivityTable } from '@/lib/data'
 import { notify } from '@/lib/freehold/notifications'
 import { emailLeadMovementToInbox, notifyBrokerOfAssignedLead } from '@/lib/transactional-email'
@@ -18,15 +18,15 @@ export const dynamic = 'force-dynamic'
 
 // "Not a duplicate" dismissals persist on the lead row (survives reloads and
 // devices). Best-effort column ensure, run once per instance.
-let dismissColEnsured: Promise<void> | null = null
-const ensureDismissColumn = () => {
-  if (!dismissColEnsured) {
-    dismissColEnsured = query(
+// Memoised via ensureOnce — keyed by (schema, key), because a module-level
+// memo marks the ALTER "done" process-wide and the next tenant served by the
+// same warm instance reads a table without the column (42703).
+const ensureDismissColumn = () =>
+  ensureOnce('crm-leads-dismiss-col', async () => {
+    await query(
       `ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS duplicate_dismissed_at timestamptz`
-    ).then(() => undefined).catch((e) => { dismissColEnsured = null; throw e })
-  }
-  return dismissColEnsured
-}
+    )
+  })
 
 // Describe what a PATCH changed so the lead's activity timeline reflects real
 // history. Failures never break the update itself.

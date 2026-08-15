@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { query } from '@/lib/db'
+import { query , ensureOnce } from '@/lib/db'
 import { ensureLeadsTable, ensureLeadActivityTable } from '@/lib/data'
 import { geminiGenerate, geminiText } from '@/lib/gemini-rest'
 
@@ -54,10 +54,10 @@ export interface ProfileFact {
   updatedAt: string
 }
 
-let tableEnsured: Promise<void> | null = null
 function ensureProfileTable(): Promise<void> {
-  if (!tableEnsured) {
-    tableEnsured = (async () => {
+  // ensureOnce keys by (schema, key) — the old module-level memo created this
+  // table only for the first tenant a warm instance served.
+  return ensureOnce('lead-profile-facts-table', async () => {
       await query(`
         CREATE TABLE IF NOT EXISTS freehold_lead_profile_facts (
           id text PRIMARY KEY,
@@ -91,9 +91,7 @@ function ensureProfileTable(): Promise<void> {
       await query(`UPDATE freehold_lead_profile_facts SET fact_label = '' WHERE fact_label IS NULL`)
       await query(`ALTER TABLE freehold_lead_profile_facts ALTER COLUMN fact_label SET DEFAULT ''`)
       await query(`ALTER TABLE freehold_lead_profile_facts ALTER COLUMN fact_label SET NOT NULL`)
-    })().catch((e) => { tableEnsured = null; throw e })
-  }
-  return tableEnsured
+    })
 }
 
 function mapRow(r: Record<string, unknown>): ProfileFact {

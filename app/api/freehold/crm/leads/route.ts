@@ -7,7 +7,7 @@ import { cookies } from 'next/headers'
 import { randomUUID } from 'node:crypto'
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { brokerOwnerKeys } from '@/lib/freehold/lead-access'
-import { query } from '@/lib/db'
+import { query, ensureOnce } from '@/lib/db'
 import { ensureLeadsTable, ensureLeadActivityTable } from '@/lib/data'
 import { notify } from '@/lib/freehold/notifications'
 
@@ -42,16 +42,17 @@ async function duplicatePhoneSet(): Promise<Set<string>> {
   } catch { return new Set() }
 }
 
-// Persistent "not a duplicate" dismissals live on the lead row.
-let dismissColEnsured: Promise<void> | null = null
-const ensureDismissColumn = () => {
-  if (!dismissColEnsured) {
-    dismissColEnsured = query(
+// Persistent "not a duplicate" dismissals live on the lead row. Memoised via
+// ensureOnce, which keys by (schema, key) — a module-level memo here marked
+// the ALTER "done" process-wide, so a warm instance that had served the shared
+// schema skipped it for the next tenant, whose fresh table then lacked
+// duplicate_dismissed_at and the list SELECT failed with 42703.
+const ensureDismissColumn = () =>
+  ensureOnce('crm-leads-dismiss-col', async () => {
+    await query(
       `ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS duplicate_dismissed_at timestamptz`
-    ).then(() => undefined).catch((e) => { dismissColEnsured = null; throw e })
-  }
-  return dismissColEnsured
-}
+    )
+  })
 
 interface DbLead {
   id: string

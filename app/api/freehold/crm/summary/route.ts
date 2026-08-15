@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
-import { query } from '@/lib/db'
+import { query, ensureOnce } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
 // Dismissed duplicate clusters are excluded from the risk count.
-let dismissColEnsured: Promise<void> | null = null
-const ensureDismissColumn = () => {
-  if (!dismissColEnsured) {
-    dismissColEnsured = query(
+// Memoised via ensureOnce — keyed by (schema, key), because a module-level
+// memo marks the ALTER "done" process-wide and the next tenant served by the
+// same warm instance reads a table without the column (42703).
+const ensureDismissColumn = () =>
+  ensureOnce('crm-leads-dismiss-col', async () => {
+    await query(
       `ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS duplicate_dismissed_at timestamptz`
-    ).then(() => undefined).catch((e) => { dismissColEnsured = null; throw e })
-  }
-  return dismissColEnsured
-}
+    )
+  })
 
 export async function GET() {
   const cookieStore = await cookies()

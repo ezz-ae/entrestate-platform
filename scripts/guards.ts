@@ -195,7 +195,10 @@ function runDbFunnel(): void {
 // the DDL "done" for every other tenant, and the second tenant crashes on a
 // missing table. This guard keeps the old pattern from coming back.
 
-const ENSURE_MEMO = /let\s+(ensured\w*|ensure\w*Promise\w*)\s*(:|=)/
+// Matches the memo NAME anywhere in the identifier — dismissColEnsured
+// escaped the original starts-with-"ensure" pattern and shipped the exact
+// warm-instance bug this guard describes (crm/leads, duplicate_dismissed_at).
+const ENSURE_MEMO = /let\s+(?:\w*[Ee]nsured\w*|ensure\w*)\s*(:|=)/
 
 function runEnsureMemos(): void {
   let hits = 0

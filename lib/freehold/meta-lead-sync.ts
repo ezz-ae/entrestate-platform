@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { query } from '@/lib/db'
+import { query , ensureOnce } from '@/lib/db'
 import { ensureLeadsTable } from '@/lib/data'
 import { getFormLeads, listAccessiblePages } from '@/lib/meta/client'
 import { listLeadFormsMerged } from '@/lib/meta/form-registry'
@@ -69,27 +69,26 @@ export interface SyncOutcome { synced: number; skipped: number }
 // Failure is tolerated — the WHERE NOT EXISTS guard still catches the common
 // case; the index only upgrades the concurrent case from "duplicate row" to
 // "caught insert error".
-let metaLeadUniqueEnsured: Promise<void> | null = null
 function ensureMetaLeadUnique(): Promise<void> {
-  if (!metaLeadUniqueEnsured) {
-    metaLeadUniqueEnsured = (async () => {
-      await query(
-        `DELETE FROM freehold_site_leads a
-          USING freehold_site_leads b
-          WHERE a.meta_lead_id IS NOT NULL
-            AND a.meta_lead_id = b.meta_lead_id
-            AND (a.created_at > b.created_at OR (a.created_at = b.created_at AND a.ctid > b.ctid))`,
-      )
-      await query(
-        `CREATE UNIQUE INDEX IF NOT EXISTS freehold_site_leads_meta_lead_id_uidx
-           ON freehold_site_leads (meta_lead_id) WHERE meta_lead_id IS NOT NULL`,
-      )
-    })().catch((e) => {
-      metaLeadUniqueEnsured = null // let a later sweep retry
-      console.error('[meta-leads] could not enforce meta_lead_id uniqueness (dedupe still applies per-row)', e)
-    })
-  }
-  return metaLeadUniqueEnsured
+  // ensureOnce keys by (schema, key): the old module-level memo ran this once
+  // per PROCESS, so only the first tenant a warm instance served ever got the
+  // dedupe + unique index. Failure stays tolerated — ensureOnce drops a
+  // rejected promise so a later sweep retries — and stays logged.
+  return ensureOnce('meta-lead-unique-idx', async () => {
+    await query(
+      `DELETE FROM freehold_site_leads a
+        USING freehold_site_leads b
+        WHERE a.meta_lead_id IS NOT NULL
+          AND a.meta_lead_id = b.meta_lead_id
+          AND (a.created_at > b.created_at OR (a.created_at = b.created_at AND a.ctid > b.ctid))`,
+    )
+    await query(
+      `CREATE UNIQUE INDEX IF NOT EXISTS freehold_site_leads_meta_lead_id_uidx
+         ON freehold_site_leads (meta_lead_id) WHERE meta_lead_id IS NOT NULL`,
+    )
+  }).catch((e) => {
+    console.error('[meta-leads] could not enforce meta_lead_id uniqueness (dedupe still applies per-row)', e)
+  })
 }
 
 export async function syncLeadsToCrm(formId: string, leads: MetaFormLead[]): Promise<SyncOutcome> {
