@@ -1626,8 +1626,18 @@ export async function ensureLeadsTable() {
       ADD COLUMN IF NOT EXISTS archived boolean DEFAULT false,
       ADD COLUMN IF NOT EXISTS muted_until timestamptz,
       ADD COLUMN IF NOT EXISTS blocked boolean DEFAULT false,
-      ADD COLUMN IF NOT EXISTS assigned_at timestamptz
+      ADD COLUMN IF NOT EXISTS assigned_at timestamptz,
+      ADD COLUMN IF NOT EXISTS meta_lead_id text,
+      ADD COLUMN IF NOT EXISTS meta_ad_id text,
+      ADD COLUMN IF NOT EXISTS meta_adset_id text
   `)
+  // The three meta_* columns used to be added only by the Meta sync and the
+  // form-analysis paths — which a deployment without Meta connected never
+  // runs. The CRM list SELECTs meta_ad_id unconditionally, so on a fresh
+  // tenant schema the whole leads list died with 42703 before the tenant had
+  // ever seen the Integrations screen. The columns are part of the lead row's
+  // shape, so they belong to the table's own ensure, not to the features that
+  // happen to write them.
   // When the current broker got this lead. The fairness rules protect a newly
   // assigned lead for a grace window, so "newly" needs a real timestamp —
   // created_at is when the LEAD arrived, not when this broker received it, and
