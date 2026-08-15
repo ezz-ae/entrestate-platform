@@ -3,19 +3,22 @@ import Link from 'next/link'
 import { Section, Band, Eyebrow, Display, H2, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
 import {
   Browser, Phone, Chat, MiniCampaigns, MiniReport, HeroVisual,
-  FeatureTile, TileGrid, PunchGrid, StatBand, GlowBand, NextStep,
+  FeatureTile, TileGrid, PunchGrid, StatBand, NextStep,
 } from '@/components/business/visuals'
+import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { PRODUCTS, PLATFORM, nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   // Absolute: this page names the whole site, so it must not inherit the
-  // product site's "| Freehold Property UAE" suffix from the root layout.
+  // product site's suffix from the root layout.
   title: { absolute: 'Entrestate for Business — Listings go in. Deals come out.' },
   description:
     'Pages, ads, leads and follow-up under your name — one system from listing to closed deal, with numbers you can defend.',
   alternates: { canonical: '/business' },
 }
 
+/* The five product branches (the Learn taxonomy) as group labels over the
+   seven tour chapters — the strip teaches the platform's shape at a glance. */
 export default function BusinessHome() {
   const next = nextInTour('/business')!
   return (
@@ -78,84 +81,77 @@ export default function BusinessHome() {
         </TileGrid>
       </Section>
 
-      {/* ── Show: the spend desk ────────────────────────────────────────── */}
-      <Band>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-          <div>
-            <Eyebrow>Advertising</Eyebrow>
-            <H2 className="mt-4">The machine spends like it&rsquo;s your money.</H2>
-            <div className="mt-5 max-w-[42ch]">
-              <Lede>Budgets move only inside rules you wrote. Every move is written down.</Lede>
-            </div>
-          </div>
-          <Browser title="app.yourbrokerage.ae/campaigns">
-            <MiniCampaigns />
-          </Browser>
-        </div>
-      </Band>
+      {/* ── The pitch, in three holders — the Keywords alone carry it ───── */}
+      <Section className="pb-20 lg:pb-28">
+        <div className="space-y-5">
+          <Holder
+            tone="gold"
+            visual={
+              <Browser title="app.yourbrokerage.ae/campaigns">
+                <MiniCampaigns />
+              </Browser>
+            }
+          >
+            <Keyword>Budgets with brakes.</Keyword>
+            <KeywordSub>The machine spends like it&rsquo;s your money — inside rules you wrote.</KeywordSub>
+            <LearnMore href="/business/docs/spend-rules" />
+          </Holder>
 
-      {/* ── Show: the first hour ────────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <Eyebrow>CRM</Eyebrow>
-            <H2 className="mt-4">The first hour wins the deal.</H2>
-            <div className="mt-5 max-w-[42ch]">
-              <Lede>
-                A lead lands at 2:47am asking about Marina Vista in Arabic. By 2:48 it has an
-                answer, a language, and an owner.
-              </Lede>
-            </div>
-          </div>
-          <div className="flex justify-center lg:order-first">
-            <Phone className="w-[250px] sm:w-[280px]">
-              <Chat />
-            </Phone>
-          </div>
+          <Holder
+            tone="green"
+            visual={
+              <div className="flex justify-center">
+                <Phone className="w-[240px] sm:w-[270px]">
+                  <Chat />
+                </Phone>
+              </div>
+            }
+          >
+            <Keyword>Leads answered fast.</Keyword>
+            <KeywordSub>At 2:47am a lead asks in Arabic. By 2:48 it&rsquo;s answered and owned.</KeywordSub>
+            <LearnMore href="/business/docs/lead-flow" />
+          </Holder>
+
+          <Holder
+            tone="blue"
+            visual={
+              <Browser title="app.yourbrokerage.ae/reports">
+                <MiniReport />
+              </Browser>
+            }
+          >
+            <Keyword>Deals teach targeting.</Keyword>
+            <KeywordSub>
+              Next month&rsquo;s ads chase people who look like your buyers — not Meta&rsquo;s first
+              guess.
+            </KeywordSub>
+            <LearnMore href="/business/docs/audiences" />
+          </Holder>
         </div>
       </Section>
 
-      {/* ── Show: the return path ───────────────────────────────────────── */}
-      <GlowBand>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-          <div>
-            <Eyebrow>The return path</Eyebrow>
-            <H2 className="mt-4">Closed deals teach the targeting.</H2>
-            <div className="mt-5 max-w-[42ch]">
-              <Lede>
-                Next month&rsquo;s ads chase people who look like your buyers — not Meta&rsquo;s
-                first guess.
-              </Lede>
-            </div>
-          </div>
-          <Browser title="app.yourbrokerage.ae/reports">
-            <MiniReport />
-          </Browser>
-        </div>
-      </GlowBand>
-
       {/* ── Products ────────────────────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
+      <Section className="pb-20 lg:pb-28">
         <SectionHeading eyebrow="Products" title="One system. Three ways in." />
         <div className="mt-12 grid grid-cols-1 gap-px lg:grid-cols-3">
           {[
             {
               ...PRODUCTS[0],
               who: 'Companies with agents',
-              body: 'The whole platform under your name — inventory, ads, pages, CRM, the month-end report. Agents get a workspace; managers get the desk.',
+              body: 'The whole platform under your name — inventory, ads, pages, CRM, the month-end report.',
               how: 'Self-serve · 14-day trial',
             },
             {
               ...PRODUCTS[1],
               who: 'Companies that need a public face',
-              body: 'Your public website and a landing page for every listing — search, enquiry forms, and the desk behind it all.',
+              body: 'Your public website and a landing page for every listing, with the desk behind it.',
               how: 'Set up with you, on request',
             },
             {
               ...PRODUCTS[2],
               who: 'Individual agents',
-              body: 'Campaigns built, launched, watched and corrected on Meta. No agency, no Ads Manager to learn.',
-              how: 'Membership',
+              body: 'Campaigns built, launched, watched and corrected on Meta. No agency, no Ads Manager.',
+              how: 'Tokens · pay as you run ads',
             },
           ].map((p) => (
             <Link
@@ -177,25 +173,29 @@ export default function BusinessHome() {
         </div>
       </Section>
 
-      {/* ── Platform chapters ───────────────────────────────────────────── */}
+      {/* ── Platform chapters — one ordered path, 01 through 07 ─────────── */}
       <Section className="pb-20 lg:pb-28">
         <SectionHeading eyebrow="Inside the platform" title="Seven chapters. One database." />
-        <div className="mt-10 divide-y divide-white/[0.06] border-y border-white/[0.06]">
-          {PLATFORM.map((f, i) => (
-            <Link
-              key={f.href}
-              href={f.href}
-              className="group grid grid-cols-[3rem_1fr_auto] items-baseline gap-4 py-4 transition hover:bg-white/[0.02] sm:grid-cols-[3.5rem_minmax(0,14rem)_1fr_auto]"
-            >
-              <span className="font-mono text-[0.8125rem] tabular-nums text-[#D4AF37]" dir="ltr">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span className="text-[0.9375rem] font-semibold text-white">{f.label}</span>
-              <span className="hidden truncate text-[0.875rem] text-[#8F959D] sm:block">{f.blurb}</span>
-              <span aria-hidden className="text-[#D4AF37] opacity-0 transition group-hover:opacity-100">→</span>
-            </Link>
+        <ul className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 border-t border-white/[0.06] pt-10 sm:grid-cols-2 lg:grid-cols-4">
+          {PLATFORM.map((f, at) => (
+            <li key={f.href}>
+              <Link href={f.href} className="group block">
+                <div className="flex items-baseline gap-3">
+                  <span className="font-mono text-[0.8125rem] tabular-nums text-[#D4AF37]" dir="ltr">
+                    {String(at + 1).padStart(2, '0')}
+                  </span>
+                  <span className="text-[0.9375rem] font-semibold text-white">{f.label}</span>
+                  <span aria-hidden className="text-[#D4AF37] opacity-0 transition group-hover:opacity-100">
+                    →
+                  </span>
+                </div>
+                <p className="mt-1.5 pl-[calc(0.8125rem*2+0.75rem)] text-[0.8125rem] leading-[1.55] text-[#8F959D]">
+                  {f.blurb}
+                </p>
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </Section>
 
       {/* ── The rules ───────────────────────────────────────────────────── */}
@@ -226,6 +226,11 @@ export default function BusinessHome() {
           ]}
         />
       </div>
+
+      {/* ── The one-pager, for the owner's desk ─────────────────────────── */}
+      <Section className="pb-20 lg:pb-28">
+        <DownloadCard />
+      </Section>
 
       {/* ── Start ───────────────────────────────────────────────────────── */}
       <Section className="pb-10">

@@ -1,15 +1,7 @@
 import type { Metadata } from 'next'
-import { Section, Display, Lede, H2, P, Eyebrow, SpecTable } from '@/components/business/ui'
-import {
-  Browser,
-  FeatureTile,
-  TileGrid,
-  Chapter,
-  NextStep,
-  StatBand,
-  PunchGrid,
-  GlowBand,
-} from '@/components/business/visuals'
+import { Section, Display, Lede } from '@/components/business/ui'
+import { Holder, Keyword, KeywordSub, HolderRow, LearnMore } from '@/components/business/holders'
+import { Browser, Chapter, NextStep, StatBand } from '@/components/business/visuals'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -21,7 +13,7 @@ export const metadata: Metadata = {
 
 /*
  * Creative ships no shared mini, so this page carries its own: the ad the
- * canvas engine composes — payment-plan layout, permit QR, variant rail.
+ * studio composes — payment-plan layout, permit QR, variant rail.
  * Mock Dubai data inside a product frame, same rules as visuals.tsx.
  */
 function MiniStudio() {
@@ -30,7 +22,7 @@ function MiniStudio() {
       <div className="flex items-baseline justify-between border-b border-white/[0.06] px-3 py-2">
         <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#8A9099]">Ad Designer</span>
         <span className="font-mono text-[9px] tabular-nums text-[#6E747C]" dir="ltr">
-          payBands · feed 4:5
+          payment plan · feed 4:5
         </span>
       </div>
       <div className="flex gap-3 p-3">
@@ -39,7 +31,7 @@ function MiniStudio() {
           <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#273B4E] via-[#16202A] to-[#0B1014]" />
           <div className="absolute inset-x-0 top-0 p-2.5">
             <div className="font-mono text-[6.5px] uppercase tracking-[0.16em] text-[#D4AF37]" dir="ltr">
-              Creek Harbour · Emaar
+              Creek Harbour · Qamar Group
             </div>
             <div className="mt-1 text-[11px] font-semibold leading-tight text-white">Waterfront 2 Bedroom</div>
           </div>
@@ -101,10 +93,10 @@ function MiniStudio() {
       </div>
       <div className="flex items-baseline justify-between border-t border-white/[0.06] px-3 py-2 font-mono text-[7.5px]">
         <span className="truncate text-[#6E747C]" dir="ltr">
-          1080×1350 · 1080×1080 · 1080×1920
+          feed · square · story
         </span>
         <span className="shrink-0 pl-2 text-[#D4AF37]" dir="ltr">
-          ZIP · caption.txt
+          one ZIP · captions in
         </span>
       </div>
     </div>
@@ -124,7 +116,7 @@ export default function CreativePage() {
             <div className="mt-6 max-w-[46ch]">
               <Lede>
                 Price, payment plan, photos, permit — read off the listing. The file you download
-                is the file Meta runs.
+                is the file that runs.
               </Lede>
             </div>
           </div>
@@ -137,81 +129,39 @@ export default function CreativePage() {
       </Section>
 
       <Section className="mt-16 lg:mt-24">
-        <TileGrid cols={3}>
-          <FeatureTile
-            icon="brand"
-            title="Every shape Meta runs"
-            body="Design once. Feed, square and story compose fresh — one ZIP, caption inside."
-          />
-          <FeatureTile
-            icon="flow"
-            title="Photos become video"
-            body="Turn listing photos into a real MP4 reel — title card, offer card, your palette."
-          />
-          <FeatureTile
-            icon="ads"
-            title="Into the working ad set"
-            body="Same audience, same lead form, same page. Only the picture is new."
-          />
-        </TileGrid>
+        <HolderRow cols={3}>
+          <Holder tone="plain">
+            <Keyword>Every shape.</Keyword>
+            <KeywordSub>Feed, square and story from one design — one ZIP, captions inside.</KeywordSub>
+          </Holder>
+          <Holder tone="blue">
+            <Keyword>Photos to video.</Keyword>
+            <KeywordSub>A real reel cut from listing photos — title card, offer card, your palette.</KeywordSub>
+          </Holder>
+          <Holder tone="green">
+            <Keyword>Arabic flips it.</Keyword>
+            <KeywordSub>Write the headline in Arabic and the whole ad turns right-to-left.</KeywordSub>
+          </Holder>
+        </HolderRow>
       </Section>
 
-      <Section className="mt-16 lg:mt-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <H2>No figure, no ad.</H2>
-            <div className="mt-6 space-y-4">
-              <P>
-                The machine writes the ad&rsquo;s wording in English, العربية or Русский. It
-                cannot return a price at all — the figure on the ad stays your typing.
-              </P>
-              <P>
-                A payment-plan ad with a blank where the price belongs looks finished — which is
-                exactly how it goes out. Those layouts stay locked until every figure is real.
-              </P>
-              <P>
-                Write the headline in Arabic and the whole ad flips right-to-left. Same engine, no
-                separate template.
-              </P>
-            </div>
-          </div>
-          <SpecTable
-            caption="What each design demands"
-            rows={[
-              { k: 'Payment-plan ads', v: 'Headline, finance hook, total price, down payment % — locked until each is real.' },
-              { k: 'Return ads', v: 'All of the above, plus the return figure.' },
-              { k: 'Price-led ads', v: 'A price on the listing. No price, no price layout.' },
-              { k: 'Yield angle', v: 'A yield figure on the listing.' },
-              { k: 'Urgency angle', v: 'A handover date.' },
-              { k: 'Golden Visa angle', v: 'Withheld. The listing has no eligibility field, and a price is not proof.' },
-            ]}
-          />
-        </div>
+      <Section className="mt-6 lg:mt-8">
+        <Holder tone="gold">
+          <Keyword>No invented figures.</Keyword>
+          <KeywordSub>The machine writes the wording. It cannot invent a price — figures stay yours.</KeywordSub>
+          <LearnMore href="/business/docs/creative-studio" label="See the studio tools" />
+        </Holder>
       </Section>
 
       <div className="mt-16 lg:mt-24">
         <StatBand
           items={[
-            { value: '3', label: 'shapes from one design', note: '1080×1350 · 1080×1080 · 1080×1920 — one ZIP, caption inside' },
-            { value: '8', label: 'layouts per listing', note: 'three lead with the down payment, modelled on ads running in Dubai' },
-            { value: '45', label: 'starting templates', note: '15 designs in English, العربية, Русский — rendered live, never screenshots' },
-            { value: '2,000', label: 'impressions before judgement', note: 'a design is proven or poor only after a real run' },
+            { value: '8', label: 'layouts per listing', note: 'three lead with the down payment — the Dubai pattern' },
+            { value: '45', label: 'starting templates', note: 'in English, العربية, Русский' },
+            { value: '3', label: 'shapes from one design', note: 'feed, square and story — one ZIP' },
           ]}
         />
       </div>
-
-      <GlowBand className="mt-16 lg:mt-24">
-        <Eyebrow className="mb-8">The rules</Eyebrow>
-        <PunchGrid
-          cols={4}
-          items={[
-            { title: 'Paused by default.', body: 'New ads never switch themselves on. Going live is your spending decision.' },
-            { title: 'No duplicate ads.', body: 'An image already running cannot be picked again — frequency would only climb.' },
-            { title: 'No race, no winner.', body: "A design spends one lead's worth and faces two contenders before any verdict." },
-            { title: 'Worn out is not broken.', body: 'A tired ad with zero leads never worked. No second angle chases it.' },
-          ]}
-        />
-      </GlowBand>
 
       <NextStep href={next.href} label={next.label} note={next.blurb} progress="Chapter 5 of 7" />
     </>

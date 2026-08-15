@@ -1,26 +1,29 @@
 import type { Metadata } from 'next'
-import { Section, Band, Eyebrow, Display, H2, Lede, SectionHeading } from '@/components/business/ui'
-import {
-  Browser, MiniReport, Ledger, FeatureTile, TileGrid, PunchGrid,
-  StatBand, StepRail, Chapter, NextStep, GlowBand,
-} from '@/components/business/visuals'
+import { Section, Band, Display, Lede, SectionHeading } from '@/components/business/ui'
+import { Ledger, PunchGrid, Chapter, NextStep } from '@/components/business/visuals'
+import { Holder, Keyword, KeywordSub } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   title: 'Intelligence',
   description:
-    'The assistant reads your pipeline and drafts the work. It cannot spend, invent a number, or raise its own permissions.',
+    'The assistant reads your pipeline and drafts the work. It never spends without your yes, and it never invents a number.',
   alternates: { canonical: '/business/platform/intelligence' },
 }
+
+/* Real asks a broker types into the assistant bar — the product's own voice. */
+const ASKS = [
+  'Triage my overdue follow-ups and draft the next message for each.',
+  'Review my new leads and tell me which to call first, and why.',
+]
 
 export default function IntelligencePage() {
   const next = nextInTour('/business/platform/intelligence')!
   return (
     <>
-      {/* ── Hero ────────────────────────────────────────────────────────── */}
       {/* This page's claim is discipline, so the first visual is the audit
           trail — not a chat window. */}
-      <Section className="pb-20 pt-16 lg:pb-28 lg:pt-24">
+      <Section className="pb-16 pt-16 lg:pb-20 lg:pt-24">
         <Chapter n={6} total={7} label="Intelligence" />
         <div className="mt-10 grid grid-cols-1 items-center gap-14 lg:grid-cols-2 lg:gap-16">
           <div>
@@ -36,10 +39,10 @@ export default function IntelligencePage() {
           <Ledger
             className="w-full"
             rows={[
-              { time: '09:41', event: 'paused Creek Harbour carousel — you said yes in chat' },
+              { time: '09:41', event: 'paused Creekside One carousel — you said yes in chat' },
               {
                 time: '09:42',
-                event: 'budget +AED 90 → Marina Vista video — inside the ±15% clamp',
+                event: 'budget +AED 90 → Marina Vista video — within the limit you set',
                 amount: '+AED 90',
               },
               { time: '11:05', event: 'drafted WhatsApp reply for Fatima A. — yours to send' },
@@ -49,129 +52,50 @@ export default function IntelligencePage() {
         </div>
       </Section>
 
-      {/* ── Refusals first ──────────────────────────────────────────────── */}
+      {/* Refusals first — the discipline is the pitch. */}
       <Band className="bg-[#090B0E]">
         <SectionHeading eyebrow="Refused" title="What it will not do" />
         <div className="mt-10">
           <PunchGrid
+            cols={4}
             items={[
               {
                 title: 'It never spends without your yes.',
-                body: 'Pause, launch, budget, resume — every money action asks first at the default setting.',
+                body: 'Pause, launch, budget, resume — every money move asks first.',
               },
               {
-                title: 'No number it cannot trace.',
-                body: 'A figure comes from your data or the report is withheld.',
+                title: 'No invented numbers.',
+                body: 'A figure comes from your own records, or the report is withheld.',
               },
               {
-                title: 'No invented campaigns.',
-                body: 'Name a campaign you do not have and the answer is discarded.',
-              },
-              {
-                title: 'No claimed launches.',
-                body: 'Say it launched when nothing ran, and the sentence is replaced with a correction.',
-              },
-              {
-                title: 'It cannot raise its own permissions.',
-                body: 'The autonomy dial is a server setting. Only management moves it.',
+                title: 'If it doesn’t know, it says so.',
+                body: 'It may not invent a project name, a price, a yield or a handover date.',
               },
               {
                 title: 'There is an off switch.',
-                body: 'One setting silences everything it writes. Every screen keeps working.',
+                body: 'One setting silences it everywhere. Every screen keeps working.',
               },
             ]}
           />
         </div>
       </Band>
 
-      {/* ── What you get ────────────────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
-        <TileGrid cols={3}>
-          <FeatureTile
-            icon="assistant"
-            title="Docked on every screen"
-            body="One chat follows you from CRM to campaigns — in English, العربية, Русский."
-          />
-          <FeatureTile
-            icon="flow"
-            title="27 real actions"
-            body="Pause a campaign, move a budget, draft the ad — the same buttons you press."
-          />
-          <FeatureTile
-            icon="gate"
-            title="Three autonomy levels"
-            body="Ask first, act with brakes, or run nightly. Management sets the dial."
-          />
-        </TileGrid>
-      </Section>
-
-      {/* ── Show: evidence ──────────────────────────────────────────────── */}
-      <GlowBand>
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-          <div>
-            <Eyebrow>Evidence</Eyebrow>
-            <H2 className="mt-4">Every number, traced or withheld.</H2>
-            <div className="mt-5 max-w-[42ch]">
-              <Lede>
-                A report&rsquo;s figures must come from your own data, pulled that turn. One stray
-                figure withholds the whole report.
-              </Lede>
-            </div>
+      <Section className="py-24 lg:py-32">
+        <Holder tone="blue" size="xl">
+          <Keyword>Tell it what to do.</Keyword>
+          <KeywordSub>It works your own pipeline — in English, العربية, Русский.</KeywordSub>
+          <div className="mt-7 grid max-w-[44rem] gap-3">
+            {ASKS.map((q) => (
+              <p
+                key={q}
+                className="rounded-2xl bg-white/[0.04] px-5 py-3.5 text-[0.9375rem] leading-[1.6] text-[#C9CDD3] ring-1 ring-white/[0.06]"
+              >
+                &ldquo;{q}&rdquo;
+              </p>
+            ))}
           </div>
-          <Browser title="app.yourbrokerage.ae/reports">
-            <MiniReport />
-          </Browser>
-        </div>
-      </GlowBand>
-
-      {/* ── A money action, in order ────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
-        <Eyebrow className="mb-8">A money action</Eyebrow>
-        <StepRail
-          steps={[
-            {
-              title: 'It proposes',
-              body: 'A plan with the audience, the page and the budget — priced in AED.',
-            },
-            {
-              title: 'You say yes',
-              body: 'In your own words. No confirmation, no action — that is the default.',
-            },
-            {
-              title: 'It acts, then writes it down',
-              body: 'The move lands in the log with the reason. Failures get no receipt.',
-            },
-          ]}
-        />
+        </Holder>
       </Section>
-
-      {/* ── Facts ───────────────────────────────────────────────────────── */}
-      <div className="pb-20 lg:pb-28">
-        <StatBand
-          items={[
-            {
-              value: '27',
-              label: 'Real actions',
-              note: 'Seven can touch money. Those are the ones that ask first.',
-            },
-            {
-              value: '±15%',
-              label: 'Largest budget move',
-              note: 'Clamped on the server, floor AED 50 — whatever was asked for.',
-            },
-            {
-              value: '205',
-              label: 'Screens it can link to',
-              note: 'Rebuilt from the app on every release. A dead link is dropped.',
-            },
-            {
-              value: '1',
-              label: 'Untraceable figure',
-              note: 'Enough to withhold the whole report. No partial credit.',
-            },
-          ]}
-        />
-      </div>
 
       <NextStep href={next.href} label={next.label} note={next.blurb} progress="Chapter 7 of 7" />
     </>

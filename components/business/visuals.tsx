@@ -186,7 +186,7 @@ export function MiniCRM() {
     {
       name: 'New',
       leads: [
-        { who: 'Fatima A.', project: 'Creek Harbour', value: 'AED 2.4M', heat: 'hot', when: '2m' },
+        { who: 'Fatima A.', project: 'Creekside One', value: 'AED 2.4M', heat: 'hot', when: '2m' },
         { who: 'Sergei M.', project: 'JVC', value: 'AED 950K', heat: 'warm', when: '11m' },
         { who: 'Hana S.', project: 'Business Bay', value: 'AED 1.1M', when: '24m' },
       ],
@@ -202,7 +202,7 @@ export function MiniCRM() {
       name: 'Viewing',
       leads: [
         { who: 'Priya S.', project: 'Palm Jumeirah', value: 'AED 6.2M', heat: 'hot', when: 'Thu 4pm' },
-        { who: 'Ivan D.', project: 'Creek Harbour', value: 'AED 2.1M', heat: 'warm', when: 'Sat 11am' },
+        { who: 'Ivan D.', project: 'Creekside One', value: 'AED 2.1M', heat: 'warm', when: 'Sat 11am' },
       ],
     },
     {
@@ -260,7 +260,7 @@ export function MiniCRM() {
 export function MiniCampaigns() {
   const rows: Array<{ name: string; on: boolean; spend: string; bar: string; leads: number; cpl: string }> = [
     { name: 'Marina Vista — 2BR video', on: true, spend: 'AED 4,120', bar: 'w-[72%]', leads: 46, cpl: 'AED 90' },
-    { name: 'Creek Harbour launch', on: true, spend: 'AED 3,480', bar: 'w-[61%]', leads: 51, cpl: 'AED 68' },
+    { name: 'Creekside One launch', on: true, spend: 'AED 3,480', bar: 'w-[61%]', leads: 51, cpl: 'AED 68' },
     { name: 'JVC townhouses', on: true, spend: 'AED 1,240', bar: 'w-[22%]', leads: 11, cpl: 'AED 113' },
     { name: 'Palm penthouse', on: false, spend: 'AED 380', bar: 'w-[7%]', leads: 2, cpl: 'AED 190' },
   ]
@@ -301,11 +301,11 @@ export function MiniCampaigns() {
                 {r.cpl}
               </span>
             </div>
-            {r.name === 'Creek Harbour launch' ? (
+            {r.name === 'Creekside One launch' ? (
               <div className="flex items-center gap-1.5 px-3 pb-2">
                 <span aria-hidden className="h-1 w-1 rounded-full bg-[#D4AF37]" />
                 <span className="truncate font-mono text-[8.5px] text-[#D4AF37]" dir="ltr">
-                  budget moved +AED 120 → Creek ad — rule: cost/lead &lt; AED 90
+                  budget moved +AED 120 → Creekside ad — rule: cost/lead &lt; AED 90
                 </span>
               </div>
             ) : null}
@@ -318,11 +318,11 @@ export function MiniCampaigns() {
 
 export function MiniInventory() {
   const units: Array<{ name: string; where: string; price: string; score: number; dead?: boolean; tint: string }> = [
-    { name: 'Marina Vista 2BR', where: 'Emaar · Dubai Marina', price: 'AED 1.9M', score: 92, tint: 'from-[#20303F]' },
-    { name: 'Creek Harbour 1BR', where: 'Emaar · Creek Harbour', price: 'AED 1.2M', score: 88, tint: 'from-[#2A2A3D]' },
-    { name: 'Palm Signature Villa', where: 'Nakheel · Palm Jumeirah', price: 'AED 12.5M', score: 90, tint: 'from-[#3A3226]' },
-    { name: 'Business Bay Studio', where: 'DAMAC · Business Bay', price: 'AED 780K', score: 84, tint: 'from-[#1F3330]' },
-    { name: 'JVC Townhouse', where: 'Sobha · JVC', price: 'AED 2.1M', score: 81, tint: 'from-[#33272E]' },
+    { name: 'Marina Vista 2BR', where: 'Bayline · Dubai Marina', price: 'AED 1.9M', score: 92, tint: 'from-[#20303F]' },
+    { name: 'Creekside One 1BR', where: 'Qamar Group · Creek Harbour', price: 'AED 1.2M', score: 88, tint: 'from-[#2A2A3D]' },
+    { name: 'Palm Rise Villa', where: 'Alnoor · Palm Jumeirah', price: 'AED 12.5M', score: 90, tint: 'from-[#3A3226]' },
+    { name: 'Business Bay Studio', where: 'Marsa Living · Business Bay', price: 'AED 780K', score: 84, tint: 'from-[#1F3330]' },
+    { name: 'JVC Townhouse', where: 'Hilalview · JVC', price: 'AED 2.1M', score: 81, tint: 'from-[#33272E]' },
     { name: 'Al Warsan 1BR', where: 'resale · Al Warsan', price: 'AED 450K', score: 41, dead: true, tint: 'from-[#22262B]' },
   ]
   return (
@@ -411,7 +411,7 @@ export function MiniReport() {
   ]
   const items: Array<{ name: string; spend: string; leads: number; deals: number }> = [
     { name: 'Marina Vista — 2BR video', spend: 'AED 16,800', leads: 148, deals: 2 },
-    { name: 'Creek Harbour launch', spend: 'AED 14,200', leads: 121, deals: 1 },
+    { name: 'Creekside One launch', spend: 'AED 14,200', leads: 121, deals: 1 },
     { name: 'JVC townhouses', spend: 'AED 7,400', leads: 43, deals: 0 },
   ]
   return (

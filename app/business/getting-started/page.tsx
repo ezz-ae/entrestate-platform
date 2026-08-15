@@ -1,18 +1,7 @@
 import type { Metadata } from 'next'
-import {
-  Section,
-  Band,
-  Eyebrow,
-  Display,
-  Lede,
-  H2,
-  P,
-  SectionHeading,
-  SpecTable,
-  ButtonLink,
-  TextLink,
-} from '@/components/business/ui'
+import { Section, Band, Eyebrow, Display, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
 import { Browser, MiniReport, StepRail, PunchGrid, NextStep } from '@/components/business/visuals'
+import { Holder, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -42,75 +31,54 @@ export default function GettingStartedPage() {
         </div>
       </Section>
 
+      {/* ── The four weeks — the full walkthrough lives in the guide ────── */}
+      <Section className="pb-16 lg:pb-20">
+        <Holder size="xl">
+          <Keyword>Four weeks.</Keyword>
+          <KeywordSub>Each week depends on the one before it.</KeywordSub>
+          <div className="mt-8">
+            <StepRail
+              steps={[
+                {
+                  title: 'Stock and team',
+                  body: 'Load projects, prices and permits. Add agents, each with a role.',
+                },
+                {
+                  title: 'Pages live',
+                  body: 'A page per listing you plan to advertise. Fix what the gate flags.',
+                },
+                {
+                  title: 'Connect Meta',
+                  body: 'Set your spend caps. The first campaign launches paused.',
+                },
+                {
+                  title: 'Read the report',
+                  body: 'Spend, leads, deals in one place. Decide next month with numbers.',
+                },
+              ]}
+            />
+          </div>
+          <LearnMore href="/business/docs/get-set-up" label="Read the setup guide" />
+        </Holder>
+      </Section>
+
+      {/* ── Week four's payoff ──────────────────────────────────────────── */}
       <Section className="pb-20 lg:pb-24">
-        <SectionHeading
-          title="Four weeks, in order."
-          lede={<Lede>Each week depends on the one before it. Skip ahead and you launch against an unchecked page.</Lede>}
-        />
-        <div className="mt-10">
-          <StepRail
-            steps={[
-              {
-                title: 'Stock and team',
-                body: 'Load projects with prices, payment plans and permits. Add agents, give each a role. Nothing is advertised yet.',
-              },
-              {
-                title: 'Pages live',
-                body: 'Generate a page per listing you plan to advertise. Fix what the gate blocks now, not at launch.',
-              },
-              {
-                title: 'Connect Meta',
-                body: 'Paste the token — tested before it saves. Set spend caps. Launch the first campaign paused.',
-              },
-              {
-                title: 'Read the report',
-                body: 'Spend, leads, deals in one place. Decide next month’s budget with numbers you can defend.',
-              },
-            ]}
-          />
-        </div>
+        <Holder
+          tone="gold"
+          visual={
+            <Browser title="app.yourbrokerage.ae/reports">
+              <MiniReport />
+            </Browser>
+          }
+        >
+          <Keyword>Month-end, one screen.</Keyword>
+          <KeywordSub>Spend, leads, deals — line items that sum. Send it upstairs as it stands.</KeywordSub>
+          <LearnMore href="/business/docs/reports" label="How to read the money" />
+        </Holder>
       </Section>
 
       <Band className="bg-[#090B0E]">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div>
-            <Eyebrow>Week four</Eyebrow>
-            <H2 className="mt-4">The month ends in one screen.</H2>
-            <P className="mt-5 max-w-[46ch]">
-              Spend, leads, deals — and line items that sum to the total. Send it upstairs as it stands.
-            </P>
-            <div className="mt-6 text-[0.9375rem]">
-              <TextLink href="/business/platform/analytics">Numbers you’d defend upstairs</TextLink>
-            </div>
-          </div>
-          <Browser title="app.yourbrokerage.ae/reports" className="w-full max-w-[440px] lg:justify-self-end">
-            <MiniReport />
-          </Browser>
-        </div>
-      </Band>
-
-      <Section className="py-20 lg:py-28">
-        <SectionHeading
-          eyebrow="Before day one"
-          title="Bring these."
-          lede={<Lede>Everything the stock load needs, in one list.</Lede>}
-        />
-        <div className="mt-10">
-          <SpecTable
-            caption="The checklist"
-            rows={[
-              { k: 'Project list', v: 'Prices, payment plans, handover dates. A spreadsheet is fine.' },
-              { k: 'Trakheesi permits', v: 'Number and expiry for anything you will advertise. No permit, no ad.' },
-              { k: 'Lead history', v: 'Phone or email per row. Rows with neither are reported, not imported.' },
-              { k: 'Team list', v: 'Names, emails, and what each person may see.' },
-              { k: 'Meta access', v: 'Admin on the ad account you intend to connect.' },
-              { k: 'Spend caps', v: 'Your daily maximum, and the most one move may shift.' },
-            ]}
-          />
-        </div>
-      </Section>
-
-      <Band>
         <SectionHeading eyebrow="The trial" title="Day one, honestly." />
         <div className="mt-10">
           <PunchGrid

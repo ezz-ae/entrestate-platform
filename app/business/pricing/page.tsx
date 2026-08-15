@@ -1,17 +1,13 @@
 import type { Metadata } from 'next'
-import {
-  Section, Eyebrow, Display, Lede, H3, P, Guardrail, SectionHeading,
-  ButtonLink, TextLink,
-} from '@/components/business/ui'
-import {
-  PunchGrid, StatBand, FeatureTile, TileGrid, GlowBand, NextStep,
-} from '@/components/business/visuals'
+import { Section, Eyebrow, Display, Lede, H3, ButtonLink, TextLink } from '@/components/business/ui'
+import { PunchGrid, StatBand, GlowBand, NextStep } from '@/components/business/visuals'
+import { DownloadCard, Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   title: 'Plans',
   description:
-    'Three plans: Lead Machine for the brokerage, Listing-to-Landing for the public site, Meta for Realtors for one agent. Talk to us for current pricing.',
+    'Three plans: Lead Machine monthly, Listing-to-Landing set up on request, Meta for Realtors on tokens as you run ads. Talk to us for current pricing.',
   alternates: { canonical: '/business/pricing' },
 }
 
@@ -48,7 +44,7 @@ const PLANS: Plan[] = [
   {
     name: 'Listing-to-Landing',
     who: 'For companies needing the public face',
-    basis: 'Setup, then monthly',
+    basis: 'Setup on request',
     price: null,
     line: 'Your public site, with the desk behind it.',
     includes: [
@@ -57,24 +53,24 @@ const PLANS: Plan[] = [
       'Search buyers actually use',
       'Enquiries land in the CRM, owned',
       'Everything in Lead Machine behind it',
-      'Set up on request',
     ],
     cta: { label: 'Talk to us', href: '/business/contact' },
   },
   {
     name: 'Meta for Realtors',
     who: 'For one agent',
-    basis: 'Monthly membership',
+    basis: 'Tokens, as you run ads',
     price: null,
     line: 'Ads for a single desk, run like a team.',
     includes: [
+      'Pay with tokens as you run ads',
+      'No monthly fee',
       'Campaigns built from your listing',
       'Budgets with caps you set',
       'Leads to your WhatsApp',
-      'Your Meta account, your own spend',
-      'Reports in plain words',
+      'Ad spend stays in your own Meta account',
     ],
-    cta: { label: 'Get membership', href: '/business/contact' },
+    cta: { label: 'Get access', href: '/business/contact' },
   },
 ]
 
@@ -84,7 +80,7 @@ export default function PricingPage() {
   return (
     <>
       {/* ── Hero ────────────────────────────────────────────────────────── */}
-      <Section className="pb-14 pt-16 lg:pb-16 lg:pt-24">
+      <Section className="pb-10 pt-16 lg:pb-12 lg:pt-24">
         <Eyebrow>Plans</Eyebrow>
         <div className="mt-5 max-w-[44rem]">
           <Display>Plans.</Display>
@@ -95,6 +91,11 @@ export default function PricingPage() {
             agent&rsquo;s ads.
           </Lede>
         </div>
+      </Section>
+
+      {/* ── The one-pager, before the columns: it travels further than a URL ─ */}
+      <Section className="pb-14 lg:pb-16">
+        <DownloadCard />
       </Section>
 
       {/* ── The three columns ───────────────────────────────────────────── */}
@@ -145,12 +146,12 @@ export default function PricingPage() {
           <PunchGrid
             items={[
               {
-                title: 'One platform fee.',
-                body: 'Monthly, per workspace. It never moves with your lead count.',
-              },
-              {
                 title: 'Your ad spend stays yours.',
                 body: 'Paid direct to Meta and Google. We take no cut.',
+              },
+              {
+                title: 'The trial just stops.',
+                body: '14 days, no card taken. When it ends, nothing is charged.',
               },
               {
                 title: 'Leave with your records.',
@@ -161,68 +162,22 @@ export default function PricingPage() {
         </div>
       </GlowBand>
 
-      {/* ── Included everywhere ─────────────────────────────────────────── */}
+      {/* ── Two doors: bigger deployments, and the first month ──────────── */}
       <Section className="py-20 lg:py-24">
-        <SectionHeading eyebrow="In every plan" title="Not sold as upgrades." />
-        <div className="mt-12">
-          <TileGrid cols={4}>
-            <FeatureTile
-              icon="team"
-              title="Every role"
-              body="Agents, managers, marketing, directors — one fee covers the team."
-            />
-            <FeatureTile
-              icon="globe"
-              title="Three languages"
-              body="English, العربية, Русский. Arabic flips the whole layout right-to-left."
-            />
-            <FeatureTile
-              icon="lock"
-              title="Your own database"
-              body="Your leads and deals live in their own schema."
-            />
-            <FeatureTile
-              icon="ledger"
-              title="Spending controls"
-              body="Caps, rules, and the decision log on every automatic move."
-            />
-          </TileGrid>
-        </div>
-      </Section>
-
-      {/* ── Own server ──────────────────────────────────────────────────── */}
-      <Section className="pb-20 lg:pb-24">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20">
-          <SectionHeading
-            eyebrow="For larger companies"
-            title="Your own server."
-            lede={<Lede>Same software, your infrastructure, your own database.</Lede>}
-          />
-          <div className="space-y-4 lg:pt-2">
-            <P>Arranged as a setup, then monthly. Your records never sit on shared ground.</P>
-            <P>
-              Say so early — it changes how the first month is planned.{' '}
-              <TextLink href="/business/contact">Ask about a dedicated deployment</TextLink>.
-            </P>
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Straight answers ────────────────────────────────────────────── */}
-      <Section className="pb-20 lg:pb-24">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20">
-          <SectionHeading eyebrow="Before you ask" title="Straight answers." />
-          <Guardrail
-            title="Asked every week"
-            items={[
-              <><span className="text-white">Do you take a cut of ad spend?</span> No. You pay Meta and Google directly.</>,
-              <><span className="text-white">What happens after the trial?</span> It stops. No card was taken, nothing is charged.</>,
-              <><span className="text-white">Is there a setup fee?</span> Not for Lead Machine — the workspace exists within a minute.</>,
-              <><span className="text-white">Can we export and leave?</span> Yes. Your leads, deals and campaign history go with you.</>,
-              <><span className="text-white">Do we still need an agency?</span> Not for the mechanics. Keep the person who knows your market.</>,
-            ]}
-          />
-        </div>
+        <HolderRow cols={2}>
+          <Holder>
+            <Keyword as="h3">Your own server.</Keyword>
+            <KeywordSub>Same software, your infrastructure, your records on your own ground.</KeywordSub>
+            <p className="mt-7 text-[0.9375rem]">
+              <TextLink href="/business/contact">Ask about a dedicated deployment</TextLink>
+            </p>
+          </Holder>
+          <Holder tone="gold">
+            <Keyword as="h3">The first month.</Keyword>
+            <KeywordSub>Load stock, pages go live, connect Meta, read the report.</KeywordSub>
+            <LearnMore href="/business/docs/get-set-up" label="See the thirty days" />
+          </Holder>
+        </HolderRow>
       </Section>
 
       <StatBand

@@ -70,6 +70,15 @@ export function BusinessHeader() {
               ) : null}
             </div>
           ))}
+          {/* The Learn layer gets a direct door, help-center style — depth is
+              one click away from anywhere, never buried in a dropdown. */}
+          <Link
+            href="/business/docs"
+            onMouseEnter={() => setOpen(null)}
+            className="px-4 py-2 text-[0.875rem] text-[#A8AEB6] transition hover:text-white"
+          >
+            Learn
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">

@@ -14,6 +14,7 @@ import {
   GlowBand,
   NextStep,
 } from '@/components/business/visuals'
+import { Holder, Keyword, KeywordSub, LearnMore, type HolderTone } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -23,61 +24,86 @@ export const metadata: Metadata = {
   alternates: { canonical: '/business/how-it-works' },
 }
 
-/* Each stop: ≤5-word title, ≤20-word body, and the screen that proves it.
-   The mini carries the meaning; the copy only points at it. */
-const STOPS: Array<{ title: string; body: string; visual: ReactNode }> = [
+/* Each stop: a Keyword, one line, the screen that proves it, and one door
+   into its guide. The Keywords alone must read as the whole path. */
+const STOPS: Array<{
+  title: string
+  sub: string
+  guide: string
+  learn: string
+  tone: HolderTone
+  visual: ReactNode
+}> = [
   {
-    title: 'Load the stock',
-    body: 'Every listing is scored. Weak stock is flagged “not fit to advertise” before it can touch a budget.',
+    title: 'Load the stock.',
+    sub: 'Every listing scored. Weak stock is flagged before it can carry a budget.',
+    guide: '/business/docs/inventory',
+    learn: 'How scoring works',
+    tone: 'plain',
     visual: (
-      <Browser title="app.yourbrokerage.ae/inventory" className="w-full max-w-[460px]">
+      <Browser title="app.yourbrokerage.ae/inventory">
         <MiniInventory />
       </Browser>
     ),
   },
   {
-    title: 'Every listing gets a page',
-    body: 'Built from the listing’s own price, plan and photos. A weak page cannot carry a campaign.',
+    title: 'Page per listing.',
+    sub: 'Built from the listing’s own price, plan and photos. Weak pages are blocked.',
+    guide: '/business/docs/landing-pages',
+    learn: 'How the gate works',
+    tone: 'blue',
     visual: (
-      <div className="w-full max-w-[300px]">
-        <Browser title="yourbrokerage.ae/marina-vista-2br">
-          <MiniPage />
-        </Browser>
-      </div>
+      <Browser title="yourbrokerage.ae/marina-vista-2br" className="mx-auto w-full max-w-[300px]">
+        <MiniPage />
+      </Browser>
     ),
   },
   {
-    title: 'Launch with brakes on',
-    body: 'Campaigns launch paused, permit checked. Budgets move only inside rules you wrote.',
+    title: 'Launch, paused.',
+    sub: 'It always launches paused, so you see the ad before a dirham moves.',
+    guide: '/business/docs/launch-a-campaign',
+    learn: 'How launching works',
+    tone: 'gold',
     visual: (
-      <Browser title="app.yourbrokerage.ae/campaigns" className="w-full max-w-[460px]">
+      <Browser title="app.yourbrokerage.ae/campaigns">
         <MiniCampaigns />
       </Browser>
     ),
   },
   {
-    title: 'The lead lands owned',
-    body: 'It arrives with its campaign attached, gets an owner, and the first-reply clock starts.',
+    title: 'Leads land owned.',
+    sub: 'The lead arrives with its campaign attached, an owner, and the clock running.',
+    guide: '/business/docs/lead-flow',
+    learn: 'How leads flow',
+    tone: 'green',
     visual: (
-      <Phone className="w-[250px]">
-        <Chat />
-      </Phone>
+      <div className="flex justify-center">
+        <Phone className="w-[240px] sm:w-[260px]">
+          <Chat />
+        </Phone>
+      </div>
     ),
   },
   {
-    title: 'Won or lost, and why',
-    body: 'The deal carries its value and commission split, in the same books as the spend.',
+    title: 'Won or lost.',
+    sub: 'The deal carries its value and commission in the same books as the spend.',
+    guide: '/business/docs/crm-day',
+    learn: 'How the day runs',
+    tone: 'plain',
     visual: (
-      <Browser title="app.yourbrokerage.ae/crm" className="w-full max-w-[460px]">
+      <Browser title="app.yourbrokerage.ae/crm">
         <MiniCRM />
       </Browser>
     ),
   },
   {
-    title: 'Closed deals teach the targeting',
-    body: 'Closed buyers become the seed. Next month’s ads chase people like them — not Meta’s first guess.',
+    title: 'Deals teach targeting.',
+    sub: 'Closed buyers become the seed. Next month’s ads chase people like them.',
+    guide: '/business/docs/audiences',
+    learn: 'How audiences learn',
+    tone: 'gold',
     visual: (
-      <Browser title="app.yourbrokerage.ae/reports" className="w-full max-w-[420px]">
+      <Browser title="app.yourbrokerage.ae/reports">
         <MiniReport />
       </Browser>
     ),
@@ -105,35 +131,20 @@ export default function HowItWorksPage() {
       </Section>
 
       <Section className="pb-24 lg:pb-32">
-        <div className="relative">
-          {/* The spine: one line from stock to report, so the order reads as one path. */}
-          <div aria-hidden className="absolute bottom-3 left-[9px] top-3 hidden w-px bg-white/[0.08] lg:block" />
-          <ol className="space-y-16 lg:space-y-24">
-            {STOPS.map((s, i) => (
-              <li
-                key={s.title}
-                className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[2.75rem_minmax(0,24rem)_minmax(0,1fr)] lg:gap-10"
-              >
-                <div className="flex items-center gap-4">
-                  <span
-                    className="relative bg-[#07090C] py-1 font-mono text-[0.9375rem] tabular-nums text-[#D4AF37]"
-                    dir="ltr"
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span aria-hidden className="h-px flex-1 bg-white/[0.08] lg:hidden" />
+        <ol className="space-y-5">
+          {STOPS.map((s, i) => (
+            <li key={s.title}>
+              <Holder tone={s.tone} visual={s.visual}>
+                <div className="font-mono text-[0.8125rem] tabular-nums text-[#D4AF37]" dir="ltr">
+                  {String(i + 1).padStart(2, '0')}
                 </div>
-                <div className="lg:pt-1">
-                  <h2 className="font-serif text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-white sm:text-[1.7rem]">
-                    {s.title}
-                  </h2>
-                  <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{s.body}</p>
-                </div>
-                <div className="min-w-0">{s.visual}</div>
-              </li>
-            ))}
-          </ol>
-        </div>
+                <Keyword className="mt-4">{s.title}</Keyword>
+                <KeywordSub>{s.sub}</KeywordSub>
+                <LearnMore href={s.guide} label={s.learn} />
+              </Holder>
+            </li>
+          ))}
+        </ol>
       </Section>
 
       <GlowBand>

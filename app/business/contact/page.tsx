@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import {
-  Section, PageHeader, H3, Card, SpecTable, TextLink, Mono,
-} from '@/components/business/ui'
+import { Section, PageHeader, H3, SpecTable, TextLink, Mono } from '@/components/business/ui'
 import { NextStep } from '@/components/business/visuals'
+import { Holder } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { BRAND } from '@/lib/freehold/brand'
 import { ContactForm } from './_form'
@@ -30,11 +29,13 @@ export default function ContactPage() {
       />
 
       <Section className="pb-20 lg:pb-28">
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-20">
-          <ContactForm />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-6">
+          <Holder className="min-w-0">
+            <ContactForm />
+          </Holder>
 
-          <div className="space-y-8">
-            <div>
+          <div className="flex flex-col gap-5">
+            <Holder className="flex-1">
               <H3>Write directly</H3>
               <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
                 Know your question already? Email{' '}
@@ -43,19 +44,21 @@ export default function ContactPage() {
                 </TextLink>{' '}
                 — it reaches the same people.
               </p>
-            </div>
+              <div className="mt-8">
+                <H3>What helps</H3>
+                <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
+                  How many agents, how many projects, and where a lead lands today.
+                </p>
+              </div>
+            </Holder>
 
-            <div>
-              <H3>What helps</H3>
+            <Holder tone="gold">
+              <H3>Start the trial instead</H3>
               <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">
-                How many agents, how many projects, and where a lead lands today.
+                The workspace exists within a minute. Open the desk, click around, come back with
+                questions. <TextLink href="/signup">Start one</TextLink>.
               </p>
-            </div>
-
-            <Card kicker="Faster" title="Start the trial instead">
-              The workspace exists within a minute. Open the desk, click around, come back with
-              questions. <TextLink href="/signup">Start one</TextLink>.
-            </Card>
+            </Holder>
           </div>
         </div>
       </Section>
@@ -67,15 +70,25 @@ export default function ContactPage() {
           rows={[
             {
               k: 'What does it cost?',
-              v: <>Talk to us for current pricing. The three plans are on <TextLink href="/business/pricing">Plans</TextLink>.</>,
+              v: (
+                <>
+                  Talk to us for current pricing. The platform bills monthly; Meta for Realtors
+                  runs on tokens as you run ads. See <TextLink href="/business/pricing">Plans</TextLink>.
+                </>
+              ),
             },
             {
               k: 'Can we run our own server?',
-              v: <>Yes. Same software, your infrastructure, your database. Say so in the form.</>,
+              v: <>Yes. Same software, your infrastructure, your records. Say so in the form.</>,
             },
             {
               k: 'Is our data separate?',
-              v: <>Your leads and deals live in their own schema. See <TextLink href="/business/security">Security</TextLink>.</>,
+              v: (
+                <>
+                  Your records live on their own ground — no other company can reach them. See{' '}
+                  <TextLink href="/business/security">Security</TextLink>.
+                </>
+              ),
             },
             {
               k: 'Do you take a cut of ad spend?',

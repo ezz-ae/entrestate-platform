@@ -98,6 +98,104 @@ export const COMPANY: NavItem[] = [
     label: 'Talk to us',
     blurb: 'Ask about your own company, or a dedicated deployment.',
   },
+  {
+    href: '/business/docs',
+    label: 'Learn',
+    blurb: 'Short guides to how each part behaves, in plain broker language.',
+  },
+]
+
+/* ── Docs (the Learn layer) ─────────────────────────────────────────────── */
+
+export const DOCS_HOME = '/business/docs'
+
+/**
+ * The five product branches plus setup. This taxonomy is product law — it
+ * matches the onboarding, so a guide can never sit in a category the app
+ * itself does not have.
+ */
+export const DOCS_CATEGORIES = [
+  'CRM & brokers',
+  'Inventory & pages',
+  'Lead machine',
+  'Creative studio',
+  'Finance',
+  'Getting set up',
+] as const
+
+export type DocsCategory = (typeof DOCS_CATEGORIES)[number]
+
+export interface GuideItem extends NavItem {
+  category: DocsCategory
+}
+
+export const GUIDES: GuideItem[] = [
+  {
+    href: '/business/docs/lead-flow',
+    label: 'How leads flow',
+    blurb: 'Four sources, one inbox, one duplicate check, and an owner for every lead.',
+    category: 'CRM & brokers',
+  },
+  {
+    href: '/business/docs/crm-day',
+    label: 'Working the day',
+    blurb: 'Stages, follow-ups, ranking by value, and finding a lead from a phone number.',
+    category: 'CRM & brokers',
+  },
+  {
+    href: '/business/docs/team-roles',
+    label: 'Team and roles',
+    blurb: 'Seven roles, who sees what, and manual versus automatic lead distribution.',
+    category: 'CRM & brokers',
+  },
+  {
+    href: '/business/docs/inventory',
+    label: 'Stock and scores',
+    blurb: 'The catalogue, the fit-to-advertise check, and what blocks a listing.',
+    category: 'Inventory & pages',
+  },
+  {
+    href: '/business/docs/landing-pages',
+    label: 'Pages and the launch gate',
+    blurb: 'A page per listing, what the gate checks, and why drafts stay invisible.',
+    category: 'Inventory & pages',
+  },
+  {
+    href: '/business/docs/launch-a-campaign',
+    label: 'Launch a campaign',
+    blurb: 'Four steps from choosing a listing to approving the plan. It starts paused.',
+    category: 'Lead machine',
+  },
+  {
+    href: '/business/docs/audiences',
+    label: 'Audiences',
+    blurb: 'Named audiences, lookalikes built from rated leads, and what never leaves your system.',
+    category: 'Lead machine',
+  },
+  {
+    href: '/business/docs/spend-rules',
+    label: 'Budgets and spend rules',
+    blurb: 'Templates, daily ceilings, only-if gates — with no rule, it spends nothing on its own.',
+    category: 'Lead machine',
+  },
+  {
+    href: '/business/docs/creative-studio',
+    label: 'The studio',
+    blurb: 'Every tool in one line each, from the Ad Designer to the library.',
+    category: 'Creative studio',
+  },
+  {
+    href: '/business/docs/reports',
+    label: 'Reading the money',
+    blurb: 'Commission against expenses, cost per lead and per deal, and agent cash.',
+    category: 'Finance',
+  },
+  {
+    href: '/business/docs/get-set-up',
+    label: 'From signup to first lead',
+    blurb: 'The first thirty days, week by week, as you would actually run them.',
+    category: 'Getting set up',
+  },
 ]
 
 export const NAV_GROUPS: NavGroup[] = [
@@ -111,7 +209,8 @@ export const ALL_BUSINESS_ROUTES: string[] = [
   '/business',
   ...PRODUCTS.map((i) => i.href),
   ...PLATFORM.map((i) => i.href),
-  ...COMPANY.map((i) => i.href),
+  ...COMPANY.map((i) => i.href), // includes the docs hub via the Learn item
+  ...GUIDES.map((i) => i.href),
 ]
 
 /**
@@ -124,7 +223,10 @@ export const TOUR: string[] = [
   ...PRODUCTS.map((i) => i.href),
   COMPANY[0].href, // how-it-works
   ...PLATFORM.map((i) => i.href),
-  ...COMPANY.slice(1).map((i) => i.href), // security → pricing → getting-started → contact
+  // security → pricing → getting-started → contact; docs are reference, not tour stops
+  ...COMPANY.slice(1)
+    .map((i) => i.href)
+    .filter((h) => h !== DOCS_HOME),
 ]
 
 /**

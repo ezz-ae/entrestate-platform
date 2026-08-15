@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { Section, Eyebrow, Display, H2, Lede, P, ButtonLink } from '@/components/business/ui'
+import { Section, Eyebrow, Display, H2, Lede, ButtonLink } from '@/components/business/ui'
 import {
   Browser, HeroVisual, GlowBand, NextStep,
   MiniInventory, MiniCampaigns, MiniCRM, Ledger,
-  TileGrid, FeatureTile, StepRail, PunchGrid, StatBand,
+  PunchGrid, StatBand,
 } from '@/components/business/visuals'
+import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -14,14 +15,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/business/lead-machine' },
 }
 
-/* The log rows mirror what the machine actually writes: nightly pass at 04:30,
-   afternoon cycle at 16:00, budget moves clamped and justified by a rule. */
+/* Every row names the rule that allowed the move — the ledger itself is the pitch. */
 const LOG_ROWS = [
-  { time: '04:30', event: 'nightly pass — 3 rules read, 2 applied' },
-  { time: '04:31', event: 'budget +AED 150 → Marina Vista video — rule: cost/lead < AED 90', amount: '+AED 150' },
-  { time: '04:31', event: 'budget −AED 150 → JVC carousel — cost/lead AED 212, over rule', amount: '−AED 150' },
-  { time: '09:14', event: 'paused → Creek Harbour launch — daily cap reached', amount: 'AED 0' },
-  { time: '16:00', event: 'afternoon cycle — Business Bay lead form checked, no change' },
+  { time: '09:14', event: 'budget +AED 150 → Marina Vista video — rule: cost/lead < AED 90', amount: '+AED 150' },
+  { time: '09:15', event: 'budget −AED 150 → Creekside One carousel — cost/lead AED 212, over rule', amount: '−AED 150' },
+  { time: '11:02', event: 'paused → Harbor Gate launch — daily cap reached', amount: 'AED 0' },
+  { time: '13:40', event: 'Bayview Terraces checked — inside its rules, no change' },
 ]
 
 export default function LeadMachinePage() {
@@ -58,145 +57,88 @@ export default function LeadMachinePage() {
           <H2>2:47am. A lead asks in Arabic.</H2>
           <div className="mt-6">
             <Lede>
-              By 2:48 it has an answer, a language tag and an owner — Omar K. wakes to a named
-              lead and a viewing proposed. The clock times the first reply from the second it lands.
+              By 2:48 it has an answer, an owner and a viewing proposed. Omar K. wakes to a named
+              lead.
             </Lede>
           </div>
         </div>
       </GlowBand>
 
-      {/* ── What you get ────────────────────────────────────────────────── */}
+      {/* ── The system, holder by holder ────────────────────────────────── */}
       <Section className="py-16 lg:py-24">
-        <TileGrid>
-          <FeatureTile
-            icon="brand"
-            title="Your name everywhere"
-            body="Your logo, your domain, your colours — on every screen, page and report."
-          />
-          <FeatureTile
-            icon="team"
-            title="Agents get a workspace"
-            body="Own leads, a ranked call queue, WhatsApp on the row. No one else's pipeline."
-          />
-          <FeatureTile
-            icon="gauge"
-            title="Managers get the desk"
-            body="Who owns what, what's overdue, how fast the first reply went out."
-          />
-          <FeatureTile
-            icon="ledger"
-            title="The books balance"
-            body="Deals, commission, spend, cost per lead — one report, every figure traceable."
-          />
-        </TileGrid>
-      </Section>
+        <div className="flex flex-col gap-4 lg:gap-5">
+          <Holder
+            tone="green"
+            visual={
+              <Browser title="app.yourbrokerage.ae/inventory">
+                <MiniInventory />
+              </Browser>
+            }
+          >
+            <Keyword>Fit to sell.</Keyword>
+            <KeywordSub>Every listing carries a score before it carries a budget.</KeywordSub>
+          </Holder>
 
-      {/* ── Show: inventory ─────────────────────────────────────────────── */}
-      <Section className="py-16 lg:py-24">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="max-w-[46ch]">
-            <H2>Stock that&rsquo;s fit to advertise.</H2>
-            <P className="mt-5">
-              Every listing carries a score before it carries a budget. Missing price, no valid
-              permit, thin media — the card goes grey and stays out of the ad queue until fixed.
-            </P>
-          </div>
-          <Browser title="app.yourbrokerage.ae/inventory">
-            <MiniInventory />
-          </Browser>
+          <Holder
+            tone="gold"
+            visual={
+              <Browser title="app.yourbrokerage.ae/campaigns">
+                <MiniCampaigns />
+              </Browser>
+            }
+          >
+            <Keyword>Budgets with brakes.</Keyword>
+            <KeywordSub>With no rule, it spends nothing on its own.</KeywordSub>
+            <LearnMore href="/business/docs/spend-rules" label="See the spend rules" />
+          </Holder>
+
+          <Holder
+            tone="blue"
+            visual={
+              <Browser title="app.yourbrokerage.ae/crm">
+                <MiniCRM />
+              </Browser>
+            }
+          >
+            <Keyword>Leads answered fast.</Keyword>
+            <KeywordSub>Every lead lands owned, tied to the exact ad that produced it.</KeywordSub>
+            <LearnMore href="/business/docs/lead-flow" label="See how leads flow" />
+          </Holder>
+
+          <Holder visual={<Ledger rows={LOG_ROWS} />}>
+            <Keyword>Written down.</Keyword>
+            <KeywordSub>Every automatic move: the rule, the amount, the campaign — on record.</KeywordSub>
+          </Holder>
+
+          <Holder>
+            <Keyword>Thirty days.</Keyword>
+            <KeywordSub>Load your stock, connect Meta when ready, watch the desk run.</KeywordSub>
+            <LearnMore href="/business/docs/get-set-up" label="See the 30-day path" />
+          </Holder>
         </div>
       </Section>
 
-      {/* ── Show: campaigns ─────────────────────────────────────────────── */}
-      <Section className="py-16 lg:py-24">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <Browser title="app.yourbrokerage.ae/campaigns" className="lg:order-first">
-            <MiniCampaigns />
-          </Browser>
-          <div className="order-first max-w-[46ch] lg:order-none">
-            <H2>Budgets with brakes.</H2>
-            <P className="mt-5">
-              You set the daily cap and the cost-per-lead rule. The machine moves budget between
-              ads only inside them — never more than 15% in one move, never past your cap.
-            </P>
-          </div>
-        </div>
-      </Section>
-
-      {/* ── Show: CRM ───────────────────────────────────────────────────── */}
-      <Section className="py-16 lg:py-24">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="max-w-[46ch]">
-            <H2>Nothing waits in a WhatsApp group.</H2>
-            <P className="mt-5">
-              A lead lands owned, tied to the exact ad that produced it. The call queue puts
-              broken promises first — 72 hours without contact and the whole desk sees it.
-            </P>
-          </div>
-          <Browser title="app.yourbrokerage.ae/crm">
-            <MiniCRM />
-          </Browser>
-        </div>
-      </Section>
-
-      {/* ── Show: the log ───────────────────────────────────────────────── */}
-      <Section className="py-16 lg:py-24">
-        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <Ledger rows={LOG_ROWS} className="lg:order-first" />
-          <div className="order-first max-w-[46ch] lg:order-none">
-            <H2>Every automatic move, written down.</H2>
-            <P className="mt-5">
-              Before the machine touches a budget, the reason is on record: the rule, the amount,
-              the campaign. Read the log over coffee and know what ran overnight.
-            </P>
-          </div>
-        </div>
-      </Section>
-
-      {/* ── How it runs ─────────────────────────────────────────────────── */}
-      <Section className="py-16 lg:py-24">
-        <Eyebrow className="mb-8">How it runs</Eyebrow>
-        <StepRail
-          steps={[
-            {
-              title: 'Load your stock',
-              body: 'Projects, prices, payment plans, media. Each listing scored as it goes in.',
-            },
-            {
-              title: 'Connect Meta when ready',
-              body: 'Your ad account, your billing. Until then, live spend stays off.',
-            },
-            {
-              title: 'The machine runs',
-              body: 'You watch the desk. Leads land owned; every automatic move is written down.',
-            },
-          ]}
-        />
-      </Section>
-
-      {/* ── The money rules ─────────────────────────────────────────────── */}
+      {/* ── The money rules + the one-pager ─────────────────────────────── */}
       <Section className="pb-16 lg:pb-24">
         <PunchGrid
           items={[
             { title: 'No rule, no spend.', body: 'Nothing moves money until you write the rule.' },
+            { title: 'Caps per day and per move.', body: 'It never spends past your cap.' },
             {
-              title: 'Spend caps per day and per move.',
-              body: "A single move can't shift more than 15% of the daily budget.",
-            },
-            {
-              title: 'A campaign with a weak page cannot launch.',
+              title: 'A weak page cannot launch.',
               body: 'The gate reads the page before the ad goes live.',
             },
           ]}
         />
+        <DownloadCard className="mt-4 lg:mt-5" />
       </Section>
 
       {/* ── Facts ───────────────────────────────────────────────────────── */}
       <StatBand
         items={[
-          { value: '14 days', label: 'Trial, no card', note: 'The workspace exists within a minute of the form.' },
-          { value: 'Yours', label: 'Own database', note: 'Your records live in their own schema. No other company can reach them.' },
-          { value: '3', label: 'Languages', note: 'English · العربية · Русский. Arabic runs right-to-left.' },
+          { value: '14 days', label: 'Trial, no card', note: 'The workspace exists within a minute.' },
+          { value: 'Yours', label: 'Own database', note: 'No other company can reach your records.' },
+          { value: '3', label: 'Languages', note: 'English · العربية · Русский' },
           { value: 'OFF', label: 'Live spend, by default', note: 'Nothing spends until you connect your own ad account.' },
         ]}
       />
