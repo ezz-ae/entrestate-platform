@@ -113,3 +113,29 @@ export const ALL_BUSINESS_ROUTES: string[] = [
   ...PLATFORM.map((i) => i.href),
   ...COMPANY.map((i) => i.href),
 ]
+
+/**
+ * The guided reading path: home → products → how-it-works → the seven
+ * platform chapters → security → pricing → getting-started → contact.
+ * Derived from the arrays above so a renamed route cannot fall out of sync.
+ */
+export const TOUR: string[] = [
+  '/business',
+  ...PRODUCTS.map((i) => i.href),
+  COMPANY[0].href, // how-it-works
+  ...PLATFORM.map((i) => i.href),
+  ...COMPANY.slice(1).map((i) => i.href), // security → pricing → getting-started → contact
+]
+
+/**
+ * The NavItem a page's NextStep card should point at. The last stop (contact)
+ * loops out of the tour into the trial, so the path never dead-ends.
+ */
+export function nextInTour(href: string): NavItem | null {
+  const at = TOUR.indexOf(href)
+  if (at === -1) return null
+  const next = TOUR[at + 1]
+  if (!next) return { href: '/signup', label: 'Start a trial', blurb: '14 days. No card.' }
+  const all = [...PRODUCTS, ...PLATFORM, ...COMPANY]
+  return all.find((i) => i.href === next) ?? null
+}

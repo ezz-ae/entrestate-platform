@@ -1,243 +1,165 @@
 import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+import { Section, Eyebrow, Display, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
 import {
-  Section, Band, PageHeader, H2, H3, Lede, P, Card, Grid, SpecTable,
-  Guardrail, Steps, Callout, SectionHeading, NextPages, Eyebrow, TextLink,
-} from '@/components/business/ui'
-import { SystemLoop } from '@/components/business/diagrams'
+  Browser,
+  Phone,
+  Chat,
+  MiniInventory,
+  MiniPage,
+  MiniCampaigns,
+  MiniCRM,
+  MiniReport,
+  PunchGrid,
+  GlowBand,
+  NextStep,
+} from '@/components/business/visuals'
+import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   title: 'How it works',
   description:
-    'The whole path from a property in your inventory to a closed deal, and how the result of that deal changes who the next campaign looks for.',
+    'Six stops from a listing to a closed deal — page, campaign, lead, deal, and the report that teaches next month’s ads.',
   alternates: { canonical: '/business/how-it-works' },
 }
 
+/* Each stop: ≤5-word title, ≤20-word body, and the screen that proves it.
+   The mini carries the meaning; the copy only points at it. */
+const STOPS: Array<{ title: string; body: string; visual: ReactNode }> = [
+  {
+    title: 'Load the stock',
+    body: 'Every listing is scored. Weak stock is flagged “not fit to advertise” before it can touch a budget.',
+    visual: (
+      <Browser title="app.yourbrokerage.ae/inventory" className="w-full max-w-[460px]">
+        <MiniInventory />
+      </Browser>
+    ),
+  },
+  {
+    title: 'Every listing gets a page',
+    body: 'Built from the listing’s own price, plan and photos. A weak page cannot carry a campaign.',
+    visual: (
+      <div className="w-full max-w-[300px]">
+        <Browser title="yourbrokerage.ae/marina-vista-2br">
+          <MiniPage />
+        </Browser>
+      </div>
+    ),
+  },
+  {
+    title: 'Launch with brakes on',
+    body: 'Campaigns launch paused, permit checked. Budgets move only inside rules you wrote.',
+    visual: (
+      <Browser title="app.yourbrokerage.ae/campaigns" className="w-full max-w-[460px]">
+        <MiniCampaigns />
+      </Browser>
+    ),
+  },
+  {
+    title: 'The lead lands owned',
+    body: 'It arrives with its campaign attached, gets an owner, and the first-reply clock starts.',
+    visual: (
+      <Phone className="w-[250px]">
+        <Chat />
+      </Phone>
+    ),
+  },
+  {
+    title: 'Won or lost, and why',
+    body: 'The deal carries its value and commission split, in the same books as the spend.',
+    visual: (
+      <Browser title="app.yourbrokerage.ae/crm" className="w-full max-w-[460px]">
+        <MiniCRM />
+      </Browser>
+    ),
+  },
+  {
+    title: 'Closed deals teach the targeting',
+    body: 'Closed buyers become the seed. Next month’s ads chase people like them — not Meta’s first guess.',
+    visual: (
+      <Browser title="app.yourbrokerage.ae/reports" className="w-full max-w-[420px]">
+        <MiniReport />
+      </Browser>
+    ),
+  },
+]
+
 export default function HowItWorksPage() {
+  const next = nextInTour('/business/how-it-works')!
   return (
     <>
-      <PageHeader
-        eyebrow="How it works"
-        title="From a listing to a closed deal, in order"
-        lede={
-          <>
-            This page follows one property all the way through the system — what happens to it,
-            what the system decides on its own, and where it stops and asks a person. Nothing here
-            is abstract: each stage is a screen somebody uses.
-          </>
-        }
-        meta={[
-          { k: 'Stages', v: 'Three' },
-          { k: 'Automatic', v: 'Preparation and detection' },
-          { k: 'Needs a person', v: 'Anything that starts spending' },
-        ]}
-      />
-
-      <Section className="pb-16">
-        <SystemLoop />
+      <Section className="pb-16 pt-16 lg:pb-20 lg:pt-24">
+        <Eyebrow>How it works</Eyebrow>
+        <div className="mt-5 max-w-[44rem]">
+          <Display>From listing to closed.</Display>
+        </div>
+        <div className="mt-6 max-w-[56ch]">
+          <Lede>The whole path, in order. No step skipped, no step hidden.</Lede>
+        </div>
+        <div className="mt-9 flex flex-wrap gap-3">
+          <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+          <ButtonLink href="/business/platform/inventory" variant="ghost">
+            See the platform
+          </ButtonLink>
+        </div>
       </Section>
 
-      {/* ── Stage one ───────────────────────────────────────────────────── */}
-      <Band>
-        <SectionHeading
-          eyebrow="Stage one"
-          title="Deciding what is worth advertising"
-          lede={
-            <Lede>
-              Before anything is promoted, the system works out whether it should be. Most wasted
-              property marketing is not bad targeting — it is a good budget pointed at a listing
-              that was never ready to receive it.
-            </Lede>
-          }
-        />
-        <div className="mt-12">
-          <Steps
-            steps={[
-              {
-                title: 'The property is described completely, or the gaps are named',
-                body: 'Price, payment plan, handover, developer, area, unit types, amenities, media, permit. Each property gets a data-quality reading that says precisely what is missing rather than a score nobody can act on.',
-                detail: 'A missing handover date is not a cosmetic problem — it is the answer to the second question every off-plan buyer asks.',
-              },
-              {
-                title: 'Ad-readiness is judged separately from completeness',
-                body: 'A listing can be perfectly filled in and still be unfit to advertise — no permit, no page to send a click to, no usable image. Ad-readiness answers one question: if money were pointed at this today, would it be wasted?',
-              },
-              {
-                title: 'Opportunity is ranked against evidence',
-                body: 'Which properties deserve budget is decided from real signals — how the area is transacting, what the enquiry history looks like, how the price sits against comparable stock — rather than from whoever asked loudest this week.',
-              },
-            ]}
-          />
+      <Section className="pb-24 lg:pb-32">
+        <div className="relative">
+          {/* The spine: one line from stock to report, so the order reads as one path. */}
+          <div aria-hidden className="absolute bottom-3 left-[9px] top-3 hidden w-px bg-white/[0.08] lg:block" />
+          <ol className="space-y-16 lg:space-y-24">
+            {STOPS.map((s, i) => (
+              <li
+                key={s.title}
+                className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[2.75rem_minmax(0,24rem)_minmax(0,1fr)] lg:gap-10"
+              >
+                <div className="flex items-center gap-4">
+                  <span
+                    className="relative bg-[#07090C] py-1 font-mono text-[0.9375rem] tabular-nums text-[#D4AF37]"
+                    dir="ltr"
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span aria-hidden className="h-px flex-1 bg-white/[0.08] lg:hidden" />
+                </div>
+                <div className="lg:pt-1">
+                  <h2 className="font-serif text-[1.5rem] leading-[1.2] tracking-[-0.01em] text-white sm:text-[1.7rem]">
+                    {s.title}
+                  </h2>
+                  <p className="mt-3 max-w-[44ch] text-[0.9375rem] leading-[1.7] text-[#9BA1A9]">{s.body}</p>
+                </div>
+                <div className="min-w-0">{s.visual}</div>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div className="mt-12">
-          <Guardrail
-            title="What stage one refuses"
+      </Section>
+
+      <GlowBand>
+        <SectionHeading eyebrow="Who decides" title="Where the machine stops." />
+        <div className="mt-10">
+          <PunchGrid
             items={[
-              <>It will not invent a missing figure to make a listing look complete. A blank stays blank and is reported as blank.</>,
-              <>It will not mark a property ready to advertise when it has no valid advertising permit or the permit has expired.</>,
-              <>It will not rank a property as an opportunity on the strength of enthusiasm. If the evidence is thin, it says the evidence is thin.</>,
-            ]}
-          />
-        </div>
-      </Band>
-
-      {/* ── Stage two ───────────────────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
-        <SectionHeading
-          eyebrow="Stage two"
-          title="Turning a listing into something that can carry money"
-          lede={
-            <Lede>
-              A campaign is only as good as the page underneath it and the creative on top of it.
-              Both are produced from the listing itself, so they cannot drift away from the facts.
-            </Lede>
-          }
-        />
-        <div className="mt-12">
-          <Steps
-            steps={[
+              { title: 'No rule, no spend.', body: 'Budgets cannot move on their own without a limit you wrote.' },
               {
-                title: 'The page is generated from the listing',
-                body: 'One page per property, carrying the same prices, plans and images that are in your inventory. When the listing changes, the page is not left telling last month’s story.',
+                title: 'Campaigns launch paused.',
+                body: 'Nothing spends because a screen was opened. A person switches it live.',
               },
               {
-                title: 'The page is tested before it is allowed to carry advertising',
-                body: 'A page missing the things a buyer needs in order to enquire is blocked from launch. This is a hard stop, not a warning banner — the most expensive mistake in property advertising is a working campaign pointed at a page that cannot convert.',
-                detail: 'The block is specific: it names what is missing so it can be fixed in minutes rather than debated.',
-              },
-              {
-                title: 'The creative set is produced from the same source',
-                body: 'Every size and placement the platforms require, generated from the listing’s own images and facts, so the advertisement and the page agree with each other.',
-              },
-              {
-                title: 'The campaign is built, and the rules are checked',
-                body: 'Targeting, budget and structure are assembled for Meta or Google. Before anything can go live it must pass the limits you set and the permit check.',
-                detail: 'Google campaigns are always created paused. Nothing starts spending because a screen was opened.',
+                title: 'Every move is written down.',
+                body: 'Each automatic budget move lands in the log with the rule behind it.',
               },
             ]}
           />
         </div>
-      </Section>
+      </GlowBand>
 
-      {/* ── Stage three ─────────────────────────────────────────────────── */}
-      <Band className="bg-[#090B0E]">
-        <SectionHeading
-          eyebrow="Stage three"
-          title="The lead, the deal, and what the system keeps"
-          lede={
-            <Lede>
-              This is the stage that most tool-chains lose, because it is where the record has to
-              survive being handed between three different systems.
-            </Lede>
-          }
-        />
-        <div className="mt-12">
-          <Steps
-            steps={[
-              {
-                title: 'The lead arrives already attributed',
-                body: 'A click carries its campaign with it, so the enquiry that follows lands in the CRM knowing which advertisement produced it, for which project. Nobody has to reconstruct that later from memory or a spreadsheet.',
-              },
-              {
-                title: 'It is owned within a known number of minutes',
-                body: 'The lead is routed to an agent by your rules, and the clock on the first reply starts the moment it lands. An unowned lead is shown as an urgent state rather than sitting quietly in a list.',
-              },
-              {
-                title: 'Duplicates and dead numbers are flagged, not deleted',
-                body: 'The same buyer enquiring twice is recognised and marked, and a number too short to dial is called out. Neither is removed on the system’s own authority — a person decides.',
-              },
-              {
-                title: 'The deal is closed with a reason',
-                body: 'Won or lost, and why. That reason is the single most valuable piece of data the company produces, because it is what makes the next stage possible.',
-              },
-              {
-                title: 'The result is fed back into who gets advertised to',
-                body: 'The people who actually bought become the seed for finding more people like them. The audience narrows toward your real customers instead of the platform’s first guess.',
-                detail: 'This is the return path in the diagram above, and it is the reason the second campaign should cost less than the first.',
-              },
-            ]}
-          />
-        </div>
-      </Band>
-
-      {/* ── Who decides ─────────────────────────────────────────────────── */}
-      <Section className="py-20 lg:py-28">
-        <SectionHeading
-          eyebrow="Division of labour"
-          title="What the system does alone, and what it must ask"
-          lede={
-            <Lede>
-              The dividing line is consistent throughout: the system may prepare anything and may
-              stop anything, but it may not start spending money on its own.
-            </Lede>
-          }
-        />
-        <div className="mt-12">
-          <SpecTable
-            caption="Who decides what"
-            rows={[
-              { k: 'Done automatically', v: <>Scoring inventory, generating pages and creative, checking permits and readiness, attributing leads, timing replies, detecting duplicates, spotting worn-out creative, blocking search terms that took money and returned nothing.</> },
-              { k: 'Proposed for approval', v: <>Budget increases and reallocation, new keywords worth buying, reassignment of a lead, anything that changes what a live campaign costs.</> },
-              { k: 'Only ever a person', v: <>Connecting an ad account, setting the spending limits, launching a campaign live, replacing a creative that is currently winning, deleting records.</> },
-            ]}
-          />
-        </div>
-        <div className="mt-10 grid grid-cols-1 gap-px sm:grid-cols-3">
-          <Card kicker="Why" title="Stopping is reversible">
-            Blocking a wasteful search term or pausing an under-performing ad set can be undone in a
-            click. That is why the system is allowed to do it without waiting for anyone.
-          </Card>
-          <Card kicker="Why" title="Starting is not">
-            A new bid spends real money against a forecast rather than a measurement. Money already
-            spent cannot be recalled, so a person decides.
-          </Card>
-          <Card kicker="Why" title="A decision you cannot read is a decision you cannot trust">
-            Every automatic action is written down in ordinary language with its reason, in the same
-            place the money is reconciled.
-          </Card>
-        </div>
-      </Section>
-
-      {/* ── Honest expectations ─────────────────────────────────────────── */}
-      <Band>
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-20">
-          <SectionHeading
-            eyebrow="What to expect"
-            title="Where the gains actually come from"
-          />
-          <div className="space-y-5">
-            <P>
-              The system does not make advertising cheap by finding a trick inside Meta or Google.
-              The platforms are the same for everyone. What changes is the quality of what you put
-              into them and the speed with which mistakes are caught.
-            </P>
-            <P>
-              Three things move the number. Money stops going to listings that were never fit to
-              carry it. Wasted search traffic is cut continuously rather than at the end of the
-              quarter. And each campaign starts from the evidence the last one produced instead of
-              from zero.
-            </P>
-            <P>
-              None of that is instant. The feedback loop needs closed deals before it has anything to
-              learn from, which in off-plan property means the first meaningful improvement arrives
-              after the first cycle of real sales — not in week one.
-            </P>
-          </div>
-        </div>
-      </Band>
-
-      <Section className="py-16 lg:py-24">
-        <Callout>
-          Every stage exists to protect one join: the money that was spent, and the deal that came
-          out the other end.
-        </Callout>
-      </Section>
-
-      <NextPages
-        items={[
-          { href: '/business/platform/inventory', label: 'Inventory', blurb: 'Where stage one happens, in detail.' },
-          { href: '/business/platform/advertising', label: 'Advertising', blurb: 'The spend rules and the two platforms.' },
-          { href: '/business/lead-machine', label: 'Lead Machine', blurb: 'The product that contains all of it.' },
-        ]}
+      <NextStep
+        href={next.href}
+        label="Start the tour: Inventory"
+        note={next.blurb}
+        progress="Chapter 1 of 7"
       />
     </>
   )
