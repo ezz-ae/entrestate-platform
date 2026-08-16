@@ -477,7 +477,7 @@ export async function POST(request: Request) {
             type: "text-delta",
             id: "text-1",
             delta:
-              "Copilot AI is temporarily running in fallback mode. Configure GEMINI_KEY, AI_GATEWAY_API_KEY, or OPENAI_API_KEY to enable full streaming reasoning.",
+              "Live reasoning is briefly offline — the analyst still answers from the dataset, with sources, but without streamed commentary. Full answers return shortly.",
           })
           writer.write({ type: "text-end", id: "text-1" })
           writer.write({ type: "finish-step" })

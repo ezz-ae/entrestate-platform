@@ -97,5 +97,14 @@ export function resolveCopilotModel() {
     return openAi(process.env.COPILOT_OPENAI_MODEL || "gpt-4o-mini")
   }
 
+  // Last resort, Vercel only: the AI Gateway accepts the deployment's OIDC
+  // token when no apiKey is configured, so a deployment with zero AI env vars
+  // still gets a working copilot instead of fallback mode. Local dev without
+  // keys still returns null — the fallback copy handles that honestly.
+  if (process.env.VERCEL) {
+    const gateway = createGateway({})
+    return gateway(process.env.COPILOT_MODEL || "google/gemini-2.5-flash")
+  }
+
   return null
 }
