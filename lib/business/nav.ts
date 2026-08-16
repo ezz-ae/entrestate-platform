@@ -103,6 +103,13 @@ export const COMPANY: NavItem[] = [
     label: 'Learn',
     blurb: 'Short guides to how each part behaves, in plain broker language.',
   },
+  {
+    // The Decision Terminal is the family's data product — same repo now,
+    // its own deployment. Absolute URL until terminal.entrestate.com resolves.
+    href: 'https://m.entrestate.com',
+    label: 'Decision Terminal',
+    blurb: 'Dubai market intelligence on DLD data — scored projects, live signals.',
+  },
 ]
 
 /* ── Docs (the Learn layer) ─────────────────────────────────────────────── */
@@ -205,11 +212,15 @@ export const NAV_GROUPS: NavGroup[] = [
 ]
 
 /** Every business route, for the sitemap and for link checking. */
+const internal = (i: NavItem) => i.href.startsWith('/')
+
 export const ALL_BUSINESS_ROUTES: string[] = [
   '/business',
   ...PRODUCTS.map((i) => i.href),
   ...PLATFORM.map((i) => i.href),
-  ...COMPANY.map((i) => i.href), // includes the docs hub via the Learn item
+  // The Terminal entry is an absolute URL to its own deployment — a nav door,
+  // not a route of this app, so the sitemap and link checks must not see it.
+  ...COMPANY.filter(internal).map((i) => i.href), // includes the docs hub via the Learn item
   ...GUIDES.map((i) => i.href),
 ]
 
@@ -223,8 +234,10 @@ export const TOUR: string[] = [
   ...PRODUCTS.map((i) => i.href),
   COMPANY[0].href, // how-it-works
   ...PLATFORM.map((i) => i.href),
-  // security → pricing → getting-started → contact; docs are reference, not tour stops
+  // security → pricing → getting-started → contact; docs are reference, not
+  // tour stops, and the Terminal's external door never enters the tour.
   ...COMPANY.slice(1)
+    .filter(internal)
     .map((i) => i.href)
     .filter((h) => h !== DOCS_HOME),
 ]
