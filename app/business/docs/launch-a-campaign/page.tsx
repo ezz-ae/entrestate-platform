@@ -8,7 +8,7 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniCampaigns } from '@/components/business/visuals'
+import { Clip } from '@/components/business/clip'
 
 export const metadata: Metadata = {
   title: 'Launch a campaign',
@@ -107,9 +107,7 @@ export default function LaunchACampaignGuide() {
             went offline — the desk says so in plain words and links to where it gets fixed.
           </p>
           <div className="mt-4 max-w-[28rem]">
-            <Browser title="app.yourbrokerage.ae/campaigns">
-              <MiniCampaigns />
-            </Browser>
+            <Clip src="/business/clips/run-ads.mp4" title="skyline.entrestate.com/…/campaigns/launch" />
           </div>
         </Step>
       </div>

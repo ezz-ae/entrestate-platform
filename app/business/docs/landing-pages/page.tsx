@@ -8,7 +8,7 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniPage } from '@/components/business/visuals'
+import { Clip } from '@/components/business/clip'
 
 export const metadata: Metadata = {
   title: 'Pages and the launch gate',
@@ -50,9 +50,7 @@ export default function LandingPagesGuide() {
             always the facts you sell from.
           </p>
           <div className="mt-4 max-w-[28rem]">
-            <Browser title="app.yourcompany.com/pages">
-              <MiniPage />
-            </Browser>
+            <Clip src="/business/clips/landing-build.mp4" title="skyline.entrestate.com/…/inventory/landings" />
           </div>
         </Step>
         <Step n={2} id="layouts" title="Three layouts, one honesty rule">

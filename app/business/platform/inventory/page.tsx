@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Section, Display, Lede } from '@/components/business/ui'
 import { Holder, Keyword, KeywordSub, HolderRow, LearnMore } from '@/components/business/holders'
-import { Browser, MiniInventory, Chapter, NextStep, StatBand } from '@/components/business/visuals'
+import { Chapter, NextStep, StatBand } from '@/components/business/visuals'
+import { Clip } from '@/components/business/clip'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -25,9 +26,7 @@ export default function InventoryPage() {
               <Lede>Every project on one record — priced, scored, and cleared to advertise.</Lede>
             </div>
           </div>
-          <Browser title="app.yourbrokerage.ae/inventory">
-            <MiniInventory />
-          </Browser>
+          <Clip src="/business/clips/inventory-real.mp4" title="skyline.entrestate.com/…/inventory" />
         </div>
       </Section>
 
