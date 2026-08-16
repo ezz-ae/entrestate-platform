@@ -17,7 +17,7 @@ export type HolderSize = 'xl' | 'lg'
 /* Layered tinted washes at 4–7% opacity over #0B0E12 — the card feeling
    without a hard fill, so the minis inside keep their own contrast. */
 const TONE_WASH: Record<HolderTone, string> = {
-  gold: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(212,175,55,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(212,175,55,0.04),transparent_60%)]',
+  gold: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(59,130,246,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(59,130,246,0.04),transparent_60%)]',
   green:
     'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(29,168,90,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(29,168,90,0.04),transparent_60%)]',
   blue: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(96,148,224,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(96,148,224,0.04),transparent_60%)]',

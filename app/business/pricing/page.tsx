@@ -61,11 +61,11 @@ const PLANS: Plan[] = [
     who: 'For one agent',
     basis: 'Tokens, as you run ads',
     price: null,
-    line: 'Ads for a single desk, run like a team.',
+    line: 'A full lead-ads system on Meta — our off-plan inventory, a few clicks.',
     includes: [
       'Pay with tokens as you run ads',
       'No monthly fee',
-      'Campaigns built from your listing',
+      'Campaigns built from our off-plan inventory',
       'Budgets with caps you set',
       'Leads to your WhatsApp',
       'Ad spend stays in your own Meta account',

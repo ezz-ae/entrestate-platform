@@ -30,7 +30,7 @@ export const PRODUCTS: NavItem[] = [
   {
     href: '/business/meta-for-realtors',
     label: 'Meta for Realtors',
-    blurb: 'The ads part alone, for one agent — pick a listing, set a budget, it runs.',
+    blurb: 'A full system for professional Meta lead ads — our off-plan inventory, your budget, a few clicks.',
   },
 ]
 

@@ -836,7 +836,7 @@ export function HeroVisual({ variant }: { variant: 'home' | 'machine' | 'listing
     <div className="relative isolate">
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.07),transparent_65%)]"
+        className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.07),transparent_65%)]"
       />
       <div className="grid">
         <div className="min-w-0 sm:col-start-1 sm:row-start-1 sm:pb-10 sm:pr-32 lg:pr-40">
@@ -858,7 +858,7 @@ export function GlowBand({ children, className = '' }: { children: ReactNode; cl
     <div className={`relative w-full border-y border-white/[0.07] ${className}`}>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_0%,rgba(212,175,55,0.06),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_0%,rgba(59,130,246,0.06),transparent_70%)]"
       />
       <div className="relative mx-auto w-full max-w-[1180px] px-6 py-20 lg:px-10 lg:py-28">{children}</div>
     </div>

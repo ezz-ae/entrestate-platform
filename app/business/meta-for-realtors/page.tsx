@@ -9,7 +9,7 @@ import { nextInTour } from '@/lib/business/nav'
 export const metadata: Metadata = {
   title: 'Meta for Realtors',
   description:
-    'Meta ads for one agent. Pick the listing, set the budget — pay with tokens as you run ads. No monthly fee.',
+    'A full system for professional real-estate lead ads on Meta. Pick a project from our off-plan inventory, set the budget — a few clicks. Tokens, no monthly fee.',
   alternates: { canonical: '/business/meta-for-realtors' },
 }
 
@@ -22,13 +22,13 @@ export default function MetaForRealtorsPage() {
       <Section className="pb-20 pt-16 lg:pb-28 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-16">
           <div>
-            <Eyebrow>Meta for Realtors · Meta ads for one agent</Eyebrow>
+            <Eyebrow>Meta for Realtors · a full lead-ads system on Meta</Eyebrow>
             <div className="mt-5 max-w-[44rem]">
               <Display>Ads like you hired a team.</Display>
             </div>
             <div className="mt-7 max-w-[48ch]">
               <Lede>
-                Pick the listing. Set the budget. The machine builds, launches, watches, and moves
+                Pick a project from our off-plan inventory. Set the budget. It builds, launches, watches, and moves
                 money to what works.
               </Lede>
             </div>
@@ -48,7 +48,7 @@ export default function MetaForRealtorsPage() {
           <div className="relative isolate">
             <div
               aria-hidden
-              className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.07),transparent_65%)]"
+              className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.07),transparent_65%)]"
             />
             <div className="grid">
               <div className="flex justify-center sm:col-start-1 sm:row-start-1 sm:items-end sm:justify-start">
@@ -122,7 +122,7 @@ export default function MetaForRealtorsPage() {
         <HolderRow cols={3}>
           <Holder>
             <Keyword as="h3">No Ads Manager.</Keyword>
-            <KeywordSub>Pick a listing, set a budget. The machine builds the rest.</KeywordSub>
+            <KeywordSub>Pick a project from our inventory, set a budget. The system builds the rest.</KeywordSub>
           </Holder>
           <Holder tone="blue">
             <Keyword as="h3">Real buyers.</Keyword>
@@ -145,8 +145,8 @@ export default function MetaForRealtorsPage() {
           <StepRail
             steps={[
               {
-                title: 'Choose listing and budget',
-                body: 'Pick the property. Set your daily cap — minimum AED 50.',
+                title: 'Choose a project and budget',
+                body: 'Pick from our off-plan inventory. Set your daily cap — minimum AED 50.',
               },
               {
                 title: 'Approve the plan',

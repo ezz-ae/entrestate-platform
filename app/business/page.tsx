@@ -195,9 +195,9 @@ export default function BusinessHome() {
             },
             {
               ...PRODUCTS[2],
-              what: 'The ads part, for one agent.',
-              who: 'For a single agent with listings to push',
-              body: 'Pick a listing, set a budget — it runs the Meta campaign and reports in plain words.',
+              what: 'Professional Meta lead ads, few clicks.',
+              who: 'For one agent selling off-plan',
+              body: 'A full system: pick a project from our off-plan inventory, set a budget — it builds and runs the campaign.',
               how: 'Tokens · pay as you run ads',
             },
           ].map((p) => (

@@ -156,7 +156,7 @@ async function main(): Promise<void> {
     },
     {
       name: 'Meta for Realtors',
-      line: 'Pick the listing. Set the budget. The machine builds, launches, watches, and reports.',
+      line: 'A full lead-ads system on Meta. Pick a project from our off-plan inventory, set the budget — a few clicks.',
       who: 'Individual agents.',
       billed: 'Pay with tokens as you run ads. No monthly fee.',
     },
