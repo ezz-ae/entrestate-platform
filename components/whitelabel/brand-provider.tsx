@@ -10,7 +10,7 @@
  * chrome (nav wordmark, logo, accent, title) re-skins per workspace.
  */
 
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { BRAND, brandName } from '@/lib/freehold/brand'
 
 export interface RuntimeBrand {
@@ -59,6 +59,8 @@ export interface BrandSnapshot {
   plan?: 'company' | 'realtor'
 }
 
+const BRAND_STORE_KEY = 'fh_last_brand_v1'
+
 export function BrandProvider({
   brand,
   children,
@@ -66,22 +68,42 @@ export function BrandProvider({
   brand: BrandSnapshot | null
   children: React.ReactNode
 }) {
-  const value: RuntimeBrand = brand
+  // Stale beats stranger, client edition. The server occasionally hands a
+  // tenant page a null brand (a request-time rendering race still under
+  // investigation — see the tenancy resolver's logging). Regressing to the
+  // STATIC vendor brand dresses a tenant's workspace in the wrong company and,
+  // for realtor plans, the wrong nav — so the last real brand seen on THIS
+  // host is remembered and used whenever the server sends none. First-ever
+  // visits have nothing stored and still show static until the next render.
+  const [stored, setStored] = useState<BrandSnapshot | null>(null)
+  useEffect(() => {
+    if (brand) {
+      try { sessionStorage.setItem(BRAND_STORE_KEY, JSON.stringify(brand)) } catch { /* private mode */ }
+    } else {
+      try {
+        const raw = sessionStorage.getItem(BRAND_STORE_KEY)
+        if (raw) setStored(JSON.parse(raw) as BrandSnapshot)
+      } catch { /* unreadable — stay static */ }
+    }
+  }, [brand])
+  const effective = brand ?? stored
+
+  const value: RuntimeBrand = effective
     ? {
-        company: brand.company,
-        product: brand.product,
-        name: `${brand.company} ${brand.product}`.trim(),
-        accent: brand.accent,
-        logo: brand.logo,
-        plan: brand.plan ?? 'company',
+        company: effective.company,
+        product: effective.product,
+        name: `${effective.company} ${effective.product}`.trim(),
+        accent: effective.accent,
+        logo: effective.logo,
+        plan: effective.plan ?? 'company',
       }
     : STATIC_BRAND
 
   // Keep the browser tab in sync with the runtime brand (Phase-1 demo touch;
   // full metadata rebrand lives in generateMetadata).
   useEffect(() => {
-    if (brand) document.title = value.name
-  }, [brand, value.name])
+    if (effective) document.title = value.name
+  }, [effective, value.name])
 
   return <BrandContext.Provider value={value}>{children}</BrandContext.Provider>
 }
