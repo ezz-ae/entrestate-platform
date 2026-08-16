@@ -72,16 +72,20 @@ export function BrandProvider({
   // tenant page a null brand (a request-time rendering race still under
   // investigation — see the tenancy resolver's logging). Regressing to the
   // STATIC vendor brand dresses a tenant's workspace in the wrong company and,
-  // for realtor plans, the wrong nav — so the last real brand seen on THIS
-  // host is remembered and used whenever the server sends none. First-ever
-  // visits have nothing stored and still show static until the next render.
+  // for realtor plans, the wrong nav — and in an SPA the initial document's
+  // brand is the WHOLE tab's brand, so one raced document used to poison the
+  // session. localStorage, not sessionStorage: it is origin-scoped (each
+  // tenant host is its own origin, so brands can never bleed across tenants)
+  // and survives restarts — a browser that has EVER seen this workspace's
+  // brand keeps it. Only the first visit of a fresh browser can catch the
+  // race, once.
   const [stored, setStored] = useState<BrandSnapshot | null>(null)
   useEffect(() => {
     if (brand) {
-      try { sessionStorage.setItem(BRAND_STORE_KEY, JSON.stringify(brand)) } catch { /* private mode */ }
+      try { localStorage.setItem(BRAND_STORE_KEY, JSON.stringify(brand)) } catch { /* private mode */ }
     } else {
       try {
-        const raw = sessionStorage.getItem(BRAND_STORE_KEY)
+        const raw = localStorage.getItem(BRAND_STORE_KEY)
         if (raw) setStored(JSON.parse(raw) as BrandSnapshot)
       } catch { /* unreadable — stay static */ }
     }
