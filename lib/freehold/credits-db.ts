@@ -232,6 +232,19 @@ async function ensureCreditsSchemaOnce(): Promise<void> {
   await ddl(`CREATE UNIQUE INDEX IF NOT EXISTS broker_credit_accounts_broker_id_uidx
              ON broker_credit_accounts (broker_id)`)
 
+  // WHO GETS THE MONTHLY GRANT. The tier quota is a COMPANY-PLAN entitlement:
+  // a brokerage's subscription buys its brokers a monthly allowance. Meta for
+  // Realtors is sold with no monthly fee and its account is stated to "open at
+  // exactly 0, topped up only when a human confirms a payment"
+  // (lib/tenancy/onboard.ts) — but the rollover reads only `tier`, which every
+  // insert hardcodes to 'Starter', so a realtor was handed the Starter quota
+  // every calendar month forever: platform fee the vendor was never paid.
+  //
+  // Defaults TRUE so every account that exists today keeps behaving exactly as
+  // it does; only a pay-as-you-go account opts out, at creation.
+  await ddl(`ALTER TABLE broker_credit_accounts
+             ADD COLUMN IF NOT EXISTS monthly_grant BOOLEAN NOT NULL DEFAULT true`)
+
   await ddl(`
     CREATE TABLE IF NOT EXISTS credit_ledger (
       id         TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -322,16 +335,20 @@ export async function ensureCreditsSchema(): Promise<void> {
  */
 export async function ensureCreditAccount(
   brokerId: string,
+  opts: { monthlyGrant?: boolean } = {},
 ): Promise<{ ok: boolean; created: boolean }> {
   if (!brokerId) return { ok: false, created: false }
   try {
     await ensureCreditsSchema()
+    // monthlyGrant defaults TRUE: every existing caller is a company broker,
+    // and a silent loss of their allowance would be the worse failure. A
+    // realtor's account passes false — see the column's comment above.
     const inserted = await query<{ broker_id: string }>(
-      `INSERT INTO broker_credit_accounts (broker_id, tier, allocated)
-       VALUES ($1, 'Starter', 0)
+      `INSERT INTO broker_credit_accounts (broker_id, tier, allocated, monthly_grant)
+       VALUES ($1, 'Starter', 0, $2)
        ON CONFLICT (broker_id) DO NOTHING
        RETURNING broker_id`,
-      [brokerId],
+      [brokerId, opts.monthlyGrant ?? true],
     )
     return { ok: true, created: inserted.length > 0 }
   } catch {
@@ -453,8 +470,9 @@ async function rollMonthlyQuotaLocked(
   brokerId: string,
   isNewAccount: boolean,
 ): Promise<number> {
-  const rows = await q<{ tier: string; cycle_month: string; now_month: string }>(
+  const rows = await q<{ tier: string; monthly_grant: boolean; cycle_month: string; now_month: string }>(
     `SELECT tier,
+            COALESCE(monthly_grant, true) AS monthly_grant,
             to_char(cycle_start AT TIME ZONE '${CYCLE_TZ}', 'YYYY-MM') AS cycle_month,
             to_char(now()       AT TIME ZONE '${CYCLE_TZ}', 'YYYY-MM') AS now_month
      FROM broker_credit_accounts
@@ -463,6 +481,11 @@ async function rollMonthlyQuotaLocked(
   )
   const row = rows[0]
   if (!row) return 0
+  // A pay-as-you-go account is never granted anything: its tokens are bought.
+  // Returning before the cycle dates are touched is deliberate — rolling the
+  // window for an account that receives nothing would print a "cycle" on a
+  // screen where no cycle exists.
+  if (!row.monthly_grant) return 0
   // Already in this month's cycle → nothing due. A just-created account is the
   // one exception: its first cycle has never been granted.
   if (!isNewAccount && row.cycle_month === row.now_month) return 0

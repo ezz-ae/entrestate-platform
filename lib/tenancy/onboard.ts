@@ -97,7 +97,7 @@ export async function signupTenant(input: {
     // failed seed self-heals on first touch (every credit path creates the
     // account row if missing), so it must never sink the signup.
     if (tenant.plan === 'realtor') {
-      const seeded = await ensureCreditAccount(email).catch(
+      const seeded = await ensureCreditAccount(email, { monthlyGrant: false }).catch(
         () => ({ ok: false as const, created: false }),
       )
       if (!seeded.ok) {

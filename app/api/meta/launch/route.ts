@@ -21,6 +21,9 @@ import { getReadyBuyer } from '@/lib/freehold/ready-buyers'
 import { planPattern, parsePattern } from '@/lib/freehold/audience-pattern'
 import { SUPPORTED_LEAD_LANGUAGES } from '@/lib/meta/lead-language'
 import { deductCreditsForCampaign, refundCredits, settleCampaignReservation, getCreditBalance } from '@/lib/freehold/credits-db'
+import { creditAccountId } from '@/lib/freehold/credit-identity'
+import { getTenantBrand } from '@/lib/tenancy/server'
+import { ensureCreditAccount } from '@/lib/freehold/credits-db'
 import { creditsForDailyBudget } from '@/lib/freehold/credits-shared'
 import { randomUUID } from 'crypto'
 import {
@@ -105,11 +108,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'A phone number is required for a call campaign.' }, { status: 400 })
   }
 
-  // Identify the creating broker (if any) from the verified session.
+  // WHO PAYS. Plan-aware, not role-aware: a realtor owner signs in as 'ceo'
+  // and still funds their own ads, so the rule lives in one shared place —
+  // see lib/freehold/credit-identity.ts for why a role test billed nothing.
   const sessionUser = __auth.user
-  let brokerId: string | undefined = sessionUser.role === 'broker'
-    ? (sessionUser.brokerId ?? sessionUser.email)
-    : undefined
+  const tenantPlan = (await getTenantBrand().catch(() => null))?.plan
+  let brokerId: string | undefined = creditAccountId(sessionUser, tenantPlan)
 
   // A LAUNCH ON BEHALF. When the launch fulfils a broker's campaign request,
   // the credits charge and the campaign attribution both belong to the
@@ -132,6 +136,13 @@ export async function POST(req: NextRequest) {
   // 1 credit = AED 10 of funded ad spend (CREDIT_VALUE_AED). Whole credits only —
   // the ledger column is INTEGER. The rate lives in credits-shared so Meta and
   // Google charge identically instead of each re-deriving "/ 10".
+  // Open the account with the right billing shape BEFORE anything can create
+  // it by self-heal. lockAccount() creates a missing row with the monthly
+  // grant ON (the company default), so a realtor whose signup seed failed
+  // would be handed the Starter quota on their very first launch — free
+  // tokens on a product sold with no monthly fee.
+  if (brokerId) await ensureCreditAccount(brokerId, { monthlyGrant: tenantPlan !== 'realtor' }).catch(() => {})
+
   const creditsToSpend = brokerId ? creditsForDailyBudget(body.dailyBudgetAED) : 0
 
   // ── Money: RESERVE credits BEFORE launching (fail-closed) ────────────────────
@@ -203,6 +214,25 @@ export async function POST(req: NextRequest) {
     return true
   }
 
+  /**
+   * REFUSE AFTER THE MONEY IS RESERVED.
+   *
+   * Every `return` below this point exits a launch that will never serve, so
+   * each one has to hand the credits back. Five of them did not: a realtor
+   * refused for an unpublished landing page, a lapsed permit, a deleted
+   * audience or an unusable Page paid the full daily reservation for a
+   * campaign that never existed — and the 400 invited a retry that charged
+   * again. One responder instead of five call sites, so the next refusal
+   * added here cannot re-open the same hole.
+   */
+  async function refuse(payload: Record<string, unknown>, status: number) {
+    const refunded = await releaseReservation()
+    return NextResponse.json(
+      { ...payload, ...(refunded ? {} : { creditsRefunded: false, creditsHeld: creditsToSpend }) },
+      { status },
+    )
+  }
+
   // Persist broker↔campaign attribution (best-effort link). The money is already
   // reserved above, so this never charges — on a real launch the reservation is
   // separately reconciled to the true campaign id.
@@ -236,7 +266,7 @@ export async function POST(req: NextRequest) {
   if (typeof body.audienceId === 'string' && body.audienceId) {
     const saved = await getAudience(body.audienceId)
     if (!saved) {
-      return NextResponse.json({ error: 'That audience no longer exists', type: 'validation' }, { status: 400 })
+      return refuse({ error: 'That audience no longer exists', type: 'validation' }, 400)
     }
     launchedAudienceKey = `saved:${saved.id}`
     launchedAudienceName = saved.name
@@ -253,7 +283,7 @@ export async function POST(req: NextRequest) {
     // same kitchen resolves it as any saved pattern audience.
     const preset = getReadyBuyer(body.presetId)
     if (!preset) {
-      return NextResponse.json({ error: 'That audience no longer exists', type: 'validation' }, { status: 400 })
+      return refuse({ error: 'That audience no longer exists', type: 'validation' }, 400)
     }
     launchedAudienceKey = `ready:${preset.id}`
     // A ready-buyer's display name lives in the dictionaries, keyed by id —
@@ -296,14 +326,14 @@ export async function POST(req: NextRequest) {
     const state = slug ? await getLandingPublishState(slug).catch(() => null) : null
     const pre = preflightLanding(body.creative.landingUrl, state, { domain: BRAND.domain })
     if (blocksLaunch(pre.verdict)) {
-      return NextResponse.json({
+      return refuse({
         error: pre.verdict === 'noSuchPage'
           ? `There is no landing page at /lp/${pre.slug}. Every click on this campaign would land on a 404.`
           : pre.verdict === 'windowClosed'
             ? `The landing page /lp/${pre.slug} stopped publishing on ${String(pre.closesOn).slice(0, 10)}. Publish it again before spending on it.`
             : `The landing page /lp/${pre.slug} is not published, so every paid click would land on a 404.`,
         type: 'validation',
-      }, { status: 400 })
+      }, 400)
     }
     if (pre.verdict === 'closesSoon') {
       landingWarnings.push(`The landing page /lp/${pre.slug} stops publishing on ${String(pre.closesOn).slice(0, 10)} — this campaign will still be running.`)
@@ -334,10 +364,10 @@ export async function POST(req: NextRequest) {
       // they are the absence of evidence, and refusing on those would block
       // launches over a blank field. Only a date that has actually passed is
       // grounds to stop someone.
-      return NextResponse.json({
+      return refuse({
         error: `The Trakheesi permit for this listing expired on ${String(listing?.permitExpiry).slice(0, 10)}. Renew it before advertising this property.`,
         type: 'validation',
-      }, { status: 400 })
+      }, 400)
     }
     permitEndTime = end ?? undefined
   } catch {
@@ -486,7 +516,7 @@ export async function POST(req: NextRequest) {
       // pass through and let Meta be the judge rather than blocking a launch
       // on our own outage.
       if (accessible.length > 0 && !accessible.some((pg) => pg.id === wanted)) {
-        return NextResponse.json({ error: `This Meta account cannot publish as Page ${wanted} — reconnect the Page or pick one of the ${accessible.length} connected Pages.` }, { status: 400 })
+        return refuse({ error: `This Meta account cannot publish as Page ${wanted} — reconnect the Page or pick one of the ${accessible.length} connected Pages.` }, 400)
       }
       launchPageId = wanted
     }
@@ -606,6 +636,7 @@ export async function POST(req: NextRequest) {
       ...landingWarnings,
       ...(routerWarns(decision) ? [duplicateWarning(decision as RouterDecision, rivalName)] : []),
     ]
+    // credits: settled — this campaign is live, so the reservation stays spent.
     return NextResponse.json(
       { ...result, brokerId, decision, ...(warnings.length ? { warnings } : {}) },
       { status: 201 },

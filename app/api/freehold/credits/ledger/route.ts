@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { readCreditLedger, getAdSpendAllocations } from '@/lib/freehold/credits-db'
+import { creditAccountId } from '@/lib/freehold/credit-identity'
+import { getTenantBrand } from '@/lib/tenancy/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,10 +13,12 @@ export async function GET() {
   const user = await verifySession(token)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const brokerId = user.role === 'broker'
-    ? (user.brokerId ?? user.email)
-    : null
-  if (!brokerId) return NextResponse.json({ error: 'Not a broker account' }, { status: 403 })
+  // The same account the balance and the launch routes resolve. Left on the
+  // role test, a realtor's balance loaded and their history 403'd — one screen
+  // telling two stories about one ledger.
+  const plan = (await getTenantBrand().catch(() => null))?.plan
+  const brokerId = creditAccountId(user, plan) ?? null
+  if (!brokerId) return NextResponse.json({ error: 'This account is not funded by credits' }, { status: 403 })
 
   const [ledgerResult, allocations] = await Promise.all([
     readCreditLedger(brokerId),

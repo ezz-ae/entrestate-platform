@@ -1,5 +1,7 @@
 'use client'
 
+import { readBalanceBody } from '@/lib/freehold/credits-shared'
+
 /**
  * A BROKER ASKS FOR A CAMPAIGN — and never needs the ads tools.
  *
@@ -51,7 +53,9 @@ export default function RequestCampaignPage() {
       .catch(() => {})
     fetch('/api/freehold/credits/balance', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (typeof d?.balance === 'number') setBalance(d.balance) })
+      // Same shared reading as every other balance screen — this tested the
+      // wrapper for a number and so never showed a balance at all.
+      .then((d) => { const r = readBalanceBody(d); if (r.state === 'ok') setBalance(r.balance); else if (r.state === 'empty') setBalance(0) })
       .catch(() => {})
     void refresh()
   }, [])

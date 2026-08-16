@@ -6,6 +6,9 @@ import { createLocalCampaign } from '@/lib/google/local-store'
 import {
   deductCreditsForCampaign, refundCredits, settleCampaignReservation, getCreditBalance,
 } from '@/lib/freehold/credits-db'
+import { creditAccountId } from '@/lib/freehold/credit-identity'
+import { getTenantBrand } from '@/lib/tenancy/server'
+import { ensureCreditAccount } from '@/lib/freehold/credits-db'
 import { creditsForDailyBudget } from '@/lib/freehold/credits-shared'
 import { randomUUID } from 'crypto'
 
@@ -37,15 +40,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'At least 2 descriptions required' }, { status: 400 })
   }
 
-  // Identify the creating broker (if any) from the verified session.
+  // WHO PAYS. Plan-aware, not role-aware — the same shared rule Meta's launch
+  // uses, so the two platforms can never disagree about who is billed.
+  // See lib/freehold/credit-identity.ts.
   const sessionUser = __auth.user
-  const brokerId    = sessionUser.role === 'broker'
-    ? (sessionUser.brokerId ?? sessionUser.email)
-    : undefined
+  const tenantPlan = (await getTenantBrand().catch(() => null))?.plan
+  const brokerId = creditAccountId(sessionUser, tenantPlan)
 
   // Same rate as Meta, from the same shared derivation: 1 credit per AED 10 of
   // funded daily budget. A Google campaign burns the broker's ad budget exactly
   // like a Meta one, so it costs exactly the same credits.
+  // Open the account with the right billing shape BEFORE anything can create
+  // it by self-heal. lockAccount() creates a missing row with the monthly
+  // grant ON (the company default), so a realtor whose signup seed failed
+  // would be handed the Starter quota on their very first launch — free
+  // tokens on a product sold with no monthly fee.
+  if (brokerId) await ensureCreditAccount(brokerId, { monthlyGrant: tenantPlan !== 'realtor' }).catch(() => {})
+
   const creditsToSpend = brokerId ? creditsForDailyBudget(body.dailyBudgetAED) : 0
 
   // ── Money: RESERVE credits BEFORE launching (fail-closed) ────────────────────

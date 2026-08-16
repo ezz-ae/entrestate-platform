@@ -24,11 +24,12 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, Zap, Upload, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Loader2, Zap, Upload, CheckCircle2, ArrowRight, Coins } from 'lucide-react'
 import { useT } from '@/lib/i18n/provider'
 import { getBrandSiteUrl } from '@/lib/freehold/brand'
 import { READY_BUYERS } from '@/lib/freehold/ready-buyers'
 import { composeProjectAd } from '@/lib/freehold/project-ad'
+import { readBalanceBody, creditsForDailyBudget } from '@/lib/freehold/credits-shared'
 
 interface Project {
   id: string
@@ -41,6 +42,21 @@ interface Project {
   handoverYear?: number | null
 }
 interface FormLite { id: string; name: string; page_id?: string }
+
+/**
+ * What the token balance read said — four states, never "a number or null".
+ *
+ * The three non-numeric answers mean different things and must not collapse:
+ * 'off' is the account saying it is not billed in tokens at all (company
+ * staff), 'failed' is a read that broke, and 'loading' is not yet knowing. A
+ * zero would be a WRONG NUMBER on a money screen — the one thing this page is
+ * not allowed to print — so no state ever degrades into one.
+ */
+type TokenRead =
+  | { state: 'loading' }
+  | { state: 'off' }
+  | { state: 'failed' }
+  | { state: 'ok'; balance: number }
 
 const PRESET = 'allArabicUAE'
 
@@ -58,6 +74,7 @@ export default function QuickLaunchPage() {
   const [done, setDone] = useState<{ campaignId: string } | null>(null)
   const designDataUrl = useRef('')
   const [budgetOverride, setBudgetOverride] = useState<number | null>(null)
+  const [tokens, setTokens] = useState<TokenRead>({ state: 'loading' })
 
   // The Rocket handoff from the ads home: the budget the operator set there.
   useEffect(() => {
@@ -85,6 +102,33 @@ export default function QuickLaunchPage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (Array.isArray(d?.forms)) setForms(d.forms) })
       .catch(() => {})
+  }, [])
+
+  /**
+   * THE BALANCE, READ ON ARRIVAL — not discovered at the till.
+   *
+   * This page used to learn that the account was empty from the launch
+   * route's 402: after the realtor had picked a project, waited for a design
+   * to compose and pressed Run. The cost is knowable the moment the budget is,
+   * so it is said BEFORE the press. Nothing here touches the launch itself.
+   */
+  useEffect(() => {
+    fetch('/api/freehold/credits/balance', { cache: 'no-store' })
+      .then(async (r): Promise<TokenRead> => {
+        // 403 is the account answering "I am not funded by tokens" — company
+        // staff, whose ads are billed to the company, not metered. Tokens are
+        // the realtor's meter, so for staff the whole vocabulary stays off the
+        // screen rather than showing them a balance that means nothing.
+        if (r.status === 403) return { state: 'off' }
+        if (!r.ok) return { state: 'failed' }
+        const d = await r.json().catch(() => null)
+        // One shared reading of this body — see readBalanceBody's comment for
+        // the misread that made this whole panel inert.
+        const read = readBalanceBody(d)
+        return read.state === 'empty' ? { state: 'ok' as const, balance: 0 } : read
+      })
+      .then(setTokens)
+      .catch(() => setTokens({ state: 'failed' }))
   }, [])
 
   async function onUpload(file: File | null) {
@@ -161,6 +205,17 @@ export default function QuickLaunchPage() {
   // own number, which outranks the derivation because they chose it.
   const budget = budgetOverride ?? Math.max(150, Math.ceil((band[1] * 3) / 50) * 50)
   const form = forms[0] ?? null
+
+  // What the press costs, from the SAME function the server charges with
+  // (lib/freehold/credits-shared.ts). Never a local "/ 10": a screen that
+  // re-derives the price is a screen that will one day quote a different
+  // number than the ledger takes.
+  const cost = creditsForDailyBudget(budget)
+  const balance = tokens.state === 'ok' ? tokens.balance : null
+  // A shortfall is only a shortfall when the balance was actually READ. A
+  // failed read is not evidence of an empty account, so it never blocks Run —
+  // it says it could not read, and lets the launch route be the authority.
+  const short = balance !== null && balance < cost
 
   async function run() {
     if (!canRun || running) return
@@ -263,12 +318,45 @@ export default function QuickLaunchPage() {
           })}
         </div>
 
+        {/* WHAT THE PRESS COSTS — beside the button that spends it.
+            'loading' and 'off' render nothing at all: the first because a
+            number that might be about to change is worse than a beat of
+            silence, the second because this account is not metered in tokens
+            and the word would only confuse. */}
+        {tokens.state === 'failed' && (
+          <div className="rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[11.5px] leading-relaxed text-slate-400">
+            {t('tok.loadFailed')}
+          </div>
+        )}
+        {tokens.state === 'ok' && (
+          <div className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[11.5px] leading-relaxed text-slate-400">
+            <Coins className="h-3.5 w-3.5 shrink-0 text-gold" />
+            {t('tok.cost', { n: cost })}
+          </div>
+        )}
+
+        {short && (
+          <div className="rounded-xl border border-rose-400/25 bg-rose-500/5 px-3.5 py-3">
+            <p className="text-[12.5px] font-semibold text-rose-200">{t('tok.short')}</p>
+            <p className="mt-1 text-[11.5px] leading-relaxed text-slate-400">
+              {t('tok.shortBody', { need: cost, have: balance })}
+            </p>
+            <Link href="/freehold-intelligence/agent/credits/topup"
+              className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-gold transition hover:opacity-80">
+              {t('tok.topUp')} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
+
         {error && <p className="text-[13px] text-rose-300">{error}</p>}
 
         <div className="flex items-center justify-between gap-3">
           <Link href="/freehold-intelligence/lead-machine/campaigns/new"
             className="text-[12px] text-slate-500 underline transition hover:text-white">{t('lm.quick.detailed')}</Link>
-          <button type="button" onClick={() => void run()} disabled={!canRun || running}
+          {/* Disabled on a CONFIRMED shortfall only — a failed balance read
+              must never take the button away from someone whose account is
+              fine. */}
+          <button type="button" onClick={() => void run()} disabled={!canRun || running || short}
             className="inline-flex items-center gap-2 rounded-full bg-gold px-6 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-bright disabled:cursor-not-allowed disabled:opacity-40">
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
             {t('lm.quick.run')}

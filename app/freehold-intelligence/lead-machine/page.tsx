@@ -8,6 +8,10 @@ import BudgetSplitPanel from '@/components/freehold/budget-split-panel'
 import LiveCampaignsWidget from '@/components/freehold/lead-machine/live-campaigns-widget'
 import RocketAdWidget from '@/components/freehold/lead-machine/rocket-ad-widget'
 import RatingLoopWidget from '@/components/freehold/rating-loop-widget'
+// The primary action's destination is plan-dependent and therefore client-side
+// (the brand payload with the plan on it only resolves reliably in the
+// browser) — it ships with the lite launcher it opens.
+import { LaunchCtaLink } from '@/components/freehold/launch-cta'
 import { getServerT } from '@/lib/i18n/server'
 
 // The Lead Machine pipeline — LIVE data only. The mental model on this page:
@@ -97,9 +101,13 @@ export default async function LeadMachineOverviewPage() {
         subtitle={t('lm.hub.flow')}
         actions={
           <>
-            <Link href="/freehold-intelligence/lead-machine/campaigns/new" className={buttonClass('primary', 'md')}>
+            {/* Realtor plans land in the lite launcher (a few clicks, which is
+                what that plan is sold as); company plans keep the 4-step
+                wizard. Same label either way — it is the same promise, kept by
+                the path the plan was sold. */}
+            <LaunchCtaLink className={buttonClass('primary', 'md')}>
               <Zap className="h-3.5 w-3.5" /> {t('lm.hub.launch')}
-            </Link>
+            </LaunchCtaLink>
             <Link href="/freehold-intelligence/lead-machine/campaigns" className={buttonClass('secondary', 'md')}>
               {t('lm.hub.allCampaigns')} <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
