@@ -190,17 +190,32 @@ export async function getTenantBySubdomain(raw: string): Promise<SaasTenant | nu
   if (!SUBDOMAIN_RE.test(sub)) return null
   const cached = bySubdomainCache.get(sub)
   if (cached && cached.expires > Date.now()) return cached.tenant
-  return runWithDefaultSchema(async () => {
-    await ensure()
-    const rows = await query<TenantRow>(
-      `SELECT ${SELECT_COLS} FROM saas_tenants WHERE subdomain = $1 LIMIT 1`,
-      [sub],
-    )
-    if (!rows[0]) return null
-    const tenant = mapTenant(rows[0])
-    bySubdomainCache.set(sub, { tenant, expires: Date.now() + BY_SUBDOMAIN_TTL_MS })
-    return tenant
-  })
+  try {
+    return await runWithDefaultSchema(async () => {
+      await ensure()
+      const rows = await query<TenantRow>(
+        `SELECT ${SELECT_COLS} FROM saas_tenants WHERE subdomain = $1 LIMIT 1`,
+        [sub],
+      )
+      if (!rows[0]) return null
+      const tenant = mapTenant(rows[0])
+      bySubdomainCache.set(sub, { tenant, expires: Date.now() + BY_SUBDOMAIN_TTL_MS })
+      return tenant
+    })
+  } catch (err) {
+    // Stale beats stranger. Brand/plan resolution rides this on every request
+    // of a tenant host, and callers degrade null to the vendor's STATIC brand
+    // — so a transient DB error (cold pool, blip) was randomly dressing a
+    // tenant's workspace in the wrong company and the full nav. A tenant we
+    // have EVER resolved in this instance keeps resolving from the expired
+    // cache entry while the error lasts; only tenants never seen here still
+    // surface the failure to the caller.
+    if (cached) {
+      console.error('[tenancy] tenant lookup failed — serving stale cache for', sub, err)
+      return cached.tenant
+    }
+    throw err
+  }
 }
 
 /** All tenants, newest first — for the vendor's admin surface. */
