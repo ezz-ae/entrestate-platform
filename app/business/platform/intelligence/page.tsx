@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import { Section, Band, Display, Lede, SectionHeading } from '@/components/business/ui'
+import { Section, Band, Display, Lede, SectionHeading, Eyebrow } from '@/components/business/ui'
 import { Ledger, PunchGrid, Chapter, NextStep } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub } from '@/components/business/holders'
+import { SceneChatBuilds } from '@/components/business/scenes'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -95,6 +96,14 @@ export default function IntelligencePage() {
             ))}
           </div>
         </Holder>
+      </Section>
+
+      {/* ── Ask, and it builds — the story without a word of prose ──────── */}
+      <Section className="pb-20 lg:pb-28">
+        <Eyebrow>Ask, and it builds</Eyebrow>
+        <div className="mt-6">
+          <SceneChatBuilds />
+        </div>
       </Section>
 
       <NextStep href={next.href} label={next.label} note={next.blurb} progress="Chapter 7 of 7" />

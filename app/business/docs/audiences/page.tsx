@@ -30,6 +30,7 @@ export default function AudiencesGuide() {
         items={[
           { id: 'named-audiences', label: 'Start from a named audience' },
           { id: 'rate-your-leads', label: 'Rate your leads' },
+          { id: 'data-workout', label: 'The form is a data workout' },
           { id: 'lookalikes', label: 'Build a lookalike' },
           { id: 'exclusions', label: 'Exclude who you already have' },
           { id: 'attach', label: 'Attach it to a campaign' },
@@ -65,7 +66,19 @@ export default function AudiencesGuide() {
             </Browser>
           </div>
         </Step>
-        <Step n={3} id="lookalikes" title="Build a lookalike">
+        <Step n={3} id="data-workout" title="The form is a data workout">
+          <p>
+            The lead form on your page looks like a form. It is not — it is a data workout that
+            builds audiences. Every lead it captures, and every rating your team gives that lead,
+            trains what the next campaign buys and what it stops buying.
+          </p>
+          <p>
+            Leads rated 6 or better become seed audiences; lookalikes are built on top of those
+            seeds. And before any contact reaches Meta it is SHA-256-hashed — raw phone numbers
+            and emails never leave the platform.
+          </p>
+        </Step>
+        <Step n={4} id="lookalikes" title="Build a lookalike">
           <p>
             A lookalike asks Meta to find new people who resemble your best leads. Build it on
             your top 3% for the closest match. It needs at least 100 matched people to stand on —
@@ -77,7 +90,7 @@ export default function AudiencesGuide() {
             so — it is not a fault.
           </p>
         </Step>
-        <Step n={4} id="exclusions" title="Exclude who you already have">
+        <Step n={5} id="exclusions" title="Exclude who you already have">
           <p>
             Two lists keep your budget off people it cannot help. The first holds everyone
             already in your CRM, so you never pay again to acquire a person you are already
@@ -85,7 +98,7 @@ export default function AudiencesGuide() {
             applied to every launch automatically, not as an option.
           </p>
         </Step>
-        <Step n={5} id="attach" title="Attach it to a campaign">
+        <Step n={6} id="attach" title="Attach it to a campaign">
           <p>
             In the campaign wizard&rsquo;s Targeting step, pick the audience by name. A saved
             audience keeps its own exclusions when you attach it. Broad delivery is allowed too —

@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: 'The studio',
   description:
-    'Every creative tool in one place — what each one does, and the rule they all share: the studio writes words, never figures.',
+    'Nine design apps in one studio — what each one does, and the rule they all share: the studio writes words, never figures.',
   alternates: { canonical: '/business/docs/creative-studio' },
 }
 
@@ -21,14 +21,14 @@ export default function CreativeStudioGuide() {
     <DocsShell href="/business/docs/creative-studio">
       <ArticleMeta category="Creative studio" read="4 min read" />
       <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
-        The studio makes everything your campaigns run — finished ad designs, video reels,
-        captions, branded brochures. What you download is the exact file that runs as the ad;
-        nothing in the studio is a mock-up.
+        The studio is nine design apps in one place, making everything your campaigns run —
+        finished ad designs, video reels, captions, branded brochures. What you download is the
+        exact file that runs as the ad; nothing in the studio is a mock-up.
       </p>
       <OnPage
         items={[
           { id: 'one-engine', label: 'One engine, three shapes' },
-          { id: 'tools', label: 'The tools' },
+          { id: 'tools', label: 'The nine apps' },
           { id: 'words-numbers', label: 'Words from the studio, numbers from the record' },
           { id: 'permit', label: 'The permit, on every size' },
           { id: 'push', label: 'Into the ad set that already works' },
@@ -44,7 +44,7 @@ export default function CreativeStudioGuide() {
             layout flips right-to-left on its own.
           </p>
         </Step>
-        <Step n={2} id="tools" title="The tools">
+        <Step n={2} id="tools" title="The nine apps">
           <ul className="list-disc space-y-2 pl-5">
             <li>
               <span className="font-medium text-white">Ad Designer</span> — pick a listing and
@@ -76,9 +76,14 @@ export default function CreativeStudioGuide() {
               page, and designs ads from the same numbers.
             </li>
             <li>
-              <span className="font-medium text-white">Templates</span> — ready designs in
-              English, Arabic and Russian, previewed live with your own photos rather than stock
-              screenshots.
+              <span className="font-medium text-white">Node canvas</span> — an open canvas for
+              the layout no template covers; compose the design block by block and keep full
+              control of every element.
+            </li>
+            <li>
+              <span className="font-medium text-white">Templates &amp; starters</span> — ready
+              designs in English, Arabic and Russian, previewed live with your own photos rather
+              than stock screenshots.
             </li>
             <li>
               <span className="font-medium text-white">Library</span> — everything any tool makes

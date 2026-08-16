@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { Section, Display, Lede } from '@/components/business/ui'
+import { Section, Display, Lede, SectionHeading, Eyebrow } from '@/components/business/ui'
 import { Holder, Keyword, KeywordSub, HolderRow, LearnMore } from '@/components/business/holders'
+import { SceneOneClickStory } from '@/components/business/scenes'
 import { Browser, Chapter, NextStep, StatBand } from '@/components/business/visuals'
 import { nextInTour } from '@/lib/business/nav'
 
@@ -129,18 +130,43 @@ export default function CreativePage() {
       </Section>
 
       <Section className="mt-16 lg:mt-24">
-        <HolderRow cols={3}>
-          <Holder tone="plain">
-            <Keyword>Every shape.</Keyword>
-            <KeywordSub>Feed, square and story from one design — one ZIP, captions inside.</KeywordSub>
-          </Holder>
+        <SectionHeading eyebrow="The studio" title="Nine design apps" />
+        <HolderRow cols={3} className="mt-12">
           <Holder tone="blue">
-            <Keyword>Photos to video.</Keyword>
-            <KeywordSub>A real reel cut from listing photos — title card, offer card, your palette.</KeywordSub>
+            <Keyword as="h3">Ad Designer.</Keyword>
+            <KeywordSub>Pick a listing — finished designs from its own price and payment plan.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Photo Reel.</Keyword>
+            <KeywordSub>Listing photos become a real video — title card, offer card, your palette.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Image editor.</Keyword>
+            <KeywordSub>Crop, reframe and touch up listing photos before they carry a design.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Video.</Keyword>
+            <KeywordSub>Trim a clip, add a caption and closing card, pick the cover frame.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Presenters.</Keyword>
+            <KeywordSub>On-camera personas with one saved face — the same person in every creative.</KeywordSub>
           </Holder>
           <Holder tone="green">
-            <Keyword>Arabic flips it.</Keyword>
-            <KeywordSub>Write the headline in Arabic and the whole ad turns right-to-left.</KeywordSub>
+            <Keyword as="h3">Brochure → Ad Set.</Keyword>
+            <KeywordSub>Drop a developer&rsquo;s PDF — the listing, its page and its ads follow.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Node canvas.</Keyword>
+            <KeywordSub>Build the layout no template covers, block by block, on an open canvas.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Templates &amp; starters.</Keyword>
+            <KeywordSub>Ready designs in English, العربية, Русский — previewed with your own photos.</KeywordSub>
+          </Holder>
+          <Holder tone="plain">
+            <Keyword as="h3">Library.</Keyword>
+            <KeywordSub>Everything any tool makes lands in one place, ready for the next campaign.</KeywordSub>
           </Holder>
         </HolderRow>
       </Section>
@@ -156,12 +182,21 @@ export default function CreativePage() {
       <div className="mt-16 lg:mt-24">
         <StatBand
           items={[
+            { value: '9', label: 'design apps in one studio', note: 'Ad Designer to Library — one login' },
             { value: '8', label: 'layouts per listing', note: 'three lead with the down payment — the Dubai pattern' },
             { value: '45', label: 'starting templates', note: 'in English, العربية, Русский' },
             { value: '3', label: 'shapes from one design', note: 'feed, square and story — one ZIP' },
           ]}
         />
       </div>
+
+      {/* ── One click, one story — the generator, acted out ─────────────── */}
+      <Section className="pb-20 lg:pb-28">
+        <Eyebrow>One click, one story</Eyebrow>
+        <div className="mt-6">
+          <SceneOneClickStory />
+        </div>
+      </Section>
 
       <NextStep href={next.href} label={next.label} note={next.blurb} progress="Chapter 5 of 7" />
     </>

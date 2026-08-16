@@ -4,6 +4,7 @@ import {
   Browser, Phone, Chat, MiniCampaigns, Ledger, StatBand, StepRail, PunchGrid, GlowBand, NextStep,
 } from '@/components/business/visuals'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
+import { SceneRunAds } from '@/components/business/scenes'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -126,7 +127,7 @@ export default function MetaForRealtorsPage() {
           </Holder>
           <Holder tone="blue">
             <Keyword as="h3">Real buyers.</Keyword>
-            <KeywordSub>Targeting starts from who actually buys, not from broad interests.</KeywordSub>
+            <KeywordSub>Forms here build audiences — every rated lead teaches the targeting.</KeywordSub>
             <LearnMore href="/business/docs/audiences" label="Learn about audiences" />
           </Holder>
           <Holder>
@@ -134,6 +135,14 @@ export default function MetaForRealtorsPage() {
             <KeywordSub>Each lead arrives in seconds, with the ad that produced it.</KeywordSub>
           </Holder>
         </HolderRow>
+      </Section>
+
+      {/* ── The story, no text: pick, cap, run, lead ────────────────────── */}
+      <Section className="pb-20 lg:pb-28">
+        <Eyebrow>Watch it run</Eyebrow>
+        <div className="mt-6">
+          <SceneRunAds />
+        </div>
       </Section>
 
       {/* ── Rail: how it runs ───────────────────────────────────────────── */}

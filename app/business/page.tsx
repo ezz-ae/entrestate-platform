@@ -6,7 +6,8 @@ import {
   FeatureTile, TileGrid, PunchGrid, StatBand, NextStep,
 } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
-import { PRODUCTS, PLATFORM, nextInTour } from '@/lib/business/nav'
+import { PRODUCTS, nextInTour } from '@/lib/business/nav'
+import { ExplorerSection } from '@/components/business/explorer'
 
 export const metadata: Metadata = {
   // Absolute: this page names the whole site, so it must not inherit the
@@ -221,30 +222,8 @@ export default function BusinessHome() {
         </div>
       </Section>
 
-      {/* ── Platform chapters — one ordered path, 01 through 07 ─────────── */}
-      <Section className="pb-20 lg:pb-28">
-        <SectionHeading eyebrow="Inside the platform" title="Seven chapters. One database." />
-        <ul className="mt-12 grid grid-cols-1 gap-x-8 gap-y-8 border-t border-white/[0.06] pt-10 sm:grid-cols-2 lg:grid-cols-4">
-          {PLATFORM.map((f, at) => (
-            <li key={f.href}>
-              <Link href={f.href} className="group block">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
-                    {String(at + 1).padStart(2, '0')}
-                  </span>
-                  <span className="text-[0.9375rem] font-semibold text-white">{f.label}</span>
-                  <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">
-                    →
-                  </span>
-                </div>
-                <p className="mt-1.5 pl-[calc(0.8125rem*2+0.75rem)] text-[0.8125rem] leading-[1.55] text-[#94A3B8]">
-                  {f.blurb}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
+      {/* ── The product, part by part — real screens, one tab each ──────── */}
+      <ExplorerSection />
 
       {/* ── The rules ───────────────────────────────────────────────────── */}
       <Band className="bg-[#0A0E14]">
