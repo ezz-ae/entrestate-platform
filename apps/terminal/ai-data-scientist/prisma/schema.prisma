@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model EntrestateMaster {
+  project_id          Int      @id @map("project_id")
+  name                String?  @map("name")
+  city_clean          String?  @map("city_clean")
+  area                String?  @map("area")
+  developer_canonical String?  @map("developer_canonical")
+  final_price_from    Float?   @map("final_price_from")
+  final_price_to      Float?   @map("final_price_to")
+  market_timing       String?  @map("market_timing")
+  derived_risk_class  String?  @map("derived_risk_class")
+  data_confidence     String?  @map("data_confidence")
+  final_status        String?  @map("final_status")
+  investor_score_v1    Float?   @map("investor_score_v1")
+
+  @@map("entrestate_master")
+}

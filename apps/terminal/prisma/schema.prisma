@@ -1,0 +1,650 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// Partial schema for Entrestate Intelligence Engine tables.
+// Raw SQL queries are used for dashboard analysis, so only key fields are mapped here.
+model EntrestateMaster {
+  project_id         Int      @id @map("project_id")
+  name               String?  @map("name")
+  city_clean         String?  @map("city_clean")
+  area               String?  @map("area")
+  developer_canonical String? @map("developer_canonical")
+  final_price_from   Float?   @map("final_price_from")
+  final_price_to     Float?   @map("final_price_to")
+  market_timing      String?  @map("market_timing")
+  derived_risk_class String?  @map("derived_risk_class")
+  data_confidence    String?  @map("data_confidence")
+  final_status       String?  @map("final_status")
+  investor_score_v1   Float?   @map("investor_score_v1")
+
+  @@map("entrestate_master")
+}
+
+enum AgentRole {
+  lead_qualifier
+  buyer_matcher
+  investor_advisor
+}
+
+enum AgentStatus {
+  draft
+  active
+  archived
+}
+
+enum OutputChannel {
+  whatsapp
+  call_script
+  investor_memo
+  crm_summary
+}
+
+enum CompanyType {
+  broker
+  developer
+  investment
+}
+
+enum RunStatus {
+  queued
+  running
+  completed
+  failed
+}
+
+enum TeamRole {
+  owner
+  admin
+  editor
+  viewer
+}
+
+enum ConnectorType {
+  listings
+  projects
+  market_intel
+  crm
+}
+
+model Team {
+  id        String       @id @default(cuid())
+  name      String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  members   TeamMember[]
+  agents    AgentDefinition[]
+  credentials ConnectorCredential[]
+  knowledgeSources KnowledgeSource[]
+  apiKeys   ApiKey[]
+  userProfiles UserProfile[]
+  assistantReports AssistantReport[]
+
+  @@map("teams")
+}
+
+model User {
+  id        String       @id @default(cuid())
+  email     String?      @unique
+  name      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  memberships TeamMember[]
+  timetables  TimeTable[]
+  profile     UserProfile?
+  chatSessions ChatSession[]
+  decisionObjects DecisionObject[]
+  apiKeys     ApiKey[]
+  assistantReports AssistantReport[]
+  marketBooks     MarketBook[]
+
+  @@map("users")
+}
+
+model AssistantReport {
+  id        String   @id @default(cuid())
+  publicId  String   @unique @default(cuid())
+  userId    String   @map("user_id")
+  teamId    String?  @map("team_id")
+  title     String
+  payload   Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([teamId, createdAt])
+  @@map("assistant_reports")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(editor)
+  createdAt DateTime @default(now())
+  team      Team     @relation(fields: [teamId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+model AgentTemplate {
+  id               String    @id @default(cuid())
+  name             String
+  description      String
+  role             AgentRole
+  defaultDefinition Json
+  sampleConversation Json
+  sampleOutput     Json
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@map("agent_templates")
+}
+
+model AgentDefinition {
+  id         String      @id @default(cuid())
+  teamId     String
+  name       String
+  role       AgentRole
+  market     String
+  companyType CompanyType
+  inputs     Json
+  rules      Json
+  outputs    Json
+  connectors Json
+  status     AgentStatus @default(draft)
+  version    Int         @default(1)
+  shareId    String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  workflowGraph Json? // Stores the ReactFlow nodes and edges for the agent workflow
+
+  team       Team        @relation(fields: [teamId], references: [id])
+  versions   AgentVersion[]
+  runs       AgentRun[]
+  ruleSets   RuleSet[]
+
+  @@index([teamId])
+  @@map("agent_definitions")
+}
+
+model AgentVersion {
+  id         String   @id @default(cuid())
+  agentId    String
+  version    Int
+  definition Json
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  agent      AgentDefinition @relation(fields: [agentId], references: [id])
+
+  @@index([agentId])
+  @@map("agent_versions")
+}
+
+model AgentRun {
+  id         String   @id @default(cuid())
+  agentId    String
+  version    Int
+  status     RunStatus
+  input      Json
+  output     Json?
+  error      String?
+  createdAt  DateTime @default(now())
+  completedAt DateTime?
+
+  agent      AgentDefinition @relation(fields: [agentId], references: [id])
+  messages   AgentMessage[]
+
+  @@index([agentId])
+  @@map("agent_runs")
+}
+
+model AgentMessage {
+  id        String   @id @default(cuid())
+  runId     String
+  role      String
+  content   String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  run       AgentRun @relation(fields: [runId], references: [id])
+
+  @@index([runId])
+  @@map("agent_messages")
+}
+
+model Connector {
+  id          String        @id @default(cuid())
+  name        String
+  type        ConnectorType
+  description String
+  configSchema Json?
+  enabled     Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("connectors")
+}
+
+model ConnectorCredential {
+  id         String   @id @default(cuid())
+  teamId     String
+  connectorId String
+  status     String
+  config     Json
+  createdAt  DateTime @default(now())
+
+  team       Team     @relation(fields: [teamId], references: [id])
+
+  @@index([teamId])
+  @@index([connectorId])
+  @@map("connector_credentials")
+}
+
+model KnowledgeSource {
+  id         String   @id @default(cuid())
+  teamId     String
+  name       String
+  type       String
+  config     Json
+  createdAt  DateTime @default(now())
+
+  team       Team     @relation(fields: [teamId], references: [id])
+
+  @@index([teamId])
+  @@map("knowledge_sources")
+}
+
+model RuleSet {
+  id         String   @id @default(cuid())
+  agentId    String
+  strictMode Boolean  @default(true)
+  toggles    Json
+  createdAt  DateTime @default(now())
+
+  agent      AgentDefinition @relation(fields: [agentId], references: [id])
+
+  @@index([agentId])
+  @@map("rule_sets")
+}
+
+enum Visibility {
+  private
+  team
+  public
+}
+
+enum RefreshPolicy {
+  manual
+  daily
+  realtime
+}
+
+enum DecisionObjectType {
+  report
+  presentation
+  memo
+  widget
+  contract
+}
+
+model TimeTable {
+  id              String         @id @default(cuid())
+  ownerId         String
+  title           String
+  tablespec       Json           // Stores the TableSpec JSON
+  hash            String         @unique
+  visibility      Visibility     @default(private)
+  refreshPolicy   RefreshPolicy  @default(manual)
+  lastRefreshAt   DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  user            User           @relation(fields: [ownerId], references: [id])
+  decisionObjects DecisionObject[]
+  automations     Automation[]
+  
+  @@index([ownerId])
+  @@index([hash])
+  @@map("timetables")
+}
+
+model DecisionObject {
+  id              String             @id @default(cuid())
+  timetableId     String
+  ownerId         String?            // Persistent link to the generating user
+  type            DecisionObjectType
+  version         Int                @default(1)
+  status          String             @default("draft")
+  artifactUrls    Json?              // Map of format -> url
+  brandProfileId  String?
+  evidence        Json?              // Snapshot of evidence at creation
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  
+  timetable       TimeTable          @relation(fields: [timetableId], references: [id])
+  owner           User?              @relation(fields: [ownerId], references: [id])
+  automations     Automation[]
+  
+  @@index([timetableId])
+  @@index([ownerId])
+  @@map("decision_objects")
+}
+
+model ChatSession {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  ChatMessage[]
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // "user", "assistant", "system", "tool"
+  content   String
+  toolCalls Json?
+  createdAt DateTime @default(now())
+  session   ChatSession @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}
+
+model ApiKey {
+  id          String   @id @default(cuid())
+  userId      String
+  teamId      String?
+  name        String
+  key         String   @unique // The hashed or encrypted key
+  prefix      String   // First 8 chars for display
+  scopes      String[] // "read:market", "read:listings", etc.
+  createdAt   DateTime @default(now())
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id])
+  team        Team?    @relation(fields: [teamId], references: [id])
+
+  @@index([userId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+model UserProfile {
+  userId          String             @id
+  teamId          String?            // Link to a team for shared strategic context
+  riskBias        Float              @default(0.65) // Default market weight
+  horizon         String?            // "Ready", "1-2yr", etc.
+  yieldVsSafety   Float              @default(0.5)
+  preferredMarkets String[]
+  inferredSignals Json?              // Auto-learned features
+  updatedAt       DateTime           @updatedAt
+  
+  user            User               @relation(fields: [userId], references: [id])
+  team            Team?              @relation(fields: [teamId], references: [id])
+  @@map("user_profiles")
+}
+
+model Automation {
+  id               String            @id @default(cuid())
+  timetableId      String?
+  decisionObjectId String?
+  type             String            // "whatsapp", "email", etc.
+  config           Json
+  enabled          Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  
+  timetable        TimeTable?        @relation(fields: [timetableId], references: [id])
+  decisionObject   DecisionObject?   @relation(fields: [decisionObjectId], references: [id])
+  
+  @@index([timetableId])
+  @@index([decisionObjectId])
+  @@map("automations")
+}
+
+model AuditEvent {
+  id              String             @id @default(cuid())
+  actorId         String
+  action          String
+  entityType      String
+  entityId        String
+  payload         Json?
+  createdAt       DateTime           @default(now())
+  
+  @@index([actorId])
+  @@index([entityId])
+  @@map("audit_events")
+}
+
+// ─── Market Book ML ────────────────────────────────────────────────────────
+
+enum BookType {
+  client
+  area
+  project
+  portfolio
+}
+
+enum BookPageType {
+  overview
+  transactions
+  comparison
+  opportunity
+  risk
+  memo
+  content
+}
+
+enum BookPageStatus {
+  pending
+  generating
+  ready
+  error
+}
+
+model MarketBook {
+  id          String     @id @default(cuid())
+  ownerId     String
+  title       String
+  subject     String
+  type        BookType
+  metadata    Json?
+  lastFedAt   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  owner       User       @relation(fields: [ownerId], references: [id])
+  pages       BookPage[]
+  feeds       BookFeed[]
+
+  @@index([ownerId, createdAt])
+  @@map("market_books")
+}
+
+model BookPage {
+  id          String         @id @default(cuid())
+  bookId      String
+  type        BookPageType
+  title       String
+  content     Json
+  rawText     String?
+  status      BookPageStatus @default(pending)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  book        MarketBook     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, type])
+  @@map("book_pages")
+}
+
+model BookFeed {
+  id          String     @id @default(cuid())
+  bookId      String
+  category    String
+  headline    String
+  detail      Json
+  seenAt      DateTime?
+  createdAt   DateTime   @default(now())
+
+  book        MarketBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId, createdAt])
+  @@map("book_feeds")
+}
+model ProvenanceLog {
+  id              String   @id @default(cuid())
+  runId           String   @unique @map("run_id")
+  snapshotTs      DateTime @default(now()) @map("snapshot_ts")
+  dataSource      String   @map("data_source")
+  confidenceScore Float    @map("confidence_score")
+  reasoning       String?  @map("reasoning")
+  payload         Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([runId])
+  @@map("provenance_logs")
+}
+
+view LatestProvenance {
+  id              String
+  runId           String   @map("run_id")
+  snapshotTs      DateTime @map("snapshot_ts")
+  dataSource      String   @map("data_source")
+  confidenceScore Float    @map("confidence_score")
+
+  @@map("latest_provenance")
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// User-owned data — added 2026-05-02 for /me + paid tier (open connection).
+//
+// UserListing      : a listing the user uploaded (manual / CSV / API / portal)
+// MarketAlert      : per-user alerts on saved areas / watched projects / listings
+// UserSavedArea    : areas the user is watching
+// UserWatchedProject: projects the user is watching
+// ────────────────────────────────────────────────────────────────────────────
+
+enum ListingSource {
+  manual
+  csv
+  json
+  brochure
+  portal
+  crm
+  api
+  webhook
+}
+
+enum Verdict {
+  STRONG_BUY
+  BUY
+  HOLD
+  WAIT
+  AVOID
+}
+
+model UserListing {
+  id              String         @id @default(cuid())
+  userId          String         @map("user_id")
+  teamId          String?        @map("team_id")
+  externalId      String?        @map("external_id")
+  name            String
+  developer       String?
+  area            String?
+  bedrooms        Int?
+  priceAed        Decimal?       @map("price_aed") @db.Decimal(14, 2)
+  yieldPct        Float?         @map("yield_pct")
+  completionYear  Int?           @map("completion_year")
+  description     String?
+  imageUrl        String?        @map("image_url")
+  source          ListingSource  @default(manual)
+  sourceMetadata  Json?          @map("source_metadata")
+  verdict         Verdict?
+  confidencePct   Float?         @map("confidence_pct")
+  scorePayload    Json?          @map("score_payload")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt      @map("updated_at")
+
+  @@index([userId])
+  @@index([teamId])
+  @@unique([userId, externalId])
+  @@map("user_listings")
+}
+
+model UserSavedArea {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  areaSlug    String   @map("area_slug")
+  notifyEmail Boolean  @default(true) @map("notify_email")
+  notifyPush  Boolean  @default(false) @map("notify_push")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, areaSlug])
+  @@index([userId])
+  @@map("user_saved_areas")
+}
+
+model UserWatchedProject {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  projectSlug String   @map("project_slug")
+  notifyEmail Boolean  @default(true) @map("notify_email")
+  notifyPush  Boolean  @default(false) @map("notify_push")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, projectSlug])
+  @@index([userId])
+  @@map("user_watched_projects")
+}
+
+enum AlertChannel {
+  email
+  push
+  webhook
+}
+
+enum AlertSubjectKind {
+  area
+  project
+  listing
+}
+
+model MarketAlert {
+  id          String           @id @default(cuid())
+  userId      String           @map("user_id")
+  channel     AlertChannel     @default(email)
+  subjectKind AlertSubjectKind @map("subject_kind")
+  subjectKey  String           @map("subject_key")        // area slug, project slug, or listing id
+  title       String
+  body        String
+  payload     Json?
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  readAt      DateTime?        @map("read_at")
+
+  @@index([userId, read, createdAt])
+  @@map("market_alerts")
+}
