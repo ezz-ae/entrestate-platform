@@ -13,11 +13,12 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { I18nProvider, useT } from '@/lib/i18n/provider'
+import { BusinessHeader, BusinessFooter } from '@/components/business/shell'
 import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from '@/lib/tenancy/config'
 import { SUBDOMAIN_RE, RESERVED_SUBDOMAINS } from '@/lib/tenancy/reserved'
 
 const MAX_LOGO_DIM = 256 // px — downscale before upload so the row stays small
-const DEFAULT_ACCENT = '#D4AF37'
+const DEFAULT_ACCENT = '#3B82F6'
 const TRIAL_DAYS = 14
 
 /** Downscale an uploaded image to a small PNG data URL via canvas. */
@@ -68,6 +69,7 @@ function SignupForm() {
   const [adminEmail, setAdminEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [createdUrl, setCreatedUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const checkSeq = useRef(0)
@@ -99,7 +101,7 @@ function SignupForm() {
 
   if (!SAAS_TENANCY) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a1628] p-6 text-center text-white/70">
+      <div className="flex min-h-[60vh] items-center justify-center bg-[#07090C] p-6 text-center text-white/70">
         {t('wl.signup.notEnabled')}
       </div>
     )
@@ -153,8 +155,13 @@ function SignupForm() {
         }[data.error ?? ''] ?? 'wl.signup.errGeneric'
         return setError(t(key))
       }
-      // Full navigation onto THEIR subdomain — the claim endpoint signs them in.
-      window.location.href = data.redirect
+      // Full navigation onto THEIR subdomain — the claim endpoint signs them
+      // in. The address is shown for a beat first: it is the one thing the
+      // broker must not lose, and if the wildcard DNS is still propagating the
+      // hop can fail while the address stays right here on screen.
+      const redirect = data.redirect
+      setCreatedUrl(redirect)
+      setTimeout(() => { window.location.href = redirect }, 1600)
     } catch {
       setLoading(false)
       setError(t('wl.signup.errGeneric'))
@@ -173,9 +180,31 @@ function SignupForm() {
   const subHint = subHintByState[subState]
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-white" style={{ ['--wl-accent' as string]: accent }}>
-      <div className="mx-auto grid min-h-screen max-w-5xl grid-cols-1 items-center gap-10 px-6 py-12 md:grid-cols-2">
-        {/* Form */}
+    <div className="min-h-screen bg-[#07090C] font-sans text-white antialiased [color-scheme:dark]" style={{ ['--wl-accent' as string]: accent }}>
+      <BusinessHeader />
+      <main className="mx-auto grid w-full max-w-5xl grid-cols-1 items-start gap-10 px-6 pb-24 pt-14 md:grid-cols-2 lg:pt-20">
+        {/* Created: show the address before the automatic hop onto it. */}
+        {createdUrl ? (
+          <div className="order-2 md:order-1">
+            <div className="rounded-2xl border border-[#3B82F6]/30 bg-[#0F131A] p-8">
+              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#34D399]">
+                <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#34D399]" />
+                {t('wl.signup.createdEyebrow')}
+              </div>
+              <h1 className="mt-4 text-2xl font-semibold tracking-tight">{t('wl.signup.createdTitle')}</h1>
+              <div dir="ltr" className="mt-5 truncate rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 font-mono text-sm text-white">
+                https://{subdomain.trim()}.{TENANT_BASE_DOMAIN}
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-[#94A3B8]">{t('wl.signup.createdNote')}</p>
+              <a
+                href={createdUrl}
+                className="mt-6 inline-block rounded-lg bg-[#3B82F6] px-5 py-3 text-sm font-semibold text-white"
+              >
+                {t('wl.signup.createdOpen')}
+              </a>
+            </div>
+          </div>
+        ) : (
         <form onSubmit={submit} className="order-2 md:order-1">
           <div className="mb-8">
             <div className="mb-2 inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/60">
@@ -291,13 +320,14 @@ function SignupForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg px-4 py-3 text-sm font-semibold text-black transition disabled:opacity-60"
+            className="w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60"
             style={{ background: 'var(--wl-accent)' }}
           >
             {loading ? t('wl.signup.submitting') : t('wl.signup.submit')}
           </button>
           <p className="mt-3 text-center text-xs text-white/40">{t('wl.signup.trialNote', { days: TRIAL_DAYS })}</p>
         </form>
+        )}
 
         {/* Live preview */}
         <div className="order-1 md:order-2">
@@ -305,7 +335,7 @@ function SignupForm() {
             <div className="mb-4 text-xs font-medium uppercase tracking-widest text-white/40">
               {t('wl.signup.previewTitle')}
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0a1628] px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0F131A] px-4 py-3">
               {logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={logo} alt="" className="h-6 w-auto max-w-[120px] object-contain" />
@@ -335,7 +365,8 @@ function SignupForm() {
             <p className="mt-4 text-xs leading-relaxed text-white/40">{t('wl.signup.previewNote')}</p>
           </div>
         </div>
-      </div>
+      </main>
+      <BusinessFooter />
     </div>
   )
 }

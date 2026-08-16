@@ -76,7 +76,7 @@ export function SiteFooter() {
   const brand = useBrand()
 
   // "/business" carries its own footer — see the note in site-header.tsx.
-  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business"]
+  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business", "/signup"]
   const isMarketCommandPath = pathname === "/market" || /^\/market\/p-/.test(pathname || "")
   if (pathname?.startsWith("/crm") || pathname === "/chat" || isMarketCommandPath || commandPaths.some((path) => pathname === path || pathname?.startsWith(`${path}/`))) {
     return null
