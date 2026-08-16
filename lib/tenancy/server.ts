@@ -19,8 +19,22 @@ export async function getTenantForRequestHost(): Promise<SaasTenant | null> {
   if (!SAAS_TENANCY) return null
   const sub = tenantSubdomainFromHost((await headers()).get('host'))
   if (!sub) return null
-  // DB hiccups must degrade to the default brand, never crash the layout.
-  return getTenantBySubdomain(sub).catch(() => null)
+  // DB hiccups must degrade to the default brand rather than crash the
+  // layout — but degrading means the VENDOR's brand over a TENANT's page, so
+  // a transient failure gets one retry first, and every degradation is named
+  // in the logs. A fresh instance's first lookup (cold pool + the control-
+  // plane ensure DDL) is exactly where the transients live.
+  try {
+    return await getTenantBySubdomain(sub)
+  } catch (first) {
+    await new Promise((r) => setTimeout(r, 250))
+    try {
+      return await getTenantBySubdomain(sub)
+    } catch (second) {
+      console.error('[tenancy] host tenant resolution degraded to static brand for', sub, second)
+      return null
+    }
+  }
 }
 
 /** Brand snapshot for the current tenant host — feeds the BrandProvider. */
