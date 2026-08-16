@@ -65,6 +65,25 @@ export async function listRegisteredForms(): Promise<RegisteredForm[]> {
 }
 
 /**
+ * Registered forms shaped as the forms page renders them: DRAFT — the amber
+ * "goes live when attached to a running ad" badge, which is exactly what a
+ * platform-created form is while Meta is not connected. The sandbox mirror of
+ * listLocalCampaigns: created work stays visible before the account link.
+ */
+export async function listRegisteredFormsAsDrafts(): Promise<MetaLeadForm[]> {
+  const registered = await listRegisteredForms()
+  return registered.map((reg) => ({
+    id: reg.id,
+    name: reg.name ?? reg.id,
+    status: 'DRAFT',
+    leads_count: 0,
+    created_time: reg.created_at instanceof Date
+      ? reg.created_at.toISOString()
+      : String(reg.created_at ?? ''),
+  }))
+}
+
+/**
  * Meta's paginated form list, plus any registered (platform-created) form the
  * list edge missed — fetched individually by id, which DOES return DRAFT
  * forms. A registered id that can't be fetched at all (deleted on Meta) still

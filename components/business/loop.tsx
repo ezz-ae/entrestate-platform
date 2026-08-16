@@ -17,6 +17,10 @@ type Stage = {
   line: string
   shot: string
   alt: string
+  /** Zoom slab: rendered img width and offsets relative to the card. */
+  zoom?: string
+  x?: string
+  y?: string
 }
 
 /* Real product captures. Each shot is the surface that runs its stage. */
@@ -27,6 +31,7 @@ const STAGES: Stage[] = [
     line: 'Stock scored and fit to advertise.',
     shot: '/business/screens/inventory.webp',
     alt: 'Inventory grouped by developer — projects, units, live pages and active campaigns counted.',
+    zoom: '240%', x: '-8%', y: '-26%',
   },
   {
     n: '02',
@@ -34,6 +39,7 @@ const STAGES: Stage[] = [
     line: 'Every listing gets a page that converts.',
     shot: '/business/screens/landings.webp',
     alt: 'Landing pages tracked per property: live, pending, draft, missing.',
+    zoom: '240%', x: '-8%', y: '-24%',
   },
   {
     n: '03',
@@ -41,6 +47,7 @@ const STAGES: Stage[] = [
     line: 'Campaigns with caps, launched paused.',
     shot: '/business/screens/campaigns.webp',
     alt: 'Meta campaigns screen with a new campaign ready to create.',
+    zoom: '240%', x: '-8%', y: '-22%',
   },
   {
     n: '04',
@@ -48,6 +55,7 @@ const STAGES: Stage[] = [
     line: 'Answered fast, owned, in WhatsApp.',
     shot: '/business/screens/crm-leads.webp',
     alt: 'CRM command centre: nine leads across seven stages, hot leads flagged.',
+    zoom: '240%', x: '-6%', y: '-28%',
   },
   {
     n: '05',
@@ -55,6 +63,7 @@ const STAGES: Stage[] = [
     line: 'Every rating teaches what to buy.',
     shot: '/business/screens/forms.webp',
     alt: 'Lead forms screen — the answers that grade every buyer.',
+    zoom: '240%', x: '-8%', y: '-24%',
   },
   {
     n: '06',
@@ -62,6 +71,7 @@ const STAGES: Stage[] = [
     line: 'Audiences from real buyers, not guesses.',
     shot: '/business/screens/audiences.webp',
     alt: 'Audience builder: special buyers, described buyers, CRM audiences, lookalikes.',
+    zoom: '240%', x: '-8%', y: '-24%',
   },
 ]
 
@@ -112,14 +122,17 @@ export function PlatformLoop() {
               {i > 0 ? <Connector /> : null}
               {/* mr-5 opens a right gutter on mobile for the green return rail. */}
               <article className="mr-5 min-w-0 bg-[#0F131A] outline outline-1 outline-white/[0.07] lg:mr-0 lg:flex-1">
-                <div className="aspect-video overflow-hidden border-b border-white/[0.06] bg-[#07090C]">
-                  {/* Oversized then clipped: shows the working surface, crops
-                     the assistant panel — at card size only the tool reads. */}
+                <div className="relative aspect-[16/11] overflow-hidden border-b border-white/[0.06] bg-[#07090C]">
+                  {/* A readable SLAB of the screen, not the whole app
+                     miniaturized: each stage zooms into its own working
+                     region (stat tiles, the table, the cards) so the thumb
+                     shows legible product instead of a smudge. */}
                   <img
                     src={s.shot}
                     alt={s.alt}
                     loading="lazy"
-                    className="h-full w-[135%] max-w-none object-cover object-left-top"
+                    className="absolute max-w-none"
+                    style={{ width: s.zoom ?? '240%', left: s.x ?? '-6%', top: s.y ?? '-4%' }}
                   />
                 </div>
                 <div className="p-4">

@@ -5,7 +5,7 @@ import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { MANAGEMENT_ROLES } from '@/lib/freehold/session-types'
 import { FileText, Plus, AlertCircle, ArrowUpRight, CheckCircle2, Users, Zap, Facebook } from 'lucide-react'
 import { MetaConfigError, MetaApiError } from '@/lib/meta/client'
-import { listLeadFormsMerged } from '@/lib/meta/form-registry'
+import { listLeadFormsMerged, listRegisteredFormsAsDrafts } from '@/lib/meta/form-registry'
 import { groupFormsByPage } from '@/lib/meta/form-templates'
 import type { MetaLeadForm } from '@/lib/meta/types'
 import { getServerT } from '@/lib/i18n/server'
@@ -28,8 +28,10 @@ async function getForms(): Promise<FormsResponse> {
     const forms = await listLeadFormsMerged()
     return { forms }
   } catch (err) {
-    // Not connected → nothing fake: an empty list plus the connect notice.
-    if (err instanceof MetaConfigError) return { forms: [], demo: true }
+    // Not connected → the connect notice plus platform-created forms as
+    // drafts (the campaigns page's sandbox rule) — never Meta-side data.
+    if (err instanceof MetaConfigError)
+      return { forms: await listRegisteredFormsAsDrafts(), demo: true }
     if (err instanceof MetaApiError)    return { forms: [], error: err.message }
     return { forms: [], error: 'Unexpected error loading forms' }
   }
