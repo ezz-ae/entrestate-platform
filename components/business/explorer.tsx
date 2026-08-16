@@ -1,10 +1,11 @@
 'use client'
 
 /**
- * ProductExplorer — the Workspace-style part-tabs section. One tab per part
- * of the product, each tab a REAL capture of the live demo workspace
- * (skyline.entrestate.com). The screenshot carries the meaning; the copy
- * only names what is already visible in it.
+ * ProductExplorer — the every-tool explorer. Two levels, taken from the
+ * product's own grouping: GROUPS (pills) → TOOLS (chips) → one REAL capture
+ * of the live demo workspace (skyline.entrestate.com) per tool. The
+ * screenshot carries the meaning; the copy only names what is already
+ * visible in the frame.
  */
 
 import { useState } from 'react'
@@ -18,179 +19,494 @@ interface MicroCard {
   body: string
 }
 
-interface Part {
+interface Tool {
   id: string
   label: string
   /** File under /business/screens/ — a real product capture, not a mockup. */
-  shot: string
+  screen: string
   /** Address shown in the Browser chrome. */
   title: string
   alt: string
   keyword: string
-  sub: string
-  /** The one door deeper — a guide under /business/docs. */
-  href: string
+  caption: string
   cards: [MicroCard, MicroCard, MicroCard]
+  /** The one door deeper — a guide under /business/docs. */
+  learn?: string
+}
+
+interface Group {
+  id: string
+  label: string
+  tools: Tool[]
 }
 
 /* Every claim below is visible in its screenshot. Nothing is promised that
    the shot does not show. */
-const PARTS: Part[] = [
+const GROUPS: Group[] = [
   {
-    id: 'crm',
-    label: 'CRM',
-    shot: '/business/screens/crm-leads.png',
-    title: 'skyline.entrestate.com/crm',
-    alt: 'The CRM command centre listing leads by stage, temperature and budget, with a no-owner warning on top',
-    keyword: 'The first hour.',
-    sub: 'Every lead lands owned, ranked, and one tap from WhatsApp.',
-    href: '/business/docs/crm-day',
-    cards: [
-      { title: 'No lead unowned', body: 'Leads with no owner get flagged for assignment.' },
-      { title: 'Ranked, worst first', body: 'Rank by value, worst first — the desk’s own sort.' },
-      { title: 'Call or WhatsApp', body: 'Every lead row carries call and WhatsApp buttons.' },
+    id: 'sell',
+    label: 'Sell & follow up',
+    tools: [
+      {
+        id: 'crm-leads',
+        label: 'CRM leads',
+        screen: '/business/screens/crm-leads.webp',
+        title: 'skyline.entrestate.com/crm',
+        alt: 'The CRM command centre listing leads by temperature, stage and budget, with a no-owner warning on top',
+        keyword: 'The first hour.',
+        caption: 'Every lead lands owned, ranked, and one tap from WhatsApp.',
+        learn: '/business/docs/crm-day',
+        cards: [
+          { title: 'No lead unowned', body: 'Leads with no owner get flagged for assignment.' },
+          { title: 'Ranked, worst first', body: 'Rank by value, worst first — the desk’s own sort.' },
+          { title: 'Call or WhatsApp', body: 'Every lead row carries call and WhatsApp buttons.' },
+        ],
+      },
+      {
+        id: 'pipeline',
+        label: 'Pipeline',
+        screen: '/business/screens/pipeline.webp',
+        title: 'skyline.entrestate.com/crm/pipeline',
+        alt: 'The sales pipeline by stage, each stage carrying its lead count and AED value, with the conversion rate',
+        keyword: 'Every stage, priced.',
+        caption: 'Each stage carries its lead count and AED value, new to closed.',
+        learn: '/business/docs/lead-flow',
+        cards: [
+          { title: 'AED per stage', body: 'Nine leads, AED 13.8M pipeline, priced stage by stage.' },
+          { title: 'Conversion on screen', body: 'Closed over total — the rate stays in view.' },
+          { title: 'Stuck stages named', body: 'The desk says when a stage stops moving.' },
+        ],
+      },
+      {
+        id: 'follow-up',
+        label: 'Follow-up queue',
+        screen: '/business/screens/follow-up.webp',
+        title: 'skyline.entrestate.com/crm/follow-ups',
+        alt: 'The follow-up queue with overdue, critical and snoozed tiles, and mark-done, snooze and WhatsApp actions per lead',
+        keyword: 'No lead goes cold.',
+        caption: 'Overdue, critical and snoozed counted — every item one tap from done.',
+        learn: '/business/docs/crm-day',
+        cards: [
+          { title: 'Queue, counted', body: 'Overdue, critical, average delay, snoozed — four tiles.' },
+          { title: 'Three actions each', body: 'Mark done, snooze, or WhatsApp from the row.' },
+          { title: 'Response clock', body: 'Set a target and late replies get flagged.' },
+        ],
+      },
     ],
   },
   {
-    id: 'pipeline',
-    label: 'Pipeline',
-    shot: '/business/screens/pipeline.png',
-    title: 'skyline.entrestate.com/crm/pipeline',
-    alt: 'The sales pipeline by stage, each stage showing its lead count, AED value and the conversion rate',
-    keyword: 'Every stage, priced.',
-    sub: 'Each stage carries its leads and their AED value, new to closed.',
-    href: '/business/docs/lead-flow',
-    cards: [
-      { title: 'AED per stage', body: 'Every stage shows its leads and pipeline value.' },
-      { title: 'Conversion on screen', body: 'Closed over total — the rate stays in view.' },
-      { title: 'Stuck stages flagged', body: 'The desk says when a stage stops moving.' },
-    ],
-  },
-  {
-    id: 'campaigns',
-    label: 'Campaigns',
-    shot: '/business/screens/campaigns.png',
-    title: 'skyline.entrestate.com/ads',
-    alt: 'The Meta campaign desk, dark until Meta is connected, with the docked expert alongside',
-    keyword: 'Ads with brakes.',
-    sub: 'The campaign desk stays dark until you connect Meta. Then it runs.',
-    href: '/business/docs/spend-rules',
-    cards: [
-      { title: 'Off until connected', body: 'No Meta connection, no spend — the desk says so.' },
-      { title: 'One-button launch', body: 'New Campaign opens the wizard from the desk.' },
-      { title: 'An expert docked', body: 'Ask what’s driving results, in plain words.' },
-    ],
-  },
-  {
-    id: 'launch',
-    label: 'Launch',
-    shot: '/business/screens/launch.png',
-    title: 'skyline.entrestate.com/ads/launch',
-    alt: 'The four-step campaign launch wizard with objective tiles and a live ad preview panel',
-    keyword: 'Four steps to live.',
-    sub: 'Campaign, targeting, creative, launch — the ad previewed before anything moves.',
-    href: '/business/docs/launch-a-campaign',
-    cards: [
-      { title: 'Pick the objective', body: 'Meta Lead, WhatsApp messages, phone calls, landing traffic.' },
-      { title: 'Preview before spend', body: 'See the ad in Feed and Story first.' },
-      { title: 'Readiness spelled out', body: 'Ready, worth a look, blocking — the wizard counts.' },
-    ],
-  },
-  {
-    id: 'inventory',
-    label: 'Inventory',
-    shot: '/business/screens/inventory.png',
-    title: 'skyline.entrestate.com/inventory',
-    alt: 'Inventory grouped by developer, each row carrying project counts, readiness scores and live pages',
-    keyword: 'Know your stock.',
-    sub: '621 units across 21 developers, each scored for ad readiness.',
-    href: '/business/docs/inventory',
-    cards: [
-      { title: 'Grouped by developer', body: 'Every project sits under its developer, counted.' },
-      { title: 'Ready or not', body: 'Each developer carries an average readiness score.' },
-      { title: 'Search everything', body: 'Find stock by name, developer, or area.' },
+    id: 'advertise',
+    label: 'Advertise',
+    tools: [
+      {
+        id: 'campaigns',
+        label: 'Campaign desk',
+        screen: '/business/screens/campaigns.webp',
+        title: 'skyline.entrestate.com/ads',
+        alt: 'The Meta campaign desk, dark until Meta is connected, with the docked expert alongside',
+        keyword: 'Ads with brakes.',
+        caption: 'The campaign desk stays dark until you connect Meta. Then it runs.',
+        learn: '/business/docs/launch-a-campaign',
+        cards: [
+          { title: 'Off until connected', body: 'No Meta connection, no spend — the desk says so.' },
+          { title: 'One-button launch', body: 'New Campaign opens the wizard from the desk.' },
+          { title: 'An expert docked', body: 'Ask what is driving results, in plain words.' },
+        ],
+      },
+      {
+        id: 'launch',
+        label: 'Launch wizard',
+        screen: '/business/screens/launch.webp',
+        title: 'skyline.entrestate.com/ads/launch',
+        alt: 'The four-step campaign launch wizard with objective tiles and a live ad preview panel',
+        keyword: 'Four steps to live.',
+        caption: 'Campaign, targeting, creative, launch — the ad previewed before anything moves.',
+        learn: '/business/docs/launch-a-campaign',
+        cards: [
+          { title: 'Pick the objective', body: 'Landing traffic, Meta Lead, WhatsApp, calls, branding, roadshow.' },
+          { title: 'Preview before spend', body: 'See the ad in Feed and Story first.' },
+          { title: 'Readiness spelled out', body: 'Ready, still to pick, worth a look, blocking.' },
+        ],
+      },
+      {
+        id: 'optimize',
+        label: 'Budget optimizer',
+        screen: '/business/screens/optimize.webp',
+        title: 'skyline.entrestate.com/ads/optimizer',
+        alt: 'The AI budget optimizer waiting on ad accounts, with a Go to Integrations button in the empty state',
+        keyword: 'Budgets, not guesses.',
+        caption: 'Live spend, leads and CPL — dark until ad accounts are linked.',
+        learn: '/business/docs/spend-rules',
+        cards: [
+          { title: 'Nothing until linked', body: 'No data shows before accounts connect — it says so.' },
+          { title: 'Meta and Google', body: 'Spend, leads and CPL from both networks.' },
+          { title: 'One door in', body: 'Go to Integrations sits on the empty state.' },
+        ],
+      },
+      {
+        id: 'ads-live',
+        label: 'Live performance',
+        screen: '/business/screens/ads-live.webp',
+        title: 'skyline.entrestate.com/ads/live',
+        alt: 'Live ad performance with a Meta and Google overview, marked not connected until accounts are linked',
+        keyword: 'Spend, watched live.',
+        caption: 'Real-time spend, leads and CPL across Meta and Google.',
+        learn: '/business/docs/get-set-up',
+        cards: [
+          { title: 'Both networks', body: 'Meta Ads and Google Ads share one overview.' },
+          { title: 'Honest header', body: 'Not connected — the badge says so up top.' },
+          { title: 'Build & manage', body: 'Building and managing sit beside the live view.' },
+        ],
+      },
+      {
+        id: 'targeting',
+        label: 'Targeting',
+        screen: '/business/screens/targeting.webp',
+        title: 'skyline.entrestate.com/ads/targeting',
+        alt: 'Audience templates for UAE buyers, each with expected CPL, suggested budget and leads per week, above Buyer Match',
+        keyword: 'Real numbers first.',
+        caption: 'Pre-built UAE buyer audiences, each priced with CPL, budget and weekly leads.',
+        learn: '/business/docs/audiences',
+        cards: [
+          { title: 'Buyer match', body: 'Pick a listing; see who actually buys it.' },
+          { title: 'Priced templates', body: 'Expected CPL, suggested budget, leads a week — printed.' },
+          { title: 'The learning loop', body: 'Real CPL feeds the next round’s targeting.' },
+        ],
+      },
     ],
   },
   {
     id: 'audiences',
     label: 'Audiences',
-    shot: '/business/screens/audiences.png',
-    title: 'skyline.entrestate.com/ads/audiences',
-    alt: 'The audience builder with special buyer lists, CRM audiences, lookalike uploads and the hashing note',
-    keyword: 'Buyers, in plain words.',
-    sub: 'Describe the buyer; the desk builds the audience and hashes the list.',
-    href: '/business/docs/audiences',
-    cards: [
-      { title: 'Special buyers list', body: 'Doctors, CEOs, Golden Visa seekers — combine three.' },
-      { title: 'Your leads, reused', body: 'Rated CRM leads become audiences and lookalikes.' },
-      { title: 'Hashed before Meta', body: 'Lists are hashed before they ever reach Meta.' },
+    tools: [
+      {
+        id: 'audiences',
+        label: 'Audience builder',
+        screen: '/business/screens/audiences.webp',
+        title: 'skyline.entrestate.com/ads/audiences',
+        alt: 'The audience builder with special buyer lists, described buyers, CRM audiences, uploads and the hashing note',
+        keyword: 'Buyers, in plain words.',
+        caption: 'Describe the buyer; the desk builds the audience and hashes the list.',
+        learn: '/business/docs/audiences',
+        cards: [
+          { title: 'Special buyers', body: 'Doctors, CEOs, Golden Visa seekers — combine three.' },
+          { title: 'Your leads, reused', body: 'CRM leads become audiences, retargeting and lookalikes.' },
+          { title: 'Hashed before Meta', body: 'Lists are hashed before they ever reach Meta.' },
+        ],
+      },
+      {
+        id: 'audience-lab',
+        label: 'Audience Lab',
+        screen: '/business/screens/audience-lab.webp',
+        title: 'skyline.entrestate.com/ads/audience-lab',
+        alt: 'Audience Lab showing captured registration events, seed depth counts and the pre-launch layer audit',
+        keyword: 'Proof over promise.',
+        caption: 'What your leads proved, how strong the seed is, which layers matter.',
+        learn: '/business/docs/audiences',
+        cards: [
+          { title: 'Seed depth counted', body: 'Seed cohort, matchable, suppress, neutral — four counts.' },
+          { title: 'Honest blockers', body: 'Lookalikes stay blocked until Meta matches enough people.' },
+          { title: 'Layer audit', body: 'Every targeting layer probed against Meta before launch.' },
+        ],
+      },
+      {
+        id: 'forms',
+        label: 'Lead forms',
+        screen: '/business/screens/forms.webp',
+        title: 'skyline.entrestate.com/ads/forms',
+        alt: 'Lead gen forms with a New form button, gated until Meta Ads is connected',
+        keyword: 'Forms, straight in.',
+        caption: 'Instant Meta lead forms, built here — dark until Meta connects.',
+        learn: '/business/docs/lead-flow',
+        cards: [
+          { title: 'One-button form', body: 'New form starts the builder from the header.' },
+          { title: 'Gated honestly', body: 'Meta Ads not connected — the screen says so.' },
+          { title: 'Ask the expert', body: 'Draft a form for the newest listing, docked.' },
+        ],
+      },
     ],
   },
   {
-    id: 'finance',
-    label: 'Finance',
-    shot: '/business/screens/finance.png',
-    title: 'skyline.entrestate.com/finance',
-    alt: 'Company finance with commission tiles, expense categories, payouts and the expense ledger',
-    keyword: 'The books balance.',
-    sub: 'Commission in, expenses out, net position on one screen.',
-    href: '/business/docs/reports',
-    cards: [
-      { title: 'Commission tracked', body: 'Approved deals in, outstanding owed to agents out.' },
-      { title: 'Every cost filed', body: 'Ads, salaries, transport, referrals — each its column.' },
-      { title: 'A written ledger', body: 'Every expense lands as an entry with status.' },
+    id: 'inventory',
+    label: 'Inventory & pages',
+    tools: [
+      {
+        id: 'inventory',
+        label: 'Inventory',
+        screen: '/business/screens/inventory.webp',
+        title: 'skyline.entrestate.com/inventory',
+        alt: 'Inventory grouped by developer with counters for developers, units, live pages and active campaigns, and search',
+        keyword: 'Know your stock.',
+        caption: 'Stock grouped by developer — units, live pages and campaigns counted.',
+        learn: '/business/docs/inventory',
+        cards: [
+          { title: 'Grouped by developer', body: 'Every property sits under its developer, counted.' },
+          { title: 'Four counters', body: 'Developers, total units, live pages, active campaigns.' },
+          { title: 'Search everything', body: 'Find stock by name, developer, or area.' },
+        ],
+      },
+      {
+        id: 'landings',
+        label: 'Landing pages',
+        screen: '/business/screens/landings.webp',
+        title: 'skyline.entrestate.com/inventory/landing-pages',
+        alt: 'Landing pages with live, pending, draft and missing tiles, a Generate all button and per-property ad-ready scores',
+        keyword: 'A page per property.',
+        caption: 'Every property carries a dedicated ad landing page — missing ones flagged.',
+        learn: '/business/docs/landing-pages',
+        cards: [
+          { title: 'Missing, flagged', body: 'Properties without pages cannot run ad campaigns.' },
+          { title: 'Generate all', body: 'One button creates every missing page.' },
+          { title: 'Ad-ready scored', body: 'Each property carries its readiness percentage bar.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'create',
+    label: 'Create',
+    tools: [
+      {
+        id: 'creative-studio',
+        label: 'Creative Suite',
+        screen: '/business/screens/creative-studio.webp',
+        title: 'skyline.entrestate.com/creative-studio',
+        alt: 'The Creative Suite grid: Ad Designer, Photo Reel, image editor, video, presenters, brochure-to-ad-set, templates and library',
+        keyword: 'One design room.',
+        caption: 'Ads, reels, images, video and presenters — every design tool together.',
+        learn: '/business/docs/creative-studio',
+        cards: [
+          { title: 'Brochure to ad set', body: 'A developer PDF becomes the full design set.' },
+          { title: 'Photo Reel', body: 'Listing photos become a real video ad.' },
+          { title: 'Library, synced', body: 'Everything saved is ready to reuse, synced with Drive.' },
+        ],
+      },
+      {
+        id: 'ad-designer',
+        label: 'Ad Designer',
+        screen: '/business/screens/ad-designer.webp',
+        title: 'skyline.entrestate.com/creative-studio/ad-designer',
+        alt: 'The Ad Designer editor with feed, square and story formats, copy fields in three languages, layouts and colours',
+        keyword: 'Real pixels ship.',
+        caption: 'Composed at full ad resolution — the download is what Meta gets.',
+        learn: '/business/docs/creative-studio',
+        cards: [
+          { title: 'Three languages', body: 'English, Arabic and Russian copy, side by side.' },
+          { title: 'Facts only', body: 'Never invents a price, date or amenity.' },
+          { title: 'Every placement', body: 'Feed, square and story, previewed at 1080×1350.' },
+        ],
+      },
+      {
+        id: 'drive',
+        label: 'Drive',
+        screen: '/business/screens/drive.webp',
+        title: 'skyline.entrestate.com/drive',
+        alt: 'Drive rooms — the files manager, media editor and account cloud — with the docked expert alongside',
+        keyword: 'Everything you made.',
+        caption: 'Files, media editor and account cloud — every room in one place.',
+        cards: [
+          { title: 'Files Manager', body: 'Browse, organise and share everything you’ve made.' },
+          { title: 'Media Editor', body: 'Open and edit images, videos, PDFs and documents.' },
+          { title: 'Cloud uploads', body: 'Bulk-upload developer brochures and sheets.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'money',
+    label: 'Money',
+    tools: [
+      {
+        id: 'finance',
+        label: 'Finance',
+        screen: '/business/screens/finance.webp',
+        title: 'skyline.entrestate.com/finance',
+        alt: 'Company finance with commission tiles, expense categories, commission payouts and the expense ledger',
+        keyword: 'The books balance.',
+        caption: 'Commission in, expenses out, net position on one screen.',
+        learn: '/business/docs/reports',
+        cards: [
+          { title: 'Commission tracked', body: 'Approved deals in, outstanding owed to agents out.' },
+          { title: 'Every cost filed', body: 'Ads, salaries, transport, referrals — each its column.' },
+          { title: 'A written ledger', body: 'Every expense lands as an entry with status.' },
+        ],
+      },
+      {
+        id: 'spend-rules',
+        label: 'AI spend rules',
+        screen: '/business/screens/spend-rules.webp',
+        title: 'skyline.entrestate.com/finance/spend-rules',
+        alt: 'AI spend rules with conservative, standard and aggressive templates, ceiling and gate fields, and the decision feed',
+        keyword: 'A leash on spend.',
+        caption: 'No rule, no autonomous spend — ceilings and result gates you set.',
+        learn: '/business/docs/spend-rules',
+        cards: [
+          { title: 'Nothing by default', body: 'With no rule the AI spends nothing.' },
+          { title: 'Three templates', body: 'Conservative, standard, aggressive — ceilings printed on each.' },
+          { title: 'Gated by results', body: 'CPL, quality and lead gates on every rule.' },
+        ],
+      },
+      {
+        id: 'tokens',
+        label: 'Credits',
+        screen: '/business/screens/tokens.webp',
+        title: 'skyline.entrestate.com/credits',
+        alt: 'The credit balance with how credits are earned from approved deals, a Create ad button and personal performance tiles',
+        keyword: 'Deals fund ads.',
+        caption: 'Approved deals earn credits; credits fund the next AI ad.',
+        cards: [
+          { title: 'Earned from deals', body: 'One credit per AED 1,000 of net commission.' },
+          { title: 'Credits become ads', body: 'Create ad sits right beside the balance.' },
+          { title: 'Performance in view', body: 'Leads, deals and closing rate, counted below.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'analyze',
+    label: 'Analyze',
+    tools: [
+      {
+        id: 'analytics',
+        label: 'Analytics',
+        screen: '/business/screens/analytics.webp',
+        title: 'skyline.entrestate.com/analytics',
+        alt: 'Company analytics with lead, conversion and closing-rate tiles, live revenue tiles and a Generate company report button',
+        keyword: 'The whole company.',
+        caption: 'Company-wide leads, conversions and revenue, with a one-button report.',
+        learn: '/business/docs/reports',
+        cards: [
+          { title: 'Four ledgers', body: 'Company, team, market and marketing tabs.' },
+          { title: 'Live tiles', body: 'Sales volume, commission and approvals marked live.' },
+          { title: 'One-button report', body: 'Generate company report sits in the header.' },
+        ],
+      },
+      {
+        id: 'desk',
+        label: 'The desk',
+        screen: '/business/screens/desk.webp',
+        title: 'skyline.entrestate.com/home',
+        alt: 'The home desk greeting the owner, with needs-your-attention items, lead tiles and a priorities list with Fix buttons',
+        keyword: 'The day starts here.',
+        caption: 'The home desk greets you with what needs attention first.',
+        learn: '/business/docs/get-set-up',
+        cards: [
+          { title: 'Needs your attention', body: 'Unassigned leads and missing pages, surfaced on arrival.' },
+          { title: 'Ask or command', body: 'Tell the AI what to do, from the desk.' },
+          { title: 'Fix from the list', body: 'Each priority row carries its own Fix button.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'setup',
+    label: 'Setup',
+    tools: [
+      {
+        id: 'integrations',
+        label: 'Integrations',
+        screen: '/business/screens/integrations.webp',
+        title: 'skyline.entrestate.com/integrations',
+        alt: 'Integrations showing two of seven systems connected, a critical pre-launch blocker and connection-state filters',
+        keyword: 'Wired, honestly.',
+        caption: 'Seven connections, states shown plainly — blockers named before launch.',
+        learn: '/business/docs/get-set-up',
+        cards: [
+          { title: 'Go-live gate', body: 'What must clear before launch, listed first.' },
+          { title: 'Critical, flagged', body: 'A missing AI provider is marked critical.' },
+          { title: 'Filter by state', body: 'Connected, partial, disconnected — one row of filters.' },
+        ],
+      },
     ],
   },
 ]
 
-export function ProductExplorer() {
-  const [activeId, setActiveId] = useState<string>('crm')
-  const active = PARTS.find((p) => p.id === activeId) ?? PARTS[0]
+/* Flat list so every screenshot stays mounted and can crossfade. */
+const ALL_TOOLS: Tool[] = GROUPS.flatMap((g) => g.tools)
 
-  /* Roving tabindex + arrow keys, per the tabs pattern. Focus is moved by
-     querying the tablist itself so no refs are needed. */
-  function onTablistKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    const idx = PARTS.findIndex((p) => p.id === activeId)
+export function ProductExplorer() {
+  const [activeGroupId, setActiveGroupId] = useState<string>(GROUPS[0].id)
+  const [activeToolId, setActiveToolId] = useState<string>(GROUPS[0].tools[0].id)
+
+  const activeGroup = GROUPS.find((g) => g.id === activeGroupId) ?? GROUPS[0]
+  const activeTool = activeGroup.tools.find((t) => t.id === activeToolId) ?? activeGroup.tools[0]
+
+  /* Switching group always lands on that group's first tool — the chips row
+     resets so the reader never faces a stale selection. */
+  function selectGroup(group: Group) {
+    setActiveGroupId(group.id)
+    setActiveToolId(group.tools[0].id)
+  }
+
+  /* Roving tabindex + arrow keys on the group row, per the tabs pattern.
+     Focus is moved by querying the tablist itself so no refs are needed. */
+  function onGroupKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const idx = GROUPS.findIndex((g) => g.id === activeGroupId)
     let next: number
-    if (e.key === 'ArrowRight') next = (idx + 1) % PARTS.length
-    else if (e.key === 'ArrowLeft') next = (idx - 1 + PARTS.length) % PARTS.length
+    if (e.key === 'ArrowRight') next = (idx + 1) % GROUPS.length
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + GROUPS.length) % GROUPS.length
     else if (e.key === 'Home') next = 0
-    else if (e.key === 'End') next = PARTS.length - 1
+    else if (e.key === 'End') next = GROUPS.length - 1
     else return
     e.preventDefault()
-    const part = PARTS[next]
-    setActiveId(part.id)
+    selectGroup(GROUPS[next])
     const tabs = e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')
     tabs[next]?.focus()
   }
 
+  const scrollRow =
+    '-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+
   return (
     <div className="rounded-2xl bg-[#0A0E14] p-4 ring-1 ring-white/[0.06] sm:p-6 lg:p-8">
+      {/* Level one — the product's own grouping. */}
       <div
         role="tablist"
         aria-label="Parts of the product"
-        onKeyDown={onTablistKeyDown}
-        className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onKeyDown={onGroupKeyDown}
+        className={scrollRow}
       >
-        {PARTS.map((part) => {
-          const isActive = part.id === activeId
+        {GROUPS.map((group) => {
+          const isActive = group.id === activeGroupId
           return (
             <button
-              key={part.id}
+              key={group.id}
               type="button"
               role="tab"
-              id={`explorer-tab-${part.id}`}
+              id={`explorer-group-${group.id}`}
               aria-selected={isActive}
-              aria-controls={`explorer-panel-${part.id}`}
+              aria-controls={`explorer-panel-${group.id}`}
               tabIndex={isActive ? 0 : -1}
-              onClick={() => setActiveId(part.id)}
+              onClick={() => selectGroup(group)}
               className={`shrink-0 rounded-full px-4 py-2 text-[0.8125rem] font-medium transition ${
                 isActive
                   ? 'bg-white/[0.08] text-white ring-1 ring-[#3B82F6]/40'
                   : 'text-[#94A3B8] hover:text-white'
               }`}
             >
-              {part.label}
+              {group.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Level two — the tools inside the active group. Plain toggles, not
+         tabs: the arrow-key contract lives on the group row above. */}
+      <div aria-label={`Tools in ${activeGroup.label}`} className={`mt-2 ${scrollRow}`}>
+        {activeGroup.tools.map((tool) => {
+          const isActive = tool.id === activeTool.id
+          return (
+            <button
+              key={tool.id}
+              type="button"
+              id={`explorer-tool-${tool.id}`}
+              aria-pressed={isActive}
+              onClick={() => setActiveToolId(tool.id)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] transition ${
+                isActive ? 'bg-white/[0.06] text-white' : 'text-[#7C8B9D] hover:text-white'
+              }`}
+            >
+              {tool.label}
             </button>
           )
         })}
@@ -198,24 +514,24 @@ export function ProductExplorer() {
 
       <div
         role="tabpanel"
-        id={`explorer-panel-${active.id}`}
-        aria-labelledby={`explorer-tab-${active.id}`}
+        id={`explorer-panel-${activeGroup.id}`}
+        aria-labelledby={`explorer-group-${activeGroup.id}`}
         className="mt-5"
       >
         <div className="grid items-center gap-6 lg:grid-cols-[7fr_5fr] lg:gap-10">
-          <Browser title={active.title}>
+          <Browser title={activeTool.title}>
             {/* All shots stay mounted and crossfade on switch — the frame
                holds still, only the screen changes, like flipping app tabs. */}
             <div className="relative aspect-[1600/1000] bg-[#07090C]">
-              {PARTS.map((part) => (
+              {ALL_TOOLS.map((tool) => (
                 <img
-                  key={part.id}
-                  src={part.shot}
-                  alt={part.alt}
+                  key={tool.id}
+                  src={tool.screen}
+                  alt={tool.alt}
                   loading="lazy"
-                  aria-hidden={part.id !== active.id}
+                  aria-hidden={tool.id !== activeTool.id}
                   className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out ${
-                    part.id === active.id ? 'opacity-100' : 'opacity-0'
+                    tool.id === activeTool.id ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
               ))}
@@ -224,15 +540,17 @@ export function ProductExplorer() {
 
           <div className="min-w-0">
             <h3 className="text-[1.75rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white sm:text-[2.1rem]">
-              {active.keyword}
+              {activeTool.keyword}
             </h3>
-            <p className="mt-3 max-w-[38ch] text-[1rem] leading-[1.55] text-[#94A3B8]">{active.sub}</p>
-            <LearnMore href={active.href} />
+            <p className="mt-3 max-w-[38ch] text-[1rem] leading-[1.55] text-[#94A3B8]">
+              {activeTool.caption}
+            </p>
+            {activeTool.learn ? <LearnMore href={activeTool.learn} /> : null}
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {active.cards.map((card) => (
+          {activeTool.cards.map((card) => (
             <div key={card.title} className="rounded-xl bg-[#0F131A] p-4 ring-1 ring-white/[0.06]">
               <div className="text-[0.875rem] font-semibold tracking-[-0.01em] text-white">{card.title}</div>
               <p className="mt-1.5 text-[0.8125rem] leading-[1.5] text-[#94A3B8]">{card.body}</p>
@@ -248,7 +566,15 @@ export function ProductExplorer() {
 export function ExplorerSection() {
   return (
     <Section>
-      <SectionHeading eyebrow="Inside the product" title="One product. Every part visible." />
+      <SectionHeading
+        eyebrow="Inside the product"
+        title="One product. Every part visible."
+        lede={
+          <p className="text-[1.0625rem] leading-[1.6] text-[#94A3B8]">
+            Twenty-two screens of the live system — pick a part.
+          </p>
+        }
+      />
       <div className="mt-8">
         <ProductExplorer />
       </div>

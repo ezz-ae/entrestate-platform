@@ -8,6 +8,7 @@ import {
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { PRODUCTS, nextInTour } from '@/lib/business/nav'
 import { ExplorerSection } from '@/components/business/explorer'
+import { LoopSection } from '@/components/business/loop'
 
 export const metadata: Metadata = {
   // Absolute: this page names the whole site, so it must not inherit the
@@ -224,6 +225,9 @@ export default function BusinessHome() {
 
       {/* ── The product, part by part — real screens, one tab each ──────── */}
       <ExplorerSection />
+
+      {/* ── The heartbeat — six stages, and the return that closes them ── */}
+      <LoopSection />
 
       {/* ── The rules ───────────────────────────────────────────────────── */}
       <Band className="bg-[#0A0E14]">

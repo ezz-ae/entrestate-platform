@@ -9,6 +9,7 @@ import {
   RelatedRow,
 } from '@/components/business/docs'
 import { Browser, MiniCRM } from '@/components/business/visuals'
+import { Clip } from '@/components/business/clip'
 
 export const metadata: Metadata = {
   title: 'Audiences',
@@ -61,9 +62,7 @@ export default function AudiencesGuide() {
             someone who merely answered the phone.
           </p>
           <div className="mt-4 max-w-[28rem]">
-            <Browser title="app.yourbrokerage.ae/crm">
-              <MiniCRM />
-            </Browser>
+            <Clip src="/business/clips/audiences.mp4" title="skyline.entrestate.com/…/audiences" />
           </div>
         </Step>
         <Step n={3} id="data-workout" title="The form is a data workout">

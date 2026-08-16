@@ -9,6 +9,7 @@ import {
   RelatedRow,
 } from '@/components/business/docs'
 import { Ledger } from '@/components/business/visuals'
+import { Clip } from '@/components/business/clip'
 
 export const metadata: Metadata = {
   title: 'Budgets and spend rules',
@@ -94,6 +95,12 @@ export default function SpendRulesGuide() {
           </ul>
         </Step>
         <Step n={5} id="the-ledger" title="Read the ledger">
+          {/* The screen itself — templates, gates, and the sentence that
+              carries the whole product: with no rule, it spends nothing. */}
+          <div className="mb-6">
+            <Clip src="/business/clips/spend-rules.mp4" title="skyline.entrestate.com/…/finance/credit-rules" />
+          </div>
+
           <p>
             Every automatic move is written down before the money moves, in plain sentences:
             what changed, by how much, and which rule allowed it. Moves the machine wanted but

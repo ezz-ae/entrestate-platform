@@ -16,6 +16,7 @@ import {
 } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, type HolderTone } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
+import { LoopSection } from '@/components/business/loop'
 
 export const metadata: Metadata = {
   title: 'How it works',
@@ -129,6 +130,9 @@ export default function HowItWorksPage() {
           </ButtonLink>
         </div>
       </Section>
+
+      {/* The whole system in one glance — the six deep stops follow below. */}
+      <LoopSection />
 
       <Section className="pb-24 lg:pb-32">
         <ol className="space-y-5">
