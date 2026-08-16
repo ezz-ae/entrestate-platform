@@ -16,9 +16,19 @@ import type { BrandSnapshot } from '@/components/whitelabel/brand-provider'
 
 /** The tenant the current request's host resolves to, or null. */
 export async function getTenantForRequestHost(): Promise<SaasTenant | null> {
+  const host = SAAS_TENANCY ? (await headers()).get('host') : null
   if (!SAAS_TENANCY) return null
-  const sub = tenantSubdomainFromHost((await headers()).get('host'))
-  if (!sub) return null
+  const sub = tenantSubdomainFromHost(host)
+  if (!sub) {
+    // Diagnostic for the intermittent vendor-brand leak: on leak rounds the
+    // resolver returns null WITHOUT an error, so either this host string is
+    // not the tenant host, or tenancy was off in this context. Log only for
+    // hosts that look like ours so vendor traffic stays quiet.
+    if (host && host.includes('entrestate')) {
+      console.warn('[tenancy] host did not resolve to a tenant:', JSON.stringify(host))
+    }
+    return null
+  }
   // DB hiccups must degrade to the default brand rather than crash the
   // layout — but degrading means the VENDOR's brand over a TENANT's page, so
   // a transient failure gets one retry first, and every degradation is named
