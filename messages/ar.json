@@ -1,0 +1,386 @@
+{
+  "nav": {
+    "chat": "محطة القرار",
+    "enterprise": "المؤسسات",
+    "signals": "بث الإشارات",
+    "overview": "نظرة عامة",
+    "areas": "المناطق",
+    "developers": "المطورون",
+    "properties": "المشاريع",
+    "research": "الأبحاث",
+    "workspace": "مساحة العمل",
+    "account": "الحساب",
+    "openAssistant": "افتح المحطة",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "mainNavigation": "التنقل الرئيسي"
+  },
+  "locale": {
+    "label": "اللغة",
+    "en": "EN",
+    "ar": "AR"
+  },
+  "common": {
+    "skipToMain": "انتقل إلى المحتوى الرئيسي"
+  },
+  "system": {
+    "loadingTitle": "جارٍ التحميل…",
+    "loadingBody": "نجلب أحدث حالة للصفحة وسياق السوق.",
+    "loadingShort": "جارٍ التحميل…",
+    "errorTitle": "حدث خطأ ما",
+    "errorBody": "تعذر عرض هذه الصفحة الآن. يمكنك إعادة المحاولة أو العودة إلى الصفحة الرئيسية.",
+    "retry": "إعادة المحاولة",
+    "backHome": "العودة للرئيسية",
+    "reference": "المرجع",
+    "serviceUnavailable": "الخدمة غير متاحة",
+    "notFound": "غير موجود"
+  },
+  "dashboard": {
+    "title": "لوحة المعلومات",
+    "investorDashboard": "لوحة بيانات المستثمر",
+    "subtitle": "نبض السوق المباشر، إشارات التوقيت، وتوزيع الثقة عبر العقارات في الإمارات.",
+    "marketPulse": "لقطة نبض السوق",
+    "totalProjects": "إجمالي المشاريع",
+    "qualifiedInventory": "المخزون المؤهل",
+    "avgPrice": "متوسط السعر",
+    "acrossInventory": "عبر كامل المخزون",
+    "avgYield": "متوسط العائد",
+    "currentGrossYield": "إجمالي العائد الحالي",
+    "buySignals": "إشارات الشراء",
+    "activeOpportunities": "الفرص النشطة",
+    "dataFreshness": "البيانات كما في"
+  },
+  "topData": {
+    "title": "بيانات السوق",
+    "subtitle": "البيانات المباشرة للسوق: التوقيت، الضغط، العائد، وملفات المناطق.",
+    "sections": {
+      "market-pulse": {
+        "title": "نبض السوق",
+        "subtitle": "الحالة الحالية للمخزون المصنّف: عدد المشاريع، ومتوسط سعر الدخول، والعائد، وإشارات الشراء النشطة."
+      },
+      "timing-signals": {
+        "title": "إشارات التوقيت",
+        "subtitle": "توزيع إشارات الشراء والاحتفاظ والانتظار مع سياق السعر والعائد."
+      },
+      "stress-grades": {
+        "title": "درجات الضغط",
+        "subtitle": "توزيع مرونة المحفظة من الدرجة A إلى E."
+      },
+      "yield-labels": {
+        "title": "تصنيفات العائد",
+        "subtitle": "توزيع فئات العائد مع سياق التسعير."
+      },
+      "evidence-levels": {
+        "title": "مستويات الأدلة",
+        "subtitle": "مزيج الثقة في البيانات وتغطية الأدلة المؤكدة."
+      },
+      "decision-labels": {
+        "title": "تصنيفات القرار",
+        "subtitle": "توزيع التوصيات من الشراء القوي إلى التجنب عبر المخزون المصنف."
+      },
+      "affordability": {
+        "title": "فئات القدرة الشرائية",
+        "subtitle": "مزيج المشاريع حسب فئة السعر وملف العائد."
+      },
+      "outcome-intents": {
+        "title": "أهداف الاستثمار",
+        "subtitle": "ما هي الأهداف الاستثمارية التي يخدمها المخزون الحالي بشكل أفضل."
+      },
+      "top-projects": {
+        "title": "أعلى المشاريع تقييماً",
+        "subtitle": "مرتبة حسب الدرجة المركبة God Metric، مع العائد ودرجة الضغط وإشارة التوقيت لكل مشروع."
+      },
+      "area-intelligence": {
+        "title": "ملف المناطق",
+        "subtitle": "عمق المشاريع على مستوى المنطقة، التسعير، الكفاءة، وضغط المعروض."
+      },
+      "developer-reliability": {
+        "title": "موثوقية المطور",
+        "subtitle": "اتساق المطور، عدد المشاريع الآمنة، وسجل الإنجاز."
+      },
+      "golden-visa": {
+        "title": "التأشيرة الذهبية",
+        "subtitle": "أعداد المخزون المؤهل وملف الجودة للمشترين فوق 2 مليون درهم."
+      },
+      "trust-bar": {
+        "title": "نظرة على ثقة البيانات",
+        "subtitle": "كيف يتم تصنيف الأدلة من L1 Canonical إلى L5 Raw، وكم من المخزون يحمل أدلة أقوى."
+      },
+      "dld-market": {
+        "title": "معاملات سوق DLD",
+        "subtitle": "المعاملات المؤكدة المباشرة من دائرة الأراضي والأملاك في دبي مع رؤى الاتجاهات."
+      }
+    }
+  },
+  "account": {
+    "title": "إعدادات الحساب",
+    "identity": "هوية الحساب",
+    "billing": "الاشتراك والفوترة",
+    "activePlan": "الباقة النشطة",
+    "status": "الحالة",
+    "nextBilling": "تاريخ الفوترة القادم",
+    "manage": "إدارة الاشتراك",
+    "tier": {
+      "free": "الأساسية",
+      "pro": "Pro",
+      "team": "الفريق",
+      "institutional": "المؤسسية"
+    },
+    "quickAccess": {
+      "chat": "مساعد القرار",
+      "chatDesc": "جلسات القرار، تصفية الصفقات، والتقارير",
+      "marketData": "بيانات السوق",
+      "marketDataDesc": "جداول البيانات ونبض السوق",
+      "areas": "ملف المناطق",
+      "areasDesc": "خرائط الثقة وضغط المعروض"
+    }
+  },
+  "chatLanding": {
+    "heroBadge": "محرك القرار V1.2",
+    "liveFeed": "رصد مباشر للسوق",
+    "titleLineOne": "تحليل يدعم القرار",
+    "titleLineTwo": "معك خطوة بخطوة.",
+    "subtitle": "أول محلل استثمار مستقل لسوق العقارات في الإمارات. مصنف، مؤكد، وجاهز للتنفيذ.",
+    "exploreEngine": "اكتشف إمكانيات المحرك التحليلي",
+    "analyze": "حلل",
+    "verifiedData": "بيانات مؤكدة عالية الثقة (درجة A/B فقط)",
+    "dldStat": "معاملات DLD اليوم: 4.2 مليار درهم",
+    "comprehensiveTitle": "مخرجات تحليلية متكاملة",
+    "outputMemoTitle": "مذكرات استثمارية",
+    "outputMemoDesc": "تقارير تحليلية شاملة للمشاريع",
+    "outputRiskTitle": "تقييم المخاطر V1",
+    "outputRiskDesc": "تحليل عميق لمرونة الضغط والسيولة",
+    "outputCompareTitle": "مقارنة السوق",
+    "outputCompareDesc": "تحليل تفصيلي للعوائد والأسعار"
+  },
+  "properties": {
+    "liveFeed": "رصد مباشر للمشاريع",
+    "titleLead": "سجل",
+    "titleAccent": "المشاريع",
+    "freshness": "تحديث البيانات",
+    "inventoryDepth": "عمق المخزون",
+    "filtered": "نتائج مخصصة",
+    "totalActive": "إجمالي المشاريع النشطة",
+    "activeBuy": "إشارات BUY في هذه الصفحة",
+    "density": "من عناصر هذه الصفحة الحالية",
+    "marketPrice": "متوسط سعر الدخول",
+    "marketPriceSub": "متوسط مشتق عبر الصفحة",
+    "strategicYield": "العائد الاستراتيجي",
+    "strategicYieldSub": "متوسط سنوي إجمالي",
+    "signal": "الإشارة:",
+    "risk": "المخاطر:",
+    "clearAll": "مسح التفضيلات",
+    "signalChip": "إشارة السوق",
+    "riskChip": "تصنيف المخاطر",
+    "areaChip": "المنطقة",
+    "developerChip": "المطور",
+    "emptyTitle": "لا توجد مشاريع مطابقة لهذه الفلاتر",
+    "emptyBody": "جرّب تعديل إشارة التوقيت أو تصنيف درجة المخاطر.",
+    "clearFilters": "إعادة تعيين الفلاتر",
+    "previous": "السابق ←",
+    "next": "← التالي"
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "body": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backHome": "العودة للرئيسية",
+    "exploreMarkets": "استكشاف الأسواق",
+    "quickLinks": "روابط سريعة:",
+    "markets": "الأسواق",
+    "library": "المكتبة",
+    "workspace": "مساحة العمل",
+    "about": "من نحن"
+  },
+  "reports": {
+    "libraryLabel": "مكتبة التقارير",
+    "errorTitle": "واجهنا مشكلة في التحميل",
+    "errorBody": "تعذر عرض مكتبة التقارير لهذا الطلب. يمكنك إعادة المحاولة الآن أو فتح التقارير المُنشأة.",
+    "retry": "إعادة المحاولة",
+    "openGenerated": "فتح التقارير المُنشأة"
+  },
+  "chatPage": {
+    "subscriptionActivated": "تم تفعيل الاشتراك. تتم الآن مزامنة باقتك الجديدة."
+  },
+  "chat": {
+    "heroPlaceholder": "ابدأ باستعلام منظم على بيانات الإمارات.",
+    "composerPlaceholder": "جرّب: \"مشاريع A في المارينا تحت 5M بعائد فوق 6%\"",
+    "liveAnalysis": "جارٍ تحليل بيانات السوق الحية...",
+    "noMatchingCommands": "لم أتمكن من العثور على أمر مطابق. جرب 'screen' أو 'project'.",
+    "compareTitle": "مقارنة المشاريع",
+    "compareEmpty": "اطلب مني مقارنة مشاريع أو مناطق لرؤيتها جنباً إلى جنب.",
+    "freeAccess": "متاح للجميع",
+    "unlimitedUsage": "استخدام غير محدود",
+    "usageCoolingDown": "في فترة التهدئة",
+    "matchedProjects": "المشاريع المطابقة",
+    "askToScreen": "اطلب التصفية",
+    "avgAskingPrice": "متوسط السعر المطلوب",
+    "appearsAfterSearch": "يظهر بعد البحث",
+    "decisionLabel": "تصنيف القرار",
+    "decisionLabels": "تصنيفات القرار",
+    "dataConfidence": "ثقة البيانات",
+    "qualityTier": "مستوى الجودة",
+    "fromLiveScan": "من المسح المباشر",
+    "acrossMatchedResults": "عبر النتائج المطابقة",
+    "timingLabelLead": "التوقيت",
+    "avgInvestorScore": "متوسط درجة المستثمر",
+    "chatLanding": {
+      "analyze": "حلل",
+      "titleLineOne": "تحليل يدعم القرار",
+      "titleLineTwo": "معك خطوة بخطوة.",
+      "dldStat": "معاملات DLD اليوم: 4.2 مليار درهم",
+      "verifiedData": "بيانات مؤكدة عالية الثقة (درجة A/B فقط)",
+      "comprehensiveTitle": "مخرجات تحليلية متكاملة",
+      "outputMemoTitle": "مذكرات استثمارية",
+      "outputMemoDesc": "تقارير تحليلية شاملة للمشاريع",
+      "outputRiskTitle": "تقييم المخاطر V1",
+      "outputRiskDesc": "تحليل عميق لمرونة الضغط والسيولة",
+      "outputCompareTitle": "مقارنة السوق",
+      "outputCompareDesc": "تحليل تفصيلي للعوائد والأسعار",
+      "exploreEngine": "اكتشف إمكانيات المحرك التحليلي"
+    },
+    "slashExamples": {
+      "screen": "هل يمكنك العثور على مشاريع تحت 2 مليون درهم في دبي مارينا مع إمكانات عالية؟",
+      "yield": "ما هي المنطقة في دبي التي تقدم أفضل عائد إيجاري حالياً؟"
+    }
+  },
+  "sidebar": {
+    "decisionIntelligence": "منظومة القرار",
+    "decisionSubtitle": "اسألني عن أي منطقة أو مشروع أو مطور في سوق الإمارات.",
+    "quickReplies": {
+      "more": "أعطني تفاصيل أكثر عن هذا",
+      "risks": "ما هي المخاطر المحتملة؟",
+      "summarize": "هل يمكنك تلخيص هذا لي؟",
+      "report": "قم بإنشاء تقرير مفصل"
+    },
+    "placeholder": "كيف يمكنني مساعدتك؟",
+    "view": "عرض",
+    "chat": "دردشة",
+    "history": "السجل",
+    "workspace": "مساحة العمل",
+    "close": "إغلاق",
+    "showLess": "عرض أقل",
+    "readMore": "اقرأ المزيد",
+    "noRecentSessions": "لم يتم العثور على جلسات حديثة.",
+    "untitledSession": "جلسة بدون عنوان",
+    "starterCards": {
+      "compare": "ساعدني في المقارنة",
+      "deals": "ابحث لي عن صفقات",
+      "market": "ماذا يحدث في السوق؟",
+      "plan": "خطط لاستثماري"
+    },
+    "workspace": {
+      "askAndCreate": "اسأل وأنشئ",
+      "viewAndAnalyze": "عرض وتحليل",
+      "links": {
+        "workspaceHome": "مساحة العمل",
+        "workspaceHomeDesc": "نظرة عامة والتحديثات",
+        "notebook": "دفتر الملاحظات",
+        "notebookDesc": "دفاتر القرار",
+        "dashboards": "لوحة السوق",
+        "dashboardsDesc": "قراءات مركبة",
+        "marketResearch": "أبحاث السوق",
+        "marketResearchDesc": "تحليل ونمذجة",
+        "investorMatch": "مطابقة المستثمر",
+        "investorMatchDesc": "ربط العميل بالمخزون",
+        "leadFlow": "مسار العملاء",
+        "leadFlowDesc": "أتمتة المسارات",
+        "search": "البحث",
+        "searchDesc": "مدن ومناطق ومشاريع",
+        "comparisons": "المقارنات",
+        "comparisonsDesc": "سيناريوهات جنبًا إلى جنب",
+        "mathTools": "حاسبات سريعة",
+        "mathToolsDesc": "حاسبات ومساعدات",
+        "properties": "المشاريع",
+        "propertiesDesc": "كل مشروع مصنّف",
+        "areas": "المناطق",
+        "areasDesc": "العائد والعرض بالموقع",
+        "developers": "المطورون",
+        "developersDesc": "الموثوقية والسجل",
+        "marketData": "بيانات السوق",
+        "marketDataDesc": "نبض · توقيت · ضغط",
+        "marketScore": "قراءة السوق",
+        "marketScoreDesc": "التحقق من الدرجة",
+        "reports": "التقارير",
+        "reportsDesc": "المذكرات والأبحاث",
+        "dataPacks": "حزم البيانات",
+        "dataPacksDesc": "منتجات بيانات",
+        "savedSearches": "المحفوظات",
+        "savedSearchesDesc": "استعلامات محفوظة",
+        "dataSources": "مصادر البيانات",
+        "dataSourcesDesc": "الإدخال والحوكمة"
+      }
+    }
+  },
+  "signals": {
+    "STRONG_BUY": "شراء قوي",
+    "BUY": "شراء",
+    "HOLD": "احتفاظ",
+    "WAIT": "انتظار",
+    "AVOID": "تجنب"
+  },
+  "timing": {
+    "STRONG_BUY": "توقيت ممتاز",
+    "BUY": "توقيت جيد",
+    "HOLD": "توقيت محايد",
+    "WAIT": "انتظر",
+    "AVOID": "توقيت سيء"
+  },
+  "stress": {
+    "A": "ممتاز",
+    "B": "جيد",
+    "C": "متوسط",
+    "D": "ضعيف",
+    "E": "خطر"
+  },
+  "yield": {
+    "EXCEPTIONAL": "استثنائي",
+    "STRONG": "قوي",
+    "FAIR": "معقول",
+    "WEAK": "ضعيف",
+    "POOR": "سيء"
+  },
+  "evidence": {
+    "L5": "مؤكد - المستوى 5",
+    "L4": "قوي - المستوى 4",
+    "L3": "متوسط - المستوى 3"
+  },
+  "metrics": {
+    "Investor Score": "تقييم المستثمر",
+    "Timing Score": "تقييم التوقيت",
+    "Stress Score": "مؤشر الضغط",
+    "Yield Score": "تقييم العائد",
+    "Evidence Score": "مؤشر الأدلة",
+    "Price": "السعر",
+    "Yield": "العائد",
+    "Golden Visa": "التأشيرة الذهبية",
+    "Transactions": "المعاملات",
+    "Volume": "الحجم",
+    "Velocity": "السرعة",
+    "Off-Plan": "على الخارطة",
+    "Ready": "جاهز"
+  },
+  "cta": {
+    "Get Exclusive Pricing": "احصل على أسعار حصرية",
+    "Request Access": "اطلب الوصول",
+    "View Project": "عرض المشروع",
+    "Compare": "مقارنة",
+    "Generate Memo": "إنشاء تقرير",
+    "Screen Projects": "تصفية المشاريع",
+    "View Area": "عرض المنطقة",
+    "View Developer": "عرض المطور"
+  },
+  "areasPack": {
+    "Jumeirah Village Circle": "قرية جميرا الدائرية",
+    "Business Bay": "بزنس باي",
+    "Dubai Marina": "مرسى دبي",
+    "Downtown Dubai": "وسط مدينة دبي",
+    "Dubai Hills Estate": "تلال دبي",
+    "Palm Jumeirah": "نخلة جميرا",
+    "Dubai South": "دبي الجنوب",
+    "MBR City": "مدينة محمد بن راشد",
+    "Al Furjan": "الفرجان",
+    "Arjan": "أرجان",
+    "DAMAC Hills": "داماك هيلز",
+    "Dubai Creek Harbour": "مرسى خور دبي"
+  }
+}
