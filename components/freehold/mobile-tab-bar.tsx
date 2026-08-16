@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Sparkles, LayoutGrid, X, BookOpen, Users, Package, Megaphone, DollarSign, UsersRound, Handshake, Search } from 'lucide-react'
 import { spineApps } from '@/lib/freehold/apps'
+import { useBrand } from '@/components/whitelabel/brand-provider'
 import { useSession } from '@/lib/freehold/use-session'
 import { openExpert } from '@/lib/freehold/expert-bus'
 import { useT } from '@/lib/i18n/provider'
@@ -46,7 +47,10 @@ export function MobileTabBar() {
   // ⌘K popup has — the Apps sheet stays the shortlist, this is everything.
   const [toolsOpen, setToolsOpen] = useState(false)
 
-  const apps = spineApps(role)
+  // Same registry, same plan awareness as the desktop spine — a realtor's
+  // phone shows the solo workspace, not the company's tabs.
+  const { plan } = useBrand()
+  const apps = spineApps(role, plan)
   const label = (id: string, fallback: string) => (NAV_KEYS[id] ? t(NAV_KEYS[id]) : fallback)
   const isActive = (href: string, exact = false) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
@@ -161,7 +165,8 @@ export function MobileTabBar() {
         className="z-[120] flex shrink-0 items-stretch border-t border-white/[0.08] bg-chrome/97 backdrop-blur-xl md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {role !== 'broker' && (
+        {/* Realtor plans skip Home too — their home is the campaign desk. */}
+        {role !== 'broker' && plan !== 'realtor' && (
           <Link href={HOME_HREF} className={`${slot} ${isActive(HOME_HREF, true) ? 'text-gold' : 'text-slate-400'}`}>
             <Home className="h-5 w-5" />
             {t('nav.home')}

@@ -200,6 +200,54 @@ export const APPS: AppDef[] = [
   },
 ]
 
+/**
+ * Workspace plan — mirrors saas_tenants.plan via the host-resolved brand
+ * payload (useBrand().plan on the client, getTenantBrand() on the server).
+ * 'realtor' is the one-person "Meta for Realtors" workspace: same tenancy
+ * rails, but the surface shrinks to what a solo ad-running agent needs.
+ */
+export type TenantPlan = 'company' | 'realtor'
+
+/**
+ * The realtor's few-clicks workspace, by app id. Plan — not role — is the
+ * authority here: a realtor tenant is one person, so the company role flags
+ * (brokerHide, MGMT_ROLES…) describe a hierarchy that doesn't exist for them.
+ *   ads       → the wizard, campaign desk, creatives, audiences, live results
+ *   crm       → their leads
+ *   inventory → our catalogue IS their stock
+ *   drive     → the creative essentials (Notebook rides along — it lives here)
+ *   agent     → My Workspace: their leads/campaigns and the token surface
+ * Deliberately absent: team, management, finance desk, web studio, creative
+ * studio's agentic canvas, settings, analytics beyond their own ad results.
+ */
+const REALTOR_APP_IDS: string[] = ['ads', 'crm', 'inventory', 'drive', 'notebook', 'agent']
+
+/** Where a realtor lands when they knock on a door they don't have. */
+export const REALTOR_HOME = '/freehold-intelligence/lead-machine'
+
+/**
+ * Route prefixes a realtor plan may open — DERIVED from the registry entries
+ * above (href + match, so relocated routes like the /ads stub and Notebook
+ * under Drive stay covered), plus the personal surfaces every plan keeps.
+ * Nav and route guard both read THIS list, so they can never disagree.
+ */
+export const REALTOR_ALLOWED_PREFIXES: string[] = [
+  ...new Set(
+    APPS.filter((a) => REALTOR_APP_IDS.includes(a.id)).flatMap((a) => [a.href, ...(a.match ?? [])]),
+  ),
+  // Integrations: Meta + WhatsApp only — the two rails their ads run on.
+  '/freehold-intelligence/integrations/meta',
+  '/freehold-intelligence/integrations/whatsapp',
+  // Personal, per-user surfaces open to everyone (matches the user menu).
+  '/freehold-intelligence/settings/connect',
+  '/freehold-intelligence/help',
+]
+
+/** Whether a realtor-plan workspace may open this pathname. */
+export function realtorAllowsPath(pathname: string): boolean {
+  return REALTOR_ALLOWED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
+}
+
 /** Whether a role may access an app — single source of truth for nav + guards. */
 export function appAllowsRole(a: AppDef, role?: Role): boolean {
   if (a.roles)          return !!role && a.roles.includes(role)
@@ -220,12 +268,13 @@ export function rolesForApp(id: string): Role[] {
   return ALL_ROLES
 }
 
-/** Apps a given role is allowed to see. */
-export function visibleApps(role?: Role): AppDef[] {
+/** Apps a given role is allowed to see; plan='realtor' overrides role. */
+export function visibleApps(role?: Role, plan?: TenantPlan): AppDef[] {
+  if (plan === 'realtor') return APPS.filter((a) => REALTOR_APP_IDS.includes(a.id))
   return APPS.filter((a) => appAllowsRole(a, role))
 }
 
-/** Apps shown in the persistent navigation spine for a role. */
-export function spineApps(role?: Role): AppDef[] {
-  return visibleApps(role).filter((a) => a.spine !== false)
+/** Apps shown in the persistent navigation spine for a role (and plan). */
+export function spineApps(role?: Role, plan?: TenantPlan): AppDef[] {
+  return visibleApps(role, plan).filter((a) => a.spine !== false)
 }

@@ -305,6 +305,40 @@ export async function ensureCreditsSchema(): Promise<void> {
   try { await ensureOnce('credits-schema', ensureCreditsSchemaOnce) } catch { /* non-blocking */ }
 }
 
+/**
+ * Signup seed: bring a credit account into existence with a balance of exactly 0.
+ *
+ * The realtor plan bills in tokens on these same rails, and a realtor's tokens
+ * are only ever credited by a human (a WhatsApp top-up an operator confirms) —
+ * so unlike every other path that conjures an account, this one deliberately
+ * does NOT roll the monthly quota: the account must open at 0, not at the
+ * Starter tier's monthly grant. The row insert alone is enough — with
+ * cycle_start defaulting to now(), the lazy rollover sees the current month as
+ * already granted and the first read shows the honest zero.
+ *
+ * Idempotent (ON CONFLICT DO NOTHING) and non-throwing, in the same spirit as
+ * provisioning: a failed seed must never fail a signup, only leave a trace.
+ * `created` reports whether THIS call brought the account into existence.
+ */
+export async function ensureCreditAccount(
+  brokerId: string,
+): Promise<{ ok: boolean; created: boolean }> {
+  if (!brokerId) return { ok: false, created: false }
+  try {
+    await ensureCreditsSchema()
+    const inserted = await query<{ broker_id: string }>(
+      `INSERT INTO broker_credit_accounts (broker_id, tier, allocated)
+       VALUES ($1, 'Starter', 0)
+       ON CONFLICT (broker_id) DO NOTHING
+       RETURNING broker_id`,
+      [brokerId],
+    )
+    return { ok: true, created: inserted.length > 0 }
+  } catch {
+    return { ok: false, created: false }
+  }
+}
+
 /** Postgres unique-violation — the concurrent-retry arm of an idempotent write. */
 const isUniqueViolation = (err: unknown): boolean =>
   typeof err === 'object' && err !== null && (err as { code?: string }).code === '23505'

@@ -26,6 +26,14 @@ const DEFAULT_ACCENT = '#D4AF37'
 
 export type TenantStatus = 'trial' | 'active' | 'suspended'
 
+/**
+ * What kind of workspace this tenant is. 'company' is the full brokerage
+ * instance; 'realtor' is a one-person workspace on the SAME rails (own
+ * schema, own catalogue copy) whose few-clicks feel comes from surface
+ * gating, not from a different tenancy shape.
+ */
+export type TenantPlan = 'company' | 'realtor'
+
 export interface SaasTenant {
   id: string
   subdomain: string
@@ -34,6 +42,7 @@ export interface SaasTenant {
   product: string
   accent: string
   logo: string
+  plan: TenantPlan
   status: TenantStatus
   trialEndsAt: string | null
   createdAt: string
@@ -47,12 +56,13 @@ interface TenantRow {
   product: string
   accent: string
   logo: string
+  plan: string
   status: string
   trial_ends_at: string | null
   created_at: string
 }
 
-const SELECT_COLS = `id, subdomain, schema_name, company, product, accent, logo, status, trial_ends_at, created_at`
+const SELECT_COLS = `id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at, created_at`
 
 // Brand resolution hits this on every request of a tenant host — cache found
 // tenants briefly. Misses are not cached (signup availability must stay live).
@@ -67,6 +77,9 @@ const mapTenant = (r: TenantRow): SaasTenant => ({
   product: r.product,
   accent: r.accent,
   logo: r.logo,
+  // Unknown values collapse to 'company' (the full surface set is the safe
+  // default — gating only ever REMOVES surfaces for 'realtor').
+  plan: r.plan === 'realtor' ? 'realtor' : 'company',
   status: (['trial', 'active', 'suspended'].includes(r.status) ? r.status : 'suspended') as TenantStatus,
   trialEndsAt: r.trial_ends_at,
   createdAt: r.created_at,
@@ -83,12 +96,16 @@ async function ensure(): Promise<void> {
         product       text NOT NULL DEFAULT 'Lead Machine',
         accent        text NOT NULL DEFAULT '${DEFAULT_ACCENT}',
         logo          text NOT NULL DEFAULT '',
+        plan          text NOT NULL DEFAULT 'company',
         status        text NOT NULL DEFAULT 'trial',
         trial_ends_at timestamptz,
         created_at    timestamptz NOT NULL DEFAULT now(),
         last_seen_at  timestamptz
       )
     `)
+    // Existing deployments already carry the table — grow it in place. The
+    // default makes every pre-existing tenant a 'company' (full surface set).
+    await query(`ALTER TABLE saas_tenants ADD COLUMN IF NOT EXISTS plan text NOT NULL DEFAULT 'company'`)
   // Self-heal: this table's ON CONFLICT target needs a real unique index.
   // Tables created before the UNIQUE was declared never gained one, which
   // makes every upsert fail with 42P10 (the bug that broke project create).
@@ -129,6 +146,7 @@ export async function createTenant(input: {
   product?: string
   accent?: string
   logo?: string
+  plan?: TenantPlan
 }): Promise<CreateTenantResult> {
   const sub = input.subdomain.trim().toLowerCase()
   if (!SUBDOMAIN_RE.test(sub)) return { ok: false, reason: 'invalid_subdomain' }
@@ -142,16 +160,17 @@ export async function createTenant(input: {
   const product = (input.product ?? '').trim().slice(0, 24) || 'Lead Machine'
   const accent = /^#[0-9a-fA-F]{6}$/.test(input.accent ?? '') ? (input.accent as string) : DEFAULT_ACCENT
   const logo = (input.logo ?? '').startsWith('data:image/') ? (input.logo as string) : ''
+  const plan: TenantPlan = input.plan === 'realtor' ? 'realtor' : 'company'
 
   return runWithDefaultSchema(async () => {
     await ensure()
     return withTransaction(async (q) => {
       const rows = await q<TenantRow>(
-        `INSERT INTO saas_tenants (id, subdomain, schema_name, company, product, accent, logo, status, trial_ends_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'trial', now() + make_interval(days => $8))
+        `INSERT INTO saas_tenants (id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'trial', now() + make_interval(days => $9))
          ON CONFLICT (subdomain) DO NOTHING
          RETURNING ${SELECT_COLS}`,
-        [id, sub, schemaName, company, product, accent, logo, TRIAL_DAYS],
+        [id, sub, schemaName, company, product, accent, logo, plan, TRIAL_DAYS],
       )
       const row = rows[0]
       if (!row) return { ok: false, reason: 'taken' } as const

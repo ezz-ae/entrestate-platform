@@ -32,5 +32,8 @@ export async function getTenantBrand(): Promise<BrandSnapshot | null> {
     product: tenant.product,
     accent: tenant.accent,
     logo: tenant.logo ? '/api/wl/logo' : '',
+    // Host-resolved on every request — NOT baked into the session cookie — so
+    // a plan change lands the moment the tenant row changes, no re-login.
+    plan: tenant.plan,
   }
 }

@@ -73,8 +73,10 @@ export function SpacesNav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  // App tabs are role-aware and read from the single app registry.
-  const apps = spineApps(role)
+  // App tabs are role-aware and read from the single app registry. The plan
+  // rides the host-resolved brand payload: on a realtor tenant the spine
+  // shrinks to the solo ad-running workspace, whatever the role says.
+  const apps = spineApps(role, brand.plan)
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -127,8 +129,10 @@ export function SpacesNav() {
           the bottom tab bar takes over there, so the top stays calm. */}
       <nav data-coach="nav-spine" className="hidden h-full flex-1 overflow-x-auto md:flex" style={{ scrollbarWidth: 'none' }}>
         <div className="flex h-full min-w-max">
-          {/* Home — hidden for brokers (they use My Workspace tab) */}
-          {role !== 'broker' && (
+          {/* Home — hidden for brokers (they use My Workspace tab) and for
+              realtor plans (their home IS the campaign desk; the hub would
+              only bounce them straight back there). */}
+          {role !== 'broker' && brand.plan !== 'realtor' && (
             <Link
               href={HOME_HREF}
               data-coach="nav-home"
@@ -215,7 +219,9 @@ export function SpacesNav() {
                 </span>
               )}
             </div>
-            {role !== 'broker' && (
+            {/* Settings is company machinery — a realtor's account lives in
+                My Workspace, so don't offer a door the guard will close. */}
+            {role !== 'broker' && brand.plan !== 'realtor' && (
               <Link
                 href="/freehold-intelligence/settings"
                 onClick={() => setMenuOpen(false)}

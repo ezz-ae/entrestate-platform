@@ -9,9 +9,15 @@
  * {sub}.TENANT_BASE_DOMAIN via the claim endpoint — the broker lands inside
  * THEIR branded instance, already signed in. Only meaningful when
  * NEXT_PUBLIC_TENANT_BASE_DOMAIN is set.
+ *
+ * ?plan=realtor flips the same screen into the Meta for Realtors door: a
+ * one-person desk on OUR off-plan inventory. Same rails, different story —
+ * the product word disappears (their product IS Meta for Realtors) and the
+ * submit carries plan: 'realtor' so provisioning marks the tenant row.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { I18nProvider, useT } from '@/lib/i18n/provider'
 import { BusinessHeader, BusinessFooter } from '@/components/business/shell'
 import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from '@/lib/tenancy/config'
@@ -52,13 +58,18 @@ type SubState = 'idle' | 'checking' | 'available' | 'taken' | 'reserved' | 'inva
 export default function SignupPage() {
   return (
     <I18nProvider>
-      <SignupForm />
+      {/* useSearchParams inside — Next wants a Suspense boundary above it. */}
+      <Suspense fallback={null}>
+        <SignupForm />
+      </Suspense>
     </I18nProvider>
   )
 }
 
 function SignupForm() {
   const t = useT()
+  // The realtor door is the same form told a different story — see file header.
+  const isRealtor = useSearchParams().get('plan') === 'realtor'
   const [company, setCompany] = useState('')
   const [subdomain, setSubdomain] = useState('')
   const [subState, setSubState] = useState<SubState>('idle')
@@ -120,7 +131,7 @@ function SignupForm() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!company.trim()) return setError(t('wl.signup.errCompany'))
+    if (!company.trim()) return setError(t(isRealtor ? 'wl.signup.errDesk' : 'wl.signup.errCompany'))
     if (!subdomain.trim() || subState === 'invalid' || subState === 'reserved' || subState === 'taken') {
       return setError(t('wl.signup.errSubdomain'))
     }
@@ -134,7 +145,9 @@ function SignupForm() {
         body: JSON.stringify({
           company: company.trim(),
           subdomain: subdomain.trim().toLowerCase(),
-          product: product.trim(),
+          // A realtor's product IS Meta for Realtors — the field is hidden.
+          product: isRealtor ? 'Meta for Realtors' : product.trim(),
+          plan: isRealtor ? 'realtor' : 'company',
           accent,
           logo,
           adminName: adminName.trim(),
@@ -168,7 +181,8 @@ function SignupForm() {
     }
   }
 
-  const previewName = company.trim() || t('wl.signup.companyPh')
+  const previewName = company.trim() || t(isRealtor ? 'wl.signup.deskNamePh' : 'wl.signup.companyPh')
+  const previewProduct = isRealtor ? 'Meta for Realtors' : product.trim() || t('wl.signup.productPh')
   const subHintByState: Record<SubState, { text: string; tone: string }> = {
     idle: { text: t('wl.signup.subdomainHint'), tone: 'text-white/40' },
     checking: { text: t('wl.signup.checking'), tone: 'text-white/40' },
@@ -208,17 +222,19 @@ function SignupForm() {
         <form onSubmit={submit} className="order-2 md:order-1">
           <div className="mb-8">
             <div className="mb-2 inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/60">
-              {t('wl.signup.eyebrow')}
+              {t(isRealtor ? 'wl.signup.realtorEyebrow' : 'wl.signup.eyebrow')}
             </div>
-            <h1 className="text-3xl font-bold">{t('wl.signup.title')}</h1>
-            <p className="mt-2 text-sm text-white/60">{t('wl.signup.subtitle')}</p>
+            <h1 className="text-3xl font-bold">{t(isRealtor ? 'wl.signup.realtorTitle' : 'wl.signup.title')}</h1>
+            <p className="mt-2 text-sm text-white/60">{t(isRealtor ? 'wl.signup.realtorSubtitle' : 'wl.signup.subtitle')}</p>
           </div>
 
-          <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.company')}</label>
+          <label className="mb-1 block text-xs font-medium text-white/60">
+            {t(isRealtor ? 'wl.signup.deskName' : 'wl.signup.company')}
+          </label>
           <input
             value={company}
             onChange={(e) => setCompany(e.target.value)}
-            placeholder={t('wl.signup.companyPh')}
+            placeholder={t(isRealtor ? 'wl.signup.deskNamePh' : 'wl.signup.companyPh')}
             maxLength={40}
             className="mb-4 w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
           />
@@ -238,16 +254,19 @@ function SignupForm() {
           <p className={`mb-4 mt-1 text-xs ${subHint.tone}`}>{subHint.text}</p>
 
           <div className="mb-4 grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.product')}</label>
-              <input
-                value={product}
-                onChange={(e) => setProduct(e.target.value)}
-                placeholder={t('wl.signup.productPh')}
-                maxLength={24}
-                className="w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
-              />
-            </div>
+            {/* Realtors don't name a product — theirs is Meta for Realtors. */}
+            {isRealtor ? null : (
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.product')}</label>
+                <input
+                  value={product}
+                  onChange={(e) => setProduct(e.target.value)}
+                  placeholder={t('wl.signup.productPh')}
+                  maxLength={24}
+                  className="w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
+                />
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.accent')}</label>
               <div className="flex items-center gap-2">
@@ -325,7 +344,9 @@ function SignupForm() {
           >
             {loading ? t('wl.signup.submitting') : t('wl.signup.submit')}
           </button>
-          <p className="mt-3 text-center text-xs text-white/40">{t('wl.signup.trialNote', { days: TRIAL_DAYS })}</p>
+          <p className="mt-3 text-center text-xs text-white/40">
+            {isRealtor ? t('wl.signup.realtorNote') : t('wl.signup.trialNote', { days: TRIAL_DAYS })}
+          </p>
         </form>
         )}
 
@@ -345,7 +366,7 @@ function SignupForm() {
               <span className="text-sm font-semibold">
                 {previewName}
                 <span className="ml-1" style={{ color: 'var(--wl-accent)' }}>
-                  {product.trim() || t('wl.signup.productPh')}
+                  {previewProduct}
                 </span>
               </span>
             </div>

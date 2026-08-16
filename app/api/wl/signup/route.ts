@@ -51,8 +51,11 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => ({}))) as {
     subdomain?: string; company?: string; product?: string; accent?: string; logo?: string
-    adminName?: string; adminEmail?: string; password?: string
+    plan?: string; adminName?: string; adminEmail?: string; password?: string
   }
+  // Public endpoint: fold anything that is not exactly 'realtor' back to the
+  // full 'company' plan rather than erroring — the plan only gates surfaces.
+  const plan = body.plan === 'realtor' ? 'realtor' : 'company'
   const subdomain = String(body.subdomain ?? '').trim().toLowerCase()
   const company = String(body.company ?? '').trim()
   const adminName = String(body.adminName ?? '').trim()
@@ -74,6 +77,7 @@ export async function POST(req: NextRequest) {
     product: body.product ? String(body.product) : undefined,
     accent: body.accent ? String(body.accent) : undefined,
     logo,
+    plan,
     adminName,
     adminEmail,
     password,

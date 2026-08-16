@@ -70,7 +70,7 @@ const PLANS: Plan[] = [
       'Leads to your WhatsApp',
       'Ad spend stays in your own Meta account',
     ],
-    cta: { label: 'Get access', href: '/business/contact' },
+    cta: { label: 'Start as a realtor', href: '/signup?plan=realtor' },
   },
 ]
 

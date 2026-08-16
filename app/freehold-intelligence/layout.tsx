@@ -1,6 +1,9 @@
 'use client'
 
 import { Toaster } from 'sonner'
+import { usePathname, redirect } from 'next/navigation'
+import { useBrand } from '@/components/whitelabel/brand-provider'
+import { realtorAllowsPath, REALTOR_HOME } from '@/lib/freehold/apps'
 import { SpacesNav } from '@/components/freehold/spaces-nav'
 import { MobileTabBar } from '@/components/freehold/mobile-tab-bar'
 import { ExpertChat } from '@/components/freehold/expert-chat'
@@ -14,6 +17,15 @@ import { CoachProvider } from '@/components/freehold/coach/coach-marks'
 function FreeholdShell({ children }: { children: React.ReactNode }) {
   const { ready } = useSessionGuard()   // any signed-in role; landing differs by role
   const { dir } = useI18n()
+  const { plan } = useBrand()
+  const pathname = usePathname()
+
+  // Defense in depth for the realtor plan: hiding a tab is not a guard. The
+  // plan is host-resolved fresh on every request (never baked into the session
+  // cookie), and the allowlist is the SAME registry export the navs read —
+  // so nav and guard cannot disagree. Anything outside it, including the hub
+  // itself, lands on the campaign desk: that IS the realtor's home.
+  if (plan === 'realtor' && !realtorAllowsPath(pathname)) redirect(REALTOR_HOME)
 
   if (!ready) {
     return (

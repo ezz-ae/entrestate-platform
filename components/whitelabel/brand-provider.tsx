@@ -24,6 +24,13 @@ export interface RuntimeBrand {
   accent: string
   /** Logo image URL, or '' for a wordmark-only mark. */
   logo: string
+  /**
+   * Workspace plan — 'realtor' is the one-person "Meta for Realtors"
+   * workspace and gets a gated surface set; 'company' is everything.
+   * Always resolved here (never optional) so gating code can branch on it
+   * without null-guards; non-tenant modes are 'company' by definition.
+   */
+  plan: 'company' | 'realtor'
 }
 
 /** The static Freehold brand — the default when no workspace override is set. */
@@ -33,6 +40,7 @@ const STATIC_BRAND: RuntimeBrand = {
   name: brandName,
   accent: BRAND.accent,
   logo: '/freehold-logo.png',
+  plan: 'company',
 }
 
 const BrandContext = createContext<RuntimeBrand>(STATIC_BRAND)
@@ -43,6 +51,12 @@ export interface BrandSnapshot {
   product: string
   accent: string
   logo: string
+  /**
+   * Optional because only the SaaS tenant host resolves a real plan; the WL
+   * demo cookie path has no tenant row and simply omits it. Absent means
+   * 'company' — the full surface set.
+   */
+  plan?: 'company' | 'realtor'
 }
 
 export function BrandProvider({
@@ -59,6 +73,7 @@ export function BrandProvider({
         name: `${brand.company} ${brand.product}`.trim(),
         accent: brand.accent,
         logo: brand.logo,
+        plan: brand.plan ?? 'company',
       }
     : STATIC_BRAND
 

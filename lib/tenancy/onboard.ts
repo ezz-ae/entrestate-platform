@@ -15,8 +15,9 @@ import { runWithSchema } from '@/lib/db'
 import { signSession } from '@/lib/freehold/auth-edge'
 import { hashPassword } from '@/lib/auth'
 import { upsertUserProfile } from '@/lib/data'
+import { ensureCreditAccount } from '@/lib/freehold/credits-db'
 import type { SessionUser } from '@/lib/freehold/session-types'
-import { createTenant, type SaasTenant } from './store'
+import { createTenant, type SaasTenant, type TenantPlan } from './store'
 import { provisionTenantSchema } from './provision'
 
 /** Claim tokens are single-purpose and near-immediate — keep them short. */
@@ -40,6 +41,7 @@ export async function signupTenant(input: {
   product?: string
   accent?: string
   logo?: string
+  plan?: TenantPlan
   adminName: string
   adminEmail: string
   password: string
@@ -50,6 +52,7 @@ export async function signupTenant(input: {
     product: input.product,
     accent: input.accent,
     logo: input.logo,
+    plan: input.plan,
   })
   if (!created.ok) return { ok: false, reason: created.reason }
   const tenant = created.tenant
@@ -71,7 +74,9 @@ export async function signupTenant(input: {
   })
 
   // The owner account lives INSIDE the tenant schema: their users table,
-  // their roster, their login.
+  // their roster, their login. A 'realtor' owner is still 'ceo' — they own
+  // their one-person workspace outright; the few-clicks UX comes from plan
+  // surface gating, never from a weaker role.
   const email = input.adminEmail.trim().toLowerCase()
   const name = input.adminName.trim() || tenant.company
   await runWithSchema(tenant.schemaName, async () => {
@@ -82,6 +87,26 @@ export async function signupTenant(input: {
       role: 'ceo',
       password_hash: await hashPassword(input.password),
     })
+    // A realtor workspace bills in tokens on the per-broker credit rails, so
+    // the owner gets their account at signup — opened at exactly 0, topped up
+    // only when a human confirms a payment. Keyed by EMAIL: every credit path
+    // resolves the account as `brokerId ?? email`, and the owner (role 'ceo')
+    // has no brokerId, so email is the identity their money lives under.
+    // Runs INSIDE this schema scope — the account belongs to THEIR ledger, not
+    // the shared one. Non-fatal and logged, same posture as provisioning: a
+    // failed seed self-heals on first touch (every credit path creates the
+    // account row if missing), so it must never sink the signup.
+    if (tenant.plan === 'realtor') {
+      const seeded = await ensureCreditAccount(email).catch(
+        () => ({ ok: false as const, created: false }),
+      )
+      if (!seeded.ok) {
+        console.error(
+          '[tenancy] token account seeding failed — owner has no credit account yet (self-heals on first credit touch)',
+          tenant.schemaName, email,
+        )
+      }
+    }
   })
 
   const owner: SessionUser = {

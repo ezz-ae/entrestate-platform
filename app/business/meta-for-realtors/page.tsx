@@ -34,7 +34,7 @@ export default function MetaForRealtorsPage() {
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/business/pricing">Get access</ButtonLink>
+              <ButtonLink href="/signup?plan=realtor">Get access</ButtonLink>
               <ButtonLink href="#how-it-runs" variant="ghost">
                 How it runs
               </ButtonLink>
@@ -218,7 +218,7 @@ export default function MetaForRealtorsPage() {
           />
         </div>
         <div className="mt-12 flex flex-wrap gap-3">
-          <ButtonLink href="/business/pricing">Get access</ButtonLink>
+          <ButtonLink href="/signup?plan=realtor">Get access</ButtonLink>
           <ButtonLink href="/business/contact" variant="ghost">
             Talk to a human
           </ButtonLink>

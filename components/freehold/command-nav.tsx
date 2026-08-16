@@ -30,8 +30,10 @@ import {
   LayoutGrid, Search, X, Loader2, ArrowRight, Clock, AlertCircle, CornerDownLeft,
 } from 'lucide-react'
 import { useSession } from '@/lib/freehold/use-session'
+import { useBrand } from '@/components/whitelabel/brand-provider'
 import { useT } from '@/lib/i18n/provider'
-import { TOOL_GROUPS, visibleTools, toolById, toolMatches, type ToolDef } from '@/lib/freehold/tools'
+import { realtorAllowsPath } from '@/lib/freehold/apps'
+import { TOOLS, TOOL_GROUPS, visibleTools, toolById, toolMatches, type ToolDef } from '@/lib/freehold/tools'
 
 /** Sections the API can return, in the order they are most useful on screen. */
 const DATA_SECTIONS = ['leads', 'inventory', 'campaigns', 'landings', 'people', 'drive'] as const
@@ -108,6 +110,10 @@ function CommandPanel({ onClose }: { onClose: () => void }) {
   const router = useRouter()
   const { user } = useSession()
   const role = user?.role
+  // Plan rides the host-resolved brand payload. On a realtor tenant the
+  // popup keeps only the routes the plan guard allows — same prefix list as
+  // the guard itself, so this can never advertise a door that then bounces.
+  const { plan } = useBrand()
 
   const [q, setQ] = useState('')
   const [data, setData] = useState<SearchSection[] | null>(null)
@@ -116,7 +122,13 @@ function CommandPanel({ onClose }: { onClose: () => void }) {
   const [recents, setRecents] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const tools = useMemo(() => visibleTools(role), [role])
+  const tools = useMemo(() => {
+    // On a realtor tenant the PLAN is the authority, exactly as in the spine:
+    // one person, so the company role flags decide nothing. Registry × the
+    // guard's own prefix list, whatever the user row's role says.
+    if (plan === 'realtor') return TOOLS.filter((tool) => realtorAllowsPath(tool.href))
+    return visibleTools(role)
+  }, [role, plan])
   const label = useCallback((tool: ToolDef) => t(tool.labelKey), [t])
 
   useEffect(() => { setRecents(readRecents()) }, [])
