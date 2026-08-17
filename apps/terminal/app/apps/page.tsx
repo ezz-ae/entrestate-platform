@@ -21,155 +21,84 @@ import {
   PieChart,
   Gauge,
   ClipboardCheck,
+  Building2,
+  Globe,
+  Megaphone,
 } from "lucide-react"
 
+/**
+ * THE THREE PRODUCTS. There is nothing else to sell.
+ *
+ * This page used to advertise twelve "apps" — Storyboard Builder, Cold Calling,
+ * Golden Visa Qualifier, Image Studio, Investor Memo Generator and the rest.
+ * Every one of them is a CAPABILITY INSIDE a product, not a thing anyone buys,
+ * and listing them here made one platform read as a dozen half-products while
+ * the three things actually on sale appeared nowhere.
+ *
+ * The commercial model this page has to carry, in one breath: the market data,
+ * the full analysis, the inventory and the search are FREE on any account. The
+ * three products are what money buys. One registration covers both — the free
+ * account IS the account that upgrades, so nobody signs up twice.
+ *
+ * Labels and blurbs are kept in step with lib/business/nav.ts, which is the
+ * canonical list the vendor site sells from. If a fourth product ever exists,
+ * it lands there first and here second — never the other way round.
+ */
 function getApps(locale: string) {
   const isArabic = locale === "ar"
+  const signup = "https://entrestate.com/signup"
 
   return [
     {
-      title: isArabic ? "بناء القصة البصرية" : "Storyboard Builder",
-      description: isArabic ? "حوّل وسائط المشروع إلى قصة إطلاق جاهزة خلال دقائق." : "Turn project media into a cinematic storyboard in minutes.",
-      summary: isArabic ? "يبني تسلسلًا بصريًا واضحًا يصلح للمشاركة والإطلاق." : "Auto-assemble a launch story with ready-to-share panels.",
-      href: "/storyboard",
-      learnHref: "/apps/docs/storyboard-builder",
-      icon: Clapperboard,
-      tag: isArabic ? "الوسائط" : "Media",
-      highlight: isArabic ? "الأفضل لإطلاق المشاريع" : "Best for: launch storyboards",
-      cta: isArabic ? "ابدأ القصة" : "Build storyboard",
+      title: isArabic ? "آلة العملاء" : "Lead Machine",
+      description: isArabic
+        ? "تصنع عملاء من وحداتك، ثم تعمل عليهم حتى الصفقة — النظام كامل، باسمك."
+        : "Makes leads from your listings, then works them to the deal — the whole system, under your name.",
+      summary: isArabic
+        ? "المخزون، الصفحات، الإعلانات، العملاء، والمتابعة في نظام واحد."
+        : "Inventory, pages, ads, leads and follow-up in one system.",
+      href: signup,
+      learnHref: "https://entrestate.com/business/lead-machine",
+      icon: Building2,
+      tag: isArabic ? "منتج" : "Product",
+      highlight: isArabic ? "للشركات · تجربة ذاتية" : "Companies · self-serve trial",
+      cta: isArabic ? "ابدأ التجربة" : "Start the trial",
       featured: true,
     },
     {
-      title: isArabic ? "خطة الإطلاق" : "Launch Timeline",
-      description: isArabic ? "رتّب مشاهد الإطلاق وتوقيته في مسار واحد واضح." : "Build a timed media sequence for project launches and ads.",
-      summary: isArabic ? "يرتب المشاهد والانتقالات وتوقيت التسليم في تدفق واحد." : "Map scenes, transitions, and delivery timing in one flow.",
-      href: "/timeline",
-      learnHref: "/apps/docs/launch-timeline",
-      icon: Clock,
-      tag: isArabic ? "الوسائط" : "Media",
-      highlight: isArabic ? "الأفضل لخطط الإطلاق" : "Best for: campaign timelines",
-      cta: isArabic ? "خطط الإطلاق" : "Plan the launch",
-      featured: false,
-    },
-    {
-      title: isArabic ? "استوديو الصور" : "Image Studio",
-      description: isArabic ? "جهّز صورًا مناسبة للإعلانات والطرح من مكتبة وسائط المشروع." : "Create listing-ready visuals from your project media library.",
-      summary: isArabic ? "ينسق المقاسات والنسخ البصرية لكل قناة." : "Refine visuals, formats, and variants for every channel.",
-      href: "/image-playground",
-      learnHref: "/apps/docs/image-playground",
-      icon: Image,
-      tag: isArabic ? "الوسائط" : "Media",
-      highlight: isArabic ? "الأفضل لصور الطرح" : "Best for: listing visuals",
-      cta: isArabic ? "افتح الاستوديو" : "Open image studio",
-      featured: false,
-    },
-    {
-      title: isArabic ? "بناء استقبال العملاء" : "Client Intake Builder",
-      description: isArabic ? "ابنِ مسار استقبال واضحًا يفرز العميل من أول خطوة." : "Build client intake flows with a guided setup and clear business rules.",
-      summary: isArabic ? "ينشر مسارًا جاهزًا مع مراحل تأهيل واضحة." : "Launch a client-ready intake flow with clear qualification stages.",
-      href: "/apps/agent-builder",
-      learnHref: "/apps/docs/agent-first-builder",
-      icon: Workflow,
-      tag: isArabic ? "استقبال العملاء" : "Client Desk",
-      highlight: isArabic ? "الأفضل للتأهيل والمطابقة" : "Best for: qualification + matching",
-      cta: isArabic ? "افتح المُنشئ" : "Open intake builder",
+      title: isArabic ? "من وحدة إلى صفحة" : "Listing-to-Landing",
+      description: isArabic
+        ? "موقعك العام يُدار كما يجب — ومعه المكتب ونظام العملاء خلفه."
+        : "Your public website, run properly — with the desk and the CRM behind it.",
+      summary: isArabic
+        ? "كل وحدة تحصل على صفحة تُحوِّل، وكل صفحة تُغذّي المكتب."
+        : "Every listing gets a page that converts, and every page feeds the desk.",
+      href: "https://entrestate.com/business/contact",
+      learnHref: "https://entrestate.com/business/listing-to-landing",
+      icon: Globe,
+      tag: isArabic ? "منتج" : "Product",
+      // Setup on request, not self-serve: this one is provisioned for
+      // large-scale operators, so "Get started" would promise a door that
+      // does not open.
+      highlight: isArabic ? "للمشغّلين الكبار · تركيب عند الطلب" : "Large-scale operators · setup on request",
+      cta: isArabic ? "اطلب التركيب" : "Request setup",
       featured: true,
     },
     {
-      title: isArabic ? "مكتب الاتصال الخارجي" : "Cold Calling",
-      description: isArabic ? "أدر جلسات الاتصال الخارجي بالنصوص وقوائم العملاء وتسجيل النتائج." : "Run outbound calling with scripts, lead queues, and outcome logging.",
-      summary: isArabic ? "يبقي جلسات الاتصال منظمة وقابلة للمتابعة." : "Keep calling sessions structured, tracked, and report-ready.",
-      href: "/apps/coldcalling",
-      learnHref: "/apps/docs/cold-calling",
-      icon: PhoneCall,
-      tag: isArabic ? "المبيعات" : "Sales",
-      highlight: isArabic ? "الأفضل للمسارات الخارجية" : "Best for: outbound pipelines",
-      cta: isArabic ? "افتح المكتب" : "Open call desk",
-      featured: false,
-    },
-    {
-      title: isArabic ? "مكتب رسائل العملاء" : "Insta DM Lead Desk",
-      description: isArabic ? "التقط العملاء من الرسائل والمواقع والصفحات وحوّلهم إلى فرص واضحة." : "Qualify real estate leads inside Instagram DMs, sites, QR codes, and landing pages.",
-      summary: isArabic ? "يحوّل الرسائل الواردة إلى عملاء مؤهلين بخطوة تالية واضحة." : "Turn inbound messages into qualified leads with clear next steps.",
-      href: "/apps/lead-agent",
-      learnHref: "/apps/docs/insta-dm-lead-agent",
-      icon: MessageCircle,
-      tag: isArabic ? "التقاط العملاء" : "Lead Desk",
-      highlight: isArabic ? "الأفضل للوارد" : "Best for: inbound capture",
-      cta: isArabic ? "افتح المكتب" : "Open lead desk",
+      title: isArabic ? "ميتا للوسطاء" : "Meta for Realtors",
+      description: isArabic
+        ? "نظام كامل لإعلانات ميتا الاحترافية — من مخزوننا، بميزانيتك، بنقرات قليلة."
+        : "A full system for professional Meta lead ads — our off-plan inventory, your budget, a few clicks.",
+      summary: isArabic
+        ? "اختر مشروعًا، حدّد الميزانية، والباقي يُبنى ويُطلق ويُراقب."
+        : "Pick a project, set the budget; it builds, launches and watches the rest.",
+      href: signup + "?plan=realtor",
+      learnHref: "https://entrestate.com/business/meta-for-realtors",
+      icon: Megaphone,
+      tag: isArabic ? "منتج" : "Product",
+      highlight: isArabic ? "للوسيط المنفرد · اشتراك" : "Individual realtors · membership",
+      cta: isArabic ? "اشترك" : "Join",
       featured: true,
-    },
-    {
-      title: isArabic ? "فرز المشاريع" : "Deal Screener",
-      description: isArabic ? "فرز المشاريع حسب درجة الاستثمار، والضغط، والتوقيت، والملاءمة." : "Rank projects by investment score, stress, timing, and affordability.",
-      summary: isArabic ? "يعرض النتائج بمعايير حتمية قابلة للمراجعة." : "Deterministic filtering on inventory_full with evidence-ready results.",
-      href: "/market-score",
-      learnHref: "/docs",
-      icon: FolderSearch,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل لالتقاط الفرص" : "Best for: sourcing candidates",
-      cta: isArabic ? "افتح الفرز" : "Open screener",
-      featured: false,
-    },
-    {
-      title: isArabic ? "فلتر الإقامة الذهبية" : "Golden Visa Qualifier",
-      description: isArabic ? "اعثر على المشاريع المؤهلة لمسارات الإقامة الذهبية بثقة أعلى." : "Identify high-confidence AED 2M+ candidates for visa pathways.",
-      summary: isArabic ? "يربط السعر والمنطقة والمطور ودرجة الضغط في فلتر واحد." : "Filter by area, developer, stress grade, and timing signal.",
-      href: "/golden-visa",
-      learnHref: "/docs",
-      icon: Shield,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل لمسارات الإقامة" : "Best for: visa workflows",
-      cta: isArabic ? "افتح الفلتر" : "Open qualifier",
-      featured: false,
-    },
-    {
-      title: isArabic ? "فحص الضغط" : "Stress Test Engine",
-      description: isArabic ? "راجع درجة الضغط وتحمل المشروع قبل الالتزام." : "Review stress grade and resilience scenarios across projects.",
-      summary: isArabic ? "يكشف قدرة المشروع على تحمل السيناريوهات الهابطة." : "Surface downside survivability before commitment.",
-      href: "/tools/stress-test",
-      learnHref: "/docs",
-      icon: Gauge,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل للضبط المخاطر" : "Best for: risk controls",
-      cta: isArabic ? "افتح الفحص" : "Run stress tests",
-      featured: false,
-    },
-    {
-      title: isArabic ? "مذكرة الاستثمار" : "Investor Memo Generator",
-      description: isArabic ? "أخرج مذكرة جاهزة للعرض تجمع السعر والمنطقة والمطور والضغط." : "Generate institutional-grade due diligence memos.",
-      summary: isArabic ? "يجمع السعر ومخاطر المنطقة وتدقيق المطور والضغط في ملف واحد." : "Combine price reality, area risk, developer DD, and stress tests.",
-      href: "/tools/memo",
-      learnHref: "/docs",
-      icon: FileText,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل للمذكرات الجاهزة" : "Best for: IC-ready memos",
-      cta: isArabic ? "ابدأ المذكرة" : "Generate memo",
-      featured: false,
-    },
-    {
-      title: isArabic ? "ملف الأدلة" : "Evidence Drawer",
-      description: isArabic ? "راجع المصادر والاستبعادات والافتراضات ومستوى الثقة." : "Inspect sources, exclusions, assumptions, and confidence.",
-      summary: isArabic ? "يُظهر ما يدعم القرار قبل اعتماده." : "Verify every claim before making a decision.",
-      href: "/tools/evidence",
-      learnHref: "/docs",
-      icon: ClipboardCheck,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل للمراجعة" : "Best for: auditability",
-      cta: isArabic ? "افتح الملف" : "Open evidence",
-      featured: false,
-    },
-    {
-      title: isArabic ? "بناء المحفظة" : "Portfolio Builder",
-      description: isArabic ? "ركّب محفظة متعددة المشاريع بحسب المخاطرة والهدف." : "Assemble multi-project portfolios by risk and intent.",
-      summary: isArabic ? "يمزج المشاريع في سلال محافظة أو نمو بحسب الهدف." : "Blend assets into conservative or growth baskets.",
-      href: "/tools/portfolio",
-      learnHref: "/docs",
-      icon: PieChart,
-      tag: isArabic ? "الاستثمار" : "Investment Desk",
-      highlight: isArabic ? "الأفضل للتوزيع" : "Best for: allocation",
-      cta: isArabic ? "ابدأ البناء" : "Build portfolio",
-      featured: false,
     },
   ]
 }
