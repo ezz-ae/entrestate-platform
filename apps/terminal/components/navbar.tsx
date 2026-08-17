@@ -41,7 +41,25 @@ export function Navbar() {
   const router = useRouter()
   const { toggleSidebar, openSidebar, isSidebarOpen } = useCopilot()
   const { data: session } = authClient.useSession()
-  const isAuthenticated = Boolean(session?.user)
+
+  // The platform's identity cookie is httpOnly, so this component cannot see
+  // it — which is why a customer who signed up on entrestate.com was known to
+  // every server render here and still saw "Sign in" in the header. Ask the
+  // server once, and only when Neon Auth has no session of its own: nobody
+  // signed in today changes, and a failed or empty answer leaves the chrome
+  // exactly as it is.
+  const [platformUser, setPlatformUser] = useState<{ name: string } | null>(null)
+  useEffect(() => {
+    if (session?.user) return
+    let cancelled = false
+    fetch("/api/session/whoami", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d?.user?.name) setPlatformUser({ name: d.user.name }) })
+      .catch(() => { /* signed-out chrome is the correct fallback */ })
+    return () => { cancelled = true }
+  }, [session?.user])
+
+  const isAuthenticated = Boolean(session?.user) || Boolean(platformUser)
   const search = searchParams?.toString() ?? ""
   const hasOpenChatIntent = searchParams?.get("openChat") === "true"
   const shouldRenderSidebar = !isChatPage && (isAuthenticated || isSidebarOpen || hasOpenChatIntent)
