@@ -61,3 +61,33 @@ export async function getTenantBrand(): Promise<BrandSnapshot | null> {
     plan: tenant.plan,
   }
 }
+
+/**
+ * Is this request for a tenant address that does not exist?
+ *
+ * The wildcard DNS record makes EVERY label under the base domain reach the
+ * app, so a typo, a probe or a deleted workspace all arrive here looking
+ * exactly like a real customer. They used to fail deep in the data layer —
+ * lib/db.ts throws TenantResolutionError when it cannot resolve a schema —
+ * and that exception surfaced as a 500. A subdomain nobody registered is a
+ * page that does not exist, not a server fault: it must be a clean 404, which
+ * is also the only answer that keeps search engines from indexing crashes.
+ *
+ * True ONLY when the host is tenant-shaped AND unresolvable. A vendor host, a
+ * reserved label, a preview URL or a custom domain all answer false, so this
+ * can never 404 the vendor's own site.
+ */
+export async function isUnknownTenantHost(): Promise<boolean> {
+  if (!SAAS_TENANCY) return false
+  const h = await headers()
+  const sub = tenantSubdomainFromHost(h.get('host'))
+  if (!sub) return false
+  // A lookup FAILURE must not read as "no such tenant" — degrading a database
+  // blip into a 404 would take every live customer down at once. Only a
+  // successful lookup that found nothing is grounds to refuse.
+  try {
+    return (await getTenantBySubdomain(sub)) === null
+  } catch {
+    return false
+  }
+}

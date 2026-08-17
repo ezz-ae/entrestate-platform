@@ -10,7 +10,8 @@ import { BRAND_OG_IMAGE, getMetadataBase, getSiteUrl } from "@/lib/site"
 import { BRAND } from "@/lib/freehold/brand"
 import { BrandProvider } from "@/components/whitelabel/brand-provider"
 import { getWorkspaceBrand } from "@/lib/whitelabel/server"
-import { getTenantBrand } from "@/lib/tenancy/server"
+import { notFound } from "next/navigation"
+import { getTenantBrand, isUnknownTenantHost } from "@/lib/tenancy/server"
 import "./globals.css"
 
 export const dynamic = "force-dynamic"
@@ -159,6 +160,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // A tenant address nobody registered is a 404, decided BEFORE any data call.
+  // The wildcard DNS record means every label reaches this app, and left to
+  // run the request failed deep in lib/db.ts with TenantResolutionError — a
+  // 500 for a page that simply does not exist. See isUnknownTenantHost.
+  if (await isUnknownTenantHost()) notFound()
+
   // Brand resolution order: SaaS tenant (by host) → WL demo workspace (by
   // cookie) → static Freehold BRAND. Null everywhere except those modes.
   const wlBrand = (await getTenantBrand()) ?? (await getWorkspaceBrand())
