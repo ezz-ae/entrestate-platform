@@ -1,6 +1,7 @@
 import "server-only"
 import { createNeonAuth } from "@neondatabase/auth/next/server"
 import { getSharedAuthCookieDomain } from "@/lib/auth/cookie-domain"
+import { getPlatformIdentity } from "@/lib/auth/platform-session"
 
 const baseUrl = process.env.NEON_AUTH_BASE_URL
 const cookieSecret = process.env.NEON_AUTH_COOKIE_SECRET
@@ -55,7 +56,21 @@ async function getSessionData() {
 
 export async function getSessionUser() {
   const session = await getSessionData()
-  return session?.user ?? null
+  if (session?.user) return session.user
+
+  // One registration: somebody who signed up on entrestate.com arrives here
+  // with the platform's identity cookie already on the request, and without
+  // this they would be a stranger on the free data their account includes.
+  // Neon Auth stays first so no existing session changes; this only answers
+  // when Neon Auth has none. Returns null on any error — see platform-session.
+  const platform = await getPlatformIdentity()
+  if (!platform) return null
+  return {
+    id: platform.id,
+    email: platform.email,
+    name: platform.name ?? platform.email,
+    role: platform.role ?? undefined,
+  }
 }
 
 export async function getSessionUserId(): Promise<string> {

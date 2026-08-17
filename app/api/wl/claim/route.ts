@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SAAS_TENANCY, tenantSubdomainFromHost } from '@/lib/tenancy/config'
 import { signSession, verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
-import { runWithDefaultSchema } from '@/lib/db'
+import { runWithDefaultSchema, query } from '@/lib/db'
 import { upsertUserProfile } from '@/lib/data'
 import { createSession, buildSessionCookie } from '@/lib/auth'
 import { randomUUID } from 'crypto'
@@ -70,7 +70,17 @@ export async function GET(req: NextRequest) {
   // must never cost the customer the workspace they just paid attention to.
   try {
     await runWithDefaultSchema(async () => {
-      const profile = await upsertUserProfile({
+      // NEVER overwrite an identity that already exists. upsertUserProfile's
+      // ON CONFLICT (email) rewrites `role`, so creating a workspace would
+      // have silently demoted an existing platform admin to 'broker' — the
+      // account would keep working and quietly lose its standing, which is the
+      // worst shape a permissions bug can take. Existing identity wins; this
+      // path only ever ADDS a person the platform has not met.
+      const [existing] = await query<{ id: string }>(
+        `SELECT id FROM freehold_site_users WHERE lower(email) = lower($1) LIMIT 1`,
+        [user.email],
+      )
+      const profile = existing ?? await upsertUserProfile({
         id: `user_${randomUUID()}`,
         name: user.name || user.email,
         email: user.email,
