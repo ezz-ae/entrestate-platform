@@ -88,6 +88,27 @@ html {
  * etc. resolve to var(--color-gold). A white-label instance overrides this one
  * variable (e.g. on the workspace root) to re-skin the whole product. */
 @theme {
+  /* THE PRODUCT SURFACES — moved out of `@theme inline`, values unchanged.
+   *
+   * `@theme inline` compiles the literal INTO the utility: `bg-surface` became
+   * `background-color:#181613`, so overriding --color-surface at runtime did
+   * nothing at all. The comment beside these tokens promised a workspace could
+   * be "re-skinned per customer by changing one line", and that had not been
+   * true since the day they were inlined — which is why the light theme needs
+   * 104 hand-written rules to re-tint utilities a token should have moved.
+   *
+   * Declared here, `bg-surface` resolves to var(--color-surface) and a tenant's
+   * colour and degree can finally reach the chrome. Nothing moves visually:
+   * every value below is byte-identical to the one it replaced. */
+  --color-app:          #0C0B0A;              /* app canvas / page background  */
+  --color-chrome:       #080706;              /* nav, headers, sidebars        */
+  --color-surface:      #181613;              /* cards & panels                */
+  --color-ink:          #121110;              /* deepest surface / on-gold text*/
+  --color-surface-2:    rgba(255,255,255,0.06);  /* raised glass / inputs      */
+  --color-surface-3:    rgba(255,255,255,0.10);  /* hover / tracks / chips     */
+  --color-line:         rgba(255,255,255,0.08);  /* hairline dividers & borders*/
+  --color-line-strong:  rgba(255,255,255,0.14);  /* control & emphasis borders */
+
   --color-gold: #D4AF37;
   /* Hover/highlight step of the brand colour — white-label overrides both. */
   --color-gold-bright: #F8E7AE;
@@ -127,14 +148,6 @@ html {
    * ─────────────────────────────────────────────────────────────────────── */
   /* Warm-neutral charcoal (not navy) so the gold brand reads true — no cold
    * blue cast on cards/panels. R ≥ G ≥ B by a whisper for a premium dark. */
-  --color-app:          #0C0B0A;              /* app canvas / page background  */
-  --color-chrome:       #080706;              /* nav, headers, sidebars        */
-  --color-surface:      #181613;              /* cards & panels                */
-  --color-ink:          #121110;              /* deepest surface / on-gold text*/
-  --color-surface-2:    rgba(255,255,255,0.06);  /* raised glass / inputs      */
-  --color-surface-3:    rgba(255,255,255,0.10);  /* hover / tracks / chips     */
-  --color-line:         rgba(255,255,255,0.08);  /* hairline dividers & borders*/
-  --color-line-strong:  rgba(255,255,255,0.14);  /* control & emphasis borders */
   /* --color-gold lives in the non-inline @theme block below so it can be
    * overridden at runtime per customer (white-label). */
 
