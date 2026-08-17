@@ -10,25 +10,36 @@ import { HomeCallbackForm } from "@/components/home-callback-form"
 import { COMPANY_WHATSAPP_URL } from "@/lib/site"
 import Link from "next/link"
 import type { Metadata } from "next"
+import { getTenantBrand } from "@/lib/tenancy/server"
 
-export const metadata: Metadata = {
-  title: `Dubai Real Estate | ${BRAND.legalName} UAE`,
-  description:
-    `Buy, sell, and invest in Dubai real estate with ${BRAND.legalName} — off-plan projects, ready properties, Golden Visa investment, and expert advisory since 2006.`,
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: `Dubai Real Estate | ${BRAND.legalName} UAE`,
-    description:
-      `Buy, sell, and invest in Dubai real estate with ${BRAND.legalName} — off-plan projects, ready properties, Golden Visa investment, and expert advisory since 2006.`,
-    url: "/",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: `${BRAND.legalName} UAE` }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `Dubai Real Estate | ${BRAND.legalName} UAE`,
-    description: `Buy, sell, and invest in Dubai real estate with ${BRAND.legalName}.`,
-    images: ["/og-image.png"],
-  },
+/**
+ * Per request, not per build: this title is what a tenant's browser tab, search
+ * result and social card say. Read off the env-driven vendor BRAND it named the
+ * VENDOR on every customer's own domain — the one string a white-label homepage
+ * must never get wrong. An unresolved host falls back to the vendor, which is
+ * correct: that is the vendor's own site.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getTenantBrand().catch(() => null)
+  const name = brand?.company ?? BRAND.legalName
+  const description = `Buy, sell, and invest in Dubai real estate with ${name} — off-plan projects, ready properties, Golden Visa investment, and expert advisory.`
+  return {
+    title: `Dubai Real Estate | ${name}`,
+    description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      title: `Dubai Real Estate | ${name}`,
+      description,
+      url: "/",
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Dubai Real Estate | ${name}`,
+      description: `Buy, sell, and invest in Dubai real estate with ${name}.`,
+      images: ["/og-image.png"],
+    },
+  }
 }
 
 // ─── Icon helpers ──────────────────────────────────────────────────────────────

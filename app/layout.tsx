@@ -46,9 +46,19 @@ const cairo = Cairo({
 
 const siteUrl = getSiteUrl()
 
-// Public-facing brand name (env-driven via NEXT_PUBLIC_BRAND_*; see
-// lib/freehold/brand.ts). Defaults to "Freehold Property UAE".
-const publicName = `${BRAND.legalName} UAE`
+// Public-facing brand name. The env-driven BRAND is the VENDOR's, baked at
+// build time and identical for every host — so as a metadata source it put the
+// vendor's name in the browser tab, the search result and the social card of
+// every customer's own domain. A white-label product cannot ship that, so the
+// name is resolved per request from the host and BRAND is only the fallback.
+const VENDOR_PUBLIC_NAME = `${BRAND.legalName} UAE`
+
+async function publicNameForHost(): Promise<string> {
+  // Never let a control-plane blip cost the page its metadata: an unresolved
+  // host is the vendor's own site, which is what BRAND already describes.
+  const brand = await getTenantBrand().catch(() => null)
+  return brand?.company ?? VENDOR_PUBLIC_NAME
+}
 
 // Phone/webapp behaviour: edge-to-edge with safe-area support (viewportFit)
 // and a browser-chrome colour that matches the app instead of default white.
@@ -63,82 +73,85 @@ export const viewport: Viewport = {
   themeColor: "#0a1628",
 }
 
-export const metadata: Metadata = {
-  metadataBase: getMetadataBase(),
-  title: {
-    default: publicName,
-    template: `%s | ${publicName}`,
-  },
-  applicationName: publicName,
-  description:
-    `${publicName} real estate advisory for sales, leasing, project marketing, investments, consultancy, valuations, and market intelligence.`,
-  generator: publicName,
-  authors: [{ name: publicName, url: siteUrl }],
-  creator: publicName,
-  publisher: publicName,
-  category: "Real Estate",
-  keywords: [
-    "Dubai real estate",
-    "Dubai properties",
-    "Dubai investment",
-    "off-plan Dubai",
-    "Golden Visa",
-    "Dubai Marina",
-    "Downtown Dubai",
-    "Dubai market intelligence",
-    publicName,
-    "investment advisors",
-  ],
-  openGraph: {
-    title: publicName,
+export async function generateMetadata(): Promise<Metadata> {
+  const publicName = await publicNameForHost()
+  return   {
+    metadataBase: getMetadataBase(),
+    title: {
+      default: publicName,
+      template: `%s | ${publicName}`,
+    },
+    applicationName: publicName,
     description:
-      "Dubai real estate advisory for buying, selling, renting, project marketing, investments, and market intelligence.",
-    url: siteUrl,
-    siteName: publicName,
-    type: "website",
-    locale: "en_US",
-    images: [
-      {
-        url: BRAND_OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: `${publicName} — Dubai Real Estate Advisory`,
-      },
+      `${publicName} real estate advisory for sales, leasing, project marketing, investments, consultancy, valuations, and market intelligence.`,
+    generator: publicName,
+    authors: [{ name: publicName, url: siteUrl }],
+    creator: publicName,
+    publisher: publicName,
+    category: "Real Estate",
+    keywords: [
+      "Dubai real estate",
+      "Dubai properties",
+      "Dubai investment",
+      "off-plan Dubai",
+      "Golden Visa",
+      "Dubai Marina",
+      "Downtown Dubai",
+      "Dubai market intelligence",
+      publicName,
+      "investment advisors",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: publicName,
-    description:
-      "Dubai real estate advisory backed by practical market intelligence.",
-    images: [BRAND_OG_IMAGE],
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png", sizes: "512x512" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
-  },
-  manifest: "/site.webmanifest",
-  // Installed-to-home-screen behaviour: full-screen, app-like, no browser chrome.
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: BRAND.company,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    openGraph: {
+      title: publicName,
+      description:
+        "Dubai real estate advisory for buying, selling, renting, project marketing, investments, and market intelligence.",
+      url: siteUrl,
+      siteName: publicName,
+      type: "website",
+      locale: "en_US",
+      images: [
+        {
+          url: BRAND_OG_IMAGE,
+          width: 1200,
+          height: 630,
+          alt: `${publicName} — Dubai Real Estate Advisory`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: publicName,
+      description:
+        "Dubai real estate advisory backed by practical market intelligence.",
+      images: [BRAND_OG_IMAGE],
+    },
+    icons: {
+      icon: [
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
+    },
+    manifest: "/site.webmanifest",
+    // Installed-to-home-screen behaviour: full-screen, app-like, no browser chrome.
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: BRAND.company,
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
+  }
 }
 
 export default async function RootLayout({
@@ -152,7 +165,10 @@ export default async function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
-    "name": publicName,
+    // The tenant's own name, not the vendor's: this JSON-LD is what search
+    // engines read for the knowledge panel, so a vendor name here published
+    // the wrong business for every customer domain.
+    "name": wlBrand?.company ?? VENDOR_PUBLIC_NAME,
     "image": `${siteUrl}${BRAND_OG_IMAGE}`,
     "logo": `${siteUrl}/icon.png`,
     "@id": siteUrl,
