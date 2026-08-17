@@ -40,10 +40,24 @@ export const CREDIT_VALUE_AED = 10
  * and they are free to diverge the day the vendor prices a margin — which is
  * exactly why nothing may derive one from the other.
  *
- * Nothing public quotes a price yet (/business/pricing says "talk to us"), so
- * this constant is the single place a price becomes real.
+ * SET TO 5 ON 2026-08-17, and here is the arithmetic so the next person can
+ * argue with it rather than guess at it. The meter charges `budget / 10`
+ * tokens ONCE per launch, and the realtor's ad money never passes through us
+ * ("ad spend stays in your own Meta account" — /business/meta-for-realtors),
+ * so the token price alone decides what fraction of a day's budget a launch
+ * costs: at 10 it is a full day, which works out at ~13% of ad spend — agency
+ * rates for a product the customer operates themselves. At 5 it is half a day,
+ * ~6.7% of spend: AED 200/month for a realtor running AED 100/day, against the
+ * AED 1,000–5,000 a month the same person already pays a portal for raw leads,
+ * and against roughly AED 30,000 of commission on one off-plan deal. It also
+ * puts the smallest pack at AED 375 rather than 750, which is the difference
+ * between an impulse and a decision.
+ *
+ * Raise it on evidence — conversion at this price, or realtors telling us it
+ * is cheap. Do not lower it to win a first cohort; add bonus tokens to the
+ * opening pack instead, because a price you cut is hard to take back.
  */
-export const TOKEN_PRICE_AED = 10
+export const TOKEN_PRICE_AED = 5
 
 /**
  * What a realtor may buy, in whole packs.
