@@ -1099,7 +1099,23 @@ export async function upsertDeveloperProfile(input: {
   return { slug, name: input.name, projectCount }
 }
 
+/**
+ * The developer directory FAILS SOFT — the same rule the blog reads learned.
+ *
+ * `freehold_site_developer_profiles` is shared reference data, created only by
+ * the management-side writer (upsertDeveloperProfile) and absent from the
+ * provisioning list, so it does not exist in a tenant schema. Unguarded, the
+ * 42P01 escaped the render and /developers returned 500 on EVERY tenant — a
+ * page linked from the header and footer of every other page, so the first
+ * thing a prospect clicked was a crash.
+ *
+ * Every sibling call site already guarded (app/developers/[slug] catches, so
+ * the detail page 404s gracefully while the listing died); the guard belongs
+ * on the reader, where it travels with the table instead of waiting to be
+ * rediscovered by the next caller.
+ */
 export async function getDevelopers() {
+  try {
   const rows = await query<DeveloperRow>(
     `SELECT id, slug, name, tier, avg_score, honesty_index, risk_discount, logo, banner_image, payload 
      FROM freehold_site_developer_profiles 
@@ -1107,23 +1123,32 @@ export async function getDevelopers() {
      ORDER BY (payload->>'projectCount')::int DESC NULLS LAST, avg_score DESC`,
   )
   return rows.map(mapDeveloperRow)
+  } catch (err) {
+    console.error('[data] getDevelopers failed — rendering an empty directory', err)
+    return []
+  }
 }
 
 export async function getDeveloperBySlug(slug: string) {
-  const cleanSlug = normalizeSlug(slug)
-  if (!cleanSlug) return null
-  const rows = await query<DeveloperRow>(
-    `SELECT id, slug, name, tier, avg_score, honesty_index, risk_discount, logo, banner_image, payload
-     FROM freehold_site_developer_profiles
-     WHERE lower(slug) = $1
-        OR lower(payload->>'slug') = $1
-        OR lower(REGEXP_REPLACE(payload->>'slug', '[^a-z0-9]+', '-', 'g')) = $1
-        OR lower(REGEXP_REPLACE(payload->>'name', '[^a-z0-9]+', '-', 'g')) = $1
-        OR lower(REGEXP_REPLACE(name, '[^a-z0-9]+', '-', 'g')) = $1
-     LIMIT 1`,
-    [cleanSlug],
-  )
-  return rows[0] ? mapDeveloperRow(rows[0]) : null
+  try {
+    const cleanSlug = normalizeSlug(slug)
+    if (!cleanSlug) return null
+    const rows = await query<DeveloperRow>(
+      `SELECT id, slug, name, tier, avg_score, honesty_index, risk_discount, logo, banner_image, payload
+       FROM freehold_site_developer_profiles
+       WHERE lower(slug) = $1
+          OR lower(payload->>'slug') = $1
+          OR lower(REGEXP_REPLACE(payload->>'slug', '[^a-z0-9]+', '-', 'g')) = $1
+          OR lower(REGEXP_REPLACE(payload->>'name', '[^a-z0-9]+', '-', 'g')) = $1
+          OR lower(REGEXP_REPLACE(name, '[^a-z0-9]+', '-', 'g')) = $1
+       LIMIT 1`,
+      [cleanSlug],
+    )
+    return rows[0] ? mapDeveloperRow(rows[0]) : null
+  } catch (err) {
+    console.error('[data] getDeveloperBySlug failed — treating as not found', err)
+    return null
+  }
 }
 
 export async function searchProjects(queryText: string, limit = 5) {
