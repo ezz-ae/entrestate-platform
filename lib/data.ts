@@ -1485,27 +1485,50 @@ export interface BlogPost extends BlogPostSummary {
   payload: unknown
 }
 
+/**
+ * BLOG READS FAIL SOFT — a missing table is "no posts", never a 500.
+ *
+ * These four run on the PUBLIC homepage of every tenant. `freehold_site_blog_posts`
+ * is created lazily by the editor and is not in the tenant provisioning list
+ * (lib/tenancy/provision.ts), so a workspace whose owner has never opened the blog
+ * has no such relation — and an unguarded SELECT threw 42P01 straight through the
+ * server render. That took the whole homepage of skyline.entrestate.com down with
+ * a 500 over a section that had nothing to show anyway.
+ *
+ * Same posture as getLandingMap in lib/inventory-data.ts: a lazily-created table is
+ * an optional one, and an optional table's absence is an empty list.
+ */
 export async function getBlogPosts(limit = 12, offset = 0) {
-  const rows = await query<BlogPostSummary>(
-    `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
-     FROM freehold_site_blog_posts
-     ORDER BY featured DESC NULLS LAST, published_at DESC NULLS LAST, created_at DESC
-     LIMIT $1 OFFSET $2`,
-    [limit, offset],
-  )
-  return rows
+  try {
+    const rows = await query<BlogPostSummary>(
+      `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
+       FROM freehold_site_blog_posts
+       ORDER BY featured DESC NULLS LAST, published_at DESC NULLS LAST, created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset],
+    )
+    return rows
+  } catch (err) {
+    console.error('[data] getBlogPosts failed — rendering without posts', err)
+    return []
+  }
 }
 
 export async function getFeaturedBlogPosts(limit = 6) {
-  const rows = await query<BlogPostSummary>(
-    `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
-     FROM freehold_site_blog_posts
-     WHERE featured = true
-     ORDER BY published_at DESC NULLS LAST, created_at DESC
-     LIMIT $1`,
-    [limit],
-  )
-  return rows
+  try {
+    const rows = await query<BlogPostSummary>(
+      `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
+       FROM freehold_site_blog_posts
+       WHERE featured = true
+       ORDER BY published_at DESC NULLS LAST, created_at DESC
+       LIMIT $1`,
+      [limit],
+    )
+    return rows
+  } catch (err) {
+    console.error('[data] getFeaturedBlogPosts failed — rendering without posts', err)
+    return []
+  }
 }
 
 const HOMEPAGE_BLOG_KEYWORDS = [
@@ -1539,56 +1562,66 @@ const HOMEPAGE_BLOG_EXCLUDES = [
 ]
 
 export async function getHomepageBlogPosts(limit = 6) {
-  const primaryRows = await query<BlogPostSummary>(
-    `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
-     FROM freehold_site_blog_posts
-     WHERE hero_image IS NOT NULL
-       AND hero_image <> ''
-       AND (
-         title ILIKE ANY($1)
-         OR excerpt ILIKE ANY($1)
-         OR category ILIKE ANY($1)
-       )
-       AND NOT (
-         title ILIKE ANY($2)
-         OR excerpt ILIKE ANY($2)
-       )
-     ORDER BY featured DESC NULLS LAST, published_at DESC NULLS LAST, created_at DESC
-     LIMIT $3`,
-    [HOMEPAGE_BLOG_KEYWORDS, HOMEPAGE_BLOG_EXCLUDES, limit],
-  )
-
-  if (primaryRows.length >= limit) return primaryRows
-
-  const excludeIds = primaryRows.map((row) => row.id)
-  const remaining = limit - primaryRows.length
-  const fallbackRows = await query<BlogPostSummary>(
-    `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
-     FROM freehold_site_blog_posts
-     WHERE hero_image IS NOT NULL
-       AND hero_image <> ''
-       AND NOT (
-         title ILIKE ANY($1)
-         OR excerpt ILIKE ANY($1)
-       )
-       AND id <> ALL($2::text[])
-     ORDER BY published_at DESC NULLS LAST, created_at DESC
-     LIMIT $3`,
-    [HOMEPAGE_BLOG_EXCLUDES, excludeIds, remaining],
-  )
-
-  return [...primaryRows, ...fallbackRows]
+  try {
+    const primaryRows = await query<BlogPostSummary>(
+      `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
+       FROM freehold_site_blog_posts
+       WHERE hero_image IS NOT NULL
+         AND hero_image <> ''
+         AND (
+           title ILIKE ANY($1)
+           OR excerpt ILIKE ANY($1)
+           OR category ILIKE ANY($1)
+         )
+         AND NOT (
+           title ILIKE ANY($2)
+           OR excerpt ILIKE ANY($2)
+         )
+       ORDER BY featured DESC NULLS LAST, published_at DESC NULLS LAST, created_at DESC
+       LIMIT $3`,
+      [HOMEPAGE_BLOG_KEYWORDS, HOMEPAGE_BLOG_EXCLUDES, limit],
+    )
+  
+    if (primaryRows.length >= limit) return primaryRows
+  
+    const excludeIds = primaryRows.map((row) => row.id)
+    const remaining = limit - primaryRows.length
+    const fallbackRows = await query<BlogPostSummary>(
+      `SELECT id, slug, title, excerpt, hero_image, category, author, published_at, read_time, featured
+       FROM freehold_site_blog_posts
+       WHERE hero_image IS NOT NULL
+         AND hero_image <> ''
+         AND NOT (
+           title ILIKE ANY($1)
+           OR excerpt ILIKE ANY($1)
+         )
+         AND id <> ALL($2::text[])
+       ORDER BY published_at DESC NULLS LAST, created_at DESC
+       LIMIT $3`,
+      [HOMEPAGE_BLOG_EXCLUDES, excludeIds, remaining],
+    )
+  
+    return [...primaryRows, ...fallbackRows]
+  } catch (err) {
+    console.error('[data] getHomepageBlogPosts failed — rendering without posts', err)
+    return []
+  }
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  const rows = await query<BlogPost>(
-    `SELECT id, slug, title, excerpt, body, hero_image, category, author, published_at, read_time, tags, payload
-     FROM freehold_site_blog_posts
-     WHERE slug = $1
-     LIMIT 1`,
-    [slug],
-  )
-  return rows[0] || null
+  try {
+    const rows = await query<BlogPost>(
+      `SELECT id, slug, title, excerpt, body, hero_image, category, author, published_at, read_time, tags, payload
+       FROM freehold_site_blog_posts
+       WHERE slug = $1
+       LIMIT 1`,
+      [slug],
+    )
+    return rows[0] || null
+  } catch (err) {
+    console.error('[data] getBlogPostBySlug failed — rendering without posts', err)
+    return null
+  }
 }
 
 export async function ensureLeadsTable() {
