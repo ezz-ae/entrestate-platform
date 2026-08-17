@@ -86,6 +86,18 @@ export async function isUnknownTenantHost(): Promise<boolean> {
   // blip into a 404 would take every live customer down at once. Only a
   // successful lookup that found nothing is grounds to refuse.
   try {
+    if ((await getTenantBySubdomain(sub)) !== null) return false
+  } catch {
+    return false
+  }
+  // ONE MISS IS NOT AN ANSWER. Signup redirects the new owner straight to a
+  // claim URL on their brand-new subdomain, and that first request raced the
+  // row's visibility: the tenant was committed, this read did not see it yet,
+  // and the customer's very first page load said their workspace does not
+  // exist. Misses are never cached (lib/tenancy/store.ts), so a second read is
+  // a genuinely fresh look — and it only ever runs for a host we are about to
+  // refuse anyway, so it costs nothing on the paths that matter.
+  try {
     return (await getTenantBySubdomain(sub)) === null
   } catch {
     return false
