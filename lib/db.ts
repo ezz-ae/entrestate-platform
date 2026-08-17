@@ -194,9 +194,24 @@ async function lookupTenantSchema(subdomain: string): Promise<TenantCacheEntry> 
         }
       : { schema: null, suspended: false, expires: Date.now() + TENANT_NEGATIVE_TTL_MS }
   } catch {
-    // Control-plane table missing or unreachable ⇒ treat as unknown tenant.
-    // Callers on tenant hosts fail closed; non-tenant hosts never get here.
-    entry = { schema: null, suspended: false, expires: Date.now() + TENANT_NEGATIVE_TTL_MS }
+    // STALE BEATS STRANGER — the same rule getTenantBySubdomain keeps.
+    //
+    // "Unreachable" was being written into the cache as "no such tenant", so a
+    // momentary control-plane error took every live tenant to a 500 for the
+    // negative TTL. Observed: a DROP SCHEMA on an unrelated throwaway tenant
+    // held locks for a few seconds and two real workspaces went down with it.
+    //
+    // A subdomain this instance has ALREADY resolved keeps its schema through
+    // the error; only a tenant we have never seen falls through to the honest
+    // "unknown", where failing closed is still right. The expiry is short so
+    // the next request re-reads rather than pinning a stale answer.
+    if (cached?.schema) {
+      entry = { ...cached, expires: Date.now() + TENANT_NEGATIVE_TTL_MS }
+    } else {
+      // Control-plane table missing or unreachable ⇒ treat as unknown tenant.
+      // Callers on tenant hosts fail closed; non-tenant hosts never get here.
+      entry = { schema: null, suspended: false, expires: Date.now() + TENANT_NEGATIVE_TTL_MS }
+    }
   }
   tenantCache.set(subdomain, entry)
   if (tenantCache.size > 5000) {
