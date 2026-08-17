@@ -11,7 +11,7 @@
 
 import { headers } from 'next/headers'
 import { SAAS_TENANCY, tenantSubdomainFromHost } from './config'
-import { getTenantBySubdomain, type SaasTenant } from './store'
+import { getTenantBySubdomain, controlPlaneHasTenants, type SaasTenant } from './store'
 import type { BrandSnapshot } from '@/components/whitelabel/brand-provider'
 
 /** The tenant the current request's host resolves to, or null. */
@@ -98,8 +98,14 @@ export async function isUnknownTenantHost(): Promise<boolean> {
   // a genuinely fresh look — and it only ever runs for a host we are about to
   // refuse anyway, so it costs nothing on the paths that matter.
   try {
-    return (await getTenantBySubdomain(sub)) === null
+    if ((await getTenantBySubdomain(sub)) !== null) return false
   } catch {
     return false
   }
+  // Two empty answers are still only as trustworthy as the thing answering.
+  // A cold instance returned null twice for a workspace that plainly exists
+  // and showed its owner a 404, so the refusal now also requires the control
+  // plane to demonstrably hold tenants — "not found" has to come from a table
+  // that is talking, not from one that is not.
+  return await controlPlaneHasTenants()
 }

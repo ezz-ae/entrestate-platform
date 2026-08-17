@@ -228,3 +228,29 @@ export async function listTenants(): Promise<SaasTenant[]> {
     return rows.map(mapTenant)
   })
 }
+
+/**
+ * Can the control plane answer at all right now?
+ *
+ * The difference between "this subdomain is not a tenant" and "I cannot see
+ * tenants at the moment" is the difference between a correct 404 and telling a
+ * paying customer their workspace does not exist. A cold lambda served exactly
+ * that: two lookups in a row came back empty for a tenant that plainly exists,
+ * and the 404 boundary believed them.
+ *
+ * A deployment with zero tenant rows is not a state this platform reaches in
+ * normal life, so "the table answered and holds somebody" is the cheapest
+ * honest proof that an empty answer for one subdomain means what it says. Runs
+ * only on the path that is about to refuse, so it costs nothing elsewhere.
+ */
+export async function controlPlaneHasTenants(): Promise<boolean> {
+  try {
+    return await runWithDefaultSchema(async () => {
+      await ensure()
+      const rows = await query<{ n: string }>(`SELECT count(*)::text AS n FROM saas_tenants`)
+      return Number(rows[0]?.n ?? 0) > 0
+    })
+  } catch {
+    return false
+  }
+}
