@@ -9,8 +9,8 @@ html {
 
 /* Freehold - Elevated Luxury Aesthetic */
 :root {
-  --background: 40 20% 98%; /* Warm White #FAF8F5 */
-  --foreground: 160 32% 10%; /* Deep Forest #152E24 */
+  --background: 36.0 33.3% 97.1%; /* Warm White #FAF8F5 */
+  --foreground: 156.0 37.3% 13.1%; /* Deep Forest #152E24 */
 
   --card: 40 18% 97%;
   --card-foreground: 160 32% 10%;
@@ -19,7 +19,7 @@ html {
   --popover-foreground: 160 32% 10%;
 
   /* Refined Champagne Gold — warmer, richer */
-  --primary: 38 52% 52%; /* #C69B3E */
+  --primary: 41.0 54.4% 51.0%; /* #C69B3E */
   --primary-foreground: 160 32% 10%;
 
   --secondary: 160 32% 8%;
