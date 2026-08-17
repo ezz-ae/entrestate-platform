@@ -31,6 +31,12 @@ const PUBLIC_API_EXACT = new Set([
   "/api/lp-analytics",          // anonymous landing-page analytics ingestion
   "/api/leads",                 // public landing-page lead capture (POST)
   "/api/auth/roster",           // login-screen profile picker (names/roles only)
+  // Answers "who is this?" from the PLATFORM session and returns a name and an
+  // email, or null. Public because it authenticates itself and because the wall
+  // below reads the WORKSPACE cookie — which a caller on a vendor host
+  // correctly does not carry, so gating it here made it answer "Authentication
+  // required" to precisely the signed-in customer it exists to recognise.
+  "/api/auth/whoami",
   "/api/auth/login",
   "/api/auth/request-reset",
   "/api/auth/reset",
