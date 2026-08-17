@@ -682,35 +682,60 @@ const getProjectOrderBy = (sort?: PropertyListingFilters["sort"]) => {
   }
 }
 
+/**
+ * THE PROJECT GRID FAILS SOFT — an empty grid beats a lost page.
+ *
+ * Both of these ride a single Promise.all on /projects, where the third
+ * member (getDashboardProjectFilters) already carries `.catch(...)`. So the
+ * page was written to survive a database that will not answer, and these two
+ * were the hole in it: Promise.all rejects if ANY member rejects, so either
+ * one throwing took the whole public listing to a 500 while its sibling
+ * degraded politely beside it.
+ *
+ * freehold_site_projects IS provisioned into every tenant (it is one of only
+ * two that are), so this is not the missing-table failure the blog and
+ * developer readers hit — it is the same page lost to any transient error at
+ * all, which is a wider door, not a narrower one.
+ */
 export async function getProjectsForGrid(limit = 50, filters?: PropertyListingFilters) {
-  const safeLimit = Math.max(1, Math.min(limit, 96))
-  const page = Math.max(1, filters?.page || 1)
-  const offset = (page - 1) * safeLimit
-  const values: Array<string | number> = []
-  const where = filters ? buildPropertyListingWhere(filters, values) : []
-  const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : ""
-  values.push(safeLimit, offset)
-
-  const rows = await query<ProjectListingRow>(
-    `SELECT id, slug, payload, name, area, status, developer_name, hero_image, price_from_aed, price_to_aed, rental_yield, golden_visa_eligible
-     FROM freehold_site_projects
-     ${whereClause}
-     ORDER BY ${getProjectOrderBy(filters?.sort)}
-     LIMIT $${values.length - 1} OFFSET $${values.length}`,
-    values,
-  )
-  return rows.map((row) => normalizeProjectPayload(row))
+  try {
+    const safeLimit = Math.max(1, Math.min(limit, 96))
+    const page = Math.max(1, filters?.page || 1)
+    const offset = (page - 1) * safeLimit
+    const values: Array<string | number> = []
+    const where = filters ? buildPropertyListingWhere(filters, values) : []
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : ""
+    values.push(safeLimit, offset)
+  
+    const rows = await query<ProjectListingRow>(
+      `SELECT id, slug, payload, name, area, status, developer_name, hero_image, price_from_aed, price_to_aed, rental_yield, golden_visa_eligible
+       FROM freehold_site_projects
+       ${whereClause}
+       ORDER BY ${getProjectOrderBy(filters?.sort)}
+       LIMIT $${values.length - 1} OFFSET $${values.length}`,
+      values,
+    )
+    return rows.map((row) => normalizeProjectPayload(row))
+  } catch (err) {
+    console.error('[data] getProjectsForGrid failed — rendering an empty grid', err)
+    return []
+  }
 }
 
 export async function getProjectsForGridCount(filters?: PropertyListingFilters) {
-  const values: Array<string | number> = []
-  const where = filters ? buildPropertyListingWhere(filters, values) : []
-  const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : ""
-  const rows = await query<{ total: number }>(
-    `SELECT COUNT(*)::int AS total FROM freehold_site_projects ${whereClause}`,
-    values,
-  )
-  return rows[0]?.total || 0
+  try {
+    const values: Array<string | number> = []
+    const where = filters ? buildPropertyListingWhere(filters, values) : []
+    const whereClause = where.length ? `WHERE ${where.join(" AND ")}` : ""
+    const rows = await query<{ total: number }>(
+      `SELECT COUNT(*)::int AS total FROM freehold_site_projects ${whereClause}`,
+      values,
+    )
+    return rows[0]?.total || 0
+  } catch (err) {
+    console.error('[data] getProjectsForGridCount failed — reporting no results', err)
+    return 0
+  }
 }
 
 export async function getAdjacentProjectSlugs(slug: string) {
@@ -762,18 +787,27 @@ export async function getProperties(limit = 12) {
   return rows.map((row) => projectToProperty(normalizeListingProject(row)))
 }
 
+/**
+ * The homepage's featured strip fails soft, for the same reason its blog does:
+ * a section with nothing to show must not cost the reader the whole page.
+ */
 export async function getFeaturedProperties(limit = 3) {
-  const rows = await query<ProjectListingRow>(
-    `SELECT id, slug, payload, name, area, status, developer_name, hero_image, price_from_aed, price_to_aed, rental_yield, golden_visa_eligible
-     FROM freehold_site_projects
-     WHERE status = 'selling'
-       AND featured = true
-     ORDER BY ${SORT_SCORE_ORDER}
-     LIMIT $1`,
-    [limit],
-  )
-
-  return rows.map((row) => projectToProperty(normalizeListingProject(row)))
+  try {
+    const rows = await query<ProjectListingRow>(
+      `SELECT id, slug, payload, name, area, status, developer_name, hero_image, price_from_aed, price_to_aed, rental_yield, golden_visa_eligible
+       FROM freehold_site_projects
+       WHERE status = 'selling'
+         AND featured = true
+       ORDER BY ${SORT_SCORE_ORDER}
+       LIMIT $1`,
+      [limit],
+    )
+  
+    return rows.map((row) => projectToProperty(normalizeListingProject(row)))
+  } catch (err) {
+    console.error('[data] getFeaturedProperties failed — rendering the homepage without them', err)
+    return []
+  }
 }
 
 export interface PropertyListingFilters {
