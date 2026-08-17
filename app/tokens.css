@@ -1,0 +1,149 @@
+/* GENERATED FROM design/tokens.css BY scripts/gen-tokens.ts — DO NOT EDIT.
+   Edit the source and re-run `pnpm guards`. */
+/**
+ * THE COLOUR-FREE CORE, AND THE PALETTE THAT DRESSES IT.
+ *
+ * One platform serves the vendor, a client brokerage under contract, and every
+ * customer at {name}.entrestate.com — each with their own brand. Every previous
+ * attempt to unify baked a colour into the system and then fought it: five
+ * competing golds, three blues, 413 hardcoded instances of one green, and two
+ * apps that ended up looking like different products.
+ *
+ * So the system holds NO brand colour at all. Everything structural — canvas,
+ * surfaces, borders, ink — is achromatic-by-intent: a single cool neutral ramp
+ * that reads as "screen", never as "brand". Brand arrives only through the
+ * PALETTE block below, which is a handful of variables a host can overwrite at
+ * runtime from a tenant record.
+ *
+ * The rule that makes it work: a component may reference a NEUTRAL or a ROLE.
+ * It may never name a colour. `border-line`, `bg-surface`, `text-accent`,
+ * `text-positive` are all legal; `#C69B3E`, `emerald-400`, `bg-[#0F131A]` are
+ * not — because the moment a component names a colour, it has opted out of
+ * every brand but one, and that is how this repo arrived where it is.
+ *
+ * WHY THE PALETTE IS TWO ACCENTS, NOT ONE. The Decision Terminal's look — the
+ * one this system is modelled on — works because it splits accent by JOB:
+ * a structural accent carries furniture (icons, active nav, links) while a
+ * semantic ramp carries meaning (a live signal, a STRONG_BUY, a lapsed permit).
+ * Collapse them and the meaning stops reading as meaning: everything glows, so
+ * nothing does.
+ *
+ * Generated into both build roots by scripts/gen-tokens.ts — apps/terminal has
+ * its own package.json and Vercel root, so a shared import is not available
+ * without a workspace conversion that this file deliberately does not require.
+ * EDIT THIS FILE, never the generated copies; the guard fails if they drift.
+ */
+
+:root {
+  /* ── THE NEUTRAL RAMP — colour-free by intent ──────────────────────────
+     Cool blue-slate, the Decision Terminal's real canvas (its themeColor is
+     pinned to --n-900 in both media queries). Chosen over a warm charcoal
+     because a cool ground lets a semantic colour read as a signal lamp rather
+     than as decoration. Nothing here is a brand and nothing here should ever
+     become one. */
+  --n-900: #0D1218;  /* deepest — page gutters, insets below the canvas */
+  --n-850: #11161D;  /* THE CANVAS */
+  --n-800: #1A232E;  /* card / raised surface */
+  --n-750: #202B36;  /* secondary surface, hover ground */
+  --n-700: #2A3542;  /* muted fill */
+  --n-600: #2F3A46;  /* border */
+  --n-500: #48566A;  /* strong border, disabled ink */
+  --n-400: #7C8B9D;  /* faint ink — captions, timestamps */
+  --n-300: #B2BDCA;  /* muted ink — labels, secondary copy */
+  --n-100: #E6ECF3;  /* ink */
+  --n-000: #FFFFFF;
+
+  /* Declared before the structural roles below, which mix it in. */
+  --color-accent: #3B82F6;
+  --color-accent-bright: #60A5FA;
+  --color-accent-ink: #FFFFFF;
+
+  /* ── DEGREE — how much of their colour a tenant wants in the room ──────
+     A brand is not only a hue, it is how loudly that hue is worn. Two brokerages
+     can both be "gold" and want completely different rooms: one wants a neutral
+     screen with gold buttons, the other wants the whole chrome warmed by it.
+     Forcing one answer is what makes a white-label product feel like somebody
+     else's software wearing your logo.
+     So the tenant picks a colour AND a degree, and the degree is the percentage
+     of that colour mixed into every structural neutral. 0% is the colour-free
+     core exactly as authored above. The ceiling is deliberately low — past
+     roughly 14% the accent stops being able to stand out against a ground made
+     of itself, which is the failure this whole file exists to prevent.
+       0%   none      a neutral screen; brand appears only on accents
+       4%   whisper   the default: present, unnameable
+       8%   warm      clearly their room
+      12%  saturated  as far as this system goes and stays legible */
+  --brand-degree: 4%;
+
+  /* ── STRUCTURAL ROLES — what a component is allowed to name ───────────── */
+  --color-app: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-850));
+  --color-chrome: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-900));
+  --color-surface: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-800));
+  --color-surface-2: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-750));
+  --color-surface-3: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-700));
+  /* Ink and lines take HALF the degree. Text tinted as hard as its background
+     loses contrast against it, and a border tinted to match its surface stops
+     being a border — the two things a brand wash breaks first. */
+  --color-ink: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-100));
+  --color-ink-muted: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-300));
+  --color-ink-faint: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-400));
+  --color-line: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-600));
+  --color-line-strong: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-500));
+
+  /* ── THE PALETTE — the ONLY place a brand exists ───────────────────────
+     A host overwrites these per tenant. Defaults are Entrestate's own mark:
+     the blue of the third square in the tri-dot wordmark, and the emerald the
+     Terminal already uses for live signal. A tenant with a gold brand sets
+     --color-accent and changes nothing else; a client brokerage keeps its
+     forest-and-gold identity without a line of its own CSS. */
+  /* Semantic ramp — MEANING, never decoration. One triple per role, applied as
+     border-{role}/50 + bg-{role}/10 + text-{role}-bright, the recipe the
+     Terminal already repeats across timing, grade and confidence scales. */
+  --color-positive: #10B981;        /* strong buy, live, healthy, published */
+  --color-positive-bright: #34D399;
+  --color-caution: #F59E0B;         /* hold, review, expiring */
+  --color-caution-bright: #FBBF24;
+  --color-warning: #F97316;         /* wait, degraded, over target */
+  --color-warning-bright: #FB923C;
+  --color-danger: #EF4444;          /* avoid, failed, blocked, refused */
+  --color-danger-bright: #F87171;
+  --color-neutral: #64748B;         /* unknown — the honest fifth step, and the
+                                       reason a missing value never borrows a
+                                       colour that implies a judgement */
+  --color-neutral-bright: #94A3B8;
+
+  /* ── CHANNEL COLOURS — identity, not palette ───────────────────────────
+     Google's blue and Meta's blue tell an operator WHICH network they are
+     configuring. They are facts about someone else's brand, so they are pinned
+     here rather than swept into the accent by a well-meaning codemod. */
+  --color-channel-google: #4285F4;
+  --color-channel-meta: #1877F2;
+
+  /* ── FORM ────────────────────────────────────────────────────────────── */
+  --radius-pill: 9999px;
+  --radius-card: 1rem;      /* rounded-2xl — the card body */
+  --radius-inset: 0.75rem;  /* rounded-xl — a well inside a card */
+  --radius-control: 0.5rem; /* rounded-lg — buttons, inputs */
+
+  /* The Terminal's signature elevation: a long, soft, accent-tinted throw with
+     heavy negative spread. Not a drop shadow — a glow the card sits in. */
+  --shadow-glow: 0 24px 80px -48px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.24);
+
+  /* ── TYPE ─────────────────────────────────────────────────────────────
+     Cairo carries Arabic AND Latin so a mixed line does not change face
+     mid-sentence; Inter carries Cyrillic. Neither app loaded any face capable
+     of Arabic or Cyrillic before this file existed — the product rendered in
+     whatever the reader's OS happened to supply. The display serif stays a
+     local stack: Latin-only by nature, so Arabic and Russian headings fall to
+     the sans, which is the honest outcome rather than a faked one. */
+  --font-sans: Inter, Cairo, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* The micro-label that does more for the "terminal" feel than any colour:
+     10px, semibold, wide-tracked, muted, uppercase. 485 hand-written copies of
+     this existed before it had a name. */
+  --label-size: 0.625rem;
+  --label-tracking: 0.18em;
+}

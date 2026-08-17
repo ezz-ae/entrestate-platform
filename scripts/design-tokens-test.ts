@@ -87,6 +87,50 @@ console.log('\n── the colours a migration is allowed to converge on ──')
   }
 }
 
+console.log('\n── one token source, generated into both build roots ──')
+{
+  // WHY: two apps, two package.json files, two Vercel roots and no pnpm
+  // workspace. A hand-copied token file is precisely how the two visual
+  // languages diverged in the first place, so the copies are generated and
+  // then asserted identical rather than trusted.
+  const src = readFileSync(join(ROOT, 'design/tokens.css'), 'utf8')
+  for (const rel of ['app/tokens.css', 'apps/terminal/app/tokens.css']) {
+    let copy = ''
+    try { copy = readFileSync(join(ROOT, rel), 'utf8') } catch { /* reported below */ }
+    const body = copy.slice(copy.indexOf('*/') + 2).trimStart()
+    check(`${rel} is current with design/tokens.css`,
+      body === src.trimStart(),
+      copy ? 'drifted — run `npx tsx scripts/gen-tokens.ts`' : 'missing — run `npx tsx scripts/gen-tokens.ts`')
+  }
+}
+
+console.log('\n── the core holds no brand colour ──')
+{
+  // WHY: the whole architecture is that structure is achromatic and brand
+  // arrives only through the palette. The moment a NEUTRAL is defined as a
+  // brand hue, every tenant inherits somebody else's identity in their chrome
+  // — which is the state this repo is migrating out of.
+  const src = readFileSync(join(ROOT, 'design/tokens.css'), 'utf8')
+  const banned = ['#C69B3E', '#D4AC50', '#D4AF37', '#C9A961', '#152E24', '#3a6fb8']
+  const neutrals = [...src.matchAll(/--n-\d+:\s*(#[0-9A-Fa-f]{6})/g)].map((m) => m[1].toUpperCase())
+  check(`the neutral ramp was found (${neutrals.length} steps)`, neutrals.length >= 8, neutrals.join(' '))
+  const branded = neutrals.filter((n) => banned.map((b) => b.toUpperCase()).includes(n))
+  check('no neutral step is a brand colour', branded.length === 0, branded.join(' '))
+
+  // WHY: a tenant sets colour AND degree. If a structural role stops mixing the
+  // degree in, that surface silently opts out of the tenant's brand and the
+  // product looks half-skinned — the exact complaint white-label customers make.
+  for (const role of ['--color-app', '--color-surface', '--color-chrome']) {
+    const m = src.match(new RegExp(role + ':\\s*([^;]+);'))
+    check(`${role} mixes the brand degree`,
+      !!m && m[1].includes('--brand-degree') && m[1].includes('--color-accent'),
+      m ? m[1].trim() : 'not declared')
+  }
+  check('the degree defaults inside the legible range',
+    /--brand-degree:\s*([0-9]|1[0-4])%/.test(src),
+    (src.match(/--brand-degree:[^;]*/) ?? ['not declared'])[0])
+}
+
 console.log(
   failures
     ? `\n${failures} design-token rule(s) broken.`
