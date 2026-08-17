@@ -57,12 +57,18 @@ export async function POST(req: Request) {
 
   const result = await confirmTopupRequest(body.id, a.user.email)
   if (!result.ok) {
-    const status = result.reason === 'not_found' ? 404 : result.reason === 'not_pending' ? 409 : 500
+    const status =
+      result.reason === 'not_found' ? 404
+      : result.reason === 'not_pending' ? 409
+      : result.reason === 'self_deal' ? 403
+      : 500
     return NextResponse.json(
       {
         error:
           result.reason === 'not_found' ? 'No request with that id.'
           : result.reason === 'not_pending' ? 'That request was already decided.'
+          : result.reason === 'self_deal'
+            ? 'A top-up cannot be confirmed by the account it credits. Entrestate confirms the payment.'
           : 'Could not confirm the top-up. Nothing was credited.',
       },
       { status },

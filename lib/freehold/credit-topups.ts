@@ -137,7 +137,7 @@ export async function confirmTopupRequest(
   decidedBy: string,
 ): Promise<
   | { ok: true; credits: number; already?: true }
-  | { ok: false; reason: 'not_found' | 'not_pending' | 'error' }
+  | { ok: false; reason: 'not_found' | 'not_pending' | 'self_deal' | 'error' }
 > {
   if (!id) return { ok: false, reason: 'not_found' }
   try {
@@ -154,6 +154,20 @@ export async function confirmTopupRequest(
         return { ok: true as const, credits: req.credits, already: true as const }
       }
       if (req.status !== 'pending') return { ok: false as const, reason: 'not_pending' as const }
+
+      // NOBODY CONFIRMS THEIR OWN MONEY.
+      //
+      // The route's role gate is not enough on a realtor tenant: that workspace
+      // is one person and they sign in as 'ceo', which is on the management
+      // list — so the paying customer WAS the approver. Walked live, a realtor
+      // requested a pack and confirmed it in the next call, minting 75 tokens
+      // for free; unbounded, it is the whole product for nothing.
+      //
+      // The refusal lives HERE, in the transaction that moves the money, so no
+      // route, script or future webhook can reach the ledger around it.
+      if (decidedBy && decidedBy.trim().toLowerCase() === req.broker_id.trim().toLowerCase()) {
+        return { ok: false as const, reason: 'self_deal' as const }
+      }
 
       const reference = `topup:${req.id}`
       // Quota column and ledger row are the same fact, in one transaction —

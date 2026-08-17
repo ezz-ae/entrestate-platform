@@ -316,6 +316,36 @@ console.log('\n── the monthly grant is a company entitlement ──')
   }
 }
 
+console.log('\n── nobody confirms their own money ──')
+{
+  // WHY: walked live on production — a realtor requested a 75-token pack and
+  // confirmed it in the very next call, minting the tokens for free. The route's
+  // role gate could never catch it: a realtor workspace is ONE person signing in
+  // as 'ceo', which is on the management list, so the paying customer was also
+  // the approver. Unbounded, that is the entire product for nothing.
+  const src = readFileSync(new URL('../lib/freehold/credit-topups.ts', import.meta.url), 'utf8')
+  const lines = src.split('\n')
+  const confirmAt = lines.findIndex((l) => l.includes('export async function confirmTopupRequest'))
+  const selfDealAt = lines.findIndex((l) => /reason: 'self_deal'/.test(l))
+  const ledgerAt = lines.findIndex((l) => /INSERT INTO credit_ledger/.test(l))
+  check('confirmTopupRequest can refuse a self-deal', selfDealAt > confirmAt, `${selfDealAt} vs ${confirmAt}`)
+
+  // WHY: the refusal has to sit INSIDE the money transaction, above the ledger
+  // write — anywhere else (a route, a helper) and the next caller reaches the
+  // ledger around it. A webhook will eventually call this same function.
+  check('…before the ledger is written, inside the transaction',
+    selfDealAt > 0 && ledgerAt > selfDealAt, `self_deal@${selfDealAt} ledger@${ledgerAt}`)
+  check('…comparing the approver against the credited account',
+    /decidedBy[\s\S]{0,120}req\.broker_id/.test(src))
+
+  // WHY: with self-confirmation refused, nobody inside a realtor tenant may
+  // approve — so a vendor-side path must exist or a realtor can never buy at all.
+  const vendor = readFileSync(new URL('../app/api/wl/topups/route.ts', import.meta.url), 'utf8')
+  check('a vendor-side till exists', /confirmTopupRequest/.test(vendor))
+  check('…gated by the vendor secret, not a session role', /x-wl-admin/.test(vendor) && /wlAdminSecret/.test(vendor))
+  check('…and reaches into the tenant that owns the request', /runWithSchema/.test(vendor) && /schemaNameForSubdomain/.test(vendor))
+}
+
 if (failures > 0) {
   console.error(`\n${failures} realtor money rule(s) broken.`)
   process.exit(1)
