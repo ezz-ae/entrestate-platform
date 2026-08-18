@@ -286,8 +286,52 @@ async function rawQuery<T extends QueryResultRow = QueryResultRow>(
   }
 }
 
+/**
+ * The empty-array fallback below is load-bearing and dangerous, so it says so
+ * out loud exactly once per process.
+ *
+ * `next build` renders pages that read the database, on machines and in CI runs
+ * that have no database. Throwing there would mean no build without a live
+ * connection, so an unconfigured `query()` returns no rows instead.
+ *
+ * The cost is that "the database is not configured" and "the table is empty"
+ * are the SAME VALUE to every caller in this app. That has already been paid
+ * once here: lookupTenantSchema cached an unreachable control plane as "no such
+ * tenant" and took two live workspaces down. It nearly happened again in a
+ * maintenance script, which read zero tenants from a shell with no env and
+ * reported "nothing to do" — a sentence one edit away from being destructive.
+ *
+ * So: keep the fallback, and make its silence impossible. Anything that must
+ * not mistake the two calls assertDatabaseConfigured() first.
+ */
+let missingConnectionWarned = false
+function warnOnMissingConnection(): void {
+  if (missingConnectionWarned) return
+  missingConnectionWarned = true
+  console.warn(
+    "[db] No NEON_DATABASE_URL or DATABASE_URL — every query returns zero rows. " +
+    "This is the build-time fallback. If you are not building, nothing you read " +
+    "is real: an empty result here means UNCONFIGURED, not empty.",
+  )
+}
+
+/**
+ * Refuse to continue when there is no database.
+ *
+ * For maintenance scripts and any caller whose next step depends on a read
+ * being TRUE rather than merely returning. `query()` cannot do this itself —
+ * see above — so the callers that cannot afford the ambiguity opt in.
+ */
+export function assertDatabaseConfigured(who = 'this operation'): void {
+  if (rawConnectionString) return
+  throw new Error(
+    `No NEON_DATABASE_URL or DATABASE_URL — ${who} would read zero rows from ` +
+    `a database it never opened. Set one, or run with \`set -a; . ./.env.local; set +a\`.`,
+  )
+}
+
 export async function query<T extends QueryResultRow = QueryResultRow>(text: string, params: unknown[] = []) {
-  if (!rawConnectionString) return [] as T[]
+  if (!rawConnectionString) { warnOnMissingConnection(); return [] as T[] }
   return rawQuery<T>(await resolveActiveSchema(), text, params)
 }
 

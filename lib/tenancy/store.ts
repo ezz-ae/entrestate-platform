@@ -92,6 +92,15 @@ const mapTenant = (r: TenantRow): SaasTenant => ({
   ownerEmail: r.owner_email,
 })
 
+/**
+ * Run the control-plane DDL. Exported for maintenance scripts, which reach
+ * saas_tenants directly and would otherwise 42703 on a column added after the
+ * database last served a request.
+ */
+export async function ensureTenantStore(): Promise<void> {
+  return runWithDefaultSchema(ensure)
+}
+
 async function ensure(): Promise<void> {
   await ensureOnce('saas_tenants', async () => {
     await query(`

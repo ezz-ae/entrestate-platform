@@ -29,13 +29,24 @@
  *   npx tsx scripts/backfill-tenant-owners.ts
  *   npx tsx scripts/backfill-tenant-owners.ts --write
  */
-import { query, runWithDefaultSchema, runWithSchema } from '../lib/db'
+import { query, runWithDefaultSchema, runWithSchema, assertDatabaseConfigured } from '../lib/db'
+import { ensureTenantStore } from '../lib/tenancy/store'
 
 const WRITE = process.argv.includes('--write')
 
 interface Row { id: string; subdomain: string; schema_name: string; owner_email: string | null }
 
 async function main() {
+  // WITHOUT THIS, the first run of this script printed "0 tenant(s) in the
+  // control plane. Nothing to do." from a shell with no env — query() returns
+  // an empty array when no database is configured (lib/db.ts), so a broken
+  // connection and an empty table are the same value. "Nothing to do" is one
+  // edit away from being a destructive conclusion.
+  assertDatabaseConfigured('the tenant-owner backfill')
+  // The column may not exist yet on a database that has not served a request
+  // since it was added — ensure() carries the ALTER.
+  await ensureTenantStore()
+
   const tenants = await runWithDefaultSchema(() =>
     query<Row>(`SELECT id, subdomain, schema_name, owner_email FROM saas_tenants ORDER BY created_at ASC`),
   )
