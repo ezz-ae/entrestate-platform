@@ -200,9 +200,17 @@ export function resolvePaidTier(value: string | null | undefined): PaidTier | nu
     case "solo":
     case "solo-analyst":
       return "pro"
+    // "realtor" and "realtor-pro" USED TO ALIAS TO TEAM, and must never again.
+    // Meta for Realtors is the ONE-AGENT product: no monthly fee, funded by
+    // tokens at TOKEN_PRICE_AED (lib/freehold/credits-shared.ts). Team is the
+    // BROKERAGE tier at AED 999/month. So /checkout?tier=realtor quoted the
+    // brokerage price for the solo product — and nothing errored, because
+    // resolvePaidTier returned a VALID tier that both app/checkout/page.tsx
+    // and app/api/billing/checkout/route.ts accept. Nothing in either app has
+    // ever emitted tier=realtor: the four emitters all write ?plan=realtor,
+    // which app/api/wl/signup/route.ts reads instead. The alias was liability
+    // with no traffic on it. Falling through to null makes that URL 400.
     case "team":
-    case "realtor":
-    case "realtor-pro":
       return "team"
     case "institutional":
     case "enterprise":

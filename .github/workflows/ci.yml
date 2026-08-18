@@ -43,3 +43,17 @@ jobs:
         run: pnpm build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+      # THE SECOND BUILD ROOT. apps/terminal is its own Vercel project
+      # (entrestate-os) with its own package.json and lockfile — there is no
+      # pnpm workspace joining them, so the install above does not touch it and
+      # every gate above is blind to it. It shipped with
+      # `typescript: { ignoreBuildErrors: true }` and 423 uncaught type errors.
+      # These two steps are the first verification that half of this repository
+      # has ever had in CI. The ratchet fails only when the debt GROWS.
+      - name: Install (terminal)
+        run: pnpm install --frozen-lockfile
+        working-directory: apps/terminal
+
+      - name: Type debt ratchet (terminal)
+        run: pnpm typecheck:terminal
