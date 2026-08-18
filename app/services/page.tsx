@@ -114,12 +114,12 @@ export default async function ServicesPage() {
       </section>
 
       {/* SERVICES — editorial card grid on layered cream */}
-      <section className="relative bg-[#FAF8F5] py-20 md:py-28">
+      <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_80%_10%,rgba(198,155,62,0.05),transparent)]" />
         <div className="container relative z-10">
           <div className="mb-14 max-w-2xl md:mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">What We Cover</p>
-            <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] text-[#152E24] md:text-5xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">What We Cover</p>
+            <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] text-foreground md:text-5xl">
               Eight disciplines, run by one team.
             </h2>
           </div>
@@ -130,26 +130,26 @@ export default async function ServicesPage() {
               return (
                 <article
                   key={s.title}
-                  className="group relative overflow-hidden rounded-[28px] border border-[#152E24]/[0.06] bg-white p-7 shadow-[0_20px_60px_-40px_rgba(21,46,36,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-[#C69B3E]/30 hover:shadow-[0_32px_80px_-40px_rgba(21,46,36,0.28)] md:p-9"
+                  className="group relative overflow-hidden rounded-[28px] border border-foreground/[0.06] bg-white p-7 shadow-[0_20px_60px_-40px_rgba(21,46,36,0.18)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_32px_80px_-40px_rgba(21,46,36,0.28)] md:p-9"
                 >
                   {/* Gold thread top */}
-                  <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#C69B3E]/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                   <div className="flex items-start justify-between gap-5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C69B3E]/15 to-[#C69B3E]/[0.04] text-[#C69B3E] ring-1 ring-[#C69B3E]/15 md:h-14 md:w-14">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/[0.04] text-primary ring-1 ring-primary/15 md:h-14 md:w-14">
                       <Icon className="h-5 w-5 md:h-6 md:w-6" />
                     </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35">{s.eyebrow}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/35">{s.eyebrow}</span>
                   </div>
 
-                  <h3 className="mt-6 font-serif text-2xl font-semibold leading-tight text-[#152E24]">{s.title}</h3>
-                  <p className="mt-3 text-[14px] leading-relaxed text-[#152E24]/55">{s.description}</p>
+                  <h3 className="mt-6 font-serif text-2xl font-semibold leading-tight text-foreground">{s.title}</h3>
+                  <p className="mt-3 text-[14px] leading-relaxed text-foreground/55">{s.description}</p>
 
-                  <ul className="mt-6 grid gap-2.5 border-t border-[#152E24]/[0.06] pt-5">
+                  <ul className="mt-6 grid gap-2.5 border-t border-foreground/[0.06] pt-5">
                     {s.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2.5 text-[13px] text-[#152E24]/75">
-                        <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#C69B3E]/10">
-                          <Check className="h-2.5 w-2.5 text-[#C69B3E]" strokeWidth={3} />
+                      <li key={f} className="flex items-start gap-2.5 text-[13px] text-foreground/75">
+                        <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                          <Check className="h-2.5 w-2.5 text-primary" strokeWidth={3} />
                         </span>
                         <span>{f}</span>
                       </li>
@@ -163,7 +163,7 @@ export default async function ServicesPage() {
       </section>
 
       {/* WHY US — dark numbered editorial */}
-      <section className="relative overflow-hidden bg-[#152E24] py-24 text-white md:py-32">
+      <section className="relative overflow-hidden bg-foreground py-24 text-white md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(198,155,62,0.08),transparent)]" />
         <div className="container relative z-10">
           <div className="mx-auto max-w-2xl text-center">
@@ -196,7 +196,7 @@ export default async function ServicesPage() {
             Book a 30-minute call with a senior advisor. We'll discuss the goal, the budget, and the next two moves.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" className="freehold-gradient h-14 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#152E24]" asChild>
+            <Button size="lg" className="freehold-gradient h-14 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground" asChild>
               <Link href="/contact">Book Consultation <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
             <Button size="lg" variant="outline" className="h-14 rounded-xl border-white/15 bg-white/5 px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-white hover:bg-white/10 hover:text-white" asChild>

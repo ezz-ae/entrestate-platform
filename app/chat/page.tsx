@@ -162,28 +162,28 @@ export default function ChatPage() {
       <div className="flex flex-1 flex-col min-w-0 h-[100dvh] lg:h-auto">
 
         {/* Slim header */}
-        <header className="flex-none border-b border-[#152E24]/10 lg:border-white/[0.06] bg-white/95 lg:bg-[#06080A]/80 backdrop-blur">
+        <header className="flex-none border-b border-foreground/10 lg:border-white/[0.06] bg-white/95 lg:bg-[#06080A]/80 backdrop-blur">
           <div className="flex h-12 items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <Link
                 href="/"
-                className="text-[#152E24]/60 lg:text-white/40 hover:text-[#152E24] lg:hover:text-white/70 transition-colors text-base leading-none"
+                className="text-foreground/60 lg:text-white/40 hover:text-foreground lg:hover:text-white/70 transition-colors text-base leading-none"
                 aria-label="Back to home"
               >
                 ←
               </Link>
               <div className="h-5 w-px bg-white/10" />
-              <span className="text-[13px] font-medium text-[#152E24] lg:text-white/80">{BRAND.company} AI</span>
+              <span className="text-[13px] font-medium text-foreground lg:text-white/80">{BRAND.company} AI</span>
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
             </div>
-            <span className="text-[11px] text-[#152E24]/30 lg:text-white/30">Dubai Real Estate Intelligence</span>
+            <span className="text-[11px] text-foreground/30 lg:text-white/30">Dubai Real Estate Intelligence</span>
           </div>
         </header>
 
         {/* Messages area */}
         <div
           ref={scrollViewportRef}
-          className="flex-1 overflow-y-auto overscroll-contain scroll-smooth bg-[#FAF8F5] lg:bg-transparent"
+          className="flex-1 overflow-y-auto overscroll-contain scroll-smooth bg-background lg:bg-transparent"
         >
           <div className="mx-auto w-full max-w-2xl px-4 py-6 space-y-6 pb-8">
 
@@ -198,18 +198,18 @@ export default function ChatPage() {
                       <Sparkles className="h-7 w-7 text-[#D4AF37]" />
                     </span>
                   </div>
-                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C69B3E] lg:text-[#D4AF37]">{BRAND.company} AI</p>
-                  <h2 className="mt-2.5 font-serif text-[28px] font-semibold leading-[1.1] tracking-tight text-[#152E24] lg:text-white sm:text-[32px]">
+                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.28em] text-primary lg:text-[#D4AF37]">{BRAND.company} AI</p>
+                  <h2 className="mt-2.5 font-serif text-[28px] font-semibold leading-[1.1] tracking-tight text-foreground lg:text-white sm:text-[32px]">
                     What are we figuring out today?
                   </h2>
-                  <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-[#152E24]/55 lg:text-white/50">
+                  <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-foreground/55 lg:text-white/50">
                     Shortlists, ROI math, Golden Visa eligibility, area comparisons, or a free-form brief — pick a starting point or just ask.
                   </p>
                 </div>
 
                 {/* Category cards */}
                 <div>
-                  <p className="mb-3 px-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35 lg:text-white/30">Quick starts</p>
+                  <p className="mb-3 px-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/35 lg:text-white/30">Quick starts</p>
                   <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
                     {categories.map((cat) => {
                       const Icon = cat.icon
@@ -217,20 +217,20 @@ export default function ChatPage() {
                         <button
                           key={cat.title}
                           onClick={() => handleSendMessage(cat.prompt)}
-                          className="group relative overflow-hidden rounded-2xl border border-[#152E24]/[0.08] lg:border-white/[0.06] bg-white lg:bg-white/[0.025] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#C69B3E]/30 lg:hover:bg-white/[0.05] hover:shadow-[0_12px_30px_-15px_rgba(21,46,36,0.18)]"
+                          className="group relative overflow-hidden rounded-2xl border border-foreground/[0.08] lg:border-white/[0.06] bg-white lg:bg-white/[0.025] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/30 lg:hover:bg-white/[0.05] hover:shadow-[0_12px_30px_-15px_rgba(21,46,36,0.18)]"
                         >
                           <div className="flex items-start gap-3.5">
-                            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#152E24]/[0.06] bg-gradient-to-br ${cat.tone}`}>
+                            <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-foreground/[0.06] bg-gradient-to-br ${cat.tone}`}>
                               <Icon className="h-4 w-4" />
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#152E24]/40 lg:text-white/35">{cat.eyebrow}</p>
-                              <p className="mt-0.5 text-[14px] font-semibold text-[#152E24] lg:text-white">{cat.title}</p>
-                              <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-[#152E24]/55 lg:text-white/50">
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/40 lg:text-white/35">{cat.eyebrow}</p>
+                              <p className="mt-0.5 text-[14px] font-semibold text-foreground lg:text-white">{cat.title}</p>
+                              <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-foreground/55 lg:text-white/50">
                                 {cat.prompt}
                               </p>
                             </div>
-                            <ArrowRight className="h-4 w-4 shrink-0 text-[#152E24]/25 transition-all group-hover:translate-x-0.5 group-hover:text-[#C69B3E] lg:text-white/25 lg:group-hover:text-[#D4AF37]" />
+                            <ArrowRight className="h-4 w-4 shrink-0 text-foreground/25 transition-all group-hover:translate-x-0.5 group-hover:text-primary lg:text-white/25 lg:group-hover:text-[#D4AF37]" />
                           </div>
                         </button>
                       )
@@ -239,7 +239,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Disclaimer strip */}
-                <div className="flex items-center justify-center gap-2 rounded-full border border-[#152E24]/[0.06] lg:border-white/[0.05] bg-[#152E24]/[0.02] lg:bg-white/[0.02] px-4 py-2 text-[10px] text-[#152E24]/35 lg:text-white/30">
+                <div className="flex items-center justify-center gap-2 rounded-full border border-foreground/[0.06] lg:border-white/[0.05] bg-foreground/[0.02] lg:bg-white/[0.02] px-4 py-2 text-[10px] text-foreground/35 lg:text-white/30">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
                   <span>Live data · 3,500+ projects mapped · responds in &lt;2s</span>
                 </div>
@@ -266,7 +266,7 @@ export default function ChatPage() {
         </div>
 
         {/* Input bar */}
-        <div className="flex-none border-t border-[#152E24]/[0.06] lg:border-white/[0.06] bg-white lg:bg-[#06080A] px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div className="flex-none border-t border-foreground/[0.06] lg:border-white/[0.06] bg-white lg:bg-[#06080A] px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
           <div className="mx-auto w-full max-w-2xl space-y-2">
             {error && (
               <div className="rounded-xl border border-red-200 lg:border-red-500/30 bg-red-50 lg:bg-red-500/10 px-4 py-2 text-xs text-red-600 lg:text-red-400">

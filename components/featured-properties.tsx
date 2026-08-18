@@ -93,7 +93,7 @@ export async function FeaturedProperties() {
 
                     {/* Type + GV badges */}
                     <div className="absolute left-4 top-4 z-20 flex flex-wrap gap-1.5">
-                      <span className="rounded-md bg-[#C69B3E] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.15em] text-[#152E24]">
+                      <span className="rounded-md bg-primary px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.15em] text-foreground">
                         {type}
                       </span>
                       {goldenVisa && (
@@ -148,7 +148,7 @@ export async function FeaturedProperties() {
                       <div className="flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.12em] text-white/25">
                         {property.type === "off-plan" && (
                           <span className="flex items-center gap-1">
-                            <span className="h-1 w-1 rounded-full bg-[#C69B3E]" />
+                            <span className="h-1 w-1 rounded-full bg-primary" />
                             Off-plan
                           </span>
                         )}

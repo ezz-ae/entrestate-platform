@@ -144,10 +144,10 @@ const amenityIconMap: { [key: string]: LucideIcon } = {
 }
 
 const projectTabTriggerClass =
-  "rounded-full border border-[#152E24]/10 bg-white px-4 text-[#152E24]/65 data-[state=active]:border-[#152E24] data-[state=active]:bg-[#152E24] data-[state=active]:text-white"
+  "rounded-full border border-foreground/10 bg-white px-4 text-foreground/65 data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-white"
 
 const brandOutlineButtonClass =
-  "border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]"
+  "border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground"
 
 const getAmenityIcon = (amenity: string): LucideIcon => {
   const lowerAmenity = amenity.toLowerCase()
@@ -368,43 +368,43 @@ export default async function ProjectPage({
         </section>
 
         {/* Project Header */}
-        <section className="relative z-10 -mt-24 bg-[#FAF8F5] pb-8">
+        <section className="relative z-10 -mt-24 bg-background pb-8">
           <div className="container">
-            <div className="grid w-full items-start gap-8 rounded-[32px] border border-[#152E24]/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] lg:grid-cols-[1.5fr,1fr] lg:p-10">
+            <div className="grid w-full items-start gap-8 rounded-[32px] border border-foreground/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] lg:grid-cols-[1.5fr,1fr] lg:p-10">
                 <div className="space-y-6">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C69B3E]">{BRAND.company} Signature Development</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{BRAND.company} Signature Development</p>
                   <div className="flex flex-wrap gap-3">
-                    <Badge variant="secondary" className="border-none bg-[#152E24]/[0.06] text-[#152E24]">
+                    <Badge variant="secondary" className="border-none bg-foreground/[0.06] text-foreground">
                       {project.status?.replace("-", " ")}
                     </Badge>
                     {project.investmentHighlights?.goldenVisaEligible && (
-                      <Badge className="border-none ore-gradient text-[#152E24]">Golden Visa Eligible</Badge>
+                      <Badge className="border-none ore-gradient text-foreground">Golden Visa Eligible</Badge>
                     )}
                     {location.freehold && (
-                      <Badge variant="outline" className="border-[#152E24]/10 bg-[#FAF8F5] text-[#152E24]">Freehold</Badge>
+                      <Badge variant="outline" className="border-foreground/10 bg-background text-foreground">Freehold</Badge>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <h1 className="font-serif text-4xl font-bold text-[#152E24] md:text-5xl lg:text-6xl">
+                    <h1 className="font-serif text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
                       {project.name}
                     </h1>
-                    <p className="max-w-2xl text-lg font-light text-[#152E24]/60">
+                    <p className="max-w-2xl text-lg font-light text-foreground/60">
                       {project.tagline}
                     </p>
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-[#152E24] md:text-base">
+                  <div className="flex flex-wrap items-center gap-6 text-sm font-medium text-foreground md:text-base">
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5 text-[#C69B3E]" />
+                      <MapPin className="h-5 w-5 text-primary" />
                       <span>{location.area}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-[#C69B3E]" />
+                      <Building2 className="h-5 w-5 text-primary" />
                       <span>{developer.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-[#C69B3E]" />
+                      <Calendar className="h-5 w-5 text-primary" />
                       <span>Handover: {timeline.handoverDate || timeline.expectedCompletion || "TBD"}</span>
                     </div>
                   </div>
@@ -440,7 +440,7 @@ export default async function ProjectPage({
 
                 {/* Floating Glass Card for Key Stats */}
                 <div className="hidden lg:block">
-                  <div className="rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] p-6 shadow-none">
+                  <div className="rounded-[28px] border border-foreground/10 bg-background p-6 shadow-none">
                     <div className="grid grid-cols-2 gap-6">
                       <div>
                         <div className="text-sm text-muted-foreground">Starting Price</div>
@@ -465,7 +465,7 @@ export default async function ProjectPage({
                       </div>
                     </div>
                     <div className="mt-6 pt-6 border-t border-border flex gap-3">
-                       <Button className="w-full ore-gradient text-[#152E24] font-semibold hover:opacity-90" asChild>
+                       <Button className="w-full ore-gradient text-foreground font-semibold hover:opacity-90" asChild>
                           <Link href="#contact">Enquire Now</Link>
                        </Button>
                     </div>
@@ -476,13 +476,13 @@ export default async function ProjectPage({
         </section>
 
         {/* Key Stats Bar */}
-        <section className="bg-[#FAF8F5] pb-6">
+        <section className="bg-background pb-6">
           <div className="container">
-            <div className="grid gap-4 rounded-[28px] border border-[#152E24]/10 bg-white p-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 rounded-[28px] border border-foreground/10 bg-white p-6 sm:grid-cols-2 lg:grid-cols-4">
               {hasRoi && (
-                <div className="flex items-center gap-4 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-4">
+                <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background p-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg ore-gradient flex-shrink-0">
-                    <TrendingUp className="h-6 w-6 text-[#152E24]" />
+                    <TrendingUp className="h-6 w-6 text-foreground" />
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Expected ROI</div>
@@ -491,9 +491,9 @@ export default async function ProjectPage({
                 </div>
               )}
               {hasYield && (
-                <div className="flex items-center gap-4 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-4">
+                <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background p-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg ore-gradient flex-shrink-0">
-                    <Home className="h-6 w-6 text-[#152E24]" />
+                    <Home className="h-6 w-6 text-foreground" />
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Rental Yield</div>
@@ -501,9 +501,9 @@ export default async function ProjectPage({
                   </div>
                 </div>
               )}
-              <div className="flex items-center gap-4 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-4">
+              <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background p-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg ore-gradient flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-[#152E24]" />
+                  <Calendar className="h-6 w-6 text-foreground" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">Handover</div>
@@ -511,9 +511,9 @@ export default async function ProjectPage({
                 </div>
               </div>
               {showProgress && (
-                <div className="flex items-center gap-4 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-4">
+                <div className="flex items-center gap-4 rounded-2xl border border-foreground/10 bg-background p-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg ore-gradient flex-shrink-0">
-                    <Maximize className="h-6 w-6 text-[#152E24]" />
+                    <Maximize className="h-6 w-6 text-foreground" />
                   </div>
                   <div>
                     <div className="text-sm text-muted-foreground">Progress</div>
@@ -526,14 +526,14 @@ export default async function ProjectPage({
         </section>
 
         {/* Main Content */}
-        <section className="bg-[#FAF8F5] py-10 md:py-16">
+        <section className="bg-background py-10 md:py-16">
           <div className="container">
-            <div className="rounded-[32px] border border-[#152E24]/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
+            <div className="rounded-[32px] border border-foreground/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
               <div className="grid gap-12 lg:grid-cols-3">
               {/* Main Content */}
               <div className="lg:col-span-2">
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-[24px] bg-[#FAF8F5] p-2">
+                  <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-[24px] bg-background p-2">
                     <TabsTrigger
                       value="overview"
                       className={projectTabTriggerClass}
@@ -1054,10 +1054,10 @@ export default async function ProjectPage({
                 <ProjectLeadForm projectName={project.name} projectSlug={project.slug} />
                 
                 {/* Market Intelligence Loop */}
-                <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                <Card className="border-foreground/10 bg-background shadow-none">
                   <CardContent className="p-6 space-y-4">
                     <h4 className="font-semibold">Market Intelligence</h4>
-                    <p className="text-sm text-[#152E24]/60">
+                    <p className="text-sm text-foreground/60">
                       Connect this project with area insights, developer track records, and market-wide trends.
                     </p>
                     <div className="flex flex-col gap-2">
@@ -1082,15 +1082,15 @@ export default async function ProjectPage({
         </section>
 
         {/* CTA Section */}
-        <section className="bg-[#FAF8F5] pb-20">
+        <section className="bg-background pb-20">
           <div className="container">
-            <div className="rounded-[32px] bg-[#152E24] px-6 py-12 text-center text-white shadow-[0_32px_100px_-50px_rgba(21,46,36,0.7)] md:px-10">
+            <div className="rounded-[32px] bg-foreground px-6 py-12 text-center text-white shadow-[0_32px_100px_-50px_rgba(21,46,36,0.7)] md:px-10">
               <h2 className="font-serif text-3xl font-bold">Ready to Invest in {project.name}?</h2>
               <p className="mt-4 text-lg text-white/70">
                 Schedule a private viewing or consultation with our investment team.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
-                <Button size="lg" className="ore-gradient text-[#152E24]" asChild>
+                <Button size="lg" className="ore-gradient text-foreground" asChild>
                   <Link href="#contact">Request Details</Link>
                 </Button>
                 <Button size="lg" variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white" asChild>
@@ -1105,30 +1105,30 @@ export default async function ProjectPage({
           <>
             <div className="sm:hidden pb-24" />
             <div className="fixed inset-x-0 bottom-0 z-50 bg-transparent sm:hidden">
-              <div className="mx-4 mb-4 flex items-center justify-between gap-3 rounded-2xl border border-[#152E24]/10 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
+              <div className="mx-4 mb-4 flex items-center justify-between gap-3 rounded-2xl border border-foreground/10 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur">
                 {prevSlug ? (
                   <Link
                     href={`/projects/${prevSlug}`}
-                    className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#152E24]/60 hover:text-[#152E24]"
+                    className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/60 hover:text-foreground"
                   >
                     <ChevronLeft className="h-4 w-4" />
                     Prev listing
                   </Link>
                 ) : (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#152E24]/35">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground/35">
                     Start
                   </span>
                 )}
                 {nextSlug ? (
                   <Link
                     href={`/projects/${nextSlug}`}
-                    className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#152E24]/60 hover:text-[#152E24]"
+                    className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground/60 hover:text-foreground"
                   >
                     Next listing
                     <ChevronRight className="h-4 w-4" />
                   </Link>
                 ) : (
-                  <span className="text-xs font-semibold uppercase tracking-wider text-[#152E24]/35">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground/35">
                     Latest
                   </span>
                 )}

@@ -40,7 +40,7 @@ const contactChannels = [
     value: COMPANY_PHONE,
     helper: "Mon–Sat · 9:00 AM – 7:00 PM (GST)",
     href: `tel:${COMPANY_PHONE_E164}`,
-    accent: "from-[#C69B3E]/20 to-[#C69B3E]/[0.05] text-[#D4AC50] border-[#C69B3E]/25",
+    accent: "from-primary/20 to-primary/[0.05] text-[#D4AC50] border-primary/25",
   },
   {
     icon: Mail,
@@ -90,7 +90,7 @@ export default async function ContactPage() {
       </section>
 
       {/* CHANNELS — premium dark cards */}
-      <section className="relative bg-[#152E24] py-20 text-white md:py-24">
+      <section className="relative bg-foreground py-20 text-white md:py-24">
         <div className="container">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
             {contactChannels.map((c) => {
@@ -119,67 +119,67 @@ export default async function ContactPage() {
       </section>
 
       {/* FORM + INFO */}
-      <section className="relative bg-[#FAF8F5] py-20 md:py-28">
+      <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_20%_50%,rgba(198,155,62,0.04),transparent)]" />
         <div className="container relative z-10">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-14">
             {/* Office card */}
             <aside>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">Visit Us</p>
-              <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-[#152E24] md:text-4xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Visit Us</p>
+              <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-foreground md:text-4xl">
                 Sobha Sapphire,<br/>Business Bay.
               </h2>
-              <p className="mt-5 text-[15px] leading-relaxed text-[#152E24]/55">
+              <p className="mt-5 text-[15px] leading-relaxed text-foreground/55">
                 Walk-ins welcome by appointment. Coffee, screens, and a senior advisor ready to map your shortlist live.
               </p>
 
               <div className="mt-8 space-y-4">
-                <div className="flex items-start gap-4 rounded-2xl border border-[#152E24]/[0.06] bg-white p-5 shadow-[0_10px_30px_-20px_rgba(21,46,36,0.15)]">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C69B3E]/10 text-[#C69B3E]">
+                <div className="flex items-start gap-4 rounded-2xl border border-foreground/[0.06] bg-white p-5 shadow-[0_10px_30px_-20px_rgba(21,46,36,0.15)]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <MapPin className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#152E24]/45">Address</p>
-                    <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed text-[#152E24]">{content.address ?? 'Sobha Sapphire Building, Office 904\nBusiness Bay, Dubai · UAE'}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Address</p>
+                    <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed text-foreground">{content.address ?? 'Sobha Sapphire Building, Office 904\nBusiness Bay, Dubai · UAE'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 rounded-2xl border border-[#152E24]/[0.06] bg-white p-5 shadow-[0_10px_30px_-20px_rgba(21,46,36,0.15)]">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#C69B3E]/10 text-[#C69B3E]">
+                <div className="flex items-start gap-4 rounded-2xl border border-foreground/[0.06] bg-white p-5 shadow-[0_10px_30px_-20px_rgba(21,46,36,0.15)]">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Clock className="h-4 w-4" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#152E24]/45">Hours</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Hours</p>
                     {content.hours ? (
-                      <p className="mt-2 whitespace-pre-line text-[13px] leading-relaxed text-[#152E24]">{content.hours}</p>
+                      <p className="mt-2 whitespace-pre-line text-[13px] leading-relaxed text-foreground">{content.hours}</p>
                     ) : (
                     <div className="mt-2 space-y-1 text-[13px]">
                       <div className="flex justify-between">
-                        <span className="text-[#152E24]/55">Monday – Saturday</span>
-                        <span className="font-semibold text-[#152E24]">9 AM – 7 PM</span>
+                        <span className="text-foreground/55">Monday – Saturday</span>
+                        <span className="font-semibold text-foreground">9 AM – 7 PM</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#152E24]/55">Sunday</span>
-                        <span className="font-semibold text-[#152E24]">Online only</span>
+                        <span className="text-foreground/55">Sunday</span>
+                        <span className="font-semibold text-foreground">Online only</span>
                       </div>
                     </div>
                     )}
                   </div>
                 </div>
 
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[#152E24]/40">RERA ORN: {content.rera ?? '28628'}</p>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-foreground/40">RERA ORN: {content.rera ?? '28628'}</p>
               </div>
             </aside>
 
             {/* Form card */}
             <div className="relative">
-              <div className="absolute -inset-2 -z-10 rounded-[36px] bg-gradient-to-br from-[#C69B3E]/10 via-transparent to-[#152E24]/[0.04] opacity-60 blur-2xl" />
-              <div className="relative rounded-[32px] border border-[#152E24]/[0.06] bg-white p-7 shadow-[0_24px_80px_-30px_rgba(21,46,36,0.18)] md:p-10">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">Briefing Request</p>
-                <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-[#152E24] md:text-4xl">
+              <div className="absolute -inset-2 -z-10 rounded-[36px] bg-gradient-to-br from-primary/10 via-transparent to-foreground/[0.04] opacity-60 blur-2xl" />
+              <div className="relative rounded-[32px] border border-foreground/[0.06] bg-white p-7 shadow-[0_24px_80px_-30px_rgba(21,46,36,0.18)] md:p-10">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Briefing Request</p>
+                <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-foreground md:text-4xl">
                   Send a brief.
                 </h2>
-                <p className="mt-3 text-[15px] leading-relaxed text-[#152E24]/55">
+                <p className="mt-3 text-[15px] leading-relaxed text-foreground/55">
                   A senior advisor responds the same business day with a curated next-step plan.
                 </p>
                 <div className="mt-7">
@@ -192,7 +192,7 @@ export default async function ContactPage() {
       </section>
 
       {/* CTA strip */}
-      <section className="relative overflow-hidden bg-[#152E24] py-20 text-white md:py-24">
+      <section className="relative overflow-hidden bg-foreground py-20 text-white md:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(212,175,55,0.10),transparent)]" />
         <div className="container relative z-10 text-center">
           <h2 className="mx-auto max-w-2xl font-serif text-3xl font-bold leading-tight md:text-4xl">
@@ -202,7 +202,7 @@ export default async function ContactPage() {
             Open the platform — the chat, projects, and area intelligence are public.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" className="h-12 rounded-xl bg-white px-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#152E24] hover:bg-white/90" asChild>
+            <Button size="lg" className="h-12 rounded-xl bg-white px-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground hover:bg-white/90" asChild>
               <Link href="/chat">Open AI Assistant</Link>
             </Button>
             <Button size="lg" variant="outline" className="h-12 rounded-xl border-white/15 bg-white/5 px-7 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-white/10 hover:text-white" asChild>

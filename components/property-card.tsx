@@ -62,7 +62,7 @@ export function PropertyCard({ property, compact = false, layout = "grid", displ
         className={cn(
           "relative overflow-hidden rounded-[24px] bg-[#0F1F18] text-white transition-all duration-300",
           "shadow-[0_24px_80px_-40px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.04]",
-          "hover:-translate-y-1 hover:ring-[#C69B3E]/30 hover:shadow-[0_36px_100px_-40px_rgba(0,0,0,0.65)]",
+          "hover:-translate-y-1 hover:ring-primary/30 hover:shadow-[0_36px_100px_-40px_rgba(0,0,0,0.65)]",
           isList && "sm:grid sm:grid-cols-[300px_minmax(0,1fr)]",
         )}
       >

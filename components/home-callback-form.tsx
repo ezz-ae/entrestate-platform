@@ -57,8 +57,8 @@ export function HomeCallbackForm() {
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-[#C69B3E]/25 bg-[#C69B3E]/[0.08] p-8 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#C69B3E]/30 bg-[#C69B3E]/15">
+      <div className="rounded-xl border border-primary/25 bg-primary/[0.08] p-8 text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/15">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4AC50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6 9 17l-5-5" />
           </svg>
@@ -84,7 +84,7 @@ export function HomeCallbackForm() {
           value={form.name}
           onChange={(e) => set("name", e.target.value)}
           placeholder="John Doe"
-          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white placeholder:text-white/20 transition focus:border-[#C69B3E]/40 focus:outline-none focus:ring-2 focus:ring-[#C69B3E]/20"
+          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white placeholder:text-white/20 transition focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
       <div>
@@ -98,7 +98,7 @@ export function HomeCallbackForm() {
           value={form.phone}
           onChange={(e) => set("phone", e.target.value)}
           placeholder="+971 50 417 3622"
-          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white placeholder:text-white/20 transition focus:border-[#C69B3E]/40 focus:outline-none focus:ring-2 focus:ring-[#C69B3E]/20"
+          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white placeholder:text-white/20 transition focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
       <div>
@@ -109,14 +109,14 @@ export function HomeCallbackForm() {
           name="interest"
           value={form.interest}
           onChange={(e) => set("interest", e.target.value)}
-          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white/70 transition focus:border-[#C69B3E]/40 focus:outline-none focus:ring-2 focus:ring-[#C69B3E]/20"
+          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.06] px-4 py-3.5 text-sm text-white/70 transition focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option value="" className="bg-[#152E24]">Select interest…</option>
-          <option value="buy" className="bg-[#152E24]">Buying a property</option>
-          <option value="sell" className="bg-[#152E24]">Selling my property</option>
-          <option value="rent" className="bg-[#152E24]">Renting</option>
-          <option value="invest" className="bg-[#152E24]">Investment advisory</option>
-          <option value="golden-visa" className="bg-[#152E24]">Golden Visa eligibility</option>
+          <option value="" className="bg-foreground">Select interest…</option>
+          <option value="buy" className="bg-foreground">Buying a property</option>
+          <option value="sell" className="bg-foreground">Selling my property</option>
+          <option value="rent" className="bg-foreground">Renting</option>
+          <option value="invest" className="bg-foreground">Investment advisory</option>
+          <option value="golden-visa" className="bg-foreground">Golden Visa eligibility</option>
         </select>
       </div>
 
@@ -125,7 +125,7 @@ export function HomeCallbackForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="freehold-gradient mt-2 flex h-13 w-full items-center justify-center gap-2 rounded-xl text-[11px] font-semibold uppercase tracking-[0.12em] text-[#152E24] shadow-lg transition hover:brightness-105 disabled:opacity-60"
+        className="freehold-gradient mt-2 flex h-13 w-full items-center justify-center gap-2 rounded-xl text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-lg transition hover:brightness-105 disabled:opacity-60"
       >
         {submitting ? "Sending…" : "Request Consultation"}
         {!submitting && <ArrowRightIcon />}

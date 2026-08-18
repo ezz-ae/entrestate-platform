@@ -88,7 +88,7 @@ export default async function ProjectsPage({
         <div className="container relative z-10">
           <div className="mx-auto max-w-3xl text-center flex flex-col items-center">
             <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80 backdrop-blur-sm mb-6">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-[#C69B3E] mr-2"></span>
+              <span className="flex h-1.5 w-1.5 rounded-full bg-primary mr-2"></span>
               Live {BRAND.company} Inventory
             </div>
             <h1 className="font-serif text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl text-white leading-tight">
@@ -110,12 +110,12 @@ export default async function ProjectsPage({
         </div>
       </section>
 
-      <section className="bg-[#152E24] py-16 md:py-20">
+      <section className="bg-foreground py-16 md:py-20">
         <div className="container">
           <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-8 lg:p-10">
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <Badge variant="secondary" className="mb-4 rounded-full border-none bg-[#C69B3E]/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#F0D792]">
+                <Badge variant="secondary" className="mb-4 rounded-full border-none bg-primary/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#F0D792]">
                   Project Inventory
                 </Badge>
                 <h2 className="font-serif text-2xl font-bold text-white md:text-3xl">Filtered Developments</h2>
@@ -125,7 +125,7 @@ export default async function ProjectsPage({
               </div>
               <Button
                 variant="outline"
-                className="border-white/10 bg-white/[0.05] text-white/75 hover:border-[#C69B3E]/25 hover:bg-white/[0.08] hover:text-white"
+                className="border-white/10 bg-white/[0.05] text-white/75 hover:border-primary/25 hover:bg-white/[0.08] hover:text-white"
                 asChild
               >
                 <Link href="/properties">Browse Properties</Link>
@@ -166,7 +166,7 @@ export default async function ProjectsPage({
                     <Link
                       href={buildPageLink(Math.max(1, page - 1))}
                       className={cn(
-                        "inline-flex h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-white/70 transition hover:border-[#C69B3E]/25 hover:text-white",
+                        "inline-flex h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-white/70 transition hover:border-primary/25 hover:text-white",
                         page <= 1 && "pointer-events-none opacity-50",
                       )}
                     >
@@ -176,7 +176,7 @@ export default async function ProjectsPage({
                     <Link
                       href={buildPageLink(Math.min(totalPages, page + 1))}
                       className={cn(
-                        "inline-flex h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-white/70 transition hover:border-[#C69B3E]/25 hover:text-white",
+                        "inline-flex h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-white/70 transition hover:border-primary/25 hover:text-white",
                         page >= totalPages && "pointer-events-none opacity-50",
                       )}
                     >

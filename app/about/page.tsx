@@ -59,7 +59,7 @@ export default async function AboutPage() {
   // Web Studio → Content overrides; built-in words are the fallback.
   const content = await getPageContent('about')
   return (
-    <div className="bg-[#FAF8F5]">
+    <div className="bg-background">
       {/* HERO */}
       <section className="relative overflow-hidden bg-[#0A1F17] pt-32 pb-28 text-white md:pt-40 md:pb-40">
         <div className="pointer-events-none absolute inset-0">
@@ -118,23 +118,23 @@ export default async function AboutPage() {
       </section>
 
       {/* MISSION & VISION — split editorial */}
-      <section className="relative bg-[#FAF8F5] py-20 md:py-28">
+      <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_80%_20%,rgba(198,155,62,0.04),transparent)]" />
         <div className="container relative z-10">
           <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
             {chapters.map((c) => {
               const Icon = c.icon
               return (
-                <article key={c.eyebrow} className="group relative overflow-hidden rounded-[28px] border border-[#152E24]/[0.06] bg-white p-8 shadow-[0_24px_80px_-50px_rgba(21,46,36,0.18)] transition-all hover:-translate-y-1 hover:border-[#C69B3E]/25 md:p-10">
-                  <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#C69B3E]/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <article key={c.eyebrow} className="group relative overflow-hidden rounded-[28px] border border-foreground/[0.06] bg-white p-8 shadow-[0_24px_80px_-50px_rgba(21,46,36,0.18)] transition-all hover:-translate-y-1 hover:border-primary/25 md:p-10">
+                  <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C69B3E]/15 to-[#C69B3E]/[0.04] text-[#C69B3E] ring-1 ring-[#C69B3E]/15">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/[0.04] text-primary ring-1 ring-primary/15">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35">{c.eyebrow}</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/35">{c.eyebrow}</span>
                   </div>
-                  <h2 className="mt-7 font-serif text-3xl font-bold leading-tight text-[#152E24] md:text-4xl">{c.title}</h2>
-                  <p className="mt-5 text-[15px] leading-relaxed text-[#152E24]/60 md:text-base">{c.body}</p>
+                  <h2 className="mt-7 font-serif text-3xl font-bold leading-tight text-foreground md:text-4xl">{c.title}</h2>
+                  <p className="mt-5 text-[15px] leading-relaxed text-foreground/60 md:text-base">{c.body}</p>
                 </article>
               )
             })}
@@ -146,17 +146,17 @@ export default async function AboutPage() {
       <section className="relative bg-[#F2EFE8] py-20 md:py-28">
         <div className="container">
           <div className="mb-14 max-w-2xl md:mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">How We Operate</p>
-            <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] text-[#152E24] md:text-5xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">How We Operate</p>
+            <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] text-foreground md:text-5xl">
               Three things we won't compromise on.
             </h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3 md:gap-7">
             {principles.map((p) => (
-              <div key={p.number} className="relative rounded-[24px] border border-[#152E24]/[0.06] bg-white p-8 transition-all hover:border-[#C69B3E]/30 hover:shadow-[0_24px_60px_-40px_rgba(21,46,36,0.2)]">
-                <div className="font-serif text-[68px] font-bold leading-none text-[#C69B3E]/25">{p.number}</div>
-                <h3 className="mt-3 font-serif text-xl font-semibold text-[#152E24] md:text-2xl">{p.title}</h3>
-                <p className="mt-3 text-[14px] leading-relaxed text-[#152E24]/55">{p.body}</p>
+              <div key={p.number} className="relative rounded-[24px] border border-foreground/[0.06] bg-white p-8 transition-all hover:border-primary/30 hover:shadow-[0_24px_60px_-40px_rgba(21,46,36,0.2)]">
+                <div className="font-serif text-[68px] font-bold leading-none text-primary/25">{p.number}</div>
+                <h3 className="mt-3 font-serif text-xl font-semibold text-foreground md:text-2xl">{p.title}</h3>
+                <p className="mt-3 text-[14px] leading-relaxed text-foreground/55">{p.body}</p>
               </div>
             ))}
           </div>
@@ -164,7 +164,7 @@ export default async function AboutPage() {
       </section>
 
       {/* STATS — dark numeric showcase */}
-      <section className="relative overflow-hidden bg-[#152E24] py-24 text-white md:py-32">
+      <section className="relative overflow-hidden bg-foreground py-24 text-white md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(198,155,62,0.10),transparent)]" />
         <div className="container relative z-10">
           <div className="mx-auto mb-16 max-w-2xl text-center md:mb-20">
@@ -188,21 +188,21 @@ export default async function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative overflow-hidden bg-[#FAF8F5] py-24 md:py-32">
+      <section className="relative overflow-hidden bg-background py-24 md:py-32">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">Start a Brief</p>
-            <h2 className="mt-5 font-serif text-4xl font-bold leading-[1.02] text-[#152E24] md:text-6xl lg:text-7xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Start a Brief</p>
+            <h2 className="mt-5 font-serif text-4xl font-bold leading-[1.02] text-foreground md:text-6xl lg:text-7xl">
               Talk to the<br/><span className="freehold-text-gradient italic">conviction desk.</span>
             </h2>
-            <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-[#152E24]/55">
+            <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-foreground/55">
               A 30-minute call with a senior advisor. We'll map the goal, the budget, and the next two moves.
             </p>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" className="freehold-gradient h-14 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#152E24]" asChild>
+              <Button size="lg" className="freehold-gradient h-14 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground" asChild>
                 <Link href="/contact">Schedule Consultation <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
-              <Button size="lg" variant="outline" className="h-14 rounded-xl border-[#152E24]/10 bg-white px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#152E24] hover:bg-white/80" asChild>
+              <Button size="lg" variant="outline" className="h-14 rounded-xl border-foreground/10 bg-white px-8 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground hover:bg-white/80" asChild>
                 <Link href="/properties">Portfolio Access</Link>
               </Button>
             </div>

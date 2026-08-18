@@ -103,7 +103,7 @@ export default async function DeveloperDetailPage({
           </div>
           <div className="container">
             <div className="relative z-10">
-            <Badge className="mb-4 border-none bg-[#C69B3E]/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
+            <Badge className="mb-4 border-none bg-primary/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
               Developer Profile
             </Badge>
             <h1 className="font-serif text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
@@ -143,47 +143,47 @@ export default async function DeveloperDetailPage({
           </div>
         </section>
 
-        <section className="bg-[#FAF8F5] py-16 md:py-20">
+        <section className="bg-background py-16 md:py-20">
           <div className="container">
-            <div className="grid gap-10 rounded-[32px] border border-[#152E24]/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] lg:grid-cols-[1.4fr,0.6fr] md:p-8 lg:p-10">
+            <div className="grid gap-10 rounded-[32px] border border-foreground/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] lg:grid-cols-[1.4fr,0.6fr] md:p-8 lg:p-10">
               <div className="space-y-8">
-                <div className="rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] p-6">
-                  <h2 className="font-serif text-3xl font-bold text-[#152E24]">About {developer.name}</h2>
+                <div className="rounded-[28px] border border-foreground/10 bg-background p-6">
+                  <h2 className="font-serif text-3xl font-bold text-foreground">About {developer.name}</h2>
                   {developer.description && (
-                    <p className="mt-4 text-sm leading-relaxed text-[#152E24]/60">
+                    <p className="mt-4 text-sm leading-relaxed text-foreground/60">
                       {developer.description}
                     </p>
                   )}
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
                     <div>
-                      <div className="text-xs uppercase tracking-wide text-[#152E24]/40">Track record</div>
+                      <div className="text-xs uppercase tracking-wide text-foreground/40">Track record</div>
                       {developer.trackRecord && (
-                        <div className="mt-2 text-sm text-[#152E24]">
+                        <div className="mt-2 text-sm text-foreground">
                           {developer.trackRecord}
                         </div>
                       )}
                     </div>
                     <div>
-                      <div className="text-xs uppercase tracking-wide text-[#152E24]/40">Top focus areas</div>
+                      <div className="text-xs uppercase tracking-wide text-foreground/40">Top focus areas</div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {stats.topAreas.length ? (
                           stats.topAreas.slice(0, 4).map((area) => (
-                            <Badge key={area.area} variant="secondary" className="border-none bg-[#C69B3E]/10 text-[#8E6B21]">
+                            <Badge key={area.area} variant="secondary" className="border-none bg-primary/10 text-[#8E6B21]">
                               {area.area}
                             </Badge>
                           ))
                         ) : (
-                          <span className="text-sm text-[#152E24]/60">Dubai-focused</span>
+                          <span className="text-sm text-foreground/60">Dubai-focused</span>
                         )}
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] p-6">
-                  <h3 className="mb-3 font-serif text-xl font-semibold text-[#152E24]">Awards</h3>
+                <div className="rounded-[28px] border border-foreground/10 bg-background p-6">
+                  <h3 className="mb-3 font-serif text-xl font-semibold text-foreground">Awards</h3>
                   <div className="flex flex-wrap gap-2">
                     {(developer.awards?.length ? developer.awards : ["Top Developer"]).map((award) => (
-                      <Badge key={award} variant="secondary" className="border-none bg-white text-[#152E24]">
+                      <Badge key={award} variant="secondary" className="border-none bg-white text-foreground">
                         {award}
                       </Badge>
                     ))}
@@ -191,33 +191,33 @@ export default async function DeveloperDetailPage({
                 </div>
               </div>
               <div className="space-y-6">
-                <div className="space-y-3 rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] p-6">
+                <div className="space-y-3 rounded-[28px] border border-foreground/10 bg-background p-6">
                   <div>
-                    <div className="text-xs uppercase tracking-wide text-[#152E24]/40">Headquarters</div>
-                    <div className="text-lg font-semibold text-[#152E24]">{headquarters}</div>
+                    <div className="text-xs uppercase tracking-wide text-foreground/40">Headquarters</div>
+                    <div className="text-lg font-semibold text-foreground">{headquarters}</div>
                   </div>
                   <div>
-                    <div className="text-xs uppercase tracking-wide text-[#152E24]/40">Founded</div>
-                    <div className="text-lg font-semibold text-[#152E24]">{foundedYear || "Est. TBD"}</div>
+                    <div className="text-xs uppercase tracking-wide text-foreground/40">Founded</div>
+                    <div className="text-lg font-semibold text-foreground">{foundedYear || "Est. TBD"}</div>
                   </div>
                   <div>
-                    <div className="text-xs uppercase tracking-wide text-[#152E24]/40">Website</div>
+                    <div className="text-xs uppercase tracking-wide text-foreground/40">Website</div>
                     <div className="text-lg font-semibold">
                       {developer.website ? (
-                        <Link href={developer.website} target="_blank" rel="noopener noreferrer" className="text-[#C69B3E] hover:text-[#8E6B21]">
+                        <Link href={developer.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-[#8E6B21]">
                           {officialWebsite}
                         </Link>
                       ) : (
-                        <span className="text-[#152E24]/50">{officialWebsite}</span>
+                        <span className="text-foreground/50">{officialWebsite}</span>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] p-6">
-                  <p className="text-sm text-[#152E24]/60">
+                <div className="rounded-[28px] border border-foreground/10 bg-background p-6">
+                  <p className="text-sm text-foreground/60">
                     Connect with the developer team for the latest launch updates.
                   </p>
-                  <Button className="mt-4 w-full ore-gradient text-[#152E24]" asChild>
+                  <Button className="mt-4 w-full ore-gradient text-foreground" asChild>
                     <Link href="/contact">Request Consultation</Link>
                   </Button>
                 </div>
@@ -226,21 +226,21 @@ export default async function DeveloperDetailPage({
           </div>
         </section>
 
-        <section className="bg-[#FAF8F5] pb-20">
+        <section className="bg-background pb-20">
           <div className="container">
-            <div className="rounded-[32px] border border-[#152E24]/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
+            <div className="rounded-[32px] border border-foreground/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
             <div className="mb-8 flex items-center justify-between">
               <div>
-                <h2 className="font-serif text-2xl font-bold text-[#152E24]">Projects by {developer.name}</h2>
-                <p className="text-sm text-[#152E24]/55">Signature developments and communities</p>
+                <h2 className="font-serif text-2xl font-bold text-foreground">Projects by {developer.name}</h2>
+                <p className="text-sm text-foreground/55">Signature developments and communities</p>
               </div>
-              <Button variant="outline" className="border-[#152E24]/10 bg-[#FAF8F5] text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" asChild>
+              <Button variant="outline" className="border-foreground/10 bg-background text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" asChild>
                 <Link href="/projects">View All Projects</Link>
               </Button>
             </div>
 
             {developerProjects.length === 0 ? (
-              <div className="rounded-[28px] border border-dashed border-[#152E24]/10 bg-[#FAF8F5] p-8 text-center text-sm text-[#152E24]/55">
+              <div className="rounded-[28px] border border-dashed border-foreground/10 bg-background p-8 text-center text-sm text-foreground/55">
                 No projects are linked to {developer.name} yet. Explore all projects to find similar launches.
               </div>
             ) : (

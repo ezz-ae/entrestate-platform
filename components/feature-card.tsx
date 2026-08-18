@@ -13,12 +13,12 @@ export function FeatureCard({ icon: Icon, title, description, className }: Featu
   return (
     <Card
       className={cn(
-        "group h-full border-border/60 bg-card hover:-translate-y-1 hover:border-[#C69B3E]/25 hover:shadow-[0_20px_40px_-24px_rgba(21,46,36,0.2)]",
+        "group h-full border-border/60 bg-card hover:-translate-y-1 hover:border-primary/25 hover:shadow-[0_20px_40px_-24px_rgba(21,46,36,0.2)]",
         className,
       )}
     >
       <CardContent className="flex h-full flex-col p-5">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#C69B3E]/15 bg-[#C69B3E]/[0.06] text-[#C69B3E] shadow-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.06] text-primary shadow-sm">
           <Icon className="h-5 w-5" />
         </div>
 
@@ -34,8 +34,8 @@ export function FeatureCard({ icon: Icon, title, description, className }: Featu
         </div>
 
         <div className="mt-auto pt-5">
-          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#C69B3E]/75">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C69B3E]" />
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary/75">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             Curated for livability
           </div>
         </div>

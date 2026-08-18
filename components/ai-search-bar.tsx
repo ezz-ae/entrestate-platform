@@ -92,14 +92,14 @@ export function AISearchBar({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setTimeout(() => setIsFocused(false), 150)}
             placeholder={placeholder}
-            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.05] px-14 py-4 pr-[130px] text-[14px] font-medium text-white backdrop-blur-md transition-all focus:border-[#C69B3E]/30 focus:bg-white/[0.08] focus:outline-none placeholder:text-white/25 sm:text-[15px]"
+            className="w-full rounded-xl border border-white/[0.08] bg-white/[0.05] px-14 py-4 pr-[130px] text-[14px] font-medium text-white backdrop-blur-md transition-all focus:border-primary/30 focus:bg-white/[0.08] focus:outline-none placeholder:text-white/25 sm:text-[15px]"
           />
 
           {/* Hint overlay — shows what AI will do */}
           {hint && query && (
             <div className="absolute left-14 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center gap-1.5">
               <span className="invisible text-[14px] font-medium sm:text-[15px]">{query}</span>
-              <span className="flex items-center gap-1 rounded-full bg-[#C69B3E]/15 px-2.5 py-0.5 text-[11px] font-medium text-[#D4AC50]">
+              <span className="flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-[11px] font-medium text-[#D4AC50]">
                 <SparklesIcon className="shrink-0" />
                 {hint}
               </span>
@@ -109,7 +109,7 @@ export function AISearchBar({
           {/* Submit button */}
           <button
             type="submit"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-lg bg-[#C69B3E] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#0A1F17] shadow-lg transition-all hover:bg-[#D4AC50]"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#0A1F17] shadow-lg transition-all hover:bg-[#D4AC50]"
           >
             <span className="hidden sm:inline">Ask AI</span>
             <ArrowRightIcon />
@@ -132,7 +132,7 @@ export function AISearchBar({
             <button
               key={suggestion}
               type="button"
-              className="text-[11px] text-white/30 transition-colors hover:text-[#C69B3E]"
+              className="text-[11px] text-white/30 transition-colors hover:text-primary"
               onClick={() => handleSuggestionClick(suggestion)}
             >
               {suggestion}

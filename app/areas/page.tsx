@@ -46,7 +46,7 @@ export default async function AreasPage() {
           </div>
           <div className="container">
             <div className="relative z-10 mx-auto max-w-4xl text-center">
-              <Badge className="mb-4 border-none bg-[#C69B3E]/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
+              <Badge className="mb-4 border-none bg-primary/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
                 Areas
               </Badge>
               <h1 className="font-serif text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
@@ -56,7 +56,7 @@ export default async function AreasPage() {
                 Compare Dubai neighborhoods by lifestyle, yield, and investment potential. Surface the few that actually outperform — not just another card grid.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                <Button className="ore-gradient text-[#152E24]" asChild>
+                <Button className="ore-gradient text-foreground" asChild>
                   <Link href="/contact">Get Area Guidance</Link>
                 </Button>
                 <Button variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white" asChild>
@@ -67,9 +67,9 @@ export default async function AreasPage() {
           </div>
         </section>
 
-        <section className="bg-[#152E24] py-16 md:py-20">
+        <section className="bg-foreground py-16 md:py-20">
           <div className="container">
-            <div className="rounded-[32px] border border-[#152E24]/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-10">
+            <div className="rounded-[32px] border border-foreground/[0.08] bg-white p-6 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-10">
               <SmallLeadForm
                 title="Request tailored area intelligence"
                 caption="Tell us your preferred budget, timelines, and districts and we will craft an investment brief for you."
@@ -78,10 +78,10 @@ export default async function AreasPage() {
           </div>
         </section>
 
-        <section className="bg-[#152E24] pb-8">
+        <section className="bg-foreground pb-8">
           <div className="container">
             <div className="grid gap-6 rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl lg:grid-cols-3 md:p-8">
-              <div className="rounded-[24px] border border-[#152E24]/10 bg-[#FAF8F5] p-5">
+              <div className="rounded-[24px] border border-foreground/10 bg-background p-5">
                 <div className="text-xs font-semibold uppercase text-muted-foreground">Top Yield</div>
                 <h3 className="mt-2 font-serif text-2xl font-bold">{topYieldAreas[0]?.name}</h3>
                 <p className="text-sm text-muted-foreground">Rental yield leader</p>
@@ -94,7 +94,7 @@ export default async function AreasPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-[24px] border border-[#152E24]/10 bg-[#FAF8F5] p-5">
+              <div className="rounded-[24px] border border-foreground/10 bg-background p-5">
                 <div className="text-xs font-semibold uppercase text-muted-foreground">Best Value</div>
                 <h3 className="mt-2 font-serif text-2xl font-bold">{bestValueAreas[0]?.name}</h3>
                 <p className="text-sm text-muted-foreground">Lowest price per sqft</p>
@@ -107,7 +107,7 @@ export default async function AreasPage() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-[24px] border border-[#152E24]/10 bg-[#FAF8F5] p-5">
+              <div className="rounded-[24px] border border-foreground/10 bg-background p-5">
                 <div className="text-xs font-semibold uppercase text-muted-foreground">Score Leaders</div>
                 <h3 className="mt-2 font-serif text-2xl font-bold">{topScoreAreas[0]?.name}</h3>
                 <p className="text-sm text-muted-foreground">Balanced demand + returns</p>
@@ -124,7 +124,7 @@ export default async function AreasPage() {
           </div>
         </section>
 
-        <section className="bg-[#152E24] pb-20">
+        <section className="bg-foreground pb-20">
           <div className="container">
             <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-8 lg:p-10">
               <div className="mb-8">

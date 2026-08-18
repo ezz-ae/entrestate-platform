@@ -21,7 +21,7 @@ export default async function BlogPage() {
           </div>
           <div className="container text-center">
             <div className="relative z-10">
-            <Badge className="mb-4 border-none bg-[#C69B3E]/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
+            <Badge className="mb-4 border-none bg-primary/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
               Blog
             </Badge>
             <h1 className="font-serif text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
@@ -35,7 +35,7 @@ export default async function BlogPage() {
         </section>
 
         {featured && (
-          <section className="bg-[#152E24] py-16 md:py-20">
+          <section className="bg-foreground py-16 md:py-20">
             <div className="container">
               <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-8 lg:p-10">
                 <div className="mb-8">
@@ -43,7 +43,7 @@ export default async function BlogPage() {
                   <h2 className="mt-2 font-serif text-2xl font-bold text-white md:text-3xl">Latest market reads and investor guidance</h2>
                 </div>
               <div className="grid gap-8 lg:grid-cols-[1.4fr,0.8fr]">
-                <article className="overflow-hidden rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] shadow-none transition hover:border-[#C69B3E]/25">
+                <article className="overflow-hidden rounded-[28px] border border-foreground/10 bg-background shadow-none transition hover:border-primary/25">
                   <div className="relative aspect-[4/3] bg-muted">
                     {featured.hero_image && (
                       <Image src={featured.hero_image} alt={featured.title} fill className="object-cover" />
@@ -68,7 +68,7 @@ export default async function BlogPage() {
                     <h2 className="mt-3 font-serif text-3xl font-bold">{featured.title}</h2>
                     <p className="mt-4 text-base text-muted-foreground">{featured.excerpt}</p>
                     <div className="mt-6">
-                      <Button variant="outline" className="border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" asChild>
+                      <Button variant="outline" className="border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" asChild>
                         <Link href={`/blog/${featured.slug}`}>Read the CEO Perspective</Link>
                       </Button>
                     </div>
@@ -77,7 +77,7 @@ export default async function BlogPage() {
 
                 <div className="space-y-4">
                   {highlights.map((post) => (
-                    <article key={post.id} className="rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-5 transition hover:border-[#C69B3E]/25">
+                    <article key={post.id} className="rounded-2xl border border-foreground/10 bg-background p-5 transition hover:border-primary/25">
                       <div className="flex items-center justify-between text-xs uppercase tracking-wide text-muted-foreground">
                         <span>{post.category || "Market Update"}</span>
                         {post.published_at && (
@@ -93,7 +93,7 @@ export default async function BlogPage() {
                       {post.excerpt && (
                         <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
                       )}
-                      <div className="mt-4 flex justify-between text-sm font-semibold text-[#C69B3E]">
+                      <div className="mt-4 flex justify-between text-sm font-semibold text-primary">
                         <Link href={`/blog/${post.slug}`}>Explore</Link>
                         {post.read_time && <span>{post.read_time} min read</span>}
                       </div>
@@ -106,7 +106,7 @@ export default async function BlogPage() {
           </section>
         )}
 
-        <section className="bg-[#152E24] pb-20">
+        <section className="bg-foreground pb-20">
           <div className="container">
             <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-8 lg:p-10">
             <div className="mb-8">
@@ -117,7 +117,7 @@ export default async function BlogPage() {
               {stories.map((post) => (
                 <article
                   key={post.id}
-                  className="flex flex-col overflow-hidden rounded-[28px] border border-[#152E24]/10 bg-[#FAF8F5] transition hover:border-[#C69B3E]/25"
+                  className="flex flex-col overflow-hidden rounded-[28px] border border-foreground/10 bg-background transition hover:border-primary/25"
                 >
                   <div className="relative aspect-[4/3] bg-muted">
                     {post.hero_image && (
@@ -138,7 +138,7 @@ export default async function BlogPage() {
                       <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
                     )}
                     <div className="mt-6">
-                      <Button variant="outline" className="border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" asChild>
+                      <Button variant="outline" className="border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" asChild>
                         <Link href={`/blog/${post.slug}`}>Read article</Link>
                       </Button>
                     </div>

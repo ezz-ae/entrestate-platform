@@ -129,7 +129,7 @@ export function IntelligenceBlock({ data }: Props) {
                     <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/35 to-transparent" />
 
                     <div className="absolute left-4 right-4 top-4 flex flex-wrap items-center gap-2 sm:left-5 sm:right-5 sm:top-5">
-                      <span className="rounded-full bg-white/90 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#152E24] shadow-sm sm:text-[10px] sm:tracking-[0.16em]">
+                      <span className="rounded-full bg-white/90 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-foreground shadow-sm sm:text-[10px] sm:tracking-[0.16em]">
                         Momentum leader
                       </span>
                       {featuredProject.golden_visa_eligible && (
@@ -361,7 +361,7 @@ export function IntelligenceBlock({ data }: Props) {
 
                       <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#C69B3E] via-[#D4AC50] to-[#F0D792]"
+                          className="h-full rounded-full bg-gradient-to-r from-primary via-[#D4AC50] to-[#F0D792]"
                           style={{ width: `${barWidth}%` }}
                         />
                       </div>

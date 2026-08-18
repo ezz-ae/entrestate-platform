@@ -46,7 +46,7 @@ export function HeroWithMotion({ heroPrompts, heroTitle, heroSubtitle }: HeroWit
         <motion.div
           animate={{ opacity: [0.06, 0.13, 0.06], scale: [1, 1.08, 1] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute left-[5%] top-[10%] h-[700px] w-[700px] rounded-full bg-[#C69B3E]/10 blur-[200px]"
+          className="absolute left-[5%] top-[10%] h-[700px] w-[700px] rounded-full bg-primary/10 blur-[200px]"
         />
         <motion.div
           animate={{ opacity: [0.04, 0.08, 0.04], scale: [1, 1.05, 1] }}
@@ -116,7 +116,7 @@ export function HeroWithMotion({ heroPrompts, heroTitle, heroSubtitle }: HeroWit
                 <Link
                   key={prompt}
                   href={`/chat?q=${encodeURIComponent(prompt)}`}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-medium text-white/40 transition-all hover:border-[#C69B3E]/40 hover:bg-[#C69B3E]/10 hover:text-[#D4AC50]"
+                  className="rounded-full border border-white/[0.07] bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-medium text-white/40 transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-[#D4AC50]"
                 >
                   {prompt}
                 </Link>

@@ -14,7 +14,7 @@ const tools = [
     description: "Estimate rental yield, ROI, and cash flow performance on any Dubai property.",
     href: "/tools/roi-calculator",
     icon: Calculator,
-    tone: "from-[#C69B3E]/25 to-[#C69B3E]/[0.04] text-[#D4AC50] border-[#C69B3E]/25",
+    tone: "from-primary/25 to-primary/[0.04] text-[#D4AC50] border-primary/25",
   },
   {
     title: "Payment Simulator",
@@ -84,7 +84,7 @@ export default function ToolsPage() {
       </section>
 
       {/* TOOLS GRID — premium dark cards */}
-      <section className="relative bg-[#152E24] py-20 text-white md:py-24">
+      <section className="relative bg-foreground py-20 text-white md:py-24">
         <div className="container">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {tools.map((tool) => {
@@ -131,7 +131,7 @@ export default function ToolsPage() {
               </div>
               <Link
                 href="/chat"
-                className="freehold-gradient inline-flex h-12 items-center gap-2 rounded-xl px-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#152E24]"
+                className="freehold-gradient inline-flex h-12 items-center gap-2 rounded-xl px-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground"
               >
                 <Sparkles className="h-4 w-4" />
                 Open AI Assistant

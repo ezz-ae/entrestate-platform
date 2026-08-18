@@ -32,7 +32,7 @@ export default async function DevelopersPage() {
           </div>
           <div className="container">
             <div className="relative z-10 mx-auto max-w-4xl text-center">
-              <Badge className="mb-4 border-none bg-[#C69B3E]/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
+              <Badge className="mb-4 border-none bg-primary/10 px-4 py-1.5 text-[#F0D792]" variant="secondary">
                 Developers
               </Badge>
               <h1 className="font-serif text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl">
@@ -42,7 +42,7 @@ export default async function DevelopersPage() {
                 Explore Dubai's master developers, from legacy builders to innovative new firms shaping the skyline.
               </p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                <Button className="ore-gradient text-[#152E24]" asChild>
+                <Button className="ore-gradient text-foreground" asChild>
                   <Link href="/projects">Explore Launches</Link>
                 </Button>
                 <Button variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white" asChild>
@@ -53,7 +53,7 @@ export default async function DevelopersPage() {
           </div>
         </section>
 
-        <section className="bg-[#152E24] py-16 md:py-20">
+        <section className="bg-foreground py-16 md:py-20">
           <div className="container">
             <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-6 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-8 lg:p-10">
               <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -66,7 +66,7 @@ export default async function DevelopersPage() {
                 </div>
                 <Button
                   variant="outline"
-                  className="border-white/10 bg-white/[0.05] text-white/75 hover:border-[#C69B3E]/25 hover:bg-white/[0.08] hover:text-white"
+                  className="border-white/10 bg-white/[0.05] text-white/75 hover:border-primary/25 hover:bg-white/[0.08] hover:text-white"
                   asChild
                 >
                   <Link href="/projects">Browse Projects</Link>

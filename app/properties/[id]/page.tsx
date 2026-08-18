@@ -132,58 +132,58 @@ export default async function PropertyPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {/* Image Gallery */}
-        <section className="bg-[#FAF8F5] pt-4 md:pt-6">
+        <section className="bg-background pt-4 md:pt-6">
           <div className="container py-4 md:py-8">
             <PropertyImageGallery images={images} title={property.title} />
           </div>
         </section>
 
-        <section className="bg-[#FAF8F5] pb-24 pt-2 lg:pb-16">
+        <section className="bg-background pb-24 pt-2 lg:pb-16">
           <div className="container">
-            <div className="rounded-[32px] border border-[#152E24]/[0.08] bg-white p-5 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
+            <div className="rounded-[32px] border border-foreground/[0.08] bg-white p-5 shadow-[0_24px_80px_-40px_rgba(21,46,36,0.18)] md:p-8 lg:p-10">
               <div className="grid gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2">
               {/* Property Header */}
               <div className="space-y-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C69B3E]">{BRAND.company} Signature Listing</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{BRAND.company} Signature Listing</p>
                 <div className="flex flex-wrap gap-2">
-                  <Badge className="border-none ore-gradient text-[#152E24]">
+                  <Badge className="border-none ore-gradient text-foreground">
                     {property.type === "off-plan"
                       ? "Off-Plan"
                       : property.type === "secondary"
                         ? "Secondary"
                         : "Commercial"}
                   </Badge>
-                  <Badge variant="outline" className="border-[#152E24]/10 bg-[#FAF8F5] text-[#152E24]">
+                  <Badge variant="outline" className="border-foreground/10 bg-background text-foreground">
                     {property.location.area}
                   </Badge>
                   {property.investmentMetrics.goldenVisaEligible && (
-                    <Badge variant="secondary" className="border-none bg-[#C69B3E]/10 text-[#8E6B21]">
+                    <Badge variant="secondary" className="border-none bg-primary/10 text-[#8E6B21]">
                       <Award className="mr-1 h-3 w-3" />
                       Golden Visa
                     </Badge>
                   )}
                   {property.location.freehold && (
-                    <Badge variant="secondary" className="border-none bg-[#152E24]/[0.06] text-[#152E24]">Freehold</Badge>
+                    <Badge variant="secondary" className="border-none bg-foreground/[0.06] text-foreground">Freehold</Badge>
                   )}
                 </div>
 
-                <h1 className="font-serif text-3xl font-bold tracking-tight text-[#152E24] md:text-4xl lg:text-5xl">
+                <h1 className="font-serif text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl">
                   {property.title}
                 </h1>
 
-                <div className="flex items-center gap-2 text-[#152E24]/60">
-                  <MapPin className="h-4 w-4 text-[#C69B3E]" />
+                <div className="flex items-center gap-2 text-foreground/60">
+                  <MapPin className="h-4 w-4 text-primary" />
                   <span>{property.location.area}, Dubai, UAE</span>
                 </div>
 
                 <div className="flex flex-wrap items-baseline gap-4">
                   <div>
-                    <span className="text-3xl font-bold text-[#C69B3E] md:text-4xl">
+                    <span className="text-3xl font-bold text-primary md:text-4xl">
                       AED {property.price.toLocaleString()}
                     </span>
-                    <span className="ml-2 text-sm text-[#152E24]/55">
+                    <span className="ml-2 text-sm text-foreground/55">
                       (${usdPrice.toLocaleString()} USD)
                     </span>
                   </div>
@@ -191,20 +191,20 @@ export default async function PropertyPage({
 
                 {/* Key Stats */}
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] px-4 py-3">
-                    <Bed className="h-5 w-5 text-[#C69B3E]" />
+                  <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-background px-4 py-3">
+                    <Bed className="h-5 w-5 text-primary" />
                     <span className="font-medium">{bedroomLabel}</span>
                   </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] px-4 py-3">
-                    <Bath className="h-5 w-5 text-[#C69B3E]" />
+                  <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-background px-4 py-3">
+                    <Bath className="h-5 w-5 text-primary" />
                     <span className="font-medium">{property.specifications.bathrooms} Bathrooms</span>
                   </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] px-4 py-3">
-                    <Maximize className="h-5 w-5 text-[#C69B3E]" />
+                  <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-background px-4 py-3">
+                    <Maximize className="h-5 w-5 text-primary" />
                     <span className="font-medium">{property.specifications.sizeSqft} sqft</span>
                   </div>
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] px-4 py-3">
-                    <Car className="h-5 w-5 text-[#C69B3E]" />
+                  <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-background px-4 py-3">
+                    <Car className="h-5 w-5 text-primary" />
                     <span className="font-medium">{property.specifications.parkingSpaces} Parking</span>
                   </div>
                 </div>
@@ -214,11 +214,11 @@ export default async function PropertyPage({
 
               {/* Tabs */}
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-[24px] bg-[#FAF8F5] p-2">
-                  <TabsTrigger value="overview" className="rounded-full border border-[#152E24]/10 bg-white px-4 text-[#152E24]/65 data-[state=active]:border-[#152E24] data-[state=active]:bg-[#152E24] data-[state=active]:text-white">Overview</TabsTrigger>
-                  <TabsTrigger value="features" className="rounded-full border border-[#152E24]/10 bg-white px-4 text-[#152E24]/65 data-[state=active]:border-[#152E24] data-[state=active]:bg-[#152E24] data-[state=active]:text-white">Features</TabsTrigger>
-                  <TabsTrigger value="investment" className="rounded-full border border-[#152E24]/10 bg-white px-4 text-[#152E24]/65 data-[state=active]:border-[#152E24] data-[state=active]:bg-[#152E24] data-[state=active]:text-white">Investment</TabsTrigger>
-                  <TabsTrigger value="location" className="rounded-full border border-[#152E24]/10 bg-white px-4 text-[#152E24]/65 data-[state=active]:border-[#152E24] data-[state=active]:bg-[#152E24] data-[state=active]:text-white">Location</TabsTrigger>
+                <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-[24px] bg-background p-2">
+                  <TabsTrigger value="overview" className="rounded-full border border-foreground/10 bg-white px-4 text-foreground/65 data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-white">Overview</TabsTrigger>
+                  <TabsTrigger value="features" className="rounded-full border border-foreground/10 bg-white px-4 text-foreground/65 data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-white">Features</TabsTrigger>
+                  <TabsTrigger value="investment" className="rounded-full border border-foreground/10 bg-white px-4 text-foreground/65 data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-white">Investment</TabsTrigger>
+                  <TabsTrigger value="location" className="rounded-full border border-foreground/10 bg-white px-4 text-foreground/65 data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-white">Location</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-6 py-6">
@@ -234,8 +234,8 @@ export default async function PropertyPage({
                     <ul className="grid gap-3 md:grid-cols-2">
                       {highlights.map((highlight, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <div className="mt-1 h-1.5 w-1.5 rounded-full bg-[#C69B3E]" />
-                          <span className="text-[#152E24]/65">{highlight}</span>
+                          <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary" />
+                          <span className="text-foreground/65">{highlight}</span>
                         </li>
                       ))}
                     </ul>
@@ -247,7 +247,7 @@ export default async function PropertyPage({
                     <h3 className="mb-4 font-serif text-xl font-semibold">Amenities & Facilities</h3>
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                       {property.amenities.map((amenity, index) => (
-                        <div key={index} className="flex items-center gap-2 rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-3">
+                        <div key={index} className="flex items-center gap-2 rounded-2xl border border-foreground/10 bg-background p-3">
                           <div className="h-2 w-2 rounded-full ore-gradient" />
                           <span className="text-sm">{amenity}</span>
                         </div>
@@ -258,19 +258,19 @@ export default async function PropertyPage({
                   <div>
                     <h3 className="mb-4 font-serif text-xl font-semibold">Specifications</h3>
                     <div className="grid gap-4 md:grid-cols-2">
-                      <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                      <Card className="border-foreground/10 bg-background shadow-none">
                         <CardContent className="p-4">
                           <div className="text-sm text-muted-foreground">Property Type</div>
                           <div className="mt-1 font-medium">{property.category}</div>
                         </CardContent>
                       </Card>
-                      <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                      <Card className="border-foreground/10 bg-background shadow-none">
                         <CardContent className="p-4">
                           <div className="text-sm text-muted-foreground">Completion</div>
                           <div className="mt-1 font-medium">{property.completionDate || "Ready"}</div>
                         </CardContent>
                       </Card>
-                      <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                      <Card className="border-foreground/10 bg-background shadow-none">
                         <CardContent className="p-4">
                           <div className="text-sm text-muted-foreground">Furnishing</div>
                           <div className="mt-1 font-medium">
@@ -278,7 +278,7 @@ export default async function PropertyPage({
                           </div>
                         </CardContent>
                       </Card>
-                      <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                      <Card className="border-foreground/10 bg-background shadow-none">
                         <CardContent className="p-4">
                           <div className="text-sm text-muted-foreground">View</div>
                           <div className="mt-1 font-medium">{property.specifications.view}</div>
@@ -290,19 +290,19 @@ export default async function PropertyPage({
 
                 <TabsContent value="investment" className="space-y-6 py-6">
                   <div className="grid gap-6 md:grid-cols-3">
-                    <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                    <Card className="border-foreground/10 bg-background shadow-none">
                       <CardContent className="p-6">
                         <div className="mb-2 flex items-center gap-2">
-                          <TrendingUp className="h-5 w-5 text-[#C69B3E]" />
+                          <TrendingUp className="h-5 w-5 text-primary" />
                           <span className="text-sm text-muted-foreground">Expected ROI</span>
                         </div>
                         <div className="text-2xl font-bold ore-text-gradient">{property.investmentMetrics.roi}%</div>
                       </CardContent>
                     </Card>
-                    <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                    <Card className="border-foreground/10 bg-background shadow-none">
                       <CardContent className="p-6">
                         <div className="mb-2 flex items-center gap-2">
-                          <Building2 className="h-5 w-5 text-[#C69B3E]" />
+                          <Building2 className="h-5 w-5 text-primary" />
                           <span className="text-sm text-muted-foreground">Rental Yield</span>
                         </div>
                         <div className="text-2xl font-bold ore-text-gradient">
@@ -310,10 +310,10 @@ export default async function PropertyPage({
                         </div>
                       </CardContent>
                     </Card>
-                    <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                    <Card className="border-foreground/10 bg-background shadow-none">
                       <CardContent className="p-6">
                         <div className="mb-2 flex items-center gap-2">
-                          <Calendar className="h-5 w-5 text-[#C69B3E]" />
+                          <Calendar className="h-5 w-5 text-primary" />
                           <span className="text-sm text-muted-foreground">Appreciation</span>
                         </div>
                         <div className="text-2xl font-bold ore-text-gradient">
@@ -325,7 +325,7 @@ export default async function PropertyPage({
 
                   <div>
                     <h3 className="mb-4 font-serif text-xl font-semibold">Investment Analysis</h3>
-                    <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                    <Card className="border-foreground/10 bg-background shadow-none">
                       <CardContent className="p-6 space-y-4">
                         <p className="text-muted-foreground leading-relaxed">
                           This property offers strong investment potential with an expected ROI of {property.investmentMetrics.roi}% 
@@ -334,7 +334,7 @@ export default async function PropertyPage({
                           and premium amenities.
                         </p>
                         {property.investmentMetrics.goldenVisaEligible && (
-                          <div className="rounded-2xl border border-[#C69B3E]/20 bg-[#C69B3E]/[0.08] p-4">
+                          <div className="rounded-2xl border border-primary/20 bg-primary/[0.08] p-4">
                             <div className="flex items-start gap-3">
                               <Award className="mt-0.5 h-5 w-5 text-[#8E6B21]" />
                               <div>
@@ -357,9 +357,9 @@ export default async function PropertyPage({
                 <TabsContent value="location" className="space-y-6 py-6">
                   <div>
                     <h3 className="mb-4 font-serif text-xl font-semibold">Location & Connectivity</h3>
-                    <div className="rounded-[24px] border border-[#152E24]/10 bg-[#FAF8F5] p-6">
+                    <div className="rounded-[24px] border border-foreground/10 bg-background p-6">
                       <div className="flex items-start gap-3">
-                        <MapPin className="mt-0.5 h-5 w-5 text-[#C69B3E]" />
+                        <MapPin className="mt-0.5 h-5 w-5 text-primary" />
                         <div>
                           <div className="font-semibold">{property.location.area}</div>
                           <div className="text-sm text-muted-foreground">
@@ -377,7 +377,7 @@ export default async function PropertyPage({
                     <h3 className="mb-4 font-serif text-xl font-semibold">Nearby Landmarks</h3>
                     <div className="space-y-3">
                       {nearbyLandmarks.map((landmark, index) => (
-                        <div key={index} className="flex items-center justify-between rounded-2xl border border-[#152E24]/10 bg-[#FAF8F5] p-4">
+                        <div key={index} className="flex items-center justify-between rounded-2xl border border-foreground/10 bg-background p-4">
                           <span className="font-medium">{landmark.name}</span>
                           <span className="text-sm text-muted-foreground">{landmark.distance}</span>
                         </div>
@@ -392,26 +392,26 @@ export default async function PropertyPage({
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
                 {/* Contact Card */}
-                <Card className="hidden border-[#152E24]/10 bg-[#FAF8F5] shadow-none lg:block">
+                <Card className="hidden border-foreground/10 bg-background shadow-none lg:block">
                   <CardContent className="p-6 space-y-4">
                     <h3 className="font-serif text-xl font-semibold">Interested in this property?</h3>
-                    <p className="text-sm text-[#152E24]/60">
+                    <p className="text-sm text-foreground/60">
                       Contact our expert team for more information or to schedule a viewing.
                     </p>
                     <div className="space-y-3">
-                      <Button className="w-full ore-gradient text-[#152E24] font-semibold" size="lg" asChild>
+                      <Button className="w-full ore-gradient text-foreground font-semibold" size="lg" asChild>
                         <a href={`tel:${COMPANY_PHONE_E164}`}>
                           <Phone className="mr-2 h-4 w-4" />
                           Call Now
                         </a>
                       </Button>
-                      <Button className="w-full border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" variant="outline" size="lg" asChild>
+                      <Button className="w-full border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" variant="outline" size="lg" asChild>
                         <a href={COMPANY_WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
                           <MessageSquare className="mr-2 h-4 w-4" />
                           WhatsApp
                         </a>
                       </Button>
-                      <Button className="w-full border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" variant="outline" size="lg" asChild>
+                      <Button className="w-full border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" variant="outline" size="lg" asChild>
                         <a href={`mailto:${COMPANY_EMAIL}`}>
                           <Mail className="mr-2 h-4 w-4" />
                           Email Inquiry
@@ -422,12 +422,12 @@ export default async function PropertyPage({
                 </Card>
 
                 {/* Developer Card */}
-                <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                <Card className="border-foreground/10 bg-background shadow-none">
                   <CardContent className="p-6 space-y-4">
                     <h3 className="font-serif text-lg font-semibold">Developer</h3>
                     <div className="flex items-center gap-3">
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg ore-gradient">
-                        <Building2 className="h-6 w-6 text-[#152E24]" />
+                        <Building2 className="h-6 w-6 text-foreground" />
                       </div>
                       <div>
                         <div className="font-medium">{property.developer.name}</div>
@@ -438,7 +438,7 @@ export default async function PropertyPage({
                 </Card>
 
                 {/* Quick Stats */}
-                <Card className="border-[#152E24]/10 bg-[#FAF8F5] shadow-none">
+                <Card className="border-foreground/10 bg-background shadow-none">
                   <CardContent className="p-6 space-y-4">
                     <h3 className="font-serif text-lg font-semibold">Property ID</h3>
                     <div className="text-sm text-muted-foreground font-mono">{BRAND.company}-{property.id.slice(0, 8).toUpperCase()}</div>

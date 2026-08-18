@@ -77,7 +77,7 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#152E24]/[0.06] bg-[#FAF8F5]/85 backdrop-blur-2xl h-[4.5rem] transition-all duration-300 lg:h-20">
+    <header className="sticky top-0 z-50 w-full border-b border-foreground/[0.06] bg-background/85 backdrop-blur-2xl h-[4.5rem] transition-all duration-300 lg:h-20">
       <div className="container flex h-full items-center justify-between px-6 max-w-7xl mx-auto">
         {/* Logo */}
         <Link href="/" className="group shrink-0 transition-opacity hover:opacity-80" aria-label={`${brand.company} — Home`}>
@@ -89,7 +89,7 @@ export function SiteHeader() {
           <NavigationMenu viewport={false}>
             <NavigationMenuList className="gap-1">
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-[#152E24]/[0.04] text-[#152E24]/60 hover:text-[#152E24] font-medium text-[13px] h-9 px-3">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-foreground/[0.04] text-foreground/60 hover:text-foreground font-medium text-[13px] h-9 px-3">
                   Properties
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className={megaMenuWide}>
@@ -98,10 +98,10 @@ export function SiteHeader() {
                       <NavigationMenuLink asChild key={item.href}>
                         <Link
                           href={item.href}
-                          className="rounded-lg border border-transparent p-3 transition hover:bg-[#152E24]/[0.03]"
+                          className="rounded-lg border border-transparent p-3 transition hover:bg-foreground/[0.03]"
                         >
-                          <div className="text-sm font-semibold text-[#152E24]">{item.label}</div>
-                          <div className="text-[11px] text-[#152E24]/40 mt-0.5">{item.description}</div>
+                          <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                          <div className="text-[11px] text-foreground/40 mt-0.5">{item.description}</div>
                         </Link>
                       </NavigationMenuLink>
                     ))}
@@ -110,7 +110,7 @@ export function SiteHeader() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-[#152E24]/[0.04] text-[#152E24]/60 hover:text-[#152E24] font-medium text-[13px] h-9 px-3">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-foreground/[0.04] text-foreground/60 hover:text-foreground font-medium text-[13px] h-9 px-3">
                   Investment Tools
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className={megaMenuMedium}>
@@ -119,10 +119,10 @@ export function SiteHeader() {
                       <NavigationMenuLink asChild key={item.href}>
                         <Link
                           href={item.href}
-                          className="rounded-lg border border-transparent p-3 transition hover:bg-[#152E24]/[0.03]"
+                          className="rounded-lg border border-transparent p-3 transition hover:bg-foreground/[0.03]"
                         >
-                          <div className="text-sm font-semibold text-[#152E24]">{item.label}</div>
-                          <div className="text-[11px] text-[#152E24]/40 mt-0.5">{item.description}</div>
+                          <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                          <div className="text-[11px] text-foreground/40 mt-0.5">{item.description}</div>
                         </Link>
                       </NavigationMenuLink>
                     ))}
@@ -131,7 +131,7 @@ export function SiteHeader() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-[#152E24]/[0.04] text-[#152E24]/60 hover:text-[#152E24] font-medium text-[13px] h-9 px-3">
+                <NavigationMenuTrigger className="bg-transparent hover:bg-foreground/[0.04] text-foreground/60 hover:text-foreground font-medium text-[13px] h-9 px-3">
                   Company
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className={megaMenuCompact}>
@@ -140,10 +140,10 @@ export function SiteHeader() {
                       <NavigationMenuLink asChild key={item.href}>
                         <Link
                           href={item.href}
-                          className="rounded-lg border border-transparent p-3 transition hover:bg-[#152E24]/[0.03]"
+                          className="rounded-lg border border-transparent p-3 transition hover:bg-foreground/[0.03]"
                         >
-                          <div className="text-sm font-semibold text-[#152E24]">{item.label}</div>
-                          <div className="text-[11px] text-[#152E24]/40 mt-0.5">{item.description}</div>
+                          <div className="text-sm font-semibold text-foreground">{item.label}</div>
+                          <div className="text-[11px] text-foreground/40 mt-0.5">{item.description}</div>
                         </Link>
                       </NavigationMenuLink>
                     ))}
@@ -160,7 +160,7 @@ export function SiteHeader() {
             variant="ghost"
             size="icon"
             asChild
-            className="rounded-full text-[#152E24]/50 hover:bg-[#152E24]/[0.04] h-9 w-9"
+            className="rounded-full text-foreground/50 hover:bg-foreground/[0.04] h-9 w-9"
           >
             <a href={COMPANY_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
               <MessageCircleIcon />
@@ -171,22 +171,22 @@ export function SiteHeader() {
             buttonClassName="hidden md:inline-flex freehold-gradient h-9 px-5 rounded-lg text-[10px] uppercase font-semibold tracking-[0.12em] border-none"
             buttonSize="sm"
           />
-          <Button asChild className="hidden md:inline-flex bg-[#152E24] hover:bg-[#152E24]/90 text-white rounded-lg h-9 px-5 text-[10px] uppercase font-semibold tracking-[0.12em]">
+          <Button asChild className="hidden md:inline-flex bg-foreground hover:bg-foreground/90 text-white rounded-lg h-9 px-5 text-[10px] uppercase font-semibold tracking-[0.12em]">
             <Link href="/chat">AI Assistant</Link>
           </Button>
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden text-[#152E24] h-9 w-9">
+              <Button variant="ghost" size="icon" className="lg:hidden text-foreground h-9 w-9">
                 <MenuIcon />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] max-w-[360px] p-0 border-l border-[#152E24]/[0.06] bg-[#FAF8F5]">
+            <SheetContent side="right" className="w-[85vw] max-w-[360px] p-0 border-l border-foreground/[0.06] bg-background">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <div className="flex flex-col h-full bg-[#FAF8F5]">
-                <div className="p-6 border-b border-[#152E24]/[0.06]">
+              <div className="flex flex-col h-full bg-background">
+                <div className="p-6 border-b border-foreground/[0.06]">
                   <Link href="/" onClick={() => setIsOpen(false)} className="shrink-0" aria-label={`${brand.company} — Home`}>
                     <BrandLogo className="h-14 w-auto" />
                   </Link>
@@ -200,7 +200,7 @@ export function SiteHeader() {
                       { title: "Our Firm", links: companyLinks }
                     ].map((section) => (
                       <div key={section.title} className="space-y-3">
-                        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#152E24]/25 px-1">
+                        <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/25 px-1">
                           {section.title}
                         </div>
                         <div className="grid gap-0.5">
@@ -209,10 +209,10 @@ export function SiteHeader() {
                               key={item.href}
                               href={item.href}
                               onClick={() => setIsOpen(false)}
-                              className="flex flex-col gap-0.5 rounded-xl p-3 text-sm font-medium transition-colors hover:bg-[#152E24]/[0.03] active:bg-[#152E24]/[0.06]"
+                              className="flex flex-col gap-0.5 rounded-xl p-3 text-sm font-medium transition-colors hover:bg-foreground/[0.03] active:bg-foreground/[0.06]"
                             >
-                              <span className="text-[15px] text-[#152E24]">{item.label}</span>
-                              <span className="text-[11px] font-normal text-[#152E24]/40 line-clamp-1">{item.description}</span>
+                              <span className="text-[15px] text-foreground">{item.label}</span>
+                              <span className="text-[11px] font-normal text-foreground/40 line-clamp-1">{item.description}</span>
                             </Link>
                           ))}
                         </div>
@@ -221,7 +221,7 @@ export function SiteHeader() {
                   </div>
                 </ScrollArea>
 
-                <div className="p-6 border-t border-[#152E24]/[0.06] bg-white/50 backdrop-blur-xl">
+                <div className="p-6 border-t border-foreground/[0.06] bg-white/50 backdrop-blur-xl">
                   <Button asChild className="w-full freehold-gradient shadow-lg h-12 rounded-xl text-[11px] uppercase font-semibold tracking-[0.12em]" size="lg">
                     <Link href="/chat" onClick={() => setIsOpen(false)}>
                       <SparklesIcon />

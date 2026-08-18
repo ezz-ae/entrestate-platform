@@ -196,7 +196,7 @@ export default async function Home() {
               href={`/chat?q=${encodeURIComponent(q)}`}
               className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 text-[13px] text-white/65 transition hover:bg-white/[0.07]"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#C69B3E]/20 text-[#D4AC50]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[#D4AC50]">
                 <SparklesIcon className="h-3 w-3" />
               </span>
               {q}
@@ -206,7 +206,7 @@ export default async function Home() {
 
         <Link
           href="/chat"
-          className="mt-4 flex items-center justify-center gap-2 rounded-2xl bg-[#C69B3E] py-3.5 text-[13px] font-semibold text-[#0A1F17]"
+          className="mt-4 flex items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-[13px] font-semibold text-[#0A1F17]"
         >
           Open AI Assistant
         </Link>
@@ -262,7 +262,7 @@ export default async function Home() {
       </div>
 
       {/* ── Featured properties ──────────────────────────────────────── */}
-      <div className="relative overflow-hidden bg-[#152E24]">
+      <div className="relative overflow-hidden bg-foreground">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,rgba(198,155,62,0.06),transparent)]" />
         <FeaturedProperties />
       </div>
@@ -295,7 +295,7 @@ export default async function Home() {
                   >
                     <div className="relative z-10 flex h-full flex-col justify-between">
                       <div>
-                        <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#C69B3E]/12 text-[#D4AC50]">
+                        <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/12 text-[#D4AC50]">
                           <Icon className="h-5 w-5" />
                         </div>
                         <h3 className="font-serif mb-3 text-2xl font-bold text-white">{item.title}</h3>
@@ -313,7 +313,7 @@ export default async function Home() {
                       )}
                     </div>
                     {/* Subtle corner glow */}
-                    <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[#C69B3E]/[0.04] blur-2xl transition-opacity group-hover:opacity-150" />
+                    <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-primary/[0.04] blur-2xl transition-opacity group-hover:opacity-150" />
                   </div>
                 )
               })}
@@ -328,11 +328,11 @@ export default async function Home() {
           style={{ backgroundImage: "radial-gradient(circle, #152E24 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="container relative z-10">
           <div className="mb-14 text-center">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">Why {BRAND.company}</p>
-            <h2 className="font-serif text-3xl font-bold text-[#152E24] md:text-4xl lg:text-5xl">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Why {BRAND.company}</p>
+            <h2 className="font-serif text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
               Local expertise, clean execution.
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-[#152E24]/45">
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-foreground/45">
               Decades of combined experience in Dubai real estate — transactions, project sales, and investment advisory, backed by an AI platform that never sleeps.
             </p>
           </div>
@@ -343,10 +343,10 @@ export default async function Home() {
               { stat: "AI-led", label: "Market intelligence", body: "Live data on yields, transactions, and price trends across every freehold area in Dubai." },
               { stat: "End-to-end", label: "One accountable team", body: "Valuation, media, buyer profiling, negotiation, and handover handled in a single clean process." },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-[#152E24]/[0.07] bg-white/70 p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
-                <p className="font-serif text-3xl font-bold text-[#C69B3E]">{item.stat}</p>
-                <h3 className="mt-3 font-serif text-lg font-bold text-[#152E24]">{item.label}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#152E24]/50">{item.body}</p>
+              <div key={item.label} className="rounded-2xl border border-foreground/[0.07] bg-white/70 p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+                <p className="font-serif text-3xl font-bold text-primary">{item.stat}</p>
+                <h3 className="mt-3 font-serif text-lg font-bold text-foreground">{item.label}</h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-foreground/50">{item.body}</p>
               </div>
             ))}
           </div>
@@ -354,7 +354,7 @@ export default async function Home() {
       </section>
 
       {/* ── Private Advisory + form ──────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#152E24] py-20 text-white md:py-28">
+      <section className="relative overflow-hidden bg-foreground py-20 text-white md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_5%_50%,rgba(198,155,62,0.06),transparent)]" />
         <div className="container relative z-10">
           <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
@@ -386,10 +386,10 @@ export default async function Home() {
 
             {/* Right: request form */}
             <div className="relative">
-              <div className="absolute -inset-8 -z-10 rounded-3xl bg-gradient-to-tr from-[#C69B3E]/[0.08] to-transparent blur-3xl" />
+              <div className="absolute -inset-8 -z-10 rounded-3xl bg-gradient-to-tr from-primary/[0.08] to-transparent blur-3xl" />
               <div className="relative z-10 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.05] p-8 backdrop-blur-xl md:p-10">
                 {/* Decorative corner */}
-                <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-[#C69B3E]/[0.04]" />
+                <div className="absolute right-0 top-0 h-32 w-32 rounded-bl-full bg-primary/[0.04]" />
                 <h3 className="mb-1 text-xl font-bold text-white md:text-2xl">Request a Callback</h3>
                 <p className="mb-8 text-[11px] font-medium uppercase tracking-[0.15em] text-white/25">
                   Business Bay office · Dubai, UAE
@@ -402,7 +402,7 @@ export default async function Home() {
       </section>
 
       {/* ── Blog / insights ──────────────────────────────────────────── */}
-      <div className="border-t border-[#152E24]/[0.04] bg-[#F2EFE8] py-20 md:py-24">
+      <div className="border-t border-foreground/[0.04] bg-[#F2EFE8] py-20 md:py-24">
         <BlogSection />
       </div>
 
@@ -411,13 +411,13 @@ export default async function Home() {
         {/* Background layers */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(198,155,62,0.07),transparent)]" />
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C69B3E]/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
 
         <div className="container relative z-10">
           <div className="mx-auto max-w-3xl text-center">
             {/* Badge */}
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#C69B3E]/25 bg-[#C69B3E]/[0.08] px-4 py-2">
+            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.08] px-4 py-2">
               <span className="h-1.5 w-1.5 rounded-full bg-[#D4AC50]" />
               <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AC50]">
                 {BRAND.legalName} UAE
@@ -455,7 +455,7 @@ export default async function Home() {
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/contact"
-                className="freehold-gradient inline-flex h-13 items-center gap-2 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#152E24] shadow-lg transition hover:brightness-105 sm:h-14"
+                className="freehold-gradient inline-flex h-13 items-center gap-2 rounded-xl px-8 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-lg transition hover:brightness-105 sm:h-14"
               >
                 Schedule Consultation
                 <ArrowRightIcon />

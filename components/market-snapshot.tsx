@@ -41,14 +41,14 @@ export async function MarketSnapshot() {
         {/* Header */}
         <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-16">
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#C69B3E]">Real-Time Data</p>
-            <h2 className="font-serif text-3xl font-bold leading-[1.08] text-[#152E24] md:text-5xl">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Real-Time Data</p>
+            <h2 className="font-serif text-3xl font-bold leading-[1.08] text-foreground md:text-5xl">
               Dubai Market<br className="hidden sm:block" /> Snapshot
             </h2>
           </div>
           <Link
             href="/chat"
-            className="inline-flex items-center gap-2 rounded-full border border-[#152E24]/12 bg-white/70 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#152E24]/60 shadow-sm backdrop-blur transition-all hover:border-[#C69B3E]/35 hover:text-[#C69B3E]"
+            className="inline-flex items-center gap-2 rounded-full border border-foreground/12 bg-white/70 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground/60 shadow-sm backdrop-blur transition-all hover:border-primary/35 hover:text-primary"
           >
             Full Report
             <ArrowRightIcon className="h-3.5 w-3.5" />
@@ -57,19 +57,19 @@ export async function MarketSnapshot() {
 
         {/* Large editorial stats — only DB-backed numbers render */}
         {stats.length > 0 && (
-          <div className={`grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-[#152E24]/[0.07] ring-1 ring-[#152E24]/[0.06] ${tileGridCols[stats.length] || "md:grid-cols-4"}`}>
+          <div className={`grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-foreground/[0.07] ring-1 ring-foreground/[0.06] ${tileGridCols[stats.length] || "md:grid-cols-4"}`}>
             {stats.map((stat) => (
               <div
                 key={stat.label}
                 className="group relative bg-[#F2EFE8] px-7 py-8 transition-colors hover:bg-white/60 md:px-8 md:py-10"
               >
-                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#152E24]/35">
+                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/35">
                   {stat.label}
                 </p>
-                <p className="font-serif text-4xl font-bold leading-none text-[#152E24] md:text-5xl">
+                <p className="font-serif text-4xl font-bold leading-none text-foreground md:text-5xl">
                   {stat.value}
                 </p>
-                <p className="mt-3 text-[11px] text-[#152E24]/35">{stat.sub}</p>
+                <p className="mt-3 text-[11px] text-foreground/35">{stat.sub}</p>
               </div>
             ))}
           </div>
@@ -77,38 +77,38 @@ export async function MarketSnapshot() {
 
         {/* Area comparison table — driven by live area profiles */}
         {topAreas.length > 0 && (
-          <div className="mt-6 overflow-hidden rounded-2xl border border-[#152E24]/[0.07] bg-white/60 shadow-sm backdrop-blur-sm">
+          <div className="mt-6 overflow-hidden rounded-2xl border border-foreground/[0.07] bg-white/60 shadow-sm backdrop-blur-sm">
             {/* Table header */}
-            <div className="grid grid-cols-[1fr_auto_auto] items-center gap-6 border-b border-[#152E24]/[0.06] bg-[#152E24]/[0.025] px-6 py-3.5">
-              <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35">Area</span>
-              <span className="hidden text-[9px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35 sm:block">Avg Price / Sqft</span>
-              <span className="min-w-[80px] text-[9px] font-semibold uppercase tracking-[0.22em] text-[#152E24]/35">Gross Yield</span>
+            <div className="grid grid-cols-[1fr_auto_auto] items-center gap-6 border-b border-foreground/[0.06] bg-foreground/[0.025] px-6 py-3.5">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.22em] text-foreground/35">Area</span>
+              <span className="hidden text-[9px] font-semibold uppercase tracking-[0.22em] text-foreground/35 sm:block">Avg Price / Sqft</span>
+              <span className="min-w-[80px] text-[9px] font-semibold uppercase tracking-[0.22em] text-foreground/35">Gross Yield</span>
             </div>
 
             {topAreas.map((area, i) => (
               <div
                 key={area.name}
-                className={`grid grid-cols-[1fr_auto_auto] items-center gap-6 px-6 py-4 transition-colors hover:bg-[#C69B3E]/[0.04] ${
-                  i < topAreas.length - 1 ? "border-b border-[#152E24]/[0.04]" : ""
+                className={`grid grid-cols-[1fr_auto_auto] items-center gap-6 px-6 py-4 transition-colors hover:bg-primary/[0.04] ${
+                  i < topAreas.length - 1 ? "border-b border-foreground/[0.04]" : ""
                 }`}
               >
                 {/* Area name */}
-                <span className="text-sm font-semibold text-[#152E24]">{area.name}</span>
+                <span className="text-sm font-semibold text-foreground">{area.name}</span>
 
                 {/* Price per sqft */}
-                <span className="hidden text-sm font-medium text-[#152E24]/60 sm:block">
+                <span className="hidden text-sm font-medium text-foreground/60 sm:block">
                   {area.pricePerSqft ? `AED ${Math.round(area.pricePerSqft).toLocaleString("en-US")}` : "—"}
                 </span>
 
                 {/* Yield + bar */}
                 <div className="flex min-w-[80px] items-center gap-3">
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-[#152E24]/[0.07]">
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-foreground/[0.07]">
                     <div
-                      className="h-full rounded-full bg-[#C69B3E]"
+                      className="h-full rounded-full bg-primary"
                       style={{ width: `${Math.min(Math.round((area.rentalYield || 0) * 10), 100)}%` }}
                     />
                   </div>
-                  <span className="text-sm font-semibold text-[#152E24]">
+                  <span className="text-sm font-semibold text-foreground">
                     {area.rentalYield ? `${area.rentalYield.toFixed(1)}%` : "—"}
                   </span>
                 </div>
@@ -118,14 +118,14 @@ export async function MarketSnapshot() {
         )}
 
         {/* Bottom CTA strip */}
-        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-[#C69B3E]/20 bg-gradient-to-br from-[#C69B3E]/[0.06] to-[#152E24]/[0.02] px-8 py-6 sm:flex-row">
+        <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.06] to-foreground/[0.02] px-8 py-6 sm:flex-row">
           <div>
-            <p className="font-serif text-lg font-bold text-[#152E24]">Ready to invest in Dubai real estate?</p>
-            <p className="mt-1 text-sm text-[#152E24]/45">Strong fundamentals, government-backed stability, and income-led rental yields await.</p>
+            <p className="font-serif text-lg font-bold text-foreground">Ready to invest in Dubai real estate?</p>
+            <p className="mt-1 text-sm text-foreground/45">Strong fundamentals, government-backed stability, and income-led rental yields await.</p>
           </div>
           <Link
             href="/chat"
-            className="freehold-gradient shrink-0 rounded-xl px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#152E24] shadow-md transition-all hover:shadow-lg hover:brightness-105"
+            className="freehold-gradient shrink-0 rounded-xl px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground shadow-md transition-all hover:shadow-lg hover:brightness-105"
           >
             Start with AI
           </Link>

@@ -98,7 +98,7 @@ export default async function PropertiesPage({
                   Explore thousands of premium residential and commercial investment opportunities across the UAE.
                 </p>
               </div>
-              <Button className="ore-gradient text-[#152E24] font-semibold h-12 px-8" asChild>
+              <Button className="ore-gradient text-foreground font-semibold h-12 px-8" asChild>
                 <Link href="/chat">Ask AI Assistant</Link>
               </Button>
             </div>
@@ -106,7 +106,7 @@ export default async function PropertiesPage({
         </section>
 
         {/* Filters & Results */}
-        <section className="bg-[#152E24] py-8 md:py-10">
+        <section className="bg-foreground py-8 md:py-10">
           <div className="container">
             <div className="rounded-[36px] border border-white/10 bg-white/[0.03] p-4 shadow-[0_28px_90px_-55px_rgba(0,0,0,0.6)] backdrop-blur-xl md:p-6 lg:p-8">
               <div className="mb-6 flex flex-col gap-3 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
@@ -159,17 +159,17 @@ export default async function PropertiesPage({
                         <PropertyCard key={property.id} property={property} layout={view} displayCurrency={typeof params.currency === "string" ? params.currency : undefined} />
                       ))
                     ) : (
-                      <div className="col-span-full flex flex-col items-center justify-center rounded-[28px] border border-dashed border-[#152E24]/10 bg-[#FAF8F5] py-20 text-center">
+                      <div className="col-span-full flex flex-col items-center justify-center rounded-[28px] border border-dashed border-foreground/10 bg-background py-20 text-center">
                         <div className="mb-4 rounded-full bg-white p-6 shadow-sm">
-                          <svg className="h-10 w-10 text-[#152E24]/45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-10 w-10 text-foreground/45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         </div>
-                        <h3 className="text-xl font-bold text-[#152E24]">No properties found</h3>
-                        <p className="mt-2 max-w-xs text-[#152E24]/55">
+                        <h3 className="text-xl font-bold text-foreground">No properties found</h3>
+                        <p className="mt-2 max-w-xs text-foreground/55">
                           Try adjusting your filters or search criteria to find what you&apos;re looking for.
                         </p>
-                        <Button variant="outline" className="mt-8 border-[#152E24]/10 bg-white text-[#152E24] hover:border-[#C69B3E]/25 hover:bg-[#C69B3E]/[0.08] hover:text-[#152E24]" asChild>
+                        <Button variant="outline" className="mt-8 border-foreground/10 bg-white text-foreground hover:border-primary/25 hover:bg-primary/[0.08] hover:text-foreground" asChild>
                           <Link href="/properties">Clear All Filters</Link>
                         </Button>
                       </div>
@@ -181,7 +181,7 @@ export default async function PropertiesPage({
                     <Link
                       href={buildPageLink(Math.max(1, page - 1))}
                       className={cn(
-                        "inline-flex h-10 items-center justify-center rounded-md border border-[#152E24]/10 bg-[#FAF8F5] px-4 text-sm font-medium text-[#152E24] transition hover:border-[#C69B3E]/25 hover:text-[#152E24]",
+                        "inline-flex h-10 items-center justify-center rounded-md border border-foreground/10 bg-background px-4 text-sm font-medium text-foreground transition hover:border-primary/25 hover:text-foreground",
                         page <= 1 && "pointer-events-none opacity-50"
                       )}
                     >
@@ -196,8 +196,8 @@ export default async function PropertiesPage({
                           className={cn(
                             "inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-medium transition",
                             p === page
-                              ? "border-[#152E24] bg-[#152E24] text-white"
-                              : "border-[#152E24]/10 bg-white text-[#152E24]/65 hover:border-[#C69B3E]/25 hover:text-[#152E24]"
+                              ? "border-foreground bg-foreground text-white"
+                              : "border-foreground/10 bg-white text-foreground/65 hover:border-primary/25 hover:text-foreground"
                           )}
                           aria-current={p === page ? "page" : undefined}
                         >
@@ -207,7 +207,7 @@ export default async function PropertiesPage({
                     <Link
                       href={buildPageLink(Math.min(totalPages, page + 1))}
                       className={cn(
-                        "inline-flex h-10 items-center justify-center rounded-md border border-[#152E24]/10 bg-[#FAF8F5] px-4 text-sm font-medium text-[#152E24] transition hover:border-[#C69B3E]/25 hover:text-[#152E24]",
+                        "inline-flex h-10 items-center justify-center rounded-md border border-foreground/10 bg-background px-4 text-sm font-medium text-foreground transition hover:border-primary/25 hover:text-foreground",
                         page >= totalPages && "pointer-events-none opacity-50"
                       )}
                     >
