@@ -20,6 +20,7 @@ import { getStoredMetaCreds, getStoredCreds, type WhatsAppStoredCreds } from '@/
 import { probeAdAccountAccess } from '@/lib/meta/client'
 import type { GoogleStoredCreds } from '@/lib/google/client'
 import type { HubspotStoredCreds } from '@/lib/hubspot/client'
+import { callingConnection } from '@/lib/calling/provider'
 
 export type IntegrationState =
   | 'connected'
@@ -120,6 +121,17 @@ export async function getLiveIntegrationStatuses(
     if (stored?.accessToken && stored?.phoneNumberId) { wa = { state: 'connected', missing: [] }; waSource = 'db' }
   }
 
+  // ── Calling (voice) ───────────────────────────────────────────────────────
+  // Read through callingConnection() rather than by testing env keys here.
+  // The rails already resolve env-first then the tenant's sealed store, and a
+  // second copy of that rule in this file is how the Overview ends up saying
+  // "not connected" about a provider the calling screen is happily using.
+  const callKeys = ['ELEVENLABS_API_KEY', 'ELEVENLABS_AGENT_ID']
+  const callConn = await callingConnection().catch(() => ({ connected: false, source: null } as const))
+  const call = callConn.connected
+    ? { state: 'connected' as IntegrationState, missing: [] as string[] }
+    : evaluate(callKeys)
+
   // ── HubSpot CRM (private-app token) ─────────────────────────────────────────
   const hubKeys = ['HUBSPOT_TOKEN']
   let hub = evaluate(hubKeys)
@@ -188,6 +200,22 @@ export async function getLiveIntegrationStatuses(
         wa.state === 'connected'
           ? (waSource === 'db' ? 'Live (connected in-app) — ' : 'Live — ') + 'outbound WhatsApp messages send through the Cloud API.'
           : 'Not configured — connect in Integrations → WhatsApp or set env keys; messages run in mock mode until then.',
+    },
+    {
+      id: 'calling',
+      name: 'Lead Calling',
+      category: 'messaging',
+      state: call.state,
+      requiredKeys: callKeys,
+      missingKeys: call.missing,
+      note:
+        call.state === 'connected'
+          ? (callConn.source === 'db' ? 'Live (connected in-app) — ' : 'Live — ') +
+            'calls place through the voice provider. A verified caller-id number is still required per brokerage.'
+          // No mock mode, unlike WhatsApp above: a call that "sends in mock
+          // mode" is a call a broker believes happened. Unconfigured means
+          // every dial is refused before it reaches a provider.
+          : 'Not configured — connect in Integrations → Calling or set env keys. Until then every call is refused, not simulated.',
     },
     {
       id: 'hubspot',

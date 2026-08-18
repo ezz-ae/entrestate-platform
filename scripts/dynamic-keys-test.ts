@@ -53,6 +53,9 @@ import { lm_ads } from '../lib/i18n/dictionaries/lm_ads'
 import { lm_core } from '../lib/i18n/dictionaries/lm_core'
 import { lm_audiences } from '../lib/i18n/dictionaries/lm_audiences'
 import { p_ads_google } from '../lib/i18n/dictionaries/p_ads_google'
+import { CALL_TYPES, CALL_BRANCHES, CALL_REFUSALS, CALL_KEY_PREFIX } from '../lib/freehold/call-templates'
+import { RAIL_REFUSALS } from '../lib/calling/gates'
+import { lm_calling } from '../lib/i18n/dictionaries/lm_calling'
 
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
@@ -282,6 +285,25 @@ console.log('\n── ready-buyer names ──')
   // t(`lm.aud.ready.${id}.name`) from the READY_BUYERS catalog — a computed
   // key per catalog entry, invisible to the literal audit like the rest.
   family('lm.aud.ready.*.name', 'lm.aud.ready.', READY_BUYERS.map((b) => `${b.id}.name`), lm_audiences)
+}
+
+console.log('\n\u2500\u2500 lead-calling families \u2500\u2500')
+{
+  // Three families on one screen, all computed. The refusal family is the one
+  // that matters most: it is the badge a broker reads on a lead that could not
+  // be called, and the fallback for a missing word is to print the code —
+  // `consentStale` — at exactly the moment somebody needs to know why the
+  // system would not ring a client.
+  check('the call types are enumerable at runtime, not only a type',
+    Array.isArray(CALL_TYPES) && CALL_TYPES.length === 7)
+  family('lm.call.type', CALL_KEY_PREFIX.type, CALL_TYPES, lm_calling)
+  family('lm.call.branch', CALL_KEY_PREFIX.branch, CALL_BRANCHES, lm_calling)
+  // Both refusal sets land in ONE family because the screen renders them
+  // through one key: the lead's own reasons (consent, hours, do-not-call) and
+  // the rails' reasons (nothing connected, no verified number) look identical
+  // to the person reading the row, and only differ in who fixes them.
+  family('lm.call.refusal', CALL_KEY_PREFIX.refusal,
+    [...CALL_REFUSALS, ...RAIL_REFUSALS], lm_calling)
 }
 
 if (failures > 0) {

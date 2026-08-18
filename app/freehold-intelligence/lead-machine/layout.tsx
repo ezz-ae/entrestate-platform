@@ -8,7 +8,7 @@ import {
   Activity,
   BarChart3, Zap,
   Monitor, ClipboardList, Crosshair, Palette, Users,
-  Search, Radio, RadioTower, Bot,
+  Search, Radio, RadioTower, Bot, PhoneCall,
   FileText, FileCheck, Shield,
 } from 'lucide-react'
 import { useSessionGuard } from '@/lib/freehold/use-session'
@@ -27,6 +27,11 @@ const MANAGER_NAV_SECTIONS = [
       { key: 'lm.nav.optimizer',   href: '/freehold-intelligence/lead-machine/campaigns/optimize',          Icon: Zap         },
       { key: 'lm.nav.attribution', href: '/freehold-intelligence/lead-machine/campaigns/attribution',       Icon: BarChart3   },
       { key: 'lm.nav.live',        href: '/freehold-intelligence/ads-live',                                 Icon: Radio       },
+      // Calling is in the Machine, not under Integrations, because it is a
+      // step in the loop the Machine runs — the lead an ad made gets worked,
+      // and how the call ended teaches the next campaign. Integrations is
+      // where the provider and the number get connected, once.
+      { key: 'lm.nav.calling',     href: '/freehold-intelligence/lead-machine/calling',                     Icon: PhoneCall   },
     ],
   },
   {

@@ -5,7 +5,7 @@ import { tabLinkClass } from '@/components/freehold/ui'
 import { usePathname } from 'next/navigation'
 import {
   ArrowLeft, ShieldCheck,
-  LayoutDashboard, Megaphone, Search, Users, MessageCircle, GitBranch,
+  LayoutDashboard, Megaphone, Search, Users, MessageCircle, GitBranch, PhoneCall,
 } from 'lucide-react'
 import { useSessionGuard } from '@/lib/freehold/use-session'
 import { useT } from '@/lib/i18n/provider'
@@ -17,6 +17,10 @@ const tabs = [
   { label: 'Google',    href: '/freehold-intelligence/integrations/google',                  Icon: Search           },
   { label: 'HubSpot',   href: '/freehold-intelligence/integrations/hubspot',                 Icon: Users            },
   { label: 'WhatsApp',  href: '/freehold-intelligence/integrations/whatsapp',                Icon: MessageCircle    },
+  // "Calling" is the channel, not the vendor: the rails in lib/calling are
+  // provider-agnostic and the tab must not have to be renamed the day the
+  // voice provider changes.
+  { label: 'Calling',   href: '/freehold-intelligence/integrations/calling',                 Icon: PhoneCall        },
   { label: 'GitHub',    href: '/freehold-intelligence/integrations/github',                  Icon: GitBranch        },
 ]
 

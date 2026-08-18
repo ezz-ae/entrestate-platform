@@ -13,6 +13,7 @@ import {
   Server,
   Users2,
   Zap,
+  PhoneCall,
   type LucideIcon,
 } from 'lucide-react'
 import { PageHeader } from '@/components/freehold/ui'
@@ -59,6 +60,7 @@ const META: Record<string, IntMeta & { href?: string }> = {
   'meta-ads':   { category: 'Paid Ads',       icon: Megaphone,     copy: 'Meta & Instagram campaigns and pixel events.',             href: '/freehold-intelligence/integrations/meta' },
   'google-ads': { category: 'Paid Ads',       icon: Megaphone,     copy: 'Google search and display — budget and bidding.',          href: '/freehold-intelligence/integrations/google' },
   whatsapp:     { category: 'Messaging',      icon: MessageSquare, copy: 'Automated and agent-triggered WhatsApp flows.',            href: '/freehold-intelligence/integrations/whatsapp' },
+  calling:      { category: 'Messaging',      icon: PhoneCall,     copy: 'Outbound voice calls on the desk’s own scripts.',        href: '/freehold-intelligence/integrations/calling' },
   tracking:     { category: 'Analytics',      icon: BarChart3,     copy: 'Meta Pixel, GA4, GTM, conversion attribution.',           href: '/freehold-intelligence/integrations/tracking' },
   neon:         { category: 'Infrastructure', icon: Database,      copy: 'Neon PostgreSQL — the private data layer.' },
   vercel:       { category: 'Infrastructure', icon: Server,        copy: 'Vercel deployment pipeline and health.' },
