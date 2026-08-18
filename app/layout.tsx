@@ -16,8 +16,12 @@ import "./globals.css"
 
 export const dynamic = "force-dynamic"
 
+// Cyrillic is not optional on a product that ships Russian: without it every
+// RU screen renders in whatever the reader's OS supplies, which is the same
+// defect the comment below already names for Arabic — stated for exported ads
+// and never applied to the product itself.
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   variable: "--font-sans",
   preload: false,
 })
@@ -34,7 +38,10 @@ const playfair = Playfair_Display({
   preload: false,
 })
 
-// Cairo — the ad engine's Arabic face. Canvas text falls back to whatever
+// Cairo — the Arabic face, for the AD ENGINE and now for the UI too: it is
+// appended to the --font-sans stack in globals.css, so an Arabic screen
+// renders in a font we chose rather than one the device happened to have.
+// Canvas text falls back to whatever
 // Arabic font happens to be installed on the machine doing the rendering,
 // which makes an exported ad look different for every agent. Loading a real
 // webfont and composing only after it is ready makes the pixels deterministic.

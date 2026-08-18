@@ -122,7 +122,12 @@ html {
 }
 
 @theme inline {
-  --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
+  /* Cairo sits in the stack so ARABIC text renders in a face we load rather
+   * than whatever the reader's device supplies — Inter has no Arabic glyphs,
+   * so every Arabic screen in this product was falling through to the OS.
+   * var() is legal inside a font-family list, and --font-ad-ar is the hashed
+   * family next/font generates for Cairo. */
+  --font-sans: "Inter", "Inter Fallback", var(--font-ad-ar), system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
   --font-mono: "Geist Mono", "Courier New", monospace;
 

@@ -132,16 +132,14 @@
   --shadow-glow: 0 24px 80px -48px color-mix(in srgb, var(--color-accent) 55%, transparent);
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.24);
 
-  /* ── TYPE ─────────────────────────────────────────────────────────────
-     Cairo carries Arabic AND Latin so a mixed line does not change face
-     mid-sentence; Inter carries Cyrillic. Neither app loaded any face capable
-     of Arabic or Cyrillic before this file existed — the product rendered in
-     whatever the reader's OS happened to supply. The display serif stays a
-     local stack: Latin-only by nature, so Arabic and Russian headings fall to
-     the sans, which is the honest outcome rather than a faked one. */
-  --font-sans: Inter, Cairo, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* ── TYPE — owned by the app, not by this file ─────────────────────────
+     Fonts are loaded with next/font in app/layout.tsx, which generates hashed
+     family names; a stack written here could only name "Inter" and "Cairo" as
+     plain strings, which resolve to whatever the device has rather than to the
+     faces actually downloaded. Declaring them here therefore competed with the
+     real stack and could only ever lose or mislead. The app composes the stack
+     (Inter for latin+cyrillic, Cairo appended for arabic); this file keeps to
+     colour and form. */
 
   /* The micro-label that does more for the "terminal" feel than any colour:
      10px, semibold, wide-tracked, muted, uppercase. 485 hand-written copies of
