@@ -55,10 +55,14 @@
   --n-100: #F2EEE8;  /* ink */
   --n-000: #FFFFFF;
 
-  /* Declared before the structural roles below, which mix it in. */
-  --color-accent: #3B82F6;
-  --color-accent-bright: #60A5FA;
-  --color-accent-ink: #FFFFFF;
+  /* NAMED --brand, NOT --color-accent, and the distinction is load-bearing:
+     app/globals.css already defines --color-accent as shadcn's accent (a muted
+     SURFACE colour, hsl(var(--accent))). Declaring a brand hue under the same
+     name gives one property two meanings and hands the cascade a coin-flip —
+     precisely the disease this file exists to cure. */
+  --brand: #3B82F6;
+  --brand-bright: #60A5FA;
+  --brand-ink: #FFFFFF;
 
   /* ── DEGREE — how much of their colour a tenant wants in the room ──────
      A brand is not only a hue, it is how loudly that hue is worn. Two brokerages
@@ -78,25 +82,25 @@
   --brand-degree: 4%;
 
   /* ── STRUCTURAL ROLES — what a component is allowed to name ───────────── */
-  --color-app: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-850));
-  --color-chrome: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-900));
-  --color-surface: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-800));
-  --color-surface-2: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-750));
-  --color-surface-3: color-mix(in srgb, var(--color-accent) var(--brand-degree), var(--n-700));
+  --color-app: color-mix(in srgb, var(--brand) var(--brand-degree), var(--n-850));
+  --color-chrome: color-mix(in srgb, var(--brand) var(--brand-degree), var(--n-900));
+  --color-surface: color-mix(in srgb, var(--brand) var(--brand-degree), var(--n-800));
+  --color-surface-2: color-mix(in srgb, var(--brand) var(--brand-degree), var(--n-750));
+  --color-surface-3: color-mix(in srgb, var(--brand) var(--brand-degree), var(--n-700));
   /* Ink and lines take HALF the degree. Text tinted as hard as its background
      loses contrast against it, and a border tinted to match its surface stops
      being a border — the two things a brand wash breaks first. */
-  --color-ink: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-100));
-  --color-ink-muted: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-300));
-  --color-ink-faint: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-400));
-  --color-line: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-600));
-  --color-line-strong: color-mix(in srgb, var(--color-accent) calc(var(--brand-degree) / 2), var(--n-500));
+  --color-ink: color-mix(in srgb, var(--brand) calc(var(--brand-degree) / 2), var(--n-100));
+  --color-ink-muted: color-mix(in srgb, var(--brand) calc(var(--brand-degree) / 2), var(--n-300));
+  --color-ink-faint: color-mix(in srgb, var(--brand) calc(var(--brand-degree) / 2), var(--n-400));
+  --color-line: color-mix(in srgb, var(--brand) calc(var(--brand-degree) / 2), var(--n-600));
+  --color-line-strong: color-mix(in srgb, var(--brand) calc(var(--brand-degree) / 2), var(--n-500));
 
   /* ── THE PALETTE — the ONLY place a brand exists ───────────────────────
      A host overwrites these per tenant. Defaults are Entrestate's own mark:
      the blue of the third square in the tri-dot wordmark, and the emerald the
      Terminal already uses for live signal. A tenant with a gold brand sets
-     --color-accent and changes nothing else; a client brokerage keeps its
+     --brand and changes nothing else; a client brokerage keeps its
      forest-and-gold identity without a line of its own CSS. */
   /* Semantic ramp — MEANING, never decoration. One triple per role, applied as
      border-{role}/50 + bg-{role}/10 + text-{role}-bright, the recipe the
@@ -129,7 +133,7 @@
 
   /* The Terminal's signature elevation: a long, soft, accent-tinted throw with
      heavy negative spread. Not a drop shadow — a glow the card sits in. */
-  --shadow-glow: 0 24px 80px -48px color-mix(in srgb, var(--color-accent) 55%, transparent);
+  --shadow-glow: 0 24px 80px -48px color-mix(in srgb, var(--brand) 55%, transparent);
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.24);
 
   /* ── TYPE — owned by the app, not by this file ─────────────────────────

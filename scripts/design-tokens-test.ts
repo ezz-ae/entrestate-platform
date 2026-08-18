@@ -120,10 +120,13 @@ console.log('\n── the core holds no brand colour ──')
   // WHY: a tenant sets colour AND degree. If a structural role stops mixing the
   // degree in, that surface silently opts out of the tenant's brand and the
   // product looks half-skinned — the exact complaint white-label customers make.
+  // WHY --brand and not --color-accent: globals.css already owns
+  // --color-accent as shadcn's muted surface colour. One name, two meanings,
+  // is how a cascade becomes a coin-flip.
   for (const role of ['--color-app', '--color-surface', '--color-chrome']) {
     const m = src.match(new RegExp(role + ':\\s*([^;]+);'))
     check(`${role} mixes the brand degree`,
-      !!m && m[1].includes('--brand-degree') && m[1].includes('--color-accent'),
+      !!m && m[1].includes('--brand-degree') && m[1].includes('--brand'),
       m ? m[1].trim() : 'not declared')
   }
   check('the degree defaults inside the legible range',
