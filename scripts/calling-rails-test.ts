@@ -1,5 +1,5 @@
 /**
- * CALLER ID, LOCKED — the number a lead sees when the phone rings.
+ * THE CALLING RAILS, LOCKED — who may be called, and from what number.
  *
  * The prohibition in lib/calling/caller-id.ts is not a preference: presenting
  * a number you have not proven you control is caller-ID spoofing, it is
@@ -36,7 +36,10 @@ import {
   normaliseE164, sameNumber, usableAsCallerId, resolveCallerId, mergeCallerIds,
   CALLER_ID_REFUSALS, type CallerId, type PendingCallerId,
 } from '../lib/calling/caller-id'
-import { describeCallWindows, RAIL_REFUSALS, RAIL_REFUSAL_SENTENCES } from '../lib/calling/gates'
+import {
+  describeCallWindows, consentDateFor, RAIL_REFUSALS, RAIL_REFUSAL_SENTENCES,
+  type CallConsentRecord,
+} from '../lib/calling/gates'
 import { CALL_WINDOWS } from '../lib/freehold/call-templates'
 
 let failures = 0
@@ -239,6 +242,38 @@ console.log('\n── merging what the provider holds with what the tenant claim
     !usableAsCallerId(unverifiedProvider[0]))
 }
 
+console.log('\n── silence is never permission ──')
+{
+  // consentDateFor is what planCall reads. Everything it returns null for is a
+  // lead the product will not ring, so each null below is a call that does not
+  // happen — which is the whole reason this function exists rather than a
+  // `grantedAt ?? null` at the call site.
+  const granted: CallConsentRecord = {
+    grantedAt: '2026-05-01T10:00:00.000Z', source: 'lp_form:marina-vista', withdrawnAt: null,
+  }
+  check('a dated grant with a named source is consent',
+    consentDateFor(granted) === granted.grantedAt, String(consentDateFor(granted)))
+
+  check('no record at all is NOT consent', consentDateFor(null) === null)
+  check('a record with no date is not consent',
+    consentDateFor({ ...granted, grantedAt: null }) === null)
+
+  // A date nobody can say the origin of is what an audit finds and cannot
+  // defend — so it is refused here rather than argued about later.
+  check('a grant with no source is not consent',
+    consentDateFor({ ...granted, source: null }) === null)
+  check('…nor is one with a blank source',
+    consentDateFor({ ...granted, source: '' }) === null)
+
+  // A withdrawal beats a grant whatever the clock says. Someone who withdrew
+  // and then filled a form again re-permissions through the desk, not through
+  // a race between two timestamps.
+  check('a withdrawal beats a grant, even an older withdrawal',
+    consentDateFor({ ...granted, withdrawnAt: '2026-01-01T00:00:00.000Z' }) === null)
+  check('…and beats a grant made the same instant',
+    consentDateFor({ ...granted, withdrawnAt: granted.grantedAt }) === null)
+}
+
 console.log('\n── the hours sentence matches the hours ──')
 {
   const said = describeCallWindows()
@@ -262,7 +297,7 @@ console.log('\n── every rail refusal has a sentence ──')
 }
 
 if (failures > 0) {
-  console.error(`\n${failures} caller-id rule(s) broken.`)
+  console.error(`\n${failures} calling-rail rule(s) broken.`)
   process.exit(1)
 }
 console.log('\nA number nobody proved they own never shows on a lead’s screen.\n')

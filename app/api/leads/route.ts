@@ -249,6 +249,32 @@ export async function POST(req: NextRequest) {
       ],
     )
 
+    // ── CONSENT TO BE CALLED, if the form asked ─────────────────────────
+    // Recorded here and nowhere else on this path, because this is the only
+    // moment the person themselves is on the other end. `callConsent` is read
+    // strictly as `=== true`: a missing field, a string "false", or a form
+    // that has no checkbox at all all mean NO CONSENT, which is what
+    // planCall() then refuses on. Silence is never permission.
+    //
+    // It lands in freehold_calling_consent rather than a lead column because
+    // consent is a legal artifact with a date, a source and a withdrawal, and
+    // lead rows get rewritten by imports and dedupe — see lib/calling/gates.ts.
+    // The source string names the exact page, so "where did they agree?" has
+    // an answer a year from now.
+    //
+    // Best-effort: a consent write that fails must never cost the enquiry.
+    // Failing it closed is safe in the only direction that matters — no row
+    // means no call.
+    if (body.callConsent === true) {
+      const { recordCallConsent } = await import('@/lib/calling/gates')
+      await recordCallConsent(
+        leadId,
+        new Date().toISOString(),
+        landingSlug ? `lp_form:${landingSlug}` : `web_form:${source || 'site'}`,
+        'lead',
+      ).catch((error) => console.error('[lp-leads] call-consent write failed', error))
+    }
+
     // CATCH THE REGISTRATION EVENT. Freeze the ad set's targeting and the ad's
     // copy as they stand right now, against this lead — the ad set can be
     // edited an hour from now, and then nothing could ever say what this
