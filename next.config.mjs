@@ -36,6 +36,12 @@ const nextConfig = {
     return [
       { source: '/management', destination: '/freehold-intelligence/management', permanent: true },
       { source: '/management/:path*', destination: '/freehold-intelligence/management/:path*', permanent: true },
+      // Listing-to-Landing is now the Mega Brokerage Platform. The old path is
+      // printed in the one-pager PDF, sits on the Terminal's apps page and is
+      // the canonical URL search already ranked, so it must keep resolving.
+      // Permanent (308) rather than temporary: the name change is final, and a
+      // 302 would leave the ranking split between two addresses.
+      { source: '/business/listing-to-landing', destination: '/business/mega-brokerage', permanent: true },
     ]
   },
 

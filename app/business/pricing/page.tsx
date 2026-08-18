@@ -7,7 +7,7 @@ import { nextInTour } from '@/lib/business/nav'
 export const metadata: Metadata = {
   title: 'Plans',
   description:
-    'Three plans: Lead Machine monthly, Listing-to-Landing set up on request, Meta for Realtors on tokens as you run ads. Talk to us for current pricing.',
+    'Three plans: Lead Machine monthly, the Mega Brokerage Platform set up on request, Meta for Realtors on tokens as you run ads. Talk to us for current pricing.',
   alternates: { canonical: '/business/pricing' },
 }
 
@@ -32,6 +32,7 @@ const PLANS: Plan[] = [
     line: 'Makes leads from your listings, then works them to the deal.',
     includes: [
       'Inventory, pages, ads, CRM, reports',
+      'A landing page for every project, on your own domain',
       'Your brand, your address, your own database',
       'Roles for agents, managers, marketing, directors',
       'English, العربية, Русский',
@@ -42,7 +43,7 @@ const PLANS: Plan[] = [
     featured: true,
   },
   {
-    name: 'Listing-to-Landing',
+    name: 'Mega Brokerage Platform',
     who: 'For companies needing the public face',
     basis: 'Setup on request',
     price: null,

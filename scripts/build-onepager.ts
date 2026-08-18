@@ -139,17 +139,21 @@ async function main(): Promise<void> {
   page.drawSvgPath('M 0 6 L 3.2 0 L 6.4 6 Z', { x: listCx - 3.2, y: boxTop - boxH, color: GOLD })
   centered(page, 'Closed deals teach the next campaign.', (listCx + dealCx) / 2, 614, 8.5, helv, MUTED)
 
-  // ── Three products ───────────────────────────────────────────────────────
+  // ── Three plans ──────────────────────────────────────────────────────────
+  // Three CARDS, four product pages: Landing Pages is sold on its own page at
+  // /business/landing-pages but ships inside Lead Machine, so it is a line in
+  // that card rather than a fourth column. Adding a column here also breaks
+  // the three-up grid this sheet is laid out on.
   eyebrow(page, bold, 'THREE PRODUCTS', 590)
   const products: Array<{ name: string; line: string; who: string; billed: string }> = [
     {
       name: 'Lead Machine',
-      line: 'Inventory, pages, ads, CRM and the month-end report — one system, your brand.',
+      line: 'Inventory, a landing page per project, ads, CRM and the month-end report — one system, your brand.',
       who: 'Brokerages and developers’ sales teams.',
       billed: 'Monthly. 14-day trial, no card.',
     },
     {
-      name: 'Listing-to-Landing',
+      name: 'Mega Brokerage Platform',
       line: 'Your public site, a landing page for every listing, and the desk that runs it.',
       who: 'Companies that need a public face.',
       billed: 'Set up on request.',

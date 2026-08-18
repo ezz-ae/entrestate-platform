@@ -24,10 +24,11 @@ import {
   Building2,
   Globe,
   Megaphone,
+  Layout,
 } from "lucide-react"
 
 /**
- * THE THREE PRODUCTS. There is nothing else to sell.
+ * THE PRODUCTS. There is nothing else to sell.
  *
  * This page used to advertise twelve "apps" — Storyboard Builder, Cold Calling,
  * Golden Visa Qualifier, Image Studio, Investor Memo Generator and the rest.
@@ -37,12 +38,12 @@ import {
  *
  * The commercial model this page has to carry, in one breath: the market data,
  * the full analysis, the inventory and the search are FREE on any account. The
- * three products are what money buys. One registration covers both — the free
+ * products are what money buys. One registration covers both — the free
  * account IS the account that upgrades, so nobody signs up twice.
  *
  * Labels and blurbs are kept in step with lib/business/nav.ts, which is the
- * canonical list the vendor site sells from. If a fourth product ever exists,
- * it lands there first and here second — never the other way round.
+ * canonical list the vendor site sells from. A product lands there first and
+ * here second — never the other way round.
  */
 function getApps(locale: string) {
   const isArabic = locale === "ar"
@@ -66,7 +67,7 @@ function getApps(locale: string) {
       featured: true,
     },
     {
-      title: isArabic ? "من وحدة إلى صفحة" : "Listing-to-Landing",
+      title: isArabic ? "منصة الوساطة الكبرى" : "Mega Brokerage Platform",
       description: isArabic
         ? "موقعك العام يُدار كما يجب — ومعه المكتب ونظام العملاء خلفه."
         : "Your public website, run properly — with the desk and the CRM behind it.",
@@ -74,7 +75,7 @@ function getApps(locale: string) {
         ? "كل وحدة تحصل على صفحة تُحوِّل، وكل صفحة تُغذّي المكتب."
         : "Every listing gets a page that converts, and every page feeds the desk.",
       href: "https://entrestate.com/business/contact",
-      learnHref: "https://entrestate.com/business/listing-to-landing",
+      learnHref: "https://entrestate.com/business/mega-brokerage",
       icon: Globe,
       tag: isArabic ? "منتج" : "Product",
       // Setup on request, not self-serve: this one is provisioned for
@@ -82,6 +83,25 @@ function getApps(locale: string) {
       // does not open.
       highlight: isArabic ? "للمشغّلين الكبار · تركيب عند الطلب" : "Large-scale operators · setup on request",
       cta: isArabic ? "اطلب التركيب" : "Request setup",
+      featured: true,
+    },
+    {
+      title: isArabic ? "صفحات الهبوط" : "Landing Pages",
+      description: isArabic
+        ? "اختر مشروعًا من مخزونك واحصل على صفحة له — من صوره وسعره وخطة سداده."
+        : "Pick a project from your inventory and get a page for it — from that project's own photos, price and payment plan.",
+      summary: isArabic
+        ? "النموذج على الصفحة يكتب مباشرة في نظام العملاء، موسومًا بالصفحة التي جاء منها."
+        : "The form on it writes straight into the CRM, tagged with the page it came from.",
+      href: signup,
+      learnHref: "https://entrestate.com/business/landing-pages",
+      icon: Layout,
+      tag: isArabic ? "منتج" : "Product",
+      // Ships inside Lead Machine, so the door is the same trial — not a
+      // second subscription. Kept in step with /business/pricing, where it is
+      // a line in the Lead Machine plan rather than a plan of its own.
+      highlight: isArabic ? "ضمن آلة العملاء · تجربة ذاتية" : "Inside Lead Machine · self-serve trial",
+      cta: isArabic ? "ابدأ التجربة" : "Start the trial",
       featured: true,
     },
     {

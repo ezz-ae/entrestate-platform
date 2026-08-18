@@ -23,9 +23,17 @@ export const PRODUCTS: NavItem[] = [
     blurb: 'Makes leads from your listings, then works them to the deal — the whole system, your brand.',
   },
   {
-    href: '/business/listing-to-landing',
-    label: 'Listing-to-Landing',
-    blurb: 'Your public website, run properly — with the desk and CRM behind it.',
+    // Renamed from Listing-to-Landing. The old path still resolves — a
+    // permanent redirect in next.config.mjs, and the product door at
+    // listing.entrestate.com (PRODUCT_DOORS in lib/tenancy/vendor-host.ts).
+    href: '/business/mega-brokerage',
+    label: 'Mega Brokerage Platform',
+    blurb: 'Your public site and the desk behind it — one catalogue, a page per project, ads and CRM.',
+  },
+  {
+    href: '/business/landing-pages',
+    label: 'Landing Pages',
+    blurb: 'A page per project, built from your own stock, with the form wired into the CRM.',
   },
   {
     href: '/business/meta-for-realtors',

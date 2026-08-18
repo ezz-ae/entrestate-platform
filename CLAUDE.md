@@ -3,9 +3,11 @@
 Next.js 16 / TypeScript real-estate operating system. Public site + management
 system + Meta/Google ads machine + CRM. Three languages (EN/AR/RU) everywhere.
 
-Sold as three products on one system: **Lead Machine**, **Listing-to-Landing**,
-**Meta for Realtors**. One deployment serves the vendor's own hosts and every
-customer instance at `{customer}.entrestate.com`, isolated schema-per-tenant.
+Sold as four products on one system: **Lead Machine**, **Mega Brokerage
+Platform** (renamed from Listing-to-Landing), **Landing Pages** (ships inside
+Lead Machine) and **Meta for Realtors**. One deployment serves the vendor's own
+hosts and every customer instance at `{customer}.entrestate.com`, isolated
+schema-per-tenant.
 
 ## THIS REPO IS NOT FREEHOLD — read this before your first command
 
