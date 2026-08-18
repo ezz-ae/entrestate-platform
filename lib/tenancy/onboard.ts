@@ -53,6 +53,12 @@ export async function signupTenant(input: {
     accent: input.accent,
     logo: input.logo,
     plan: input.plan,
+    // Recorded on the tenant row, in the CONTROL PLANE, because that is the
+    // only table reachable from a host that is not theirs. The same email also
+    // becomes the owner inside the tenant schema below, with the password —
+    // but nothing on entrestate.com can read a tenant schema without first
+    // knowing which one to open, which is exactly what this answers.
+    ownerEmail: input.adminEmail,
   })
   if (!created.ok) return { ok: false, reason: created.reason }
   const tenant = created.tenant

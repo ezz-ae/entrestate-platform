@@ -65,9 +65,14 @@ function ServerAuthInner() {
     if (!email || !password || loading) return
     setLoading(true)
     setError(false)
-    const user = await login(email, password, remember)
-    if (user) {
-      router.replace(user.home)
+    const result = await login(email, password, remember)
+    if (result.kind === 'user') {
+      router.replace(result.user.home)
+    } else if (result.kind === 'handoff') {
+      // Their workspace is on another host, and the session it needs can only
+      // be set there. A full navigation, not router.replace: this crosses an
+      // origin, and the claim route on the far side does the rest.
+      window.location.href = result.redirect
     } else {
       setError(true)
       setLoading(false)

@@ -46,6 +46,9 @@ export interface SaasTenant {
   status: TenantStatus
   trialEndsAt: string | null
   createdAt: string
+  /** The person who signed up. NULL on tenants created before this existed —
+   *  read it as "unknown", never as "ownerless". */
+  ownerEmail: string | null
 }
 
 interface TenantRow {
@@ -60,9 +63,10 @@ interface TenantRow {
   status: string
   trial_ends_at: string | null
   created_at: string
+  owner_email: string | null
 }
 
-const SELECT_COLS = `id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at, created_at`
+const SELECT_COLS = `id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at, created_at, owner_email`
 
 // Brand resolution hits this on every request of a tenant host — cache found
 // tenants briefly. Misses are not cached (signup availability must stay live).
@@ -83,6 +87,9 @@ const mapTenant = (r: TenantRow): SaasTenant => ({
   status: (['trial', 'active', 'suspended'].includes(r.status) ? r.status : 'suspended') as TenantStatus,
   trialEndsAt: r.trial_ends_at,
   createdAt: r.created_at,
+  // NULL means "we do not know", not "nobody". Tenants created before this
+  // column existed carry null and must not be treated as ownerless.
+  ownerEmail: r.owner_email,
 })
 
 async function ensure(): Promise<void> {
@@ -100,12 +107,33 @@ async function ensure(): Promise<void> {
         status        text NOT NULL DEFAULT 'trial',
         trial_ends_at timestamptz,
         created_at    timestamptz NOT NULL DEFAULT now(),
-        last_seen_at  timestamptz
+        last_seen_at  timestamptz,
+        owner_email   text
       )
     `)
     // Existing deployments already carry the table — grow it in place. The
     // default makes every pre-existing tenant a 'company' (full surface set).
     await query(`ALTER TABLE saas_tenants ADD COLUMN IF NOT EXISTS plan text NOT NULL DEFAULT 'company'`)
+    // WHO OWNS THIS WORKSPACE. Added because nothing could answer it.
+    //
+    // The owner's real password lives in the TENANT schema (lib/tenancy/
+    // onboard.ts writes it there); the identity created in the shared schema
+    // by app/api/wl/claim/route.ts deliberately has no password_hash. So a
+    // customer signing in at entrestate.com hit authenticateFromDB against the
+    // shared schema, verifyPassword returned false on a null hash, and they
+    // were told "Incorrect email or password" while holding correct
+    // credentials — with nothing anywhere able to say which host to try
+    // instead, because this table had no column naming a person.
+    //
+    // Nullable, and it must stay nullable: tenants created before this column
+    // existed have no owner recorded and no safe way to invent one. Readers
+    // must treat NULL as "unknown", never as "no owner".
+    await query(`ALTER TABLE saas_tenants ADD COLUMN IF NOT EXISTS owner_email text`)
+    // Lookup is by lowercased email on the sign-in path, so the index has to
+    // match that expression or it is never used.
+    try {
+      await query(`CREATE INDEX IF NOT EXISTS saas_tenants_owner_email_idx ON saas_tenants (lower(owner_email))`)
+    } catch { /* index creation is an optimisation, never a reason to fail startup */ }
   // Self-heal: this table's ON CONFLICT target needs a real unique index.
   // Tables created before the UNIQUE was declared never gained one, which
   // makes every upsert fail with 42P10 (the bug that broke project create).
@@ -147,6 +175,8 @@ export async function createTenant(input: {
   accent?: string
   logo?: string
   plan?: TenantPlan
+  /** The person signing up. Recorded so "where is my workspace" has an answer. */
+  ownerEmail?: string
 }): Promise<CreateTenantResult> {
   const sub = input.subdomain.trim().toLowerCase()
   if (!SUBDOMAIN_RE.test(sub)) return { ok: false, reason: 'invalid_subdomain' }
@@ -161,16 +191,20 @@ export async function createTenant(input: {
   const accent = /^#[0-9a-fA-F]{6}$/.test(input.accent ?? '') ? (input.accent as string) : DEFAULT_ACCENT
   const logo = (input.logo ?? '').startsWith('data:image/') ? (input.logo as string) : ''
   const plan: TenantPlan = input.plan === 'realtor' ? 'realtor' : 'company'
+  // Lowercased at the boundary so the stored value and every lookup agree.
+  // An absent owner is stored as NULL, never as '' — an empty string would
+  // match an empty lookup and hand a stranger somebody's workspace.
+  const ownerEmail = (input.ownerEmail ?? '').trim().toLowerCase() || null
 
   return runWithDefaultSchema(async () => {
     await ensure()
     return withTransaction(async (q) => {
       const rows = await q<TenantRow>(
-        `INSERT INTO saas_tenants (id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'trial', now() + make_interval(days => $9))
+        `INSERT INTO saas_tenants (id, subdomain, schema_name, company, product, accent, logo, plan, status, trial_ends_at, owner_email)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'trial', now() + make_interval(days => $9), $10)
          ON CONFLICT (subdomain) DO NOTHING
          RETURNING ${SELECT_COLS}`,
-        [id, sub, schemaName, company, product, accent, logo, plan, TRIAL_DAYS],
+        [id, sub, schemaName, company, product, accent, logo, plan, TRIAL_DAYS, ownerEmail],
       )
       const row = rows[0]
       if (!row) return { ok: false, reason: 'taken' } as const
@@ -185,6 +219,58 @@ export async function createTenant(input: {
 }
 
 /** Fetch a tenant by subdomain (brand resolution, signup checks). */
+/**
+ * Every workspace this email owns.
+ *
+ * THE ONLY LOOKUP THAT WORKS FROM A HOST THAT IS NOT THEIRS. A customer stands
+ * on entrestate.com and types the credentials they use every day; their
+ * password lives in a schema this request has not opened and cannot name.
+ * Before this existed, the answer was "Incorrect email or password".
+ *
+ * Returns a LIST, not one row, and that is deliberate: one person can own more
+ * than one brokerage workspace, and silently picking the first would sign them
+ * into whichever the database happened to return first.
+ *
+ * DELIBERATELY NOT CACHED. `bySubdomainCache` above exists because brand
+ * resolution runs on every request of a tenant host; this runs once per
+ * sign-in attempt. Caching it would mean a workspace created a moment ago is
+ * invisible to the person who just created it, to save a query nobody makes
+ * twice.
+ *
+ * THE CALLER OWES A PASSWORD CHECK. This function proves nothing about who is
+ * asking — it maps an email to workspaces, and an attacker can type any email.
+ * Nothing it returns may reach a response body, a redirect, or an error
+ * message before a password has verified against that tenant's own schema, or
+ * this becomes an endpoint that confirms which brokerages a person runs.
+ */
+export async function tenantsOwnedByEmail(rawEmail: string): Promise<SaasTenant[]> {
+  const email = rawEmail.trim().toLowerCase()
+  // An empty lookup must never match the tenants whose owner is unknown.
+  // createTenant stores an absent owner as NULL for the same reason, but a
+  // guard on each side of the comparison costs nothing and this is the side
+  // an attacker controls.
+  if (!email || !email.includes('@')) return []
+  try {
+    return await runWithDefaultSchema(async () => {
+      await ensure()
+      const rows = await query<TenantRow>(
+        `SELECT ${SELECT_COLS} FROM saas_tenants
+          WHERE lower(owner_email) = $1 AND status <> 'suspended'
+          ORDER BY created_at ASC`,
+        [email],
+      )
+      return rows.map(mapTenant)
+    })
+  } catch (err) {
+    // Fail CLOSED, unlike getTenantBySubdomain below. That one serves stale
+    // brand data rather than take a live site down; this one decides whether
+    // somebody gets signed in, and an unreadable control plane is not a reason
+    // to guess. The caller renders the ordinary "incorrect email or password".
+    console.error('[tenancy] owner lookup failed — sign-in will fall through', err)
+    return []
+  }
+}
+
 export async function getTenantBySubdomain(raw: string): Promise<SaasTenant | null> {
   const sub = raw.trim().toLowerCase()
   if (!SUBDOMAIN_RE.test(sub)) return null
