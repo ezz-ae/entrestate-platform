@@ -19,10 +19,10 @@ export const metadata: Metadata = {
  */
 function MiniStudio() {
   return (
-    <div className="bg-[#0B0F16]">
+    <div className="bg-chrome">
       <div className="flex items-baseline justify-between border-b border-white/[0.06] px-3 py-2">
-        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#7C8B9D]">Ad Designer</span>
-        <span className="font-mono text-[9px] tabular-nums text-[#64748B]" dir="ltr">
+        <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">Ad Designer</span>
+        <span className="font-mono text-[9px] tabular-nums text-ink-faint" dir="ltr">
           payment plan · feed 4:5
         </span>
       </div>
@@ -37,7 +37,7 @@ function MiniStudio() {
             <div className="mt-1 text-[11px] font-semibold leading-tight text-white">Waterfront 2 Bedroom</div>
           </div>
           <div className="absolute inset-x-0 bottom-0 space-y-1 p-2.5">
-            <div className="rounded-[2px] bg-[#3B82F6] px-1.5 py-[3px] text-[7.5px] font-bold tracking-wide text-[#07090C]" dir="ltr">
+            <div className="rounded-[2px] bg-[#3B82F6] px-1.5 py-[3px] text-[7.5px] font-bold tracking-wide text-app" dir="ltr">
               20% DOWN PAYMENT
             </div>
             <div className="rounded-[2px] bg-black/50 px-1.5 py-[3px] font-mono text-[6.5px] text-[#D7DBDF] ring-1 ring-white/[0.08]" dir="ltr">
@@ -70,9 +70,9 @@ function MiniStudio() {
         </div>
         {/* Variant rail: same listing, different layout and palette — one is Arabic. */}
         <div className="flex w-[96px] shrink-0 flex-col gap-1.5">
-          <div className="font-mono text-[7px] uppercase tracking-[0.14em] text-[#64748B]">variants</div>
+          <div className="font-mono text-[7px] uppercase tracking-[0.14em] text-ink-faint">variants</div>
           <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#273B4E] to-[#10161C] ring-1 ring-[#3B82F6]/60">
-            <div className="absolute inset-x-0 bottom-0 bg-[#3B82F6] px-1 py-[2px] text-[5.5px] font-bold text-[#07090C]" dir="ltr">
+            <div className="absolute inset-x-0 bottom-0 bg-[#3B82F6] px-1 py-[2px] text-[5.5px] font-bold text-app" dir="ltr">
               20% DOWN
             </div>
           </div>
@@ -86,14 +86,14 @@ function MiniStudio() {
               AED 1.9M
             </div>
           </div>
-          <div className="mt-auto space-y-0.5 border-t border-white/[0.06] pt-1.5 font-mono text-[6.5px] leading-snug text-[#7C8B9D]">
+          <div className="mt-auto space-y-0.5 border-t border-white/[0.06] pt-1.5 font-mono text-[6.5px] leading-snug text-ink-faint">
             <div dir="ltr">8 layouts · 8 palettes</div>
             <div className="text-[#3B82F6]" dir="ltr">Arabic → flips RTL</div>
           </div>
         </div>
       </div>
       <div className="flex items-baseline justify-between border-t border-white/[0.06] px-3 py-2 font-mono text-[7.5px]">
-        <span className="truncate text-[#64748B]" dir="ltr">
+        <span className="truncate text-ink-faint" dir="ltr">
           feed · square · story
         </span>
         <span className="shrink-0 pl-2 text-[#3B82F6]" dir="ltr">

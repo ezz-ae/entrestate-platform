@@ -26,7 +26,7 @@ function Wordmark() {
       <span className="font-sans text-[1.05rem] font-semibold leading-none tracking-[-0.01em] text-white">
         entrestate
       </span>
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#7C8B9D] transition group-hover:text-[#3B82F6]">
+      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint transition group-hover:text-[#3B82F6]">
         Business
       </span>
     </Link>
@@ -46,7 +46,7 @@ export function BusinessHeader() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#07090C]/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-app/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-6 lg:px-10">
         <Wordmark />
 
@@ -58,13 +58,13 @@ export function BusinessHeader() {
                 onClick={() => setOpen(open === g.label ? null : g.label)}
                 aria-expanded={open === g.label}
                 className={`px-4 py-2 text-[0.875rem] transition ${
-                  open === g.label ? 'text-white' : 'text-[#9FB0C2] hover:text-white'
+                  open === g.label ? 'text-white' : 'text-ink-muted hover:text-white'
                 }`}
               >
                 {g.label}
               </button>
               {open === g.label ? (
-                <div className="absolute left-0 top-full w-[26rem] border border-white/[0.09] bg-[#0F131A] p-2 shadow-2xl shadow-black/60">
+                <div className="absolute left-0 top-full w-[26rem] border border-white/[0.09] bg-surface p-2 shadow-2xl shadow-black/60">
                   {g.items.map((i) => (
                     <Link
                       key={i.href}
@@ -72,7 +72,7 @@ export function BusinessHeader() {
                       className="block px-4 py-3 transition hover:bg-white/[0.04]"
                     >
                       <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
-                      <div className="mt-1 text-[0.8125rem] leading-snug text-[#7C8B9D]">{i.blurb}</div>
+                      <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
                     </Link>
                   ))}
                 </div>
@@ -84,7 +84,7 @@ export function BusinessHeader() {
           <Link
             href="/business/docs"
             onMouseEnter={() => setOpen(null)}
-            className="px-4 py-2 text-[0.875rem] text-[#9FB0C2] transition hover:text-white"
+            className="px-4 py-2 text-[0.875rem] text-ink-muted transition hover:text-white"
           >
             Learn
           </Link>
@@ -93,7 +93,7 @@ export function BusinessHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/server"
-            className="hidden text-[0.875rem] text-[#9FB0C2] transition hover:text-white sm:block"
+            className="hidden text-[0.875rem] text-ink-muted transition hover:text-white sm:block"
           >
             Sign in
           </Link>
@@ -118,11 +118,11 @@ export function BusinessHeader() {
       </div>
 
       {mobile ? (
-        <div className="border-t border-white/[0.07] bg-[#0F131A] lg:hidden">
+        <div className="border-t border-white/[0.07] bg-surface lg:hidden">
           <div className="mx-auto max-h-[70vh] w-full max-w-[1180px] overflow-y-auto px-6 py-6">
             {NAV_GROUPS.map((g) => (
               <div key={g.label} className="mb-7">
-                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#64748B]">
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
                   {g.label}
                 </div>
                 <div className="space-y-1">
@@ -148,7 +148,7 @@ export function BusinessFooter() {
     { label: 'Company', items: COMPANY },
   ]
   return (
-    <footer className="border-t border-white/[0.07] bg-[#07090C]">
+    <footer className="border-t border-white/[0.07] bg-app">
       <div className="mx-auto w-full max-w-[1180px] px-6 py-16 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
@@ -159,11 +159,11 @@ export function BusinessFooter() {
           </div>
           {cols.map((c) => (
             <div key={c.label}>
-              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#64748B]">{c.label}</div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">{c.label}</div>
               <ul className="mt-4 space-y-2.5">
                 {c.items.map((i) => (
                   <li key={i.href}>
-                    <Link href={i.href} className="text-[0.875rem] text-[#9FB0C2] transition hover:text-white">
+                    <Link href={i.href} className="text-[0.875rem] text-ink-muted transition hover:text-white">
                       {i.label}
                     </Link>
                   </li>
@@ -173,14 +173,14 @@ export function BusinessFooter() {
           ))}
         </div>
         <div className="mt-14 flex flex-col gap-4 border-t border-white/[0.07] pt-7 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[0.8125rem] text-[#64748B]">
+          <p className="text-[0.8125rem] text-ink-faint">
             © {new Date().getFullYear()} Entrestate. Dubai, United Arab Emirates.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="text-[0.8125rem] text-[#64748B] transition hover:text-white">
+            <Link href="/privacy" className="text-[0.8125rem] text-ink-faint transition hover:text-white">
               Privacy
             </Link>
-            <Link href="/terms" className="text-[0.8125rem] text-[#64748B] transition hover:text-white">
+            <Link href="/terms" className="text-[0.8125rem] text-ink-faint transition hover:text-white">
               Terms
             </Link>
           </div>

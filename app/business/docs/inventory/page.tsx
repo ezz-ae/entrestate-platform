@@ -21,7 +21,7 @@ export default function InventoryGuide() {
   return (
     <DocsShell href="/business/docs/inventory">
       <ArticleMeta category="Inventory & pages" read="5 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         Everything your company sells lives in one catalogue. Each listing carries the facts a
         salesperson actually quotes, and on top of those facts the system keeps scores that tell
         you — at a glance — what is ready to advertise and what deserves the next dirham.

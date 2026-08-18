@@ -35,7 +35,7 @@ export default function ListingToLandingPage() {
                 See the platform
               </ButtonLink>
             </div>
-            <p className="mt-5 font-mono text-[11px] text-[#64748B]">
+            <p className="mt-5 font-mono text-[11px] text-ink-faint">
               Set up with our team, on request. Your own domain.
             </p>
           </div>

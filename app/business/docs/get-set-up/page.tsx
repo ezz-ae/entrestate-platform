@@ -21,7 +21,7 @@ export default function GetSetUpGuide() {
   return (
     <DocsShell href="/business/docs/get-set-up">
       <ArticleMeta category="Getting set up" read="6 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         Thirty days from an empty workspace to a campaign producing leads — in the order a
         working company actually does it. Nothing on this page needs a developer, and nothing
         spends money until you deliberately switch it on.
@@ -103,7 +103,7 @@ export default function GetSetUpGuide() {
                 <Chat />
               </Phone>
             </div>
-            <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-[#64748B]">
+            <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-ink-faint">
               The first one arrives — answered, tagged by language, owned by an agent.
             </figcaption>
           </figure>

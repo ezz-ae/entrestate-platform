@@ -45,7 +45,7 @@ export default function BusinessHome() {
                 See how it works
               </ButtonLink>
             </div>
-            <p className="mt-5 text-[0.8125rem] text-[#64748B]">
+            <p className="mt-5 text-[0.8125rem] text-ink-faint">
               No card. Your own address and your own database from the first screen.
             </p>
           </div>
@@ -142,7 +142,7 @@ export default function BusinessHome() {
         {/* The main product, alone — one important thing at a time. */}
         <Link
           href={PRODUCTS[0].href}
-          className="group mt-12 block bg-[#0F131A] p-8 outline outline-1 outline-[#3B82F6]/25 transition hover:bg-[#131926] lg:p-12"
+          className="group mt-12 block bg-surface p-8 outline outline-1 outline-[#3B82F6]/25 transition hover:bg-[#131926] lg:p-12"
         >
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
             <div>
@@ -156,7 +156,7 @@ export default function BusinessHome() {
               <p className="mt-2 text-[1.125rem] leading-snug text-[#3B82F6]">
                 Makes leads from your listings. Works them to the deal.
               </p>
-              <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
+              <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-[1.7] text-ink-muted">
                 Not a tool you bolt on — the operation itself, installed under your name. Your
                 listings become pages, pages carry ads, ads bring leads, and the CRM works every
                 one of them.
@@ -165,13 +165,13 @@ export default function BusinessHome() {
                 {['Inventory', 'Pages', 'Ads', 'CRM', 'Reports'].map((c) => (
                   <span
                     key={c}
-                    className="rounded-full bg-white/[0.05] px-3 py-1 text-[0.75rem] text-[#9FB0C2] ring-1 ring-white/[0.07]"
+                    className="rounded-full bg-white/[0.05] px-3 py-1 text-[0.75rem] text-ink-muted ring-1 ring-white/[0.07]"
                   >
                     {c}
                   </span>
                 ))}
               </div>
-              <div className="mt-8 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#7C8B9D]">
+              <div className="mt-8 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
                 Self-serve · 14-day trial · no card
               </div>
             </div>
@@ -185,7 +185,7 @@ export default function BusinessHome() {
 
         {/* The two narrower doors — each opens with who it is for, so the
             reader routes themselves in one glance. */}
-        <p className="mt-10 text-[0.875rem] text-[#64748B]">Only need part of it?</p>
+        <p className="mt-10 text-[0.875rem] text-ink-faint">Only need part of it?</p>
         <div className="mt-4 grid grid-cols-1 gap-px lg:grid-cols-2">
           {[
             {
@@ -206,7 +206,7 @@ export default function BusinessHome() {
             <Link
               key={p.href}
               href={p.href}
-              className="group flex flex-col bg-[#0F131A] p-8 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
+              className="group flex flex-col bg-surface p-8 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
             >
               <Eyebrow>{p.who}</Eyebrow>
               <div className="mt-4 flex items-baseline justify-between gap-3">
@@ -214,8 +214,8 @@ export default function BusinessHome() {
                 <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">→</span>
               </div>
               <p className="mt-1 text-[0.9375rem] leading-snug text-[#3B82F6]">{p.what}</p>
-              <p className="mt-3 flex-1 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">{p.body}</p>
-              <div className="mt-6 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#7C8B9D]">
+              <p className="mt-3 flex-1 text-[0.9375rem] leading-[1.7] text-ink-muted">{p.body}</p>
+              <div className="mt-6 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
                 {p.how}
               </div>
             </Link>
@@ -268,7 +268,7 @@ export default function BusinessHome() {
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <H2>Start with your own address.</H2>
-            <p className="mt-3 text-[0.9375rem] leading-[1.7] text-[#94A3B8]">
+            <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
               14 days, no card. Live spend stays off until you connect an ad account.
             </p>
           </div>

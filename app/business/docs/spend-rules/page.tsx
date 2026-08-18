@@ -22,7 +22,7 @@ export default function SpendRulesGuide() {
   return (
     <DocsShell href="/business/docs/spend-rules">
       <ArticleMeta category="Lead machine" read="4 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         The machine can move money between ads — pause a loser, raise a winner — but only inside
         rules you wrote. This guide shows how to set that ceiling. The default is simple: with no
         rule, it spends nothing on its own.

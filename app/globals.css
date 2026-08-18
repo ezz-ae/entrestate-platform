@@ -116,6 +116,14 @@ html {
   --color-line:         rgba(255,255,255,0.08);  /* hairline dividers & borders*/
   --color-line-strong:  rgba(255,255,255,0.14);  /* control & emphasis borders */
 
+  /* Ink steps. The vendor site had been carrying its own slate ramp as raw
+   * literals (#94A3B8, #7C8B9D, #64748B …) because the product exposed no
+   * name for "muted copy" — so the two halves of one platform described the
+   * same grey differently. Values are the warm ramp's, so they sit on a warm
+   * ground instead of casting blue against it. */
+  --color-ink-muted:    #BFB8AF;              /* labels, secondary copy       */
+  --color-ink-faint:    #8A8078;              /* captions, timestamps         */
+
   --color-gold: #D4AF37;
   /* Hover/highlight step of the brand colour — white-label overrides both. */
   --color-gold-bright: #F8E7AE;

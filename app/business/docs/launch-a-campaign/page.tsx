@@ -21,7 +21,7 @@ export default function LaunchACampaignGuide() {
   return (
     <DocsShell href="/business/docs/launch-a-campaign">
       <ArticleMeta category="Lead machine" read="5 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         A campaign takes about ten minutes to set up. The wizard walks you through four steps —
         Campaign, Targeting, Creative, Launch — and nothing spends a dirham until you have seen
         the finished ad and switched it on yourself.

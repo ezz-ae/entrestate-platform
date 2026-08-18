@@ -121,8 +121,8 @@ export function PlatformLoop() {
             <Fragment key={s.n}>
               {i > 0 ? <Connector /> : null}
               {/* mr-5 opens a right gutter on mobile for the green return rail. */}
-              <article className="mr-5 min-w-0 bg-[#0F131A] outline outline-1 outline-white/[0.07] lg:mr-0 lg:flex-1">
-                <div className="relative aspect-[16/11] overflow-hidden border-b border-white/[0.06] bg-[#07090C]">
+              <article className="mr-5 min-w-0 bg-surface outline outline-1 outline-white/[0.07] lg:mr-0 lg:flex-1">
+                <div className="relative aspect-[16/11] overflow-hidden border-b border-white/[0.06] bg-app">
                   {/* A readable SLAB of the screen, not the whole app
                      miniaturized: each stage zooms into its own working
                      region (stat tiles, the table, the cards) so the thumb
@@ -144,7 +144,7 @@ export function PlatformLoop() {
                       {s.name}
                     </h3>
                   </div>
-                  <p className="mt-1.5 text-[0.8125rem] leading-[1.55] text-[#94A3B8]">{s.line}</p>
+                  <p className="mt-1.5 text-[0.8125rem] leading-[1.55] text-ink-muted">{s.line}</p>
                 </div>
               </article>
             </Fragment>
@@ -199,7 +199,7 @@ export function PlatformLoop() {
         </svg>
         <div className="absolute inset-x-0 bottom-4 flex translate-y-1/2 justify-center">
           {/* Chip background masks the line it sits on — canvas colour. */}
-          <span className="bg-[#07090C] px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#34D399]">
+          <span className="bg-app px-3 font-mono text-[10px] uppercase tracking-[0.14em] text-[#34D399]">
             learning feeds back
           </span>
         </div>

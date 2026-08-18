@@ -20,7 +20,7 @@ export default function CreativeStudioGuide() {
   return (
     <DocsShell href="/business/docs/creative-studio">
       <ArticleMeta category="Creative studio" read="4 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         The studio is nine design apps in one place, making everything your campaigns run —
         finished ad designs, video reels, captions, branded brochures. What you download is the
         exact file that runs as the ad; nothing in the studio is a mock-up.

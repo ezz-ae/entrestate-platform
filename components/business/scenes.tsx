@@ -154,14 +154,14 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
 
         <div className="pt-16">
           {/* beat 1: the project card */}
-          <div className="bscene-in-a w-[232px] rounded-xl bg-[#0F131A] p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+          <div className="bscene-in-a w-[232px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
             <div className="h-20 rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220]" />
             <div className="mt-2 flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="truncate text-[11px] font-semibold tracking-tight text-white">
                   Narenj Villas · Masaar 2
                 </p>
-                <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[#94A3B8]">AED 540K</p>
+                <p className="mt-0.5 font-mono text-[10px] tabular-nums text-ink-muted">AED 540K</p>
               </div>
               <span className="shrink-0 rounded-md bg-[#3B82F6]/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-[#60A5FA] ring-1 ring-[#3B82F6]/25">
                 85
@@ -171,13 +171,13 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
 
           {/* beat 2: the cap goes on before anything spends */}
           <div
-            className={`bscene-in-b mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-3 py-1.5 ${MONO} text-[#94A3B8] ring-1 ring-white/[0.06]`}
+            className={`bscene-in-b mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-3 py-1.5 ${MONO} text-ink-muted ring-1 ring-white/[0.06]`}
           >
             AED 300/day · cap
           </div>
 
           {/* beat 3: the campaign row goes ON, spend fills in */}
-          <div className="bscene-in-c mt-3 w-full max-w-[264px] rounded-xl bg-[#0F131A] p-3 ring-1 ring-white/[0.06]">
+          <div className="bscene-in-c mt-3 w-full max-w-[264px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06]">
             <div className="flex items-center justify-between gap-2">
               <p className="truncate text-[10px] font-semibold tracking-tight text-white">
                 Narenj Villas — Leads
@@ -189,7 +189,7 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
               <div className="bscene-bar h-full w-[78%] rounded-full bg-[#3B82F6]" />
             </div>
-            <p className="mt-1.5 font-mono text-[9px] tabular-nums text-[#64748B]">
+            <p className="mt-1.5 font-mono text-[9px] tabular-nums text-ink-faint">
               AED 212 spent · 4 leads · AED 53/lead
             </p>
           </div>
@@ -225,24 +225,24 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
         </div>
 
         {/* beat 2: thinking — transient, absent from the final frame */}
-        <div className="bscene-dots mt-2 inline-flex items-center gap-1 rounded-2xl rounded-bl-sm bg-[#0F131A] px-3 py-2.5 opacity-0 ring-1 ring-white/[0.06]">
+        <div className="bscene-dots mt-2 inline-flex items-center gap-1 rounded-2xl rounded-bl-sm bg-surface px-3 py-2.5 opacity-0 ring-1 ring-white/[0.06]">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="bscene-dot h-1.5 w-1.5 rounded-full bg-[#7C8B9D]"
+              className="bscene-dot h-1.5 w-1.5 rounded-full bg-ink-faint"
               style={{ animationDelay: `${i * 0.15}s` }}
             />
           ))}
         </div>
 
         {/* beat 3: the page skeleton fills in */}
-        <div className="bscene-frame relative mt-4 rounded-xl bg-[#0F131A] p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+        <div className="bscene-frame relative mt-4 rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
           <div className="bscene-p1 flex h-14 items-end rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220] p-2">
             <span className="h-2 w-1/2 rounded-full bg-white/[0.14]" />
           </div>
           <div className="bscene-p2 mt-2 flex items-center justify-between">
             <span className="h-2 w-16 rounded-full bg-white/[0.08]" />
-            <span className="font-mono text-[9px] tabular-nums text-[#94A3B8]">AED 540K</span>
+            <span className="font-mono text-[9px] tabular-nums text-ink-muted">AED 540K</span>
           </div>
           <div className="bscene-p3 mt-2 grid grid-cols-3 gap-2">
             <span className="h-10 rounded-md bg-white/[0.05]" />
@@ -281,21 +281,21 @@ export function SceneOneClickStory({ className = '' }: { className?: string }) {
     >
       <div className="flex items-center justify-center gap-4 sm:gap-6">
         {/* beat 1: the inventory card */}
-        <div className="bscene-in-a w-[176px] rounded-xl bg-[#0F131A] p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] sm:w-[216px]">
+        <div className="bscene-in-a w-[176px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] sm:w-[216px]">
           <div className="h-20 rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220] sm:h-24" />
           <div className="mt-2 flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="truncate text-[11px] font-semibold tracking-tight text-white">
                 Narenj Villas
               </p>
-              <p className="mt-0.5 font-mono text-[10px] tabular-nums text-[#94A3B8]">AED 540K</p>
+              <p className="mt-0.5 font-mono text-[10px] tabular-nums text-ink-muted">AED 540K</p>
             </div>
             <span className="shrink-0 rounded-md bg-[#3B82F6]/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-[#60A5FA] ring-1 ring-[#3B82F6]/25">
               85
             </span>
           </div>
           <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2">
-            <span className={`${MONO} text-[#64748B]`}>Inventory</span>
+            <span className={`${MONO} text-ink-faint`}>Inventory</span>
             <span className="relative inline-flex">
               {/* beats 2: cursor glides in, presses, ripples */}
               <span className="bscene-press inline-flex rounded-md bg-[#3B82F6] px-2.5 py-1 text-[10px] font-semibold tracking-tight text-white">

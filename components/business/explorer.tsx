@@ -511,7 +511,7 @@ export function ProductExplorer() {
               className={`shrink-0 rounded-full px-4 py-2 text-[0.8125rem] font-medium transition ${
                 isActive
                   ? 'bg-white/[0.08] text-white ring-1 ring-[#3B82F6]/40'
-                  : 'text-[#94A3B8] hover:text-white'
+                  : 'text-ink-muted hover:text-white'
               }`}
             >
               {group.label}
@@ -533,7 +533,7 @@ export function ProductExplorer() {
               aria-pressed={isActive}
               onClick={() => setActiveToolId(tool.id)}
               className={`shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] transition ${
-                isActive ? 'bg-white/[0.06] text-white' : 'text-[#7C8B9D] hover:text-white'
+                isActive ? 'bg-white/[0.06] text-white' : 'text-ink-faint hover:text-white'
               }`}
             >
               {tool.label}
@@ -552,7 +552,7 @@ export function ProductExplorer() {
           <Browser title={activeTool.title}>
             {/* All shots stay mounted and crossfade on switch — the frame
                holds still, only the screen changes, like flipping app tabs. */}
-            <div className="relative aspect-[1600/1000] bg-[#07090C]">
+            <div className="relative aspect-[1600/1000] bg-app">
               {ALL_TOOLS.map((tool) => (
                 <img
                   key={tool.id}
@@ -572,7 +572,7 @@ export function ProductExplorer() {
             <h3 className="text-[1.75rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white sm:text-[2.1rem]">
               {activeTool.keyword}
             </h3>
-            <p className="mt-3 max-w-[38ch] text-[1rem] leading-[1.55] text-[#94A3B8]">
+            <p className="mt-3 max-w-[38ch] text-[1rem] leading-[1.55] text-ink-muted">
               {activeTool.caption}
             </p>
             {activeTool.learn ? <LearnMore href={activeTool.learn} /> : null}
@@ -581,9 +581,9 @@ export function ProductExplorer() {
 
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {activeTool.cards.map((card) => (
-            <div key={card.title} className="rounded-xl bg-[#0F131A] p-4 ring-1 ring-white/[0.06]">
+            <div key={card.title} className="rounded-xl bg-surface p-4 ring-1 ring-white/[0.06]">
               <div className="text-[0.875rem] font-semibold tracking-[-0.01em] text-white">{card.title}</div>
-              <p className="mt-1.5 text-[0.8125rem] leading-[1.5] text-[#94A3B8]">{card.body}</p>
+              <p className="mt-1.5 text-[0.8125rem] leading-[1.5] text-ink-muted">{card.body}</p>
             </div>
           ))}
         </div>
@@ -600,7 +600,7 @@ export function ExplorerSection() {
         eyebrow="Inside the product"
         title="One product. Every part visible."
         lede={
-          <p className="text-[1.0625rem] leading-[1.6] text-[#94A3B8]">
+          <p className="text-[1.0625rem] leading-[1.6] text-ink-muted">
             Twenty-two screens of the live system — pick a part.
           </p>
         }

@@ -22,7 +22,7 @@ export default function AudiencesGuide() {
   return (
     <DocsShell href="/business/docs/audiences">
       <ArticleMeta category="Lead machine" read="4 min read" />
-      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-[#94A3B8]">
+      <p className="mt-6 text-[0.9375rem] leading-[1.75] text-ink-muted">
         An audience is who your ad is shown to. Entrestate starts from who actually buys, not
         from broad interests — and it never hands anyone a raw phone number or email to get
         there.

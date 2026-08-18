@@ -42,7 +42,7 @@ export default function DocsHubPage() {
             <section key={category} id={docsCategoryId(category)} className="scroll-mt-24">
               <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-b border-white/[0.07] pb-4">
                 <h2 className="text-[1.25rem] font-semibold tracking-[-0.01em] text-white">{category}</h2>
-                <p className="text-[0.875rem] text-[#64748B]">{CATEGORY_LINES[category]}</p>
+                <p className="text-[0.875rem] text-ink-faint">{CATEGORY_LINES[category]}</p>
               </div>
               <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((g) => (

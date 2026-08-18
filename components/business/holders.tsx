@@ -90,7 +90,7 @@ export function Keyword({
 /** One line under the Keyword. Fourteen words or fewer — the writer's law. */
 export function KeywordSub({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={`mt-3 max-w-[40ch] text-[1.0625rem] leading-[1.55] text-[#94A3B8] ${className}`}>
+    <p className={`mt-3 max-w-[40ch] text-[1.0625rem] leading-[1.55] text-ink-muted ${className}`}>
       {children}
     </p>
   )
@@ -169,7 +169,7 @@ export function DownloadCard({
           </div>
           <ul className="mt-4 space-y-1.5">
             {lines.map((line) => (
-              <li key={line} className="flex gap-3 text-[0.9375rem] leading-[1.6] text-[#94A3B8]">
+              <li key={line} className="flex gap-3 text-[0.9375rem] leading-[1.6] text-ink-muted">
                 <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#3B82F6]/60" />
                 <span>{line}</span>
               </li>
