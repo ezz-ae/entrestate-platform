@@ -79,7 +79,12 @@ const phoneE164 = env(process.env.NEXT_PUBLIC_BRAND_PHONE_E164, '+971504173622')
 export const BRAND: BrandConfig = {
   company: env(process.env.NEXT_PUBLIC_BRAND_COMPANY, 'Freehold'),
   product: env(process.env.NEXT_PUBLIC_BRAND_PRODUCT, 'Intelligence'),
-  accent: env(process.env.NEXT_PUBLIC_BRAND_ACCENT, '#D4AF37'),
+  /* Entrestate's own accent — the blue of the third square in the tri-dot
+   * wordmark. The previous default was #D4AF37, the FREEHOLD brand this repo
+   * was forked from: a client's colour standing in as the platform's, so any
+   * instance that never set the env wore the wrong company. Freehold's own
+   * deployment sets NEXT_PUBLIC_BRAND_ACCENT and is unaffected. */
+  accent: env(process.env.NEXT_PUBLIC_BRAND_ACCENT, '#3B82F6'),
   domain,
   legalName: env(process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME, 'Freehold Property'),
   tagline: env(process.env.NEXT_PUBLIC_BRAND_TAGLINE, 'Authorized Personnel Only'),

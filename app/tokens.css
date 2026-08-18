@@ -36,21 +36,25 @@
 
 :root {
   /* ── THE NEUTRAL RAMP — colour-free by intent ──────────────────────────
-     Cool blue-slate, the Decision Terminal's real canvas (its themeColor is
-     pinned to --n-900 in both media queries). Chosen over a warm charcoal
-     because a cool ground lets a semantic colour read as a signal lamp rather
-     than as decoration. Nothing here is a brand and nothing here should ever
-     become one. */
-  --n-900: #0D1218;  /* deepest — page gutters, insets below the canvas */
-  --n-850: #11161D;  /* THE CANVAS */
-  --n-800: #1A232E;  /* card / raised surface */
-  --n-750: #202B36;  /* secondary surface, hover ground */
-  --n-700: #2A3542;  /* muted fill */
-  --n-600: #2F3A46;  /* border */
-  --n-500: #48566A;  /* strong border, disabled ink */
-  --n-400: #7C8B9D;  /* faint ink — captions, timestamps */
-  --n-300: #B2BDCA;  /* muted ink — labels, secondary copy */
-  --n-100: #E6ECF3;  /* ink */
+     WARM charcoal, not blue-slate. The first version of this file chose a cool
+     ground on the argument that it makes a signal colour read as a signal. Put
+     on the actual product it lost the argument: the warm ground lets an accent
+     sit ON the room instead of competing with it, and the cool one fought
+     whatever was placed against it. Anchored on the two values the product
+     already shipped (#0C0B0A canvas, #181613 surface) and extended into the
+     steps it never had.
+
+     Nothing here is a brand and nothing here may become one. */
+  --n-900: #080706;  /* deepest — nav, headers, sidebars */
+  --n-850: #0C0B0A;  /* THE CANVAS */
+  --n-800: #181613;  /* card / raised surface */
+  --n-750: #201D19;  /* secondary surface, hover ground */
+  --n-700: #2A2621;  /* muted fill */
+  --n-600: #332E28;  /* border */
+  --n-500: #4A433A;  /* strong border, disabled ink */
+  --n-400: #8A8078;  /* faint ink — captions, timestamps */
+  --n-300: #BFB8AF;  /* muted ink — labels, secondary copy */
+  --n-100: #F2EEE8;  /* ink */
   --n-000: #FFFFFF;
 
   /* Declared before the structural roles below, which mix it in. */

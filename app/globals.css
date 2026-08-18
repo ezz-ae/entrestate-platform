@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./tokens.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -100,10 +101,16 @@ html {
    * Declared here, `bg-surface` resolves to var(--color-surface) and a tenant's
    * colour and degree can finally reach the chrome. Nothing moves visually:
    * every value below is byte-identical to the one it replaced. */
-  --color-app:          #0C0B0A;              /* app canvas / page background  */
-  --color-chrome:       #080706;              /* nav, headers, sidebars        */
-  --color-surface:      #181613;              /* cards & panels                */
-  --color-ink:          #121110;              /* deepest surface / on-gold text*/
+  /* Structure comes from the colour-free ramp in design/tokens.css; the brand
+   * arrives only as a wash of --color-gold at --brand-degree. Mixing the BRAND
+   * variable (not a fixed accent) is what makes the room follow the tenant:
+   * a gold instance warms gold, a blue one cools blue, from the same file.
+   * Ink and lines take half the degree — text tinted as hard as its background
+   * loses contrast, and a border tinted to match its surface stops being one. */
+  --color-app:          color-mix(in srgb, var(--color-gold) var(--brand-degree), var(--n-850));
+  --color-chrome:       color-mix(in srgb, var(--color-gold) var(--brand-degree), var(--n-900));
+  --color-surface:      color-mix(in srgb, var(--color-gold) var(--brand-degree), var(--n-800));
+  --color-ink:          color-mix(in srgb, var(--color-gold) calc(var(--brand-degree) / 2), #121110);
   --color-surface-2:    rgba(255,255,255,0.06);  /* raised glass / inputs      */
   --color-surface-3:    rgba(255,255,255,0.10);  /* hover / tracks / chips     */
   --color-line:         rgba(255,255,255,0.08);  /* hairline dividers & borders*/
