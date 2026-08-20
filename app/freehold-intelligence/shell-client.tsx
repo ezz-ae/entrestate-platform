@@ -5,6 +5,8 @@ import { usePathname, redirect } from 'next/navigation'
 import { useBrand } from '@/components/whitelabel/brand-provider'
 import { realtorAllowsPath, REALTOR_HOME } from '@/lib/freehold/apps'
 import { SpacesNav } from '@/components/freehold/spaces-nav'
+import { TrialBanner } from '@/components/freehold/trial-banner'
+import type { TrialState } from '@/lib/tenancy/trial'
 import { MobileTabBar } from '@/components/freehold/mobile-tab-bar'
 import { ExpertChat } from '@/components/freehold/expert-chat'
 import { MachineVerdictNotifier } from '@/components/freehold/machine-verdict-notifier'
@@ -14,7 +16,7 @@ import { BRAND } from '@/lib/freehold/brand'
 import { I18nProvider, useI18n } from '@/lib/i18n/provider'
 import { CoachProvider } from '@/components/freehold/coach/coach-marks'
 
-function FreeholdShell({ children }: { children: React.ReactNode }) {
+function FreeholdShell({ children, trial }: { children: React.ReactNode; trial: TrialState | null }) {
   const { ready } = useSessionGuard()   // any signed-in role; landing differs by role
   const { dir } = useI18n()
   const { plan } = useBrand()
@@ -57,6 +59,7 @@ function FreeholdShell({ children }: { children: React.ReactNode }) {
       `}</style>
       <CoachProvider>
         <SpacesNav />
+        {trial && <TrialBanner state={trial} />}
         <div className="flex min-h-0 flex-1">
           {/* overflow-x-hidden is the page-level guard: no matter what a child
               renders, the app never scrolls sideways on a phone. Intentional
@@ -94,10 +97,15 @@ function FreeholdShell({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function FreeholdIntelligenceShell({ children }: { children: React.ReactNode }) {
+export function FreeholdIntelligenceShell({
+  children,
+  // Null on the vendor host, on a failed tenant lookup, and on every state
+  // that has nothing to say — all of which render no banner at all.
+  trial = null,
+}: { children: React.ReactNode; trial?: TrialState | null }) {
   return (
     <I18nProvider>
-      <FreeholdShell>{children}</FreeholdShell>
+      <FreeholdShell trial={trial}>{children}</FreeholdShell>
     </I18nProvider>
   )
 }

@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { SAAS_TENANCY } from '@/lib/tenancy/config'
 import { wlAdminSecret } from '@/lib/whitelabel/config'
 import { createTenant, listTenants } from '@/lib/tenancy/store'
+import { trialState, trialsToChase } from '@/lib/tenancy/trial'
 import { provisionTenantSchema } from '@/lib/tenancy/provision'
 
 export const runtime = 'nodejs'
@@ -27,7 +28,27 @@ function authorize(req: NextRequest): boolean {
 export async function GET(req: NextRequest) {
   if (!authorize(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const tenants = await listTenants().catch(() => [])
-  return NextResponse.json({ tenants })
+
+  // WHERE EACH TRIAL STANDS, and which ones are owed a conversation today.
+  // trial_ends_at has been written since this product had tenants and read by
+  // nothing, so a workspace could run months past its trial with nobody on
+  // either side ever being told. `chase` is that list, already ordered:
+  // longest-lapsed first, then soonest to end. Its LENGTH is the size of the
+  // job — a tenant with nothing worth saying is dropped, not sorted last.
+  const now = new Date()
+  return NextResponse.json({
+    tenants: tenants.map((t) => ({ ...t, trial: trialState(t, now) })),
+    chase: trialsToChase(tenants, now).map(({ tenant, state }) => ({
+      subdomain: tenant.subdomain,
+      company: tenant.company,
+      // The owner is the person to write to. Null on workspaces created before
+      // saas_tenants carried the column — scripts/backfill-tenant-owners.ts
+      // recovers those; until it runs, null means "unknown", not "nobody".
+      ownerEmail: tenant.ownerEmail,
+      plan: tenant.plan,
+      ...state,
+    })),
+  })
 }
 
 export async function POST(req: NextRequest) {

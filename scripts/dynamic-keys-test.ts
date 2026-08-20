@@ -56,6 +56,8 @@ import { p_ads_google } from '../lib/i18n/dictionaries/p_ads_google'
 import { CALL_TYPES, CALL_BRANCHES, CALL_REFUSALS, CALL_KEY_PREFIX } from '../lib/freehold/call-templates'
 import { RAIL_REFUSALS } from '../lib/calling/gates'
 import { lm_calling } from '../lib/i18n/dictionaries/lm_calling'
+import { TRIAL_STATES } from '../lib/tenancy/trial'
+import { trial as trialDict } from '../lib/i18n/dictionaries/trial'
 
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
@@ -304,6 +306,31 @@ console.log('\n\u2500\u2500 lead-calling families \u2500\u2500')
   // to the person reading the row, and only differ in who fixes them.
   family('lm.call.refusal', CALL_KEY_PREFIX.refusal,
     [...CALL_REFUSALS, ...RAIL_REFUSALS], lm_calling)
+}
+
+console.log('\n\u2500\u2500 trial states \u2500\u2500')
+{
+  // NOT checked with family(): three of these five are deliberately EMPTY.
+  // notOnTrial / active / unknown render nothing, which is what every
+  // workspace looked like before the trial was read at all — and `unknown` is
+  // where every unparseable date lands, so giving it words would turn a parse
+  // failure into a new sentence on a paying customer's screen.
+  const SPEAKS = ['endingSoon', 'expired']
+  const SILENT = TRIAL_STATES.filter((k) => !SPEAKS.includes(k))
+  check('every trial state is either one that speaks or one that is silent',
+    SPEAKS.length + SILENT.length === TRIAL_STATES.length)
+
+  for (const locale of LOCALES) {
+    const missing = SPEAKS.filter((k) => !trialDict[locale][`trial.state.${k}`]?.trim())
+    check(`${locale}: the states that speak have words`, missing.length === 0, missing.join(', '))
+    // Present-but-empty is the point here, so assert the KEY exists rather
+    // than that it has a value — an absent key renders as its own name.
+    const absent = SILENT.filter((k) => typeof trialDict[locale][`trial.state.${k}`] !== 'string')
+    check(`${locale}: the silent states are declared, not merely missing`,
+      absent.length === 0, absent.join(', '))
+    const loud = SILENT.filter((k) => trialDict[locale][`trial.state.${k}`]?.trim())
+    check(`${locale}: …and they really are silent`, loud.length === 0, loud.join(', '))
+  }
 }
 
 if (failures > 0) {
