@@ -150,7 +150,7 @@ async function main(): Promise<void> {
       name: 'Lead Machine',
       line: 'Inventory, a landing page per project, ads, CRM and the month-end report — one system, your brand.',
       who: 'Brokerages and developers’ sales teams.',
-      billed: 'Monthly. 14-day trial, no card.',
+      billed: 'AED 999/month. 14-day trial, no card.',
     },
     {
       name: 'Mega Brokerage Platform',
@@ -162,7 +162,7 @@ async function main(): Promise<void> {
       name: 'Meta for Realtors',
       line: 'A full lead-ads system on Meta. Pick a project from our off-plan inventory, set the budget — a few clicks.',
       who: 'Individual agents.',
-      billed: 'Pay with tokens as you run ads. No monthly fee.',
+      billed: 'AED 5 per token, as you run ads. No monthly fee.',
     },
   ]
   const colGap = 17.14

@@ -127,6 +127,41 @@ console.log('\n── the display currency is the charged currency ──')
   check('every badge carrying a number says AED', wrong.length === 0, wrong.join(' | '))
 }
 
+console.log('\n── every surface that names a price names the same one ──')
+{
+  // The AED 999 exists in exactly one deciding place — the Team tier literal
+  // this file freezes above. The owner mapped that tier onto Lead Machine, so
+  // the vendor pricing page and the one-pager PDF now PRINT it. A price
+  // edited in one surface and not the others is a client quoted two numbers
+  // by the same company, which is the end of a negotiation.
+  const page = readFileSync(join(process.cwd(), 'app/business/pricing/page.tsx'), 'utf8')
+  const onepager = readFileSync(join(process.cwd(), 'scripts/build-onepager.ts'), 'utf8')
+
+  check('the pricing page quotes the Team monthly figure',
+    page.includes('AED 999 / month'), 'AED 999 not found on the page')
+  check('…and the annual figure beside it',
+    page.includes('AED 9,588 / year'), '9,588 missing')
+  check('the one-pager quotes the same monthly figure',
+    onepager.includes('AED 999/month'), 'AED 999 not in build-onepager.ts')
+
+  // The token price is different: the page IMPORTS it from the module the
+  // ledger charges by, so it cannot drift — assert the import stays, because
+  // replacing it with a retyped 5 would compile and drift silently.
+  check('the token price is imported from credits-shared, never retyped',
+    page.includes("TOKEN_PRICE_AED } from '@/lib/freehold/credits-shared'") &&
+    page.includes('AED ${TOKEN_PRICE_AED} per token'),
+    'the page hardcodes the token price')
+  check('the one-pager quotes the token price the ledger charges',
+    onepager.includes('AED 5 per token'), 'token price missing from the one-pager')
+
+  // Mega Brokerage is priced per setup, deliberately. A number appearing on
+  // that card means somebody invented one — there is no deciding literal for
+  // it anywhere in the repository.
+  const mega = page.slice(page.indexOf("name: 'Mega Brokerage Platform'"), page.indexOf("name: 'Meta for Realtors'"))
+  check('Mega Brokerage still carries no invented number',
+    /price: null/.test(mega), mega.match(/price: [^,]+/)?.[0] ?? '')
+}
+
 if (failures > 0) {
   console.error(`\n${failures} terminal-price rule(s) broken.`)
   console.error('If a price really did change, change EXPECTED in this file in the same commit.\n')

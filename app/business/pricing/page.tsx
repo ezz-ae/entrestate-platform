@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import { Section, Eyebrow, Display, Lede, H3, ButtonLink, TextLink } from '@/components/business/ui'
 import { PunchGrid, StatBand, GlowBand, NextStep } from '@/components/business/visuals'
 import { DownloadCard, Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
+import { TOKEN_PRICE_AED } from '@/lib/freehold/credits-shared'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   title: 'Plans',
   description:
-    'Three plans: Lead Machine monthly, the Mega Brokerage Platform set up on request, Meta for Realtors on tokens as you run ads. Talk to us for current pricing.',
+    'Lead Machine at AED 999 a month, Meta for Realtors at AED 5 per token as you run ads, and the Mega Brokerage Platform set up on request.',
   alternates: { canonical: '/business/pricing' },
 }
 
@@ -15,7 +16,10 @@ interface Plan {
   name: string
   who: string
   basis: string
-  /** Stays null until the client supplies figures — adding a number is one line. */
+  /** Null renders "Talk to us for current pricing." — the honest line for a
+   *  plan priced per setup. Where a number exists it is shown: a card with a
+   *  price outsells a card without one, and a buyer who has to ask assumes it
+   *  costs more than it does. */
   price: string | null
   line: string
   includes: string[]
@@ -28,7 +32,13 @@ const PLANS: Plan[] = [
     name: 'Lead Machine',
     who: 'For brokerages',
     basis: 'Monthly, per workspace',
-    price: null,
+    // The one subscription price in the company. It is ALSO the Terminal's
+    // Team tier literal (apps/terminal/lib/pricing/plans.ts) — the owner
+    // mapped that tier onto this product — and scripts/terminal-price-test.ts
+    // asserts the two surfaces name the same number, so neither can be edited
+    // alone. Change the price THERE first; this line fails the guard until it
+    // agrees.
+    price: 'AED 999 / month · AED 9,588 / year',
     line: 'Makes leads from your listings, then works them to the deal.',
     includes: [
       'Inventory, pages, ads, CRM, reports',
@@ -61,7 +71,9 @@ const PLANS: Plan[] = [
     name: 'Meta for Realtors',
     who: 'For one agent',
     basis: 'Tokens, as you run ads',
-    price: null,
+    // Read from the module the ledger actually charges by, not retyped — a
+    // page quoting a price the till disagrees with is the worst kind of wrong.
+    price: `AED ${TOKEN_PRICE_AED} per token · no monthly fee`,
     line: 'A full lead-ads system on Meta — our off-plan inventory, a few clicks.',
     includes: [
       'Pay with tokens as you run ads',
