@@ -17,7 +17,14 @@ export const UAE_INTERESTS: CatalogInterest[] = [
   { id: '6003051380892', name: 'Real estate investing' },
   { id: '6003105898571', name: 'Property' },
   { id: '6003193636887', name: 'Luxury goods' },
-  { id: '6004132891184', name: 'Investment' },
+  // Bare 'Investment' (6004132891184) left this list on purpose. It is the
+  // ONLY vocabulary the AI recommender may use, and clampRecommendation
+  // accepts any subset of it — so while the entity was here, an audience of
+  // investment-in-general people (no property root anywhere) was a LEGAL
+  // recommendation, which the setup check then condemns on the live page. The
+  // entity still exists in the product where it narrows rather than stands
+  // alone: MOTIVE.golden_visa in lib/freehold/audience-pattern.ts, ANDed
+  // against the property anchor.
   { id: '6003409935589', name: 'Architecture' },
 ]
 

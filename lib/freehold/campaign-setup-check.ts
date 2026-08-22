@@ -82,7 +82,16 @@ function allSignals(t?: Record<string, unknown> | null): string[] {
  * trusting. Matched on wording, because the ids are re-resolved at launch and
  * an id proves nothing about what it means today.
  */
-const PROPERTY_WORDS = ['propert', 'real estate', 'realestate', 'mortgage', 'apartment', 'villa', 'investing', 'investment', 'investor']
+// NO BARE INVESTMENT WORDS. 'investing'/'investment'/'investor' used to be in
+// this list, which made an ad set whose only interest was Meta's bare
+// 'Investment' node (crypto, equities, gold — anything) read as ok:property.
+// A property audience is named by a property ROOT; investment-minded people
+// are reached by narrowing them AGAINST a property anchor, never by counting
+// the word itself as the anchor. ('Real estate investing' still matches, via
+// 'real estate'.) The builder side holds the same line: REAL_ESTATE_MUST and
+// the buyer-match price bands carry no bare-Investment entity either — see
+// lib/freehold/audience-pattern.ts and lib/freehold/buyer-match.ts.
+const PROPERTY_WORDS = ['propert', 'real estate', 'realestate', 'mortgage', 'apartment', 'villa']
 function hasPropertyIntent(t?: Record<string, unknown> | null): boolean {
   return allSignals(t).some((n) => {
     const s = n.toLowerCase()

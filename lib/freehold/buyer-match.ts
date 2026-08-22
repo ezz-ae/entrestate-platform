@@ -34,12 +34,19 @@ export type PriceBand = {
 
 // Price bands for Dubai freehold. interestNames name into the UAE_INTERESTS
 // catalog (real Meta interest ids) — higher bands skew to investment/luxury.
+// NO BARE 'Investment' IN ANY BAND. The planner ships these as a FLAT interest
+// list (ads-machine-planner.ts builds the buyer-match candidate with no
+// narrowing and no hardenRealEstate), and flat interests are OR — so a band
+// naming bare 'Investment' was buying crypto/equities/gold people as its
+// ENTIRE intent layer above AED 2M, and the setup check on the live page now
+// calls exactly that wrong:noProperty. 'Real estate investing' keeps the
+// investment skew the upper bands exist for, with the property root attached.
 export const PRICE_BANDS: PriceBand[] = [
   { key: 'entry',   min: 0,          max: 1_000_000,  label: 'Entry',       ageMin: 27, ageMax: 45, interestNames: ['Property'] },
-  { key: 'mid',     min: 1_000_000,  max: 2_000_000,  label: 'Mid-market',  ageMin: 30, ageMax: 50, interestNames: ['Property', 'Investment'] },
-  { key: 'premium', min: 2_000_000,  max: 5_000_000,  label: 'Premium',     ageMin: 33, ageMax: 55, interestNames: ['Investment'] },
-  { key: 'luxury',  min: 5_000_000,  max: 15_000_000, label: 'Luxury',      ageMin: 35, ageMax: 60, interestNames: ['Luxury goods', 'Investment'] },
-  { key: 'ultra',   min: 15_000_000, max: Infinity,   label: 'Ultra-prime', ageMin: 38, ageMax: 62, interestNames: ['Luxury goods', 'Investment'] },
+  { key: 'mid',     min: 1_000_000,  max: 2_000_000,  label: 'Mid-market',  ageMin: 30, ageMax: 50, interestNames: ['Property', 'Real estate investing'] },
+  { key: 'premium', min: 2_000_000,  max: 5_000_000,  label: 'Premium',     ageMin: 33, ageMax: 55, interestNames: ['Real estate investing'] },
+  { key: 'luxury',  min: 5_000_000,  max: 15_000_000, label: 'Luxury',      ageMin: 35, ageMax: 60, interestNames: ['Luxury goods', 'Real estate investing'] },
+  { key: 'ultra',   min: 15_000_000, max: Infinity,   label: 'Ultra-prime', ageMin: 38, ageMax: 62, interestNames: ['Luxury goods', 'Real estate investing'] },
 ]
 
 export function bandForPrice(price: number): PriceBand {

@@ -259,7 +259,9 @@ If there is no history at all, choose interest_refined honestly, say so, and put
     rec = clampRecommendation(JSON.parse(jsonStart >= 0 ? raw.slice(jsonStart, raw.lastIndexOf('}') + 1) : raw))
   } catch {
     // Named, not indexed — see buyer-match.ts's PriceBand comment for why.
-    const fallbackIds = UAE_INTERESTS.filter((i) => i.name === 'Property' || i.name === 'Investment').map((i) => i.id)
+    // 'Investment' used to be the second name here; it is no longer in the
+    // catalog (see targeting-catalog.ts), so the property pair is explicit.
+    const fallbackIds = UAE_INTERESTS.filter((i) => i.name === 'Property' || i.name === 'Real estate investing').map((i) => i.id)
     rec = clampRecommendation({ strategy: 'interest_refined', interestIds: fallbackIds })
     rec.analysis = 'AI is offline — this is the proven cold-start setup for Dubai real-estate investors.'
     rec.signalPlan = 'Connect the pixel/CAPI and feed qualified-lead outcomes back weekly so the algorithm optimizes for quality.'

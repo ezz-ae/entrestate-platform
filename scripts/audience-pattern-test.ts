@@ -282,6 +282,35 @@ console.log('\n── the recipe never crosses the wire ──')
     'pattern' in forClient({ ...base, kind: 'pattern', pattern: { money: 'cash' } }))
 }
 
+
+console.log('\n── the anchor is property-rooted all the way through ──')
+{
+  // Bare 'Investment' (6004132891184) sat INSIDE REAL_ESTATE_MUST, and since
+  // entities in a narrowing group are OR, "the ONE HARD RULE" was satisfiable
+  // by a crypto or equities investor with zero property signal. These two
+  // checks are what make that unrepeatable.
+  const ROOTS = ['propert', 'real estate']
+  check('every way through REAL_ESTATE_MUST is a property-rooted name',
+    REAL_ESTATE_MUST.every((e) => ROOTS.some((r) => e.name.toLowerCase().includes(r))),
+    REAL_ESTATE_MUST.map((e) => e.name).join(', '))
+  check('…and the bare Investment id is not a member',
+    REAL_ESTATE_MUST.every((e) => e.id !== '6004132891184'))
+
+  // The composition-side twin: a group made only of bare 'Investment' used to
+  // read as "already hard", which SUPPRESSED the real anchor. Now it does not,
+  // so the anchor is prepended and the group narrows against it — which is
+  // the one arrangement where bare Investment is legitimate.
+  const lone = hardenRealEstate({
+    countries: ['AE'], cityKeys: [], ageMin: 30, ageMax: 55,
+    narrowing: [{ interests: [{ id: '6004132891184', name: 'Investment' }], behaviors: [] }],
+  } as never)
+  const first = (lone.narrowing ?? [])[0]
+  check('a lone bare-Investment group no longer stands in for the anchor',
+    (lone.narrowing ?? []).length === 2 &&
+    (first?.interests ?? []).some((e) => e.id === '6003105898571'),
+    JSON.stringify(lone.narrowing))
+}
+
 console.log('\n── every segment carries the level it came from ──')
 {
   // THE INPUT THE ARM PLANNER NEVER HAD. Levels were assigned nowhere in the
@@ -292,8 +321,11 @@ console.log('\n── every segment carries the level it came from ──')
   const byId = new Map(p.entityLevels.map((e) => [e.id, e.level]))
   check('a money segment lands at the money level',
     byId.get('6003193636887') === 2, String(byId.get('6003193636887')))
+  // 6003051380892 = 'Real estate investing' — the id the investment motive
+  // maps to since bare 'Investment' left it (entities in a group are OR, so
+  // the bare node widened to investors-of-anything instead of narrowing).
   check('a why-they-buy segment lands at the product level',
-    byId.get('6004132891184') === 3, String(byId.get('6004132891184')))
+    byId.get('6003051380892') === 3, String(byId.get('6003051380892')))
   check('every segment in the spec has a level',
     p.entityLevels.length > 0 && p.entityLevels.every((e) => e.level >= 1 && e.level <= 5),
     JSON.stringify(p.entityLevels))

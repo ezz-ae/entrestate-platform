@@ -103,6 +103,26 @@ console.log('\n── the one rule: these people must be interested in property 
   check('the anchor counts wherever it sits in the spec',
     !keys(checkCampaignSetup(CAMPAIGN, [inNarrowing])).includes('wrong:noProperty'))
 
+  // THE WHITEPAPER'S CLAIM, MADE TRUE AND HELD. Bare 'Investment'
+  // (crypto, equities, gold — anything Meta calls investing) is not a
+  // property signal: an audience whose only interest is that node is exactly
+  // the generic, low-intent audience the property gate exists to refuse.
+  const bareInvestment = at({ id: 'a12' }, {
+    ...good.targeting,
+    narrowing: [{ interests: [{ id: '6004132891184', name: 'Investment' }] }],
+  })
+  check('bare Investment alone is NOT property intent',
+    keys(checkCampaignSetup(CAMPAIGN, [bareInvestment])).includes('wrong:noProperty'))
+
+  // …while the property-ROOTED investment node still passes: the skew the
+  // upper price bands want, with the root attached.
+  const rooted = at({ id: 'a13' }, {
+    ...good.targeting,
+    narrowing: [{ interests: [{ id: '6003051380892', name: 'Real estate investing' }] }],
+  })
+  check('Real estate investing alone still is',
+    !keys(checkCampaignSetup(CAMPAIGN, [rooted])).includes('wrong:noProperty'))
+
   const behaviour = at({ id: 'a9' }, {
     ...good.targeting,
     narrowing: [{ behaviors: [{ id: '5', name: 'Likely to move into a new apartment' }] }],

@@ -226,12 +226,19 @@ export const BUNDLE: Record<SpeakerBundle, { creative: string; alsoReach: string
 }
 
 const MOTIVE: Record<Motive, Mapped> = {
-  // Investment intent is the one motive Meta models directly and well.
-  investment:   { entities: [{ id: '6003051380892', name: 'Real estate investing' }, { id: '6004132891184', name: 'Investment' }], defining: true },
+  // Investment intent is the one motive Meta models directly and well. The
+  // property-rooted node ONLY: entities inside a group are OR, so listing bare
+  // 'Investment' beside it did not narrow to property investors — it widened
+  // to everyone Meta calls an investor of anything.
+  investment:   { entities: [{ id: '6003051380892', name: 'Real estate investing' }], defining: true },
   first_home:   { entities: [{ id: '6003105898571', name: 'Property' }], ageMin: 25, ageMax: 45, mass: true },
   upgrade:      { entities: [{ id: '6003105898571', name: 'Property' }], ageMin: 30, mass: true },
   holiday_home: { entities: [{ id: '6003193636887', name: 'Luxury goods' }], ageMin: 35 },
   // A visa motive is a residency question, not a property one — it binds.
+  // Bare 'Investment' is CORRECT here and only here: golden-visa buyers are
+  // investment-minded people first, and this group is ANDed against the
+  // property anchor, so it narrows. It can no longer stand IN for the anchor —
+  // it left REAL_ESTATE_MUST, so hardenRealEstate always prepends the real one.
   golden_visa:  { entities: [{ id: '6004132891184', name: 'Investment' }], ageMin: 30, defining: true },
   relocation:   { entities: [{ id: '6003105898571', name: 'Property' }], mass: true },
 }
@@ -298,7 +305,14 @@ export const speakerLocales = (speakers: SpeakerBundle[]): string[] =>
 export const REAL_ESTATE_MUST: TargetingEntity[] = [
   { id: '6003105898571', name: 'Property' },
   { id: '6003051380892', name: 'Real estate investing' },
-  { id: '6004132891184', name: 'Investment' },
+  // Bare 'Investment' (6004132891184) was the third member, and it hollowed
+  // the anchor out: entities in a narrowing group are OR, so "the ONE HARD
+  // RULE" was satisfiable by a crypto or equities investor who had never
+  // looked at property. Worse, hardenRealEstate's already-hard test treated a
+  // group made only of that entity as the anchor itself and skipped adding
+  // the real one. An anchor is only an anchor if every way through it is
+  // property-rooted. Investment-mindedness is a MOTIVE layer, ANDed against
+  // this group — see MOTIVE.golden_visa — never a member of it.
 ]
 const RE_MUST_IDS = new Set(REAL_ESTATE_MUST.map((e) => e.id))
 
