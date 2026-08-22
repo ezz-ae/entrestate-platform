@@ -162,6 +162,39 @@ console.log('\n── every surface that names a price names the same one ──
     /price: null/.test(mega), mega.match(/price: [^,]+/)?.[0] ?? '')
 }
 
+console.log('\n── the Terminal pricing page sells the products, not a second catalogue ──')
+{
+  // The page used to sell Pro/Team/Institutional beside the platform's four
+  // products — one company, two price lists. These hold the merge in place.
+  const tpage = readFileSync(join(process.cwd(), 'apps/terminal/app/pricing/page.tsx'), 'utf8')
+  const products = readFileSync(join(process.cwd(), 'apps/terminal/lib/pricing/products.ts'), 'utf8')
+
+  check('the page renders the product cards module', tpage.includes('PRODUCT_CARDS'))
+  // DERIVED, never retyped: the Lead Machine price must be read off the same
+  // Team literal this file freezes above — a retyped 999 would drift the day
+  // the literal changes.
+  check('Lead Machine derives its price from the Team tier literal',
+    products.includes('pricingPlans.team.monthlyAed') && products.includes('pricingPlans.team.annualAed'),
+    'the products module retypes the price')
+  check('the seat derives its price from the Pro literal',
+    products.includes('pricingPlans.pro.monthlyAed'))
+  check('the token price digit agrees with the ledger',
+    products.includes('AED 5 per token'), 'token price missing or changed in products.ts')
+  check('Mega Brokerage carries no invented number on this surface either',
+    /priceLine: \{ en: "Priced per setup"/.test(products))
+
+  // The only tier checkout the page still emits is the seat. tier=team and
+  // tier=institutional stay ACCEPTED by the money code — resolvePaidTier,
+  // webhooks, entitlement rows — but nothing on this page sells them.
+  check('the only tier checkout emitted is the Pro seat',
+    !tpage.includes('tier=team') && !tpage.includes('tier=institutional') &&
+    products.includes('/checkout?tier=pro'),
+    'a retired tier checkout is being emitted again')
+  // Links in the wild deep-link to the old anchors (the upgrade modal did).
+  check('the old tier anchors still resolve',
+    products.includes('"team"') && products.includes('"institutional"') && tpage.includes('card.aliasAnchor'))
+}
+
 if (failures > 0) {
   console.error(`\n${failures} terminal-price rule(s) broken.`)
   console.error('If a price really did change, change EXPECTED in this file in the same commit.\n')

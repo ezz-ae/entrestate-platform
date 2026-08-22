@@ -167,8 +167,11 @@ export const pricingFaq = [
       ar: "هل يمكنني تغيير الخطة لاحقاً؟",
     },
     a: {
-      en: "Yes. The account tier model remains Pro, Team, and Institutional, so upgrades can be mapped cleanly without changing your workspace identity.",
-      ar: "نعم. نموذج الباقات يبقى احترافي، فريق، ومؤسسي، لذلك يمكن ترحيل الترقية بدون تغيير هوية مساحة العمل.",
+      // The tiers were mapped onto the products (Team = Lead Machine,
+      // Institutional = Mega Brokerage); the tier strings stay accepted by
+      // every piece of money code, so an old entitlement never strands.
+      en: "Yes. Moving between the products keeps your account and workspace identity — and older tier names (Pro, Team, Institutional) are still recognised, so nothing you already have is lost.",
+      ar: "نعم. الانتقال بين المنتجات يحافظ على حسابك وهوية مساحة عملك — وأسماء الباقات القديمة (احترافي، فريق، مؤسسية) ما زالت معتمدة، فلا تفقد شيئاً مما لديك.",
     },
   },
   {

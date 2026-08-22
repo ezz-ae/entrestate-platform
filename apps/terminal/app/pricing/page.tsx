@@ -7,19 +7,27 @@ import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { getRequestLocale } from "@/i18n/request"
 import { prefixLocalePath, type AppLocale } from "@/i18n/locale"
-import {
-  getLocalizedText,
-  getPaidPlan,
-  getPricingComparisonRows,
-  getPricingTrustLinks,
-  pricingFaq,
-  pricingPlans,
-} from "@/lib/pricing/plans"
+import { getLocalizedText, getPricingTrustLinks, pricingFaq, pricingPlans } from "@/lib/pricing/plans"
+import { PRODUCT_CARDS, SEAT, productText } from "@/lib/pricing/products"
 import { faqSchema, productSchema } from "@/lib/seo/schema"
+
+/**
+ * THE PRICING PAGE SELLS THE PRODUCTS, NOT A SECOND CATALOGUE.
+ *
+ * This page used to sell Pro / Team / Institutional while
+ * entrestate.com/business/pricing sold Lead Machine, the Mega Brokerage
+ * Platform and Meta for Realtors — the same company quoting two price lists.
+ * The tiers were mapped onto the products (see lib/pricing/products.ts for
+ * the mapping and where each number is derived from); the tier STRINGS stay
+ * accepted by every piece of money code, and the old #team / #institutional
+ * anchors still resolve — links in the wild deep-link to them.
+ *
+ * What survives of the old catalogue on this page is the one thing the
+ * Terminal itself sells: the Pro seat, at the foot.
+ */
 
 function formatAed(value: number | null, locale: AppLocale) {
   if (value === null) return locale === "ar" ? "تسعير مخصص" : "Custom pricing"
-
   return new Intl.NumberFormat(locale === "ar" ? "ar-AE" : "en-AE", {
     style: "currency",
     currency: "AED",
@@ -27,18 +35,41 @@ function formatAed(value: number | null, locale: AppLocale) {
   }).format(value)
 }
 
-function formatCadence(value: "monthly" | "annual", locale: AppLocale) {
-  if (locale === "ar") return value === "monthly" ? "شهرياً" : "سنوياً"
-  return value === "monthly" ? "per month" : "per year"
+/** Who-fits-what, in the comparison form the old tier table used. */
+function productRows(locale: AppLocale) {
+  const ar = locale === "ar"
+  return [
+    {
+      feature: ar ? "لمن هو" : "Who it is for",
+      values: ar
+        ? ["أي حساب", "شركة وساطة", "شركة تحتاج واجهتها العامة", "وسيط واحد"]
+        : ["Any account", "A brokerage", "A company needing its public face", "One agent"],
+    },
+    {
+      feature: ar ? "محطة القرار والبحث" : "Decision Terminal + search",
+      values: ar ? ["مضمن", "مضمن", "مضمن", "مضمن"] : ["Included", "Included", "Included", "Included"],
+    },
+    {
+      feature: ar ? "المكتب وإدارة العملاء" : "The desk and the CRM",
+      values: ar ? ["—", "مضمن", "مضمن", "حملاتك فقط"] : ["—", "Included", "Included", "Your campaigns only"],
+    },
+    {
+      feature: ar ? "موقع عام على نطاقك" : "Public site on your domain",
+      values: ar ? ["—", "صفحات الهبوط", "الموقع كاملاً", "—"] : ["—", "Landing pages", "The whole site", "—"],
+    },
+    {
+      feature: ar ? "الفوترة" : "Billed",
+      values: ar
+        ? ["مجاني", "شهرياً", "حسب التجهيز", "رموز أثناء التشغيل"]
+        : ["Free", "Monthly", "Per setup", "Tokens as you run ads"],
+    },
+  ]
 }
 
 export default async function PricingPage() {
   const locale = await getRequestLocale()
   const isArabic = locale === "ar"
-  const proPlan = getPaidPlan("pro")
-  const teamPlan = getPaidPlan("team")
-  const institutionalPlan = getPaidPlan("institutional")
-  const comparisonRows = getPricingComparisonRows(locale)
+  const rows = productRows(locale)
   const trustLinks = getPricingTrustLinks(locale)
   const jsonLdFaq = faqSchema(
     pricingFaq.map((item) => ({
@@ -46,15 +77,22 @@ export default async function PricingPage() {
       a: getLocalizedText(item.a, locale),
     })),
   )
-  const productSchemas = [proPlan, teamPlan].map((plan) =>
-    productSchema({
-      name: getLocalizedText(plan.name, locale),
-      description: getLocalizedText(plan.tagline, locale),
-      url: `https://www.entrestate.com${prefixLocalePath("/pricing", locale)}#${plan.tier}`,
-      price: plan.monthlyAed ?? 0,
+  const productSchemas = [
+    {
+      name: productText(PRODUCT_CARDS[0].name, locale),
+      description: productText(PRODUCT_CARDS[0].line, locale),
+      url: `https://www.entrestate.com${prefixLocalePath("/pricing", locale)}#lead-machine`,
+      price: pricingPlans.team.monthlyAed ?? 0,
       currency: "AED",
-    }),
-  )
+    },
+    {
+      name: productText(SEAT.name, locale),
+      description: productText(SEAT.line, locale),
+      url: `https://www.entrestate.com${prefixLocalePath("/pricing", locale)}#pro`,
+      price: pricingPlans.pro.monthlyAed ?? 0,
+      currency: "AED",
+    },
+  ].map((p) => productSchema(p))
 
   return (
     <main id="main-content">
@@ -70,12 +108,12 @@ export default async function PricingPage() {
             {isArabic ? "التسعير" : "Pricing"}
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground md:text-6xl">
-            {isArabic ? "تسعير واضح. بالدرهم. ومسار ترقية واضح." : "Clear pricing. Quoted in AED. One upgrade path."}
+            {isArabic ? "تسعير واضح. بالدرهم." : "Clear pricing. Quoted in AED."}
           </h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
             {isArabic
-              ? "الوصول المجاني يفتح الأسطح الأساسية. أما الخطط المدفوعة فتبقى ضمن نموذج الباقات الحالي: احترافي، فريق، ومؤسسية."
-              : "Free access opens the core surfaces. Paid access stays on the live tier model already used by the product: Pro, Team, and Institutional."}
+              ? "الوصول المجاني يفتح بيانات السوق والبحث لأي حساب. المنتجات هي ما يُشترى — والأسعار هنا هي نفسها على entrestate.com."
+              : "Free access opens the market data and search on any account. The products are what money buys — and the prices here are the same ones on entrestate.com."}
           </p>
           <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-border/60 bg-card/60 px-4 py-2 text-sm text-muted-foreground">
             <Wallet className="h-4 w-4 text-primary" />
@@ -119,63 +157,76 @@ export default async function PricingPage() {
         </section>
 
         <section className="mt-10 grid gap-5 md:grid-cols-3">
-          {[proPlan, teamPlan, institutionalPlan].map((plan) => {
-            const price = plan.monthlyAed
-            const href = prefixLocalePath(plan.ctaHref, locale)
-
-            return (
-              <article
-                key={plan.tier}
-                id={plan.tier}
-                className={`rounded-[28px] border p-6 ${
-                  plan.highlight ? "border-primary/30 bg-card shadow-xl shadow-primary/5" : "border-border/60 bg-card/70"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
-                    <Building2 className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="rounded-full border border-border/60 bg-background/70 px-3 py-1 text-xs font-semibold text-muted-foreground">
-                    {getLocalizedText(plan.badge, locale)}
-                  </span>
+          {PRODUCT_CARDS.map((card) => (
+            <article
+              key={card.key}
+              id={card.key}
+              className={`scroll-mt-28 rounded-[28px] border p-6 ${
+                card.highlight ? "border-primary/30 bg-card shadow-xl shadow-primary/5" : "border-border/60 bg-card/70"
+              }`}
+            >
+              {/* The old tier anchor, kept alive: links in the wild deep-link
+                  to #team and #institutional, and an anchor that stops
+                  resolving is a back button nobody pressed. */}
+              {card.aliasAnchor ? <span id={card.aliasAnchor} aria-hidden /> : null}
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+                  <Building2 className="h-5 w-5 text-primary" />
                 </div>
+                <span className="rounded-full border border-border/60 bg-background/70 px-3 py-1 text-xs font-semibold text-muted-foreground">
+                  {productText(card.who, locale)}
+                </span>
+              </div>
 
-                <h2 className="mt-5 text-xl font-semibold text-foreground">{getLocalizedText(plan.name, locale)}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{getLocalizedText(plan.tagline, locale)}</p>
-                <p className="mt-5 text-3xl font-semibold text-foreground">
-                  {formatAed(price, locale)}
-                  {price !== null ? (
-                    <span className="ms-2 text-sm font-medium text-muted-foreground">
-                      {formatCadence("monthly", locale)}
-                    </span>
-                  ) : null}
-                </p>
-                {plan.annualAed ? (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {isArabic
-                      ? `${formatAed(plan.annualAed, locale)} سنوياً`
-                      : `${formatAed(plan.annualAed, locale)} per year`}
-                  </p>
-                ) : null}
+              <h2 className="mt-5 text-xl font-semibold text-foreground">{productText(card.name, locale)}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{productText(card.line, locale)}</p>
+              <p className="mt-5 text-3xl font-semibold text-foreground">{productText(card.priceLine, locale)}</p>
+              {card.annualLine ? (
+                <p className="mt-1 text-sm text-muted-foreground">{productText(card.annualLine, locale)}</p>
+              ) : null}
 
-                <ul className="mt-6 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature.en} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                      {getLocalizedText(feature, locale)}
-                    </li>
-                  ))}
-                </ul>
+              <ul className="mt-6 space-y-3">
+                {card.features.map((feature) => (
+                  <li key={feature.en} className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                    {productText(feature, locale)}
+                  </li>
+                ))}
+              </ul>
 
-                <Button asChild className="mt-7 w-full gap-2" variant={plan.highlight ? "default" : "outline"}>
-                  <Link href={href}>
-                    {getLocalizedText(plan.ctaLabel, locale)}
-                    <ArrowRight className={`h-4 w-4 ${isArabic ? "rotate-180" : ""}`} />
-                  </Link>
-                </Button>
-              </article>
-            )
-          })}
+              <Button asChild className="mt-7 w-full gap-2" variant={card.highlight ? "default" : "outline"}>
+                <Link href={card.cta.href}>
+                  {productText(card.cta.label, locale)}
+                  <ArrowRight className={`h-4 w-4 ${isArabic ? "rotate-180" : ""}`} />
+                </Link>
+              </Button>
+            </article>
+          ))}
+        </section>
+
+        {/* The one thing the Terminal itself sells: a seat. */}
+        <section id="pro" className="mt-10 scroll-mt-28 rounded-[28px] border border-border/60 bg-card/70 p-6 md:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground/60">
+                {isArabic ? "مقعد فردي" : "A single seat"}
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-foreground">{productText(SEAT.name, locale)}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+                {productText(SEAT.line, locale)}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-background/80 p-5">
+              <p className="text-3xl font-semibold text-foreground">{productText(SEAT.priceLine, locale)}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{productText(SEAT.annualLine, locale)}</p>
+              <Button asChild className="mt-5 w-full gap-2" variant="outline">
+                <Link href={prefixLocalePath(SEAT.cta.href, locale)}>
+                  {productText(SEAT.cta.label, locale)}
+                  <ArrowRight className={`h-4 w-4 ${isArabic ? "rotate-180" : ""}`} />
+                </Link>
+              </Button>
+            </div>
+          </div>
         </section>
 
         <section className="mt-14 rounded-[28px] border border-border/60 bg-card/70 p-6 md:p-8">
@@ -185,12 +236,12 @@ export default async function PricingPage() {
                 {isArabic ? "مقارنة مباشرة" : "Direct comparison"}
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-foreground">
-                {isArabic ? "ما الذي يتغير بين المستويات؟" : "What changes across tiers?"}
+                {isArabic ? "أي واحد يناسبك؟" : "Which one fits you?"}
               </h2>
             </div>
             <div className="hidden items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300 md:flex">
               <ShieldCheck className="h-4 w-4" />
-              <span>{isArabic ? "منسق مع الحوكمة الحية" : "Aligned to the live entitlement model"}</span>
+              <span>{isArabic ? "نفس الأسعار على entrestate.com" : "Same prices as entrestate.com"}</span>
             </div>
           </div>
 
@@ -200,13 +251,13 @@ export default async function PricingPage() {
                 <tr className="border-b border-border/40">
                   <th className="pb-3 pr-3 font-medium text-muted-foreground">{isArabic ? "الميزة" : "Capability"}</th>
                   <th className="pb-3 pr-3 font-medium text-muted-foreground">{isArabic ? "مجاني" : "Free"}</th>
-                  <th className="pb-3 pr-3 font-medium text-muted-foreground">{isArabic ? "احترافي" : "Pro"}</th>
-                  <th className="pb-3 pr-3 font-medium text-muted-foreground">{isArabic ? "فريق" : "Team"}</th>
-                  <th className="pb-3 font-medium text-muted-foreground">{isArabic ? "مؤسسية" : "Institutional"}</th>
+                  <th className="pb-3 pr-3 font-medium text-muted-foreground">Lead Machine</th>
+                  <th className="pb-3 pr-3 font-medium text-muted-foreground">Mega Brokerage</th>
+                  <th className="pb-3 font-medium text-muted-foreground">Meta for Realtors</th>
                 </tr>
               </thead>
               <tbody>
-                {comparisonRows.map((row) => (
+                {rows.map((row) => (
                   <tr key={row.feature} className="border-b border-border/30">
                     <td className="py-3 pr-3 font-medium text-foreground">{row.feature}</td>
                     {row.values.map((value, index) => (

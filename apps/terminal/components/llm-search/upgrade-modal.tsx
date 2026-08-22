@@ -38,14 +38,17 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       ],
     },
     team: {
-      label: isArabic ? "فريق" : "Team",
+      // The Team tier was mapped onto Lead Machine — the door this modal
+      // opens is the product page card, whose anchor #lead-machine (alias
+      // #team) resolves on /pricing.
+      label: isArabic ? "آلة العملاء" : "Lead Machine",
       price: isArabic ? "999 درهم / شهرياً" : "AED 999 / month",
       note: isArabic ? "للوساطة، والاستشارات، وفرق التشغيل." : "For brokerage, advisory, and operator teams.",
       description: isArabic
         ? "للفرق التي تحتاج مخرجات جاهزة للعملاء ومسارات عمل مشتركة وهوية تشغيلية أوضح."
         : "For teams that need client-ready outputs, shared workflows, and a clearer operating layer.",
       ctaLabel: isArabic ? "راجع الباقات" : "Review plans",
-      ctaHref: prefixLocalePath("/pricing#team", locale),
+      ctaHref: prefixLocalePath("/pricing#lead-machine", locale),
       helperLabel: isArabic ? "احجز جلسة" : "Book a call",
       helperHref: prefixLocalePath("/contact", locale),
       features: [

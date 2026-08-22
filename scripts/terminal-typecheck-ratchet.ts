@@ -44,10 +44,10 @@ import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
- * Measured 2026-08-18 on the first run of `tsc --noEmit` in apps/terminal.
+ * Measured 2026-08-18 at 423 on the first run; 377 after the 2026-08-22 reinstall of `tsc --noEmit` in apps/terminal.
  * LOWER THIS when you fix errors. Never raise it.
  */
-const BASELINE = 423
+const BASELINE = 377
 
 const dir = join(process.cwd(), 'apps/terminal')
 
