@@ -13,7 +13,7 @@ import { getRequest as getLandingEditRequest } from '@/lib/freehold/landing-edit
 import {
   LP_CHROME, normalizeLpLang, lpDir, lpFill, translateLandingContent, type LpLang,
 } from '@/lib/landing-i18n'
-import { resolveTheme, lpPalette, resolveLpAccent, lpAccentVars, type LpTheme, type LpPalette } from '@/lib/landing-theme'
+import { resolveTheme, lpPalette, resolveLpAccent, lpAccentVars, resolveLpTypeface, lpTypefaceVars, type LpTheme, type LpPalette } from '@/lib/landing-theme'
 import type { InventoryProperty } from '@/src/features/freehold-intelligence/inventory'
 import { getInventoryPropertyBySlug } from '@/lib/inventory-data'
 import { normalizePermit, qrApiPath, permitVerificationUrl } from '@/lib/freehold/trakheesi'
@@ -128,6 +128,7 @@ function inventoryToLandingPage(prop: InventoryProperty | null): LandingPageData
     soldOut: false,
     template: 'classic',
     palette: '',
+    typeface: '',
     sections,
     project: { slug: prop.slug, name: prop.name, area: prop.area, developerName: prop.developer, heroImage: '/logo.png', priceFromAed: prop.startingPriceAED, priceToAed: prop.maxPriceAED, rentalYield: prop.roi, gallery: [], brochureUrl: null, amenities: [], faqs: [] },
   }
@@ -1229,6 +1230,9 @@ export default async function LandingPage({
   // Unknown/empty → null → brand default, exactly the pre-accent page.
   const accent = resolveLpAccent(sp.palette) ?? resolveLpAccent(page.palette)
   const palette = lpPalette(theme, page.template, accent)
+  // Heading typeface — the "finish". Stored on the row, overridable with
+  // ?font= (the editor's live preview). Unknown/empty → null → Inter headings.
+  const typeface = resolveLpTypeface(sp.font) ?? resolveLpTypeface(page.typeface)
 
   const { page: localized } = await translateLandingContent(page, lang)
 
@@ -1251,15 +1255,18 @@ export default async function LandingPage({
   )
 
   return (
-    <div className={`min-h-screen${theme === 'day' ? ' lp-day' : ''}`} dir={dir} lang={lang} style={{ background: palette.bg, color: palette.textPrimary, ...lpAccentVars(accent) } as React.CSSProperties}>
-      {/* .lp-cta: hover state of accent-filled CTAs. Was lp-cta
+    <div className={`lp-root min-h-screen${theme === 'day' ? ' lp-day' : ''}`} dir={dir} lang={lang} style={{ background: palette.bg, color: palette.textPrimary, ...lpAccentVars(accent), ...lpTypefaceVars(typeface) } as React.CSSProperties}>
+      {/* .lp-cta: hover state of accent-filled CTAs. Was hover:bg-[#E8C547]
           hardcoded per-button — hoisted here so a chosen accent retints it via
           --lp-gold-bright; the fallback IS the shipped hex (no accent → today's
-          exact hover). Day-theme contrast: the gold accent (#D4AF37) is tuned
-          for dark backgrounds; at 60-80% opacity on off-white it washes out.
-          Remap all gold TEXT (labels, eyebrows, stats) to a deep readable tone
-          in day mode — gold-filled buttons/backgrounds keep the brand tone. */}
-      <style>{`.lp-cta:hover{background:var(--lp-gold-bright,#E8C547)}${theme === 'day' ? `.lp-day [class*="text-gold"]{color:var(--lp-gold-day-text,#8E6D1A) !important}` : ''}`}</style>
+          exact hover). .lp-root headings read --lp-heading-font, set only when a
+          typeface is picked — otherwise `inherit` keeps the body's Inter,
+          byte-identical to the pre-picker page. Day-theme contrast: the gold
+          accent (#D4AF37) is tuned for dark backgrounds; at 60-80% opacity on
+          off-white it washes out. Remap all gold TEXT (labels, eyebrows, stats)
+          to a deep readable tone in day mode — gold-filled buttons/backgrounds
+          keep the brand tone. */}
+      <style>{`.lp-cta:hover{background:var(--lp-gold-bright,#E8C547)}.lp-root h1,.lp-root h2,.lp-root h3{font-family:var(--lp-heading-font,inherit)}${theme === 'day' ? `.lp-day [class*="text-gold"]{color:var(--lp-gold-day-text,#8E6D1A) !important}` : ''}`}</style>
       <Tracker
         slug={adapted.slug}
         projectSlug={adapted.projectSlug}

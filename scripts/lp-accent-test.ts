@@ -1,19 +1,19 @@
 /**
- * Landing accent palettes — the contract, locked.
+ * A landing page's LOOK — accent palette + heading typeface — the contract, locked.
  *
- * The landing builder lets a page pick an accent palette. Its safety story is
- * the same three rules as the front-page builder, restated as assertions:
+ * The landing builder lets a page pick an accent palette and a heading font.
+ * Both obey the same three rules as the front-page builder, as assertions:
  *
  *   1. THE REGISTRY IS THE CONTRACT — an unknown / empty key resolves to null
  *      ("no override"), keys are unique, every shade is a real hex.
  *   2. NO PICK RENDERS TODAY'S PAGE — the `gold` entry's shades are EXACTLY
  *      the hexes the public page hardcoded before accents existed, the page
- *      source keeps those hexes as var() fallbacks, and the default gradient
- *      string still carries the shipped 212,175,55 wash byte-identically.
- *   3. THE ACCENT RIDES CSS VARS, NOT FORKED MARKUP — the page root spreads
- *      lpAccentVars, the frozen #D4AF37 literals are gone from the form and
- *      sticky CTA (they now retint with the brand like everything else), and
- *      the store/API persist only registry-sanitized keys.
+ *      source keeps those hexes as var() fallbacks, the default gradient
+ *      string still carries the shipped 212,175,55 wash byte-identically, and
+ *      with no typeface the heading rule falls back to `inherit` (body Inter).
+ *   3. THE LOOK RIDES CSS VARS, NOT FORKED MARKUP — the page root spreads
+ *      lpAccentVars + lpTypefaceVars, the frozen #D4AF37 literals are gone from
+ *      the form and sticky CTA, and the store/API persist only sanitized keys.
  *
  * Pure — no model, no database, no network.
  */
@@ -21,6 +21,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   LP_ACCENTS, LP_ACCENT_KEYS, resolveLpAccent, lpAccentVars, lpPalette,
+  LP_TYPEFACES, LP_TYPEFACE_KEYS, resolveLpTypeface, lpTypefaceVars,
 } from '../lib/landing-theme'
 import { BRAND } from '../lib/freehold/brand'
 
@@ -98,8 +99,53 @@ console.log('\n── the accent rides CSS vars, not forked markup ──')
     api.includes('resolveLpAccent(body?.palette)?.key ?? ""') && api.includes('palette = $20'))
 }
 
+console.log('\n── the heading typeface obeys the same three rules ──')
+{
+  check('unknown / empty / junk typeface → null (default Inter headings)',
+    resolveLpTypeface('comic-sans') === null && resolveLpTypeface('') === null && resolveLpTypeface(99) === null)
+  check('a typeface resolves case-insensitively, trimmed', resolveLpTypeface('  CLASSIC ')?.key === 'classic')
+  check('typeface keys are unique', new Set(LP_TYPEFACE_KEYS).size === LP_TYPEFACES.length)
+  check('there is no redundant "default"/"modern-Inter" entry — the default IS no pick',
+    !LP_TYPEFACE_KEYS.includes('default'))
+  check('every stack ends with the Arabic face so Arabic headings never hit the OS',
+    LP_TYPEFACES.every((t) => t.stack.includes('var(--font-ad-ar)')))
+  check('every stack references a real next/font variable',
+    LP_TYPEFACES.every((t) => /var\(--font-(serif|lp-editorial|lp-architect)\)/.test(t.stack)))
+
+  check('no typeface → no --lp-heading-font var (heading rule falls to inherit)',
+    Object.keys(lpTypefaceVars(null)).length === 0)
+  check('a chosen typeface sets --lp-heading-font to its stack',
+    lpTypefaceVars(resolveLpTypeface('editorial'))['--lp-heading-font']?.includes('--font-lp-editorial') === true)
+
+  const page = readFileSync(join(process.cwd(), 'app/lp/[slug]/page.tsx'), 'utf8')
+  check('the page root scopes headings with lp-root and spreads lpTypefaceVars',
+    page.includes('lp-root') && page.includes('...lpTypefaceVars(typeface)'))
+  check('the heading rule falls back to inherit (no pick = body Inter, unchanged)',
+    page.includes('.lp-root h1,.lp-root h2,.lp-root h3{font-family:var(--lp-heading-font,inherit)}'))
+  check('the page resolves the stored typeface through the registry',
+    page.includes('resolveLpTypeface(page.typeface)'))
+
+  // The three faces the page references must actually be loaded in the root
+  // layout, or a pick would silently fall through to the generic.
+  const layout = readFileSync(join(process.cwd(), 'app/layout.tsx'), 'utf8')
+  check('layout loads Playfair (--font-serif)', /variable:\s*"--font-serif"/.test(layout))
+  check('layout loads the editorial face (--font-lp-editorial)', /variable:\s*"--font-lp-editorial"/.test(layout))
+  check('layout loads the architect face (--font-lp-architect)', /variable:\s*"--font-lp-architect"/.test(layout))
+  check('the three landing faces are applied to <body>',
+    layout.includes('cormorant.variable') && layout.includes('sora.variable'))
+
+  const store = readFileSync(join(process.cwd(), 'lib/landing-pages.ts'), 'utf8')
+  check('the store has the typeface column', store.includes('ADD COLUMN IF NOT EXISTS typeface text'))
+  check('the readers sanitize the typeface through the registry',
+    (store.match(/resolveLpTypeface\(row\.typeface\)\?\.key \?\? ""/g) ?? []).length >= 2)
+
+  const api = readFileSync(join(process.cwd(), 'app/api/crm/landing-pages/[slug]/route.ts'), 'utf8')
+  check('the editor API persists a registry-sanitized typeface only',
+    api.includes('resolveLpTypeface(body?.typeface)?.key ?? ""') && api.includes('typeface = $21'))
+}
+
 if (failures > 0) {
-  console.error(`\n${failures} landing-accent guard(s) broken.`)
+  console.error(`\n${failures} landing-look guard(s) broken.`)
   process.exit(1)
 }
-console.log('\nThe landing pages recolor; no pick is still yesterday\'s page.\n')
+console.log('\nThe landing pages recolor and reletter; no pick is still yesterday\'s page.\n')

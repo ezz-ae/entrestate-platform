@@ -4,7 +4,7 @@ import { BRAND } from '@/lib/freehold/brand'
 import { randomUUID } from "node:crypto"
 import { query, ensureOnce } from "@/lib/db"
 import { normalizePaymentPlan } from "@/lib/payment-plan"
-import { resolveLpAccent } from "@/lib/landing-theme"
+import { resolveLpAccent, resolveLpTypeface } from "@/lib/landing-theme"
 // Local bindings (the block below only RE-exports these, which doesn't bind them
 // for use inside this module) — needed by createLandingPage().
 import { landingTemplate as landingTemplateMeta, isLandingTemplateKey as isLandingTemplateKeyFn } from "./landing-templates"
@@ -118,6 +118,8 @@ export interface LandingPageData {
   template: string
   /** Accent palette key from LP_ACCENTS (lib/landing-theme.ts); "" = brand default. */
   palette: string
+  /** Heading typeface key from LP_TYPEFACES; "" = default (Inter headings). */
+  typeface: string
   project: LandingProjectSummary | null
   /** True when the project has no available units — the page stays live and
       shows an honest "Sold Out" state instead of coming down. */
@@ -161,6 +163,8 @@ export interface LandingPageEditorData {
   updatedAt: string | null
   /** Accent palette key from LP_ACCENTS (lib/landing-theme.ts); "" = brand default. */
   palette: string
+  /** Heading typeface key from LP_TYPEFACES; "" = default (Inter headings). */
+  typeface: string
   /** The page's section blocks, in render order — powers the layout canvas. */
   sections: LandingSection[]
 }
@@ -668,6 +672,8 @@ const ensureLandingPagesSchema = async () => {
   // Accent palette key from LP_ACCENTS (lib/landing-theme.ts). NULL/'' = brand
   // default — the page renders exactly as before the picker existed.
   await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS palette text`)
+  // Heading typeface key from LP_TYPEFACES. NULL/'' = default (Inter headings).
+  await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS typeface text`)
 }
 
 const ensureLandingPagesSchemaOnce = () => ensureOnce("freehold_site_project_landing_pages", ensureLandingPagesSchema)
@@ -1003,6 +1009,7 @@ export async function getLandingPageBySlug(
     // Sanitized at the reader: a stale/unknown stored key reads as "" (brand
     // default) — the registry is the contract, exactly like the front builder.
     palette: resolveLpAccent(row.palette)?.key ?? "",
+    typeface: resolveLpTypeface(row.typeface)?.key ?? "",
     project,
     soldOut,
   }
@@ -1059,6 +1066,7 @@ export async function getLandingPageForEditor(slug: string): Promise<LandingPage
     autoUpdatePricing: row.auto_update_pricing === true,
     updatedAt: pickString(row.updated_at, row.created_at) || null,
     palette: resolveLpAccent(row.palette)?.key ?? "",
+    typeface: resolveLpTypeface(row.typeface)?.key ?? "",
     sections: normalizeSections(sectionsRaw, project, row),
   }
 }

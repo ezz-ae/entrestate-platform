@@ -12,7 +12,16 @@ import { useSession } from '@/lib/freehold/use-session'
 import { useAutosaveDraft } from '@/lib/freehold/use-autosave-draft'
 import { Send } from 'lucide-react'
 import { LANDING_TEMPLATES } from '@/lib/landing-templates'
-import { LP_ACCENTS } from '@/lib/landing-theme'
+import { LP_ACCENTS, LP_TYPEFACES } from '@/lib/landing-theme'
+
+// Preview font stacks for the editor's typeface chips — the SAME faces the
+// public page uses (next/font sets these variables on <body>, which the CRM
+// layout shares), so each chip renders in the font it selects.
+const TYPEFACE_PREVIEW: Record<string, string> = {
+  classic: 'var(--font-serif), Georgia, serif',
+  editorial: 'var(--font-lp-editorial), Georgia, serif',
+  architect: 'var(--font-lp-architect), system-ui, sans-serif',
+}
 
 type Landing = {
   slug: string
@@ -31,6 +40,8 @@ type Landing = {
   updatedAt: string | null
   /** Accent palette key from LP_ACCENTS; '' = brand default. */
   palette: string
+  /** Heading typeface key from LP_TYPEFACES; '' = default (Inter headings). */
+  typeface: string
   sections?: LpSection[]
 }
 
@@ -937,6 +948,32 @@ export default function LandingEditorPage() {
                 </button>
               ))}
             </div>
+
+            {/* Heading typeface — the "finish". Each chip previews in the font
+                it sets; default keeps Inter headings, exactly today's page. */}
+            <div className="mt-4 mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <Pencil className="h-3.5 w-3.5" /> {t('lpe.font.title')}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => set('typeface', '')}
+                className={`rounded-full border px-3 py-1.5 text-[13px] font-semibold transition ${!form.typeface ? 'border-gold/50 bg-gold/10 text-white' : 'border-line bg-surface/70 text-slate-400 hover:text-white'}`}
+              >
+                {t('lpe.font.default')}
+              </button>
+              {LP_TYPEFACES.map((tf) => (
+                <button
+                  key={tf.key}
+                  type="button"
+                  onClick={() => set('typeface', tf.key)}
+                  style={{ fontFamily: TYPEFACE_PREVIEW[tf.key] }}
+                  className={`rounded-full border px-3 py-1.5 text-[15px] font-semibold transition ${form.typeface === tf.key ? 'border-gold/50 bg-gold/10 text-white' : 'border-line bg-surface/70 text-slate-300 hover:text-white'}`}
+                >
+                  {t(`lpe.font.${tf.key}`)}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Layout canvas — reorder / show-hide the page's real section blocks */}
@@ -1087,7 +1124,7 @@ export default function LandingEditorPage() {
               <a href={`/lp/${slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-gold/70 hover:text-gold">{t('lpe.openTab')} <ExternalLink className="h-3 w-3" /></a>
             </div>
           </div>
-          <iframe ref={previewRef} key={previewKey} src={`/lp/${slug}?lpe=1${form.palette ? `&palette=${form.palette}` : ''}`} title="preview" className="h-[70vh] w-full rounded-2xl border-4 border-surface-3 bg-white shadow-2xl lg:h-[calc(100%-2rem)]" />
+          <iframe ref={previewRef} key={previewKey} src={`/lp/${slug}?lpe=1${form.palette ? `&palette=${form.palette}` : ''}${form.typeface ? `&font=${form.typeface}` : ''}`} title="preview" className="h-[70vh] w-full rounded-2xl border-4 border-surface-3 bg-white shadow-2xl lg:h-[calc(100%-2rem)]" />
           <p className="mt-2 text-[11px] text-slate-600">{t('lpe.previewNote')} · <span className="text-gold/70">{t('lpe.canvasHint')}</span></p>
         </div>
       </div>

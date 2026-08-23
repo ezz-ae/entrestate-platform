@@ -7,11 +7,13 @@
 // are driven from `lpPalette(theme)` via inline styles. Semantic colors
 // (WhatsApp green, amber draft banner) are identical in both themes.
 //
-// ACCENTS (the builder's "بالتة ألوان"): each landing page may pick one accent
-// palette from LP_ACCENTS; the pick is stored in the page row and applied as
-// CSS custom properties on the page root (lpAccentVars), so every gold-derived
-// utility and inline shade retints in one place. Three rules, same spirit as
-// the front-page builder (lib/freehold/front-layout.ts):
+// ACCENTS (the builder's "بالتة ألوان") and TYPEFACES (the "finish"): each
+// landing page may pick one accent palette from LP_ACCENTS and one heading
+// typeface from LP_TYPEFACES; both picks are stored on the page row and applied
+// as CSS custom properties on the page root (lpAccentVars / lpTypefaceVars), so
+// every gold-derived shade retints and every heading reflows in one place.
+// Three rules, same spirit as the front-page builder
+// (lib/freehold/front-layout.ts):
 //   1. THE REGISTRY IS THE CONTRACT — an unknown / empty key resolves to null
 //      and null means "no override": the page renders exactly as before the
 //      picker existed (--color-gold = BRAND.accent, every shade var absent so
@@ -68,6 +70,43 @@ export function resolveLpAccent(key: unknown): LpAccent | null {
   const raw = Array.isArray(key) ? key[0] : key
   const s = typeof raw === "string" ? raw.trim().toLowerCase() : ""
   return LP_ACCENTS.find((a) => a.key === s) ?? null
+}
+
+/** One pickable heading typeface — the other half of the "finish". The stack
+    references next/font CSS variables (the real hashed families next/font sets
+    on <body>), always ending with the Arabic face + a generic, so an Arabic
+    heading in a Latin display font falls per-glyph to Cairo rather than the OS. */
+export interface LpTypeface {
+  key: string
+  /** CSS font-family value for the page's h1/h2/h3. */
+  stack: string
+}
+
+// The DEFAULT is no pick → headings keep --font-sans (Inter), exactly the page
+// before the picker existed. Each entry here is an explicit departure from that.
+export const LP_TYPEFACES: readonly LpTypeface[] = [
+  { key: "classic",   stack: 'var(--font-serif), var(--font-ad-ar), Georgia, serif' },
+  { key: "editorial", stack: 'var(--font-lp-editorial), var(--font-ad-ar), Georgia, serif' },
+  { key: "architect", stack: 'var(--font-lp-architect), var(--font-ad-ar), system-ui, sans-serif' },
+]
+
+/** Walkable key list — enumerated in scripts/dynamic-keys-test.ts. */
+export const LP_TYPEFACE_KEYS = LP_TYPEFACES.map((t) => t.key)
+
+/** Unknown / empty / junk → null, and null means "default headings (Inter)". */
+export function resolveLpTypeface(key: unknown): LpTypeface | null {
+  const raw = Array.isArray(key) ? key[0] : key
+  const s = typeof raw === "string" ? raw.trim().toLowerCase() : ""
+  return LP_TYPEFACES.find((t) => t.key === s) ?? null
+}
+
+/**
+ * CSS custom property for the page root. No typeface → nothing set, so the
+ * scoped `h1,h2,h3 { font-family: var(--lp-heading-font, inherit) }` rule
+ * resolves to `inherit` — headings keep the body's --font-sans, unchanged.
+ */
+export function lpTypefaceVars(typeface: LpTypeface | null): Record<string, string> {
+  return typeface ? { "--lp-heading-font": typeface.stack } : {}
 }
 
 /** "#D4AF37" → "212,175,55" (for rgba() washes inside gradient strings). */

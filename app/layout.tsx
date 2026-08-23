@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Geist_Mono, Playfair_Display, Cairo } from "next/font/google"
+import { Inter, Geist_Mono, Playfair_Display, Cairo, Cormorant_Garamond, Sora } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SiteHeader } from "@/components/site-header"
@@ -32,9 +32,27 @@ const geistMono = Geist_Mono({
   preload: false,
 })
 
-const playfair = Playfair_Display({ 
+const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-serif",
+  preload: false,
+})
+
+// Landing-only heading faces (the builder's "finish"): a page may set its
+// heading font to one of these via LP_TYPEFACES (lib/landing-theme.ts).
+// preload:false so only a landing page that actually references the variable
+// pulls the file — every other screen in the product pays nothing.
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-lp-editorial",
+  preload: false,
+})
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-lp-architect",
   preload: false,
 })
 
@@ -229,7 +247,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} ${geistMono.variable} ${cairo.variable} bg-background font-sans antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} ${geistMono.variable} ${cairo.variable} ${cormorant.variable} ${sora.variable} bg-background font-sans antialiased`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

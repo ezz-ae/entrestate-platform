@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { query } from "@/lib/db"
 import { getSessionUser, isAdminRole, canAuthorizePublish } from "@/lib/auth"
 import { getLandingPageForEditor } from "@/lib/landing-pages"
-import { resolveLpAccent } from "@/lib/landing-theme"
+import { resolveLpAccent, resolveLpTypeface } from "@/lib/landing-theme"
 import { getSiteUrl } from "@/lib/site"
 
 export const runtime = "nodejs"
@@ -85,6 +85,9 @@ export async function PATCH(
     const palette = hasKey(body, "palette")
       ? (resolveLpAccent(body?.palette)?.key ?? "")
       : existing.palette
+    const typeface = hasKey(body, "typeface")
+      ? (resolveLpTypeface(body?.typeface)?.key ?? "")
+      : existing.typeface
 
     if (!headline) {
       return NextResponse.json({ error: "Headline is required." }, { status: 400 })
@@ -137,6 +140,7 @@ export async function PATCH(
            publish_requested_by = COALESCE($18, publish_requested_by),
            publish_requested_at = COALESCE($19, publish_requested_at),
            palette = $20,
+           typeface = $21,
            updated_at = now()
        WHERE lower(slug) = $1`,
       [
@@ -160,6 +164,7 @@ export async function PATCH(
         requestedBy,
         requestedAt,
         palette || null,
+        typeface || null,
       ],
     )
 
