@@ -27,9 +27,18 @@ interface SectionDef { key: string; label: string; hint: string }
 interface BlockField { key: string; label: string; kind: 'text' | 'textarea' | 'select'; options?: string[]; placeholder?: string }
 interface BlockDef { label: string; hint: string; fields: BlockField[] }
 interface Item { id: string; kind: 'section' | 'block'; type: string; hidden?: boolean; data?: Record<string, string> }
-interface Layout { items: Item[]; palette: string }
+interface Layout { items: Item[]; palette: string; typeface: string }
 interface PageState { page: string; draft: Layout; live: boolean }
 interface Palette { key: string; label: string; dark: string; cream: string; accent: string; accentSoft: string }
+interface Typeface { key: string; label: string; stack: string }
+
+// Each typeface chip previews in the face it selects — the same next/font
+// variables the public page uses (loaded on <body> by the shared root layout).
+const TYPEFACE_PREVIEW: Record<string, string> = {
+  classic: 'var(--font-serif), Georgia, serif',
+  editorial: 'var(--font-lp-editorial), Georgia, serif',
+  architect: 'var(--font-lp-architect), system-ui, sans-serif',
+}
 
 const PAGE_LABEL: Record<string, string> = {
   home: 'Home', about: 'About', services: 'Services', contact: 'Contact',
@@ -46,6 +55,7 @@ export default function PageBuilderPage() {
   const [sections, setSections] = useState<Record<string, SectionDef[]>>({})
   const [blocks, setBlocks] = useState<Record<string, BlockDef>>({})
   const [palettes, setPalettes] = useState<Palette[]>([])
+  const [typefaces, setTypefaces] = useState<Typeface[]>([])
   const [active, setActive] = useState('home')
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [expanded, setExpanded] = useState('')
@@ -62,6 +72,7 @@ export default function PageBuilderPage() {
         setSections(d?.sections ?? {})
         setBlocks(d?.blocks ?? {})
         setPalettes(Array.isArray(d?.palettes) ? d.palettes : [])
+        setTypefaces(Array.isArray(d?.typefaces) ? d.typefaces : [])
       })
       .catch(() => setError(t('paim.fpb.loadFailed')))
       .finally(() => setLoading(false))
@@ -206,6 +217,32 @@ export default function PageBuilderPage() {
                     <span className="h-5 w-5" style={{ backgroundColor: pal.cream }} />
                   </span>
                   {pal.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Heading typeface — the twin of the palette. "Default" clears the
+              override so the page keeps its shipped fonts. */}
+          <div className="rounded-[20px] border border-line bg-surface-2 p-4">
+            <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">{t('paim.fpb.typeface')}</p>
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                type="button"
+                onClick={() => mutate((l) => ({ ...l, typeface: '' }))}
+                className={`rounded-xl border px-3 py-2 text-[13px] transition ${!state.draft.typeface ? 'border-gold/60 bg-gold/[0.08] text-white' : 'border-line bg-surface text-slate-400 hover:text-white'}`}
+              >
+                {t('paim.fpb.typefaceDefault')}
+              </button>
+              {typefaces.map((tf) => (
+                <button
+                  key={tf.key}
+                  type="button"
+                  onClick={() => mutate((l) => ({ ...l, typeface: tf.key }))}
+                  style={{ fontFamily: TYPEFACE_PREVIEW[tf.key] }}
+                  className={`rounded-xl border px-3 py-2 text-[15px] transition ${state.draft.typeface === tf.key ? 'border-gold/60 bg-gold/[0.08] text-white' : 'border-line bg-surface text-slate-300 hover:text-white'}`}
+                >
+                  {tf.label}
                 </button>
               ))}
             </div>

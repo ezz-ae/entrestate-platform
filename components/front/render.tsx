@@ -14,7 +14,7 @@
  * or missing row can only ever mean "today's site".
  */
 import type { ReactNode } from 'react'
-import { defaultFrontLayout, paletteVars, type FrontLayout, type FrontPage } from '@/lib/freehold/front-layout'
+import { defaultFrontLayout, paletteVars, typefaceVars, type FrontLayout, type FrontPage } from '@/lib/freehold/front-layout'
 import { FrontGenericBlock } from './blocks'
 
 export function FrontCanvas({
@@ -26,8 +26,16 @@ export function FrontCanvas({
   className?: string
 }) {
   const resolved = layout ?? defaultFrontLayout(page)
+  // data-fp-typeface is set ONLY when a typeface is chosen, so a default page
+  // grows no attribute and the globals.css heading rule never matches it —
+  // byte-identical to before the picker existed.
   return (
-    <div className={className} data-fp-palette={resolved.palette} style={paletteVars(resolved.palette) as React.CSSProperties}>
+    <div
+      className={className}
+      data-fp-palette={resolved.palette}
+      data-fp-typeface={resolved.typeface || undefined}
+      style={{ ...paletteVars(resolved.palette), ...typefaceVars(resolved.typeface) } as React.CSSProperties}
+    >
       {resolved.items.map((item) => {
         if (item.hidden) return null
         if (item.kind === 'section') {

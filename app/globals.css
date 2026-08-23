@@ -1156,3 +1156,10 @@ html {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Heading typeface — the "finish" control (front-layout.ts → typefaceVars).
+ * The attribute is present ONLY when a typeface is chosen, so a default front
+ * page never matches this rule and keeps its shipped fonts byte-for-byte. */
+[data-fp-typeface] :is(h1, h2, h3) {
+  font-family: var(--fp-heading-font, inherit);
+}

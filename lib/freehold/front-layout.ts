@@ -10,8 +10,9 @@
  * This module gives each front page a LAYOUT: the page's real sections as
  * named, reorderable, hideable items, plus generic content blocks (heading,
  * text, stats, CTA, FAQ) that can be inserted between them, plus one palette
- * choice for the branded surfaces. Web Studio → Page Builder edits a DRAFT;
- * publishing copies it live; unpublishing returns the page to the code.
+ * choice for the branded surfaces and one heading typeface — the same two
+ * "finish" controls the landing builder has. Web Studio → Page Builder edits a
+ * DRAFT; publishing copies it live; unpublishing returns the page to the code.
  *
  * THE FALLBACK IS THE CODE — same law as site-content.ts. No row, no DB,
  * a broken row, an empty items list: the page renders exactly as built, in
@@ -174,6 +175,8 @@ export interface FrontItem {
 export interface FrontLayout {
   items: FrontItem[]
   palette: string
+  /** Heading typeface key from FRONT_TYPEFACES; '' = the shipped fonts. */
+  typeface: string
 }
 
 export interface FrontPalette {
@@ -220,10 +223,40 @@ export function paletteVars(key: string): Record<string, string> {
   }
 }
 
+/**
+ * Heading typefaces — the "finish" control, the twin of the palette. Unlike
+ * the palette (whose first entry IS the shipped design, always applied), the
+ * DEFAULT here is NO pick ('') → the page keeps its shipped fonts, and the
+ * canvas sets no --fp-heading-font, so the scoped rule resolves to `inherit`.
+ * The stacks reference the same next/font variables the landing typefaces use
+ * (loaded globally in app/layout.tsx), always ending with the Arabic face so
+ * an Arabic heading in a Latin display font falls per-glyph to Cairo.
+ */
+export interface FrontTypeface {
+  key: string
+  label: string
+  stack: string
+}
+
+export const FRONT_TYPEFACES: FrontTypeface[] = [
+  { key: 'classic',   label: 'Classic serif',  stack: 'var(--font-serif), var(--font-ad-ar), Georgia, serif' },
+  { key: 'editorial', label: 'Editorial serif', stack: 'var(--font-lp-editorial), var(--font-ad-ar), Georgia, serif' },
+  { key: 'architect', label: 'Modern sans',    stack: 'var(--font-lp-architect), var(--font-ad-ar), system-ui, sans-serif' },
+]
+
+export const FRONT_TYPEFACE_KEYS = FRONT_TYPEFACES.map((t) => t.key)
+
+/** '' or an unknown key → no override (headings keep the shipped fonts). */
+export function typefaceVars(key: string): Record<string, string> {
+  const t = FRONT_TYPEFACES.find((x) => x.key === key)
+  return t ? { '--fp-heading-font': t.stack } : {}
+}
+
 export function defaultFrontLayout(page: FrontPage): FrontLayout {
   return {
     items: FRONT_SECTIONS[page].map((s) => ({ id: `s_${s.key}`, kind: 'section', type: s.key })),
     palette: DEFAULT_PALETTE,
+    typeface: '',
   }
 }
 
@@ -243,7 +276,8 @@ const MAX_ITEMS = 60
  *     must show up, not vanish under an old layout);
  *   - block data is projected onto the block's registered fields, trimmed
  *     and length-capped;
- *   - an unknown palette falls back to the shipped one.
+ *   - an unknown palette falls back to the shipped one, and an unknown / absent
+ *     typeface falls back to '' (no override — the shipped fonts).
  */
 export function sanitizeFrontLayout(page: FrontPage, raw: unknown): FrontLayout {
   const sectionKeys = new Set(FRONT_SECTIONS[page].map((s) => s.key))
@@ -292,7 +326,13 @@ export function sanitizeFrontLayout(page: FrontPage, raw: unknown): FrontLayout 
     ? rawPalette
     : DEFAULT_PALETTE
 
-  return { items, palette }
+  // An unknown / absent typeface is '' — no override, the shipped fonts.
+  const rawTypeface = raw && typeof raw === 'object' ? (raw as { typeface?: unknown }).typeface : undefined
+  const typeface = typeof rawTypeface === 'string' && FRONT_TYPEFACES.some((t) => t.key === rawTypeface)
+    ? rawTypeface
+    : ''
+
+  return { items, palette, typeface }
 }
 
 // ── Store ───────────────────────────────────────────────────────────────────

@@ -22,6 +22,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   FRONT_PAGES, FRONT_SECTIONS, FRONT_BLOCKS, FRONT_PALETTES, DEFAULT_PALETTE,
+  FRONT_TYPEFACES, FRONT_TYPEFACE_KEYS, typefaceVars,
   sanitizeFrontLayout, defaultFrontLayout, paletteVars,
 } from '../lib/freehold/front-layout'
 
@@ -95,6 +96,35 @@ console.log('\n── an empty store renders today\'s site ──')
   check('the default layout is the registry order, nothing hidden',
     def.items.every((i, idx) => i.kind === 'section' && i.type === FRONT_SECTIONS.services[idx].key && !i.hidden)
     && def.palette === DEFAULT_PALETTE)
+  check('the default layout has NO typeface override (shipped fonts)', def.typeface === '')
+}
+
+console.log('\n── the heading typeface is opt-in ──')
+{
+  // Unlike the palette (first entry IS the shipped design, always applied), the
+  // typeface default is NO pick: '' sets no var, so the scoped rule inherits
+  // the page's shipped fonts. A page with no typeface must be byte-identical.
+  check('typeface keys are unique', new Set(FRONT_TYPEFACE_KEYS).size === FRONT_TYPEFACES.length)
+  check('every typeface carries a label and a stack',
+    FRONT_TYPEFACES.every((t) => t.key && t.label && t.stack))
+  check('every stack ends with the Arabic face (no OS fallback for Arabic headings)',
+    FRONT_TYPEFACES.every((t) => t.stack.includes('var(--font-ad-ar)')))
+  check('no typeface → no --fp-heading-font var (rule falls to inherit)',
+    Object.keys(typefaceVars('')).length === 0 && Object.keys(typefaceVars('bogus')).length === 0)
+  check('a chosen typeface sets --fp-heading-font to its stack',
+    typefaceVars('editorial')['--fp-heading-font']?.includes('--font-lp-editorial') === true)
+
+  const clean = sanitizeFrontLayout('home', { items: [], palette: 'emerald', typeface: 'neon' })
+  check('an unknown stored typeface sanitizes to "" (no override)', clean.typeface === '')
+  const kept = sanitizeFrontLayout('home', { items: [], palette: 'emerald', typeface: 'classic' })
+  check('a known stored typeface survives the sanitizer', kept.typeface === 'classic')
+
+  const render = readFileSync(join(process.cwd(), 'components/front/render.tsx'), 'utf8')
+  check('the canvas sets data-fp-typeface only when chosen (|| undefined)',
+    render.includes('data-fp-typeface={resolved.typeface || undefined}') && render.includes('typefaceVars(resolved.typeface)'))
+  const css = readFileSync(join(process.cwd(), 'app/globals.css'), 'utf8')
+  check('globals.css scopes the heading rule to a chosen typeface, falling back to inherit',
+    css.includes('[data-fp-typeface] :is(h1, h2, h3)') && css.includes('var(--fp-heading-font, inherit)'))
 }
 
 console.log('\n── a registered section must render ──')

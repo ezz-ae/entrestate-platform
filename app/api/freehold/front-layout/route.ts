@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireSession } from '@/lib/freehold/api-auth'
 import { MANAGEMENT_ROLES, type Role } from '@/lib/freehold/session-types'
 import {
-  FRONT_PAGES, FRONT_SECTIONS, FRONT_BLOCKS, FRONT_PALETTES,
+  FRONT_PAGES, FRONT_SECTIONS, FRONT_BLOCKS, FRONT_PALETTES, FRONT_TYPEFACES,
   getFrontEditorState, saveFrontDraft, publishFront, unpublishFront,
   type FrontPage,
 } from '@/lib/freehold/front-layout'
@@ -34,6 +34,7 @@ export async function GET() {
     sections: FRONT_SECTIONS,
     blocks: FRONT_BLOCKS,
     palettes: FRONT_PALETTES,
+    typefaces: FRONT_TYPEFACES,
   })
 }
 
