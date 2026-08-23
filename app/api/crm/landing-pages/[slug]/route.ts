@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { query } from "@/lib/db"
 import { getSessionUser, isAdminRole, canAuthorizePublish } from "@/lib/auth"
 import { getLandingPageForEditor } from "@/lib/landing-pages"
+import { resolveLpAccent } from "@/lib/landing-theme"
 import { getSiteUrl } from "@/lib/site"
 
 export const runtime = "nodejs"
@@ -79,6 +80,11 @@ export async function PATCH(
       ? toText(body?.googleConversionId)
       : existing.googleConversionId
     const tiktokPixelId = hasKey(body, "tiktokPixelId") ? toText(body?.tiktokPixelId) : existing.tiktokPixelId
+    // Registry-sanitized: an unknown key stores as "" (brand default), never a
+    // free string — the page reader would drop it anyway, but the row stays clean.
+    const palette = hasKey(body, "palette")
+      ? (resolveLpAccent(body?.palette)?.key ?? "")
+      : existing.palette
 
     if (!headline) {
       return NextResponse.json({ error: "Headline is required." }, { status: 400 })
@@ -130,6 +136,7 @@ export async function PATCH(
            authorized_at = COALESCE($17, authorized_at),
            publish_requested_by = COALESCE($18, publish_requested_by),
            publish_requested_at = COALESCE($19, publish_requested_at),
+           palette = $20,
            updated_at = now()
        WHERE lower(slug) = $1`,
       [
@@ -152,6 +159,7 @@ export async function PATCH(
         authorizedAt,
         requestedBy,
         requestedAt,
+        palette || null,
       ],
     )
 

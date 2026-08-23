@@ -4,6 +4,7 @@ import { BRAND } from '@/lib/freehold/brand'
 import { randomUUID } from "node:crypto"
 import { query, ensureOnce } from "@/lib/db"
 import { normalizePaymentPlan } from "@/lib/payment-plan"
+import { resolveLpAccent } from "@/lib/landing-theme"
 // Local bindings (the block below only RE-exports these, which doesn't bind them
 // for use inside this module) — needed by createLandingPage().
 import { landingTemplate as landingTemplateMeta, isLandingTemplateKey as isLandingTemplateKeyFn } from "./landing-templates"
@@ -115,6 +116,8 @@ export interface LandingPageData {
   sections: LandingSection[]
   /** Layout template the page was created with: "classic" (default) or "campaign". */
   template: string
+  /** Accent palette key from LP_ACCENTS (lib/landing-theme.ts); "" = brand default. */
+  palette: string
   project: LandingProjectSummary | null
   /** True when the project has no available units — the page stays live and
       shows an honest "Sold Out" state instead of coming down. */
@@ -156,6 +159,8 @@ export interface LandingPageEditorData {
   tiktokPixelId: string
   autoUpdatePricing: boolean
   updatedAt: string | null
+  /** Accent palette key from LP_ACCENTS (lib/landing-theme.ts); "" = brand default. */
+  palette: string
   /** The page's section blocks, in render order — powers the layout canvas. */
   sections: LandingSection[]
 }
@@ -660,6 +665,9 @@ const ensureLandingPagesSchema = async () => {
   await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS authorized_by text`)
   await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS authorized_at timestamptz`)
   await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS template text`)
+  // Accent palette key from LP_ACCENTS (lib/landing-theme.ts). NULL/'' = brand
+  // default — the page renders exactly as before the picker existed.
+  await query(`ALTER TABLE freehold_site_project_landing_pages ADD COLUMN IF NOT EXISTS palette text`)
 }
 
 const ensureLandingPagesSchemaOnce = () => ensureOnce("freehold_site_project_landing_pages", ensureLandingPagesSchema)
@@ -992,6 +1000,9 @@ export async function getLandingPageBySlug(
     pixels: mergePixels(await getGlobalPixels(), readPixels(row)),
     sections: normalizeSections(sectionsRaw, project, row),
     template: row.template ? String(row.template) : "classic",
+    // Sanitized at the reader: a stale/unknown stored key reads as "" (brand
+    // default) — the registry is the contract, exactly like the front builder.
+    palette: resolveLpAccent(row.palette)?.key ?? "",
     project,
     soldOut,
   }
@@ -1047,6 +1058,7 @@ export async function getLandingPageForEditor(slug: string): Promise<LandingPage
     tiktokPixelId: pickString(row.tiktok_pixel_id, row.tiktokPixelId),
     autoUpdatePricing: row.auto_update_pricing === true,
     updatedAt: pickString(row.updated_at, row.created_at) || null,
+    palette: resolveLpAccent(row.palette)?.key ?? "",
     sections: normalizeSections(sectionsRaw, project, row),
   }
 }

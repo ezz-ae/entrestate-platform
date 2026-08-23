@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Sparkles, Loader2, ExternalLink, RefreshCw, Eye, EyeOff, FlaskConical, CheckCircle2, AlertTriangle, XCircle, X, Wand2, ChevronDown, ChevronUp, Layers, Copy, Trash2, GripVertical, Undo2, Redo2, Pencil, CalendarClock, TrendingUp, PackageX, Crosshair, Download } from 'lucide-react'
+import { ArrowLeft, Save, Sparkles, Loader2, ExternalLink, RefreshCw, Eye, EyeOff, FlaskConical, CheckCircle2, AlertTriangle, XCircle, X, Wand2, ChevronDown, ChevronUp, Layers, Copy, Trash2, GripVertical, Undo2, Redo2, Pencil, CalendarClock, TrendingUp, PackageX, Crosshair, Download, Palette } from 'lucide-react'
 import QRCode from 'qrcode'
 import { toast } from 'sonner'
 import { useT, useI18n } from '@/lib/i18n/provider'
@@ -12,6 +12,7 @@ import { useSession } from '@/lib/freehold/use-session'
 import { useAutosaveDraft } from '@/lib/freehold/use-autosave-draft'
 import { Send } from 'lucide-react'
 import { LANDING_TEMPLATES } from '@/lib/landing-templates'
+import { LP_ACCENTS } from '@/lib/landing-theme'
 
 type Landing = {
   slug: string
@@ -28,6 +29,8 @@ type Landing = {
   seoDescription: string
   ogImage: string
   updatedAt: string | null
+  /** Accent palette key from LP_ACCENTS; '' = brand default. */
+  palette: string
   sections?: LpSection[]
 }
 
@@ -905,6 +908,37 @@ export default function LandingEditorPage() {
           </div>
           )}
 
+          {/* Accent palette — retints the whole public page through CSS vars.
+              Default = the brand accent, exactly the page before the picker
+              existed; a swatch pick previews instantly (the iframe reloads
+              with ?palette=) and persists with Save edits. */}
+          <div className="rounded-2xl border border-line bg-surface-2/40 p-4">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <Palette className="h-4 w-4" /> {t('lpe.palette.title')}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => set('palette', '')}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${!form.palette ? 'border-gold/50 bg-gold/10 text-white' : 'border-line bg-surface/70 text-slate-400 hover:text-white'}`}
+              >
+                <span className="h-3.5 w-3.5 rounded-full border border-dashed border-slate-400" />
+                {t('lpe.palette.default')}
+              </button>
+              {LP_ACCENTS.map((a) => (
+                <button
+                  key={a.key}
+                  type="button"
+                  onClick={() => set('palette', a.key)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${form.palette === a.key ? 'border-gold/50 bg-gold/10 text-white' : 'border-line bg-surface/70 text-slate-400 hover:text-white'}`}
+                >
+                  <span className="h-3.5 w-3.5 rounded-full" style={{ background: a.accent }} />
+                  {t(`lpe.palette.${a.key}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Layout canvas — reorder / show-hide the page's real section blocks */}
           {form.sections && form.sections.length > 0 && (
             <div className="rounded-2xl border border-line bg-surface-2/40 p-4">
@@ -1053,7 +1087,7 @@ export default function LandingEditorPage() {
               <a href={`/lp/${slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-gold/70 hover:text-gold">{t('lpe.openTab')} <ExternalLink className="h-3 w-3" /></a>
             </div>
           </div>
-          <iframe ref={previewRef} key={previewKey} src={`/lp/${slug}?lpe=1`} title="preview" className="h-[70vh] w-full rounded-2xl border-4 border-surface-3 bg-white shadow-2xl lg:h-[calc(100%-2rem)]" />
+          <iframe ref={previewRef} key={previewKey} src={`/lp/${slug}?lpe=1${form.palette ? `&palette=${form.palette}` : ''}`} title="preview" className="h-[70vh] w-full rounded-2xl border-4 border-surface-3 bg-white shadow-2xl lg:h-[calc(100%-2rem)]" />
           <p className="mt-2 text-[11px] text-slate-600">{t('lpe.previewNote')} · <span className="text-gold/70">{t('lpe.canvasHint')}</span></p>
         </div>
       </div>

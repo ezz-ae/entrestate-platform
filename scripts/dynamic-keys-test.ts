@@ -38,6 +38,7 @@ import { AD_FORMATS } from '../lib/meta/adset-placements'
 import { SIGNAL_IDS, SIGNAL_ACTIONS } from '../lib/freehold/live-signals'
 import { LAB_ANGLES, WITHHELD_REASONS, RECIPE_VERDICTS } from '../lib/freehold/creative-lab'
 import { LOOP_STEPS, LOOP_STATES } from '../lib/freehold/rating-loop'
+import { LP_ACCENT_KEYS } from '../lib/landing-theme'
 import { SEED_SIGNALS, AVOID_SIGNALS } from '../lib/freehold/seed-cohort'
 import { DESTINATION_KINDS, ATTRIBUTION_STATES } from '../lib/freehold/campaign-destination'
 import { READINESS_CHECKS, REACHABLE } from '../lib/freehold/launch-readiness'
@@ -129,6 +130,13 @@ console.log('\n── launcher audience markets ──')
   // lm_core is a different shard than lm_ads, hence the explicit dict — the
   // family helper does not care which shard, only that words exist.
   family('lm.newCampaign.s2.market', 'lm.newCampaign.s2.market.', ['uae', 'gulf', 'world'], lm_core)
+}
+
+console.log('\n── landing accent palettes ──')
+{
+  // The landing editor renders t(`lpe.palette.${a.key}`) over LP_ACCENTS —
+  // a new palette cannot ship without a name in every language.
+  family('lpe.palette', 'lpe.palette.', LP_ACCENT_KEYS, lm_core)
 }
 
 console.log('\n── recommendations ──')

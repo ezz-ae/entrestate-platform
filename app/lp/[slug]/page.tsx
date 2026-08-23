@@ -13,7 +13,7 @@ import { getRequest as getLandingEditRequest } from '@/lib/freehold/landing-edit
 import {
   LP_CHROME, normalizeLpLang, lpDir, lpFill, translateLandingContent, type LpLang,
 } from '@/lib/landing-i18n'
-import { resolveTheme, lpPalette, type LpTheme, type LpPalette } from '@/lib/landing-theme'
+import { resolveTheme, lpPalette, resolveLpAccent, lpAccentVars, type LpTheme, type LpPalette } from '@/lib/landing-theme'
 import type { InventoryProperty } from '@/src/features/freehold-intelligence/inventory'
 import { getInventoryPropertyBySlug } from '@/lib/inventory-data'
 import { normalizePermit, qrApiPath, permitVerificationUrl } from '@/lib/freehold/trakheesi'
@@ -127,6 +127,7 @@ function inventoryToLandingPage(prop: InventoryProperty | null): LandingPageData
     pixels: {},
     soldOut: false,
     template: 'classic',
+    palette: '',
     sections,
     project: { slug: prop.slug, name: prop.name, area: prop.area, developerName: prop.developer, heroImage: '/logo.png', priceFromAed: prop.startingPriceAED, priceToAed: prop.maxPriceAED, rentalYield: prop.roi, gallery: [], brochureUrl: null, amenities: [], faqs: [] },
   }
@@ -225,7 +226,7 @@ function HeroSection({ d, page, L, p }: { d: Record<string, unknown>; page: Land
             )}
 
             <div className="mt-10 flex flex-wrap gap-3">
-              <a href="#lead-form" className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-bold text-[#06080A] transition-all hover:bg-[#E8C547] active:scale-[0.98]">
+              <a href="#lead-form" className="inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-bold text-[#06080A] transition-all lp-cta active:scale-[0.98]">
                 <span data-lpe="ctaText">{page.ctaText}</span> <ChevronRight className="h-4 w-4" />
               </a>
             </div>
@@ -372,7 +373,7 @@ function UnitsSection({ d, L, p }: { d: Record<string, unknown>; L: Dict; p: LpP
             return (
               <div key={i} className="group flex flex-col rounded-2xl border overflow-hidden transition-all hover:border-gold/25" style={{ borderColor: p.surfaceBorder, background: p.surface }}>
                 {/* Color band */}
-                <div className="h-1 w-full" style={{ background: i === 0 ? '#9B8020' : i === 1 ? 'var(--color-gold)' : '#C9A227' }} />
+                <div className="h-1 w-full" style={{ background: i === 0 ? 'var(--lp-gold-deep, #9B8020)' : i === 1 ? 'var(--color-gold)' : 'var(--lp-gold-mid, #C9A227)' }} />
                 <div className="flex flex-1 flex-col p-6">
                   <div className="mb-4">
                     <div className="text-[11px] font-semibold uppercase tracking-widest text-gold/60">{L['units.unitType']}</div>
@@ -456,9 +457,9 @@ function PaymentPlanSection({ d, L, p }: { d: Record<string, unknown>; L: Dict; 
   if (down + during + onHand + post <= 0) return null
   const stages = [
     { label: L['payment.stage.down'], pct: down, sub: L['payment.stage.downSub'], color: 'var(--color-gold)' },
-    { label: L['payment.stage.during'], pct: during, sub: L['payment.stage.duringSub'], color: '#9B8020' },
-    { label: L['payment.stage.handover'], pct: onHand, sub: L['payment.stage.handoverSub'], color: '#6B5A15' },
-    ...(post > 0 ? [{ label: L['payment.stage.post'], pct: post, sub: L['payment.stage.postSub'], color: '#3D330B' }] : []),
+    { label: L['payment.stage.during'], pct: during, sub: L['payment.stage.duringSub'], color: 'var(--lp-gold-deep, #9B8020)' },
+    { label: L['payment.stage.handover'], pct: onHand, sub: L['payment.stage.handoverSub'], color: 'var(--lp-gold-dark, #6B5A15)' },
+    ...(post > 0 ? [{ label: L['payment.stage.post'], pct: post, sub: L['payment.stage.postSub'], color: 'var(--lp-gold-darkest, #3D330B)' }] : []),
   ].filter(s => s.pct > 0)
 
   return (
@@ -691,7 +692,7 @@ function GoldenVisaSection({ d, L, p }: { d: Record<string, unknown>; L: Dict; p
               </div>
               <h2 className="mt-4 text-[36px] font-bold leading-tight" style={{ color: p.textPrimary }}>{L['goldenVisa.title']}</h2>
               <p className="mt-3 text-[15px] leading-relaxed" style={{ color: p.textMuted }}>{lpFill(L['goldenVisa.desc'], { threshold })}</p>
-              <a href="#lead-form" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-[14px] font-bold text-[#06080A] transition-all hover:bg-[#E8C547]">
+              <a href="#lead-form" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-[14px] font-bold text-[#06080A] transition-all lp-cta">
                 {L['goldenVisa.cta']} <ChevronRight className="h-4 w-4" />
               </a>
             </div>
@@ -985,11 +986,11 @@ function DownloadBrochureSection({ d, page, L, p }: { d: Record<string, unknown>
             <h3 className="text-[28px] font-bold" style={{ color: p.textPrimary }}>{title}</h3>
             <p className="mx-auto mt-3 text-[14px] leading-relaxed" style={{ color: p.textMuted }}>{subtitle}</p>
             {hasBrochure ? (
-              <a href={brochureUrl} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-9 py-4 text-[15px] font-bold text-[#06080A] transition-all hover:bg-[#E8C547]">
+              <a href={brochureUrl} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-9 py-4 text-[15px] font-bold text-[#06080A] transition-all lp-cta">
                 {L['brochure.download']} <Download className="h-4 w-4" />
               </a>
             ) : (
-              <a href="#lead-form" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-9 py-4 text-[15px] font-bold text-[#06080A] transition-all hover:bg-[#E8C547]">
+              <a href="#lead-form" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-9 py-4 text-[15px] font-bold text-[#06080A] transition-all lp-cta">
                 {page.ctaText} <ChevronRight className="h-4 w-4" />
               </a>
             )}
@@ -1223,7 +1224,11 @@ export default async function LandingPage({
   }
 
   // The template drives the page's atmosphere (Signature → lagoon palette).
-  const palette = lpPalette(theme, page.template)
+  // The accent retints it: stored on the page row, overridable with ?palette=
+  // (the editor's live preview; harmless publicly, same contract as ?theme=).
+  // Unknown/empty → null → brand default, exactly the pre-accent page.
+  const accent = resolveLpAccent(sp.palette) ?? resolveLpAccent(page.palette)
+  const palette = lpPalette(theme, page.template, accent)
 
   const { page: localized } = await translateLandingContent(page, lang)
 
@@ -1246,14 +1251,15 @@ export default async function LandingPage({
   )
 
   return (
-    <div className={`min-h-screen${theme === 'day' ? ' lp-day' : ''}`} dir={dir} lang={lang} style={{ background: palette.bg, color: palette.textPrimary, ['--color-gold' as string]: BRAND.accent } as React.CSSProperties}>
-      {/* Day-theme contrast: the gold accent (#D4AF37) is tuned for dark
-          backgrounds; at 60-80% opacity on off-white it washes out. Remap all
-          gold TEXT (labels, eyebrows, stats) to a deep readable gold in day
-          mode — gold-filled buttons/backgrounds keep the brand tone. */}
-      {theme === 'day' && (
-        <style>{`.lp-day [class*="text-gold"]{color:#8E6D1A !important}`}</style>
-      )}
+    <div className={`min-h-screen${theme === 'day' ? ' lp-day' : ''}`} dir={dir} lang={lang} style={{ background: palette.bg, color: palette.textPrimary, ...lpAccentVars(accent) } as React.CSSProperties}>
+      {/* .lp-cta: hover state of accent-filled CTAs. Was lp-cta
+          hardcoded per-button — hoisted here so a chosen accent retints it via
+          --lp-gold-bright; the fallback IS the shipped hex (no accent → today's
+          exact hover). Day-theme contrast: the gold accent (#D4AF37) is tuned
+          for dark backgrounds; at 60-80% opacity on off-white it washes out.
+          Remap all gold TEXT (labels, eyebrows, stats) to a deep readable tone
+          in day mode — gold-filled buttons/backgrounds keep the brand tone. */}
+      <style>{`.lp-cta:hover{background:var(--lp-gold-bright,#E8C547)}${theme === 'day' ? `.lp-day [class*="text-gold"]{color:var(--lp-gold-day-text,#8E6D1A) !important}` : ''}`}</style>
       <Tracker
         slug={adapted.slug}
         projectSlug={adapted.projectSlug}
