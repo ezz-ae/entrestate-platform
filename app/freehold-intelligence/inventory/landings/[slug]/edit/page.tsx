@@ -13,6 +13,7 @@ import { useAutosaveDraft } from '@/lib/freehold/use-autosave-draft'
 import { Send } from 'lucide-react'
 import { LANDING_TEMPLATES } from '@/lib/landing-templates'
 import { LP_ACCENTS, LP_TYPEFACES } from '@/lib/landing-theme'
+import { LP_GENERIC_BLOCKS, isGenericBlock } from '@/lib/landing-blocks'
 
 // Preview font stacks for the editor's typeface chips — the SAME faces the
 // public page uses (next/font sets these variables on <body>, which the CRM
@@ -72,6 +73,11 @@ function SectionThumb({ type }: { type: string }) {
     case 'ai-concierge': body = <div className="space-y-1"><div className="h-3 w-2/3 rounded-lg rounded-bl-none bg-slate-700/70" /><div className="ms-auto h-3 w-1/2 rounded-lg rounded-br-none bg-gold/40" /></div>; break
     case 'faq': body = <div className="space-y-1">{Array.from({ length: 3 }, (_, i) => <div key={i} className="flex items-center justify-between rounded border border-slate-700 px-1.5 py-1">{bar('w-2/3', 'h-1')}<span className="text-[8px] text-slate-500">＋</span></div>)}</div>; break
     case 'download-brochure': body = <div className="flex items-center justify-between rounded border border-gold/30 bg-gold/[0.06] px-2 py-2">{bar('w-1/2')}<div className="h-3 w-10 rounded-full bg-gold/60" /></div>; break
+    case 'free-heading': body = <div className="space-y-1.5 text-center"><div className="mx-auto h-2 w-10 rounded-full bg-gold/50" /><div className="mx-auto h-2.5 w-3/4 rounded-full bg-slate-600" />{bar('w-1/2 mx-auto')}</div>; break
+    case 'free-text': body = <div className="space-y-1.5">{bar('w-1/3', 'h-2')}{bar('w-full')}{bar('w-full')}{bar('w-4/6')}</div>; break
+    case 'call-to-action': body = <div className="rounded border border-gold/30 bg-gold/[0.06] p-2 text-center space-y-1.5">{bar('w-2/3 mx-auto')}<div className="mx-auto h-3 w-12 rounded-full bg-gold/60" /></div>; break
+    case 'free-stats': body = tile(4, 'grid-cols-4', 'h-8'); break
+    case 'divider': body = <div className="flex h-8 items-center"><div className="h-px w-full bg-slate-600" /></div>; break
     case 'lead-form': body = <div className="space-y-1">{tile(2, 'grid-cols-1', 'h-3')}<div className="h-3 w-14 rounded-full bg-gold/60" /></div>; break
     case 'neighborhood': case 'description': default: body = <div className="space-y-1.5">{bar('w-1/3', 'h-2')}{bar('w-full')}{bar('w-5/6')}{bar('w-2/3')}</div>
   }
@@ -129,6 +135,12 @@ const SECTION_FIELDS: Record<string, FieldDef[]> = {
   faq: [{ kind: 'pairs', key: 'items', a: 'question', b: 'answer', bLong: true }],
   'download-brochure': [TITLE, SUBTITLE],
   'lead-form': [TITLE, SUBTITLE],
+  // Generic marketer blocks (LP_GENERIC_BLOCKS) — free content, project-agnostic.
+  'free-heading': [{ kind: 'text', key: 'eyebrow' }, TITLE, SUBTITLE],
+  'free-text': [TITLE, { kind: 'long', key: 'body', alt: ['content'] }],
+  'call-to-action': [TITLE, SUBTITLE, { kind: 'text', key: 'buttonText' }, { kind: 'text', key: 'buttonHref' }],
+  'free-stats': [TITLE, { kind: 'pairs', key: 'items', a: 'value', b: 'label' }],
+  divider: [], // pure spacing — nothing to edit
 }
 const DEFAULT_FIELDS: FieldDef[] = [TITLE, SUBTITLE]
 const fieldsFor = (type: string): FieldDef[] => SECTION_FIELDS[type] ?? DEFAULT_FIELDS
@@ -538,6 +550,9 @@ export default function LandingEditorPage() {
   // ── Layout canvas — reorder / show-hide the page's real section blocks ──────
   const [layoutSaving, setLayoutSaving] = useState(false)
   function sectionLabel(type: string) {
+    // Generic blocks carry a localized name; project sections keep the
+    // English prettify the builder has always shown (parity with today).
+    if (isGenericBlock(type)) return t(`lpe.blk.${type}`)
     return type.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
   }
   function setSections(next: LpSection[]) { setEdited(true); setSectionsTouched(true); setForm((prev) => (prev ? { ...prev, sections: next } : prev)) }
@@ -677,8 +692,9 @@ export default function LandingEditorPage() {
       </div>
     )
   }
-  // Content sections the marketer can add to a page (hero is intentionally omitted).
-  const ADD_TYPES = ['description', 'key-facts', 'payment-plan', 'roi', 'why-dubai', 'golden-visa', 'amenities', 'location', 'developer-profile', 'social-proof', 'neighborhood', 'faq', 'download-brochure', 'lead-form']
+  // Content sections the marketer can add to a page (hero is intentionally
+  // omitted). Project sections first, then the generic free-content blocks.
+  const ADD_TYPES = ['description', 'key-facts', 'payment-plan', 'roi', 'why-dubai', 'golden-visa', 'amenities', 'location', 'developer-profile', 'social-proof', 'neighborhood', 'faq', 'download-brochure', 'lead-form', ...LP_GENERIC_BLOCKS]
   // Native HTML5 drag-and-drop reorder (arrows stay for touch / a11y).
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)

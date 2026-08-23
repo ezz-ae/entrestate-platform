@@ -39,6 +39,7 @@ import { SIGNAL_IDS, SIGNAL_ACTIONS } from '../lib/freehold/live-signals'
 import { LAB_ANGLES, WITHHELD_REASONS, RECIPE_VERDICTS } from '../lib/freehold/creative-lab'
 import { LOOP_STEPS, LOOP_STATES } from '../lib/freehold/rating-loop'
 import { LP_ACCENT_KEYS, LP_TYPEFACE_KEYS } from '../lib/landing-theme'
+import { LP_GENERIC_BLOCKS } from '../lib/landing-blocks'
 import { SEED_SIGNALS, AVOID_SIGNALS } from '../lib/freehold/seed-cohort'
 import { DESTINATION_KINDS, ATTRIBUTION_STATES } from '../lib/freehold/campaign-destination'
 import { READINESS_CHECKS, REACHABLE } from '../lib/freehold/launch-readiness'
@@ -139,6 +140,9 @@ console.log('\n── landing accent palettes ──')
   family('lpe.palette', 'lpe.palette.', LP_ACCENT_KEYS, lm_core)
   // …and t(`lpe.font.${tf.key}`) over LP_TYPEFACES.
   family('lpe.font', 'lpe.font.', LP_TYPEFACE_KEYS, lm_core)
+  // …and t(`lpe.blk.${type}`) — the localized name of each generic block in
+  // the layout canvas and add-block menu (sectionLabel).
+  family('lpe.blk', 'lpe.blk.', [...LP_GENERIC_BLOCKS], lm_core)
 }
 
 console.log('\n── recommendations ──')

@@ -47,11 +47,23 @@ export type LandingSectionType =
   | "faq"
   | "download-brochure"
   | "lead-form"
+  // Generic marketer blocks (LP_GENERIC_BLOCKS) — free content the builder can
+  // add anywhere, not derived from the project. See the block below.
+  | "free-heading"
+  | "free-text"
+  | "call-to-action"
+  | "free-stats"
+  | "divider"
 
 export interface LandingSection {
   type: LandingSectionType
   data: Record<string, unknown>
 }
+
+// The generic-block list lives in a pure module (lib/landing-blocks.ts) so the
+// 'use client' editor can share it without importing this server module. Re-
+// exported here because normalizeType and the type union below build on it.
+export { LP_GENERIC_BLOCKS, isGenericBlock, type LandingGenericBlock } from "./landing-blocks"
 
 export interface CampaignPixelIds {
   metaPixelId?: string
@@ -342,6 +354,28 @@ const normalizeType = (value: string): LandingSectionType | null => {
     case "lead":
     case "form":
       return "lead-form"
+    // Generic marketer blocks — a couple of forgiving aliases each.
+    case "free-heading":
+    case "heading":
+    case "section-heading":
+      return "free-heading"
+    case "free-text":
+    case "text":
+    case "paragraph":
+    case "rich-text":
+      return "free-text"
+    case "call-to-action":
+    case "cta":
+    case "cta-band":
+      return "call-to-action"
+    case "free-stats":
+    case "stats":
+    case "stat-row":
+      return "free-stats"
+    case "divider":
+    case "spacer":
+    case "separator":
+      return "divider"
     default:
       return null
   }

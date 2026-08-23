@@ -64,6 +64,17 @@ function toObj(v: unknown): Record<string, unknown> {
   return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {}
 }
 
+// A marketer-typed button URL is the one place a generic block carries an
+// attacker-controllable value into an attribute (React escapes text nodes, but
+// not href schemes). Allow only navigational schemes; anything else — most
+// importantly javascript:/data: — collapses to the page's own lead form.
+function safeHref(v: unknown): string {
+  const s = typeof v === 'string' ? v.trim() : ''
+  if (!s) return '#lead-form'
+  if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(s) && !/^\s*javascript:/i.test(s)) return s
+  return '#lead-form'
+}
+
 // ─── Inventory fallback ───────────────────────────────────────────────────────
 // When no landing page row exists yet, build the page from the LIVE inventory
 // project (never from seed data).
@@ -1004,6 +1015,109 @@ function DownloadBrochureSection({ d, page, L, p }: { d: Record<string, unknown>
 
 // ─── Section dispatcher ───────────────────────────────────────────────────────
 
+// ─── Generic marketer blocks ──────────────────────────────────────────────────
+// Free content the builder adds anywhere (LP_GENERIC_BLOCKS). Same NOTHING-FAKE
+// discipline as the project sections: an empty block self-hides rather than
+// leaving a blank band. Text is React-escaped; only the CTA href is scheme-
+// checked (safeHref). Headings are <h2>/<h3> so the page's typeface pick and
+// accent utilities reach them exactly like every other section.
+
+function FreeHeadingSection({ d, p }: { d: Record<string, unknown>; p: LpPalette }) {
+  const eyebrow = pick(d, 'eyebrow')
+  const title = pick(d, 'title')
+  const subtitle = pick(d, 'subtitle')
+  if (!title && !subtitle) return null
+  return (
+    <section className="border-t px-5 py-16 sm:px-8" style={{ borderTopColor: p.divider }}>
+      <div className="mx-auto max-w-3xl text-center">
+        {eyebrow && <div className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-gold/60">{eyebrow}</div>}
+        {title && <h2 className="text-[32px] font-bold leading-tight" style={{ color: p.textPrimary }}>{title}</h2>}
+        {subtitle && <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed" style={{ color: p.textMuted }}>{subtitle}</p>}
+      </div>
+    </section>
+  )
+}
+
+function FreeTextSection({ d, p }: { d: Record<string, unknown>; p: LpPalette }) {
+  const title = pick(d, 'title')
+  const body = pick(d, 'body', 'content')
+  if (!title && !body) return null
+  return (
+    <section className="border-t px-5 py-16 sm:px-8" style={{ borderTopColor: p.divider }}>
+      <div className="mx-auto max-w-3xl">
+        {title && <h2 className="mb-5 text-[28px] font-bold leading-tight" style={{ color: p.textPrimary }}>{title}</h2>}
+        {body && (
+          <div className="space-y-4">
+            {body.split('\n\n').map((s) => s.trim()).filter(Boolean).map((para, i) => (
+              <p key={i} className="text-[16px] leading-[1.75]" style={{ color: p.textMuted }}>{para}</p>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function CallToActionSection({ d, page, p }: { d: Record<string, unknown>; page: LandingPageData; p: LpPalette }) {
+  const title = pick(d, 'title')
+  const subtitle = pick(d, 'subtitle')
+  // A CTA with no words is nothing to say — self-hide. The button label falls
+  // back to the page's own CTA text so a half-filled block still works.
+  if (!title && !subtitle) return null
+  const label = pick(d, 'buttonText', 'ctaText') || page.ctaText
+  const href = safeHref(pick(d, 'buttonHref', 'href', 'url'))
+  return (
+    <section className="border-t px-5 py-16 sm:px-8" style={{ borderTopColor: p.divider }}>
+      <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl px-8 py-12 text-center"
+        style={{ background: 'linear-gradient(135deg, color-mix(in srgb, var(--color-gold) 12%, transparent) 0%, color-mix(in srgb, var(--color-gold) 4%, transparent) 60%, transparent 100%)', border: '1px solid color-mix(in srgb, var(--color-gold) 20%, transparent)' }}>
+        {title && <h2 className="text-[30px] font-bold leading-tight" style={{ color: p.textPrimary }}>{title}</h2>}
+        {subtitle && <p className="mx-auto mt-3 max-w-2xl text-[16px] leading-relaxed" style={{ color: p.textMuted }}>{subtitle}</p>}
+        <a href={href} className="lp-cta mt-8 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 text-[15px] font-bold text-[#06080A] transition-all active:scale-[0.98]">
+          {label} <ChevronRight className="h-4 w-4" />
+        </a>
+      </div>
+    </section>
+  )
+}
+
+function FreeStatsSection({ d, p }: { d: Record<string, unknown>; p: LpPalette }) {
+  const title = pick(d, 'title')
+  // Only real tiles render — a stat needs at least a value or a label.
+  const items = pickArr(d, 'items', 'stats').map(toObj)
+    .map((it) => ({ value: toStr(it.value), label: toStr(it.label) }))
+    .filter((it) => it.value || it.label)
+    .slice(0, 4)
+  if (!items.length) return null
+  const cols: Record<number, string> = { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-4' }
+  return (
+    <section className="border-t px-5 py-16 sm:px-8" style={{ borderTopColor: p.divider, background: p.bgAlt }}>
+      <div className="mx-auto max-w-6xl">
+        {title && <h2 className="mb-8 text-center text-[28px] font-bold" style={{ color: p.textPrimary }}>{title}</h2>}
+        <div className={`grid grid-cols-2 gap-4 ${cols[items.length] ?? 'sm:grid-cols-4'}`}>
+          {items.map(({ value, label }, i) => (
+            <div key={i} className="rounded-2xl border p-6 text-center" style={{ borderColor: p.surfaceBorder, background: p.surface }}>
+              <div className="text-[34px] font-bold leading-none text-gold">{value || '—'}</div>
+              {label && <div className="mt-2 text-[12px] font-medium" style={{ color: p.textMuted }}>{label}</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function DividerSection({ p }: { p: LpPalette }) {
+  // A deliberate breath between blocks — the one generic block with no content
+  // to self-hide on. A hairline centered in vertical space.
+  return (
+    <div className="px-5 py-10 sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="h-px w-full" style={{ background: p.divider }} />
+      </div>
+    </div>
+  )
+}
+
 function Section({ section, page, L, p }: { section: LandingSection; page: LandingPageData; L: Dict; p: LpPalette }) {
   const d = section.data
   // Layout canvas: a section hidden in the editor is skipped on the live page.
@@ -1047,6 +1161,11 @@ function Section({ section, page, L, p }: { section: LandingSection; page: Landi
     }
     case 'download-brochure': return <DownloadBrochureSection d={d} page={page} L={L} p={p} />
     case 'lead-form': return <LeadFormSection d={d} page={page} L={L} p={p} />
+    case 'free-heading': return <FreeHeadingSection d={d} p={p} />
+    case 'free-text': return <FreeTextSection d={d} p={p} />
+    case 'call-to-action': return <CallToActionSection d={d} page={page} p={p} />
+    case 'free-stats': return <FreeStatsSection d={d} p={p} />
+    case 'divider': return <DividerSection p={p} />
     default: return null
   }
 }
