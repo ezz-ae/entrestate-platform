@@ -1130,3 +1130,29 @@ html {
     padding: 18px;
   }
 }
+
+/* ── Front-page palette (Web Studio → Page Builder) ─────────────────────────
+ * The public front pages' branded surfaces read these variables, set per page
+ * by the published layout (lib/freehold/front-layout.ts → paletteVars). The
+ * fallbacks ARE the shipped design's exact hexes, so a page with no layout —
+ * or the default "emerald" palette — renders byte-identically to the coded
+ * site. The front-layout guard asserts these four fallback values. */
+.fp-dark-bg   { background-color: var(--fp-dark, #0A1F17); }
+.fp-cream-bg  { background-color: var(--fp-cream, #F2EFE8); }
+.fp-accent    { color: var(--fp-accent, #D4AC50); }
+.fp-accent-soft { color: var(--fp-accent-soft, #F0D792); }
+.fp-accent-bg { background-color: var(--fp-accent, #D4AC50); }
+
+/* Non-default palettes also retint the branded gradients; the default keeps
+ * the original three-stop gold, untouched. */
+[data-fp-palette]:not([data-fp-palette="emerald"]) .freehold-gradient,
+[data-fp-palette]:not([data-fp-palette="emerald"]) .gold-gradient {
+  background: linear-gradient(135deg, var(--fp-accent) 0%, var(--fp-accent-soft) 100%);
+}
+[data-fp-palette]:not([data-fp-palette="emerald"]) .freehold-text-gradient,
+[data-fp-palette]:not([data-fp-palette="emerald"]) .gold-text-gradient {
+  background: linear-gradient(135deg, var(--fp-accent) 0%, var(--fp-accent-soft) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

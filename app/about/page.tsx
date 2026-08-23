@@ -9,6 +9,8 @@ const REBRANDED = Boolean(process.env.NEXT_PUBLIC_BRAND_COMPANY?.trim() || proce
 const LEGAL_ENTITY = REBRANDED ? BRAND.legalName : "Freehold Properties LLC"
 import { Target, Eye, ArrowRight, Quote } from "lucide-react"
 import Link from "next/link"
+import { getPublishedFrontLayout } from "@/lib/freehold/front-layout"
+import { FrontCanvas } from "@/components/front/render"
 
 export const metadata = {
   title: `About ${BRAND.legalName} UAE | 19 Years in Dubai Real Estate`,
@@ -58,10 +60,13 @@ const principles = [
 export default async function AboutPage() {
   // Web Studio → Content overrides; built-in words are the fallback.
   const content = await getPageContent('about')
-  return (
-    <div className="bg-background">
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0A1F17] pt-32 pb-28 text-white md:pt-40 md:pb-40">
+  // Web Studio → Page Builder. Null = the built-in order and colors.
+  const layout = await getPublishedFrontLayout('about')
+
+  const sections: Record<string, React.ReactNode> = {
+
+    hero: (
+      <section className="relative overflow-hidden fp-dark-bg pt-32 pb-28 text-white md:pt-40 md:pb-40">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-0 h-[400px] w-[1100px] -translate-x-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(212,175,55,0.18),transparent)]" />
           <div className="absolute bottom-0 right-0 h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.10),transparent_55%)] blur-[100px]" />
@@ -69,8 +74,8 @@ export default async function AboutPage() {
         <div className="container relative z-10">
           <div className="grid items-end gap-14 lg:grid-cols-[1.4fr_1fr]">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F0D792] backdrop-blur-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4AC50]" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] fp-accent-soft backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full fp-accent-bg" />
                 About {BRAND.company}
               </span>
               <h1 className="mt-8 font-serif text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl lg:text-[5.5rem]">
@@ -86,7 +91,7 @@ export default async function AboutPage() {
                   <div key={s.label}>
                     <div className="flex items-baseline gap-1">
                       <span className="font-serif text-5xl font-bold text-white md:text-6xl">{s.value}</span>
-                      <span className="text-2xl font-bold text-[#D4AC50]">{s.suffix}</span>
+                      <span className="text-2xl font-bold fp-accent">{s.suffix}</span>
                     </div>
                     <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35">{s.label}</p>
                   </div>
@@ -98,16 +103,16 @@ export default async function AboutPage() {
             <aside className="relative">
               <div className="absolute -inset-3 -z-10 rounded-[36px] bg-gradient-to-br from-[#D4AC50]/15 via-transparent to-transparent opacity-70 blur-2xl" />
               <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-white/[0.04] p-8 backdrop-blur-xl md:p-10">
-                <Quote className="h-8 w-8 text-[#D4AC50]/60" />
+                <Quote className="h-8 w-8 fp-accent/60" />
                 <blockquote className="mt-6 font-serif text-xl leading-relaxed text-white md:text-2xl">
                   &quot;Navigating Dubai&apos;s growth corridors with institutional rigor.&quot;
                 </blockquote>
                 <div className="mt-8 flex items-center gap-4 border-t border-white/[0.06] pt-6">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#D4AC50]/25 bg-gradient-to-br from-[#D4AC50]/20 to-transparent">
-                    <Target className="h-5 w-5 text-[#D4AC50]" />
+                    <Target className="h-5 w-5 fp-accent" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AC50]">Conviction Desk</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] fp-accent">Conviction Desk</p>
                     <p className="mt-1 text-[13px] text-white/60">Curated exclusively · senior advisors</p>
                   </div>
                 </div>
@@ -116,8 +121,9 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* MISSION & VISION — split editorial */}
+    mission: (
       <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_80%_20%,rgba(198,155,62,0.04),transparent)]" />
         <div className="container relative z-10">
@@ -141,9 +147,10 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* PRINCIPLES — numbered editorial on cream */}
-      <section className="relative bg-[#F2EFE8] py-20 md:py-28">
+    principles: (
+      <section className="relative fp-cream-bg py-20 md:py-28">
         <div className="container">
           <div className="mb-14 max-w-2xl md:mb-20">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">How We Operate</p>
@@ -162,13 +169,14 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* STATS — dark numeric showcase */}
+    stats: (
       <section className="relative overflow-hidden bg-foreground py-24 text-white md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(198,155,62,0.10),transparent)]" />
         <div className="container relative z-10">
           <div className="mx-auto mb-16 max-w-2xl text-center md:mb-20">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AC50]">By the Numbers</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] fp-accent">By the Numbers</p>
             <h2 className="mt-4 font-serif text-3xl font-bold leading-tight md:text-5xl">
               The track record speaks.
             </h2>
@@ -178,7 +186,7 @@ export default async function AboutPage() {
               <div key={s.label} className="group rounded-[24px] border border-white/[0.06] bg-white/[0.03] p-7 text-center backdrop-blur-sm transition-all hover:border-[#D4AC50]/30 hover:bg-white/[0.05] md:p-9">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-serif text-5xl font-bold text-white transition-transform duration-500 group-hover:scale-105 md:text-6xl">{s.value}</span>
-                  <span className="text-2xl font-bold text-[#D4AC50]">{s.suffix}</span>
+                  <span className="text-2xl font-bold fp-accent">{s.suffix}</span>
                 </div>
                 <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">{s.label}</p>
               </div>
@@ -186,8 +194,9 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* CTA */}
+    cta: (
       <section className="relative overflow-hidden bg-background py-24 md:py-32">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center">
@@ -209,6 +218,8 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
-    </div>
-  )
+    ),
+  }
+
+  return <FrontCanvas page="about" layout={layout} sections={sections} className="bg-background" />
 }

@@ -9,6 +9,8 @@ const REBRANDED = Boolean(process.env.NEXT_PUBLIC_BRAND_COMPANY?.trim() || proce
 const PUBLIC_NAME = REBRANDED ? `${BRAND.legalName} UAE` : "Freehold Properties UAE"
 import { Search, TrendingUp, FileText, Globe, Shield, HeadphonesIcon, Home, Briefcase, Check, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { getPublishedFrontLayout } from "@/lib/freehold/front-layout"
+import { FrontCanvas } from "@/components/front/render"
 
 export const metadata = {
   title: `Real Estate Services in Dubai | ${PUBLIC_NAME}`,
@@ -89,18 +91,21 @@ const principles = [
 
 export default async function ServicesPage() {
   const content = await getPageContent('services')
-  return (
-    <>
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0A1F17] pt-32 pb-24 text-white md:pt-40 md:pb-32">
+  // Web Studio → Page Builder. Null = the built-in order and colors.
+  const layout = await getPublishedFrontLayout('services')
+
+  const sections: Record<string, React.ReactNode> = {
+
+    hero: (
+      <section className="relative overflow-hidden fp-dark-bg pt-32 pb-24 text-white md:pt-40 md:pb-32">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-0 h-[280px] w-[900px] -translate-x-1/2 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(212,175,55,0.18),transparent)]" />
           <div className="absolute bottom-0 right-0 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.10),transparent_55%)] blur-[80px]" />
         </div>
         <div className="container relative z-10">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F0D792] backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D4AC50]" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] fp-accent-soft backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 rounded-full fp-accent-bg" />
               Service Coverage
             </span>
             <h1 className="mt-8 font-serif text-5xl font-bold leading-[1.04] tracking-tight md:text-6xl lg:text-7xl">
@@ -112,8 +117,9 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* SERVICES — editorial card grid on layered cream */}
+    services: (
       <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_80%_10%,rgba(198,155,62,0.05),transparent)]" />
         <div className="container relative z-10">
@@ -161,13 +167,14 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* WHY US — dark numbered editorial */}
+    why: (
       <section className="relative overflow-hidden bg-foreground py-24 text-white md:py-32">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(198,155,62,0.08),transparent)]" />
         <div className="container relative z-10">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AC50]">Why {BRAND.company}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] fp-accent">Why {BRAND.company}</p>
             <h2 className="mt-4 font-serif text-3xl font-bold leading-[1.05] md:text-5xl">
               Built differently for a reason.
             </h2>
@@ -176,7 +183,7 @@ export default async function ServicesPage() {
           <div className="mt-16 grid gap-6 md:grid-cols-3 md:gap-8">
             {principles.map((p) => (
               <div key={p.title} className="relative rounded-[24px] border border-white/[0.06] bg-white/[0.03] p-8 backdrop-blur-sm transition-all hover:border-[#D4AC50]/30 hover:bg-white/[0.05]">
-                <div className="font-serif text-[64px] font-bold leading-none text-[#D4AC50]/25">{p.number}</div>
+                <div className="font-serif text-[64px] font-bold leading-none fp-accent/25">{p.number}</div>
                 <h3 className="mt-4 font-serif text-xl font-semibold text-white md:text-2xl">{p.title}</h3>
                 <p className="mt-3 text-[14px] leading-relaxed text-white/55">{p.body}</p>
               </div>
@@ -184,9 +191,10 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* CTA */}
-      <section className="relative overflow-hidden bg-[#0A1F17] py-24 text-white md:py-28">
+    cta: (
+      <section className="relative overflow-hidden fp-dark-bg py-24 text-white md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(212,175,55,0.10),transparent)]" />
         <div className="container relative z-10 text-center">
           <h2 className="mx-auto max-w-2xl font-serif text-3xl font-bold leading-[1.05] md:text-5xl">
@@ -205,6 +213,8 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
-    </>
-  )
+    ),
+  }
+
+  return <FrontCanvas page="services" layout={layout} sections={sections} />
 }

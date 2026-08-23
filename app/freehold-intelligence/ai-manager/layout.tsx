@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   ArrowLeft, Bot,
   LayoutDashboard, Building2, MapPin, HardHat, Globe, Hash, Lightbulb, MonitorSmartphone, PenLine,
+  LayoutPanelTop,
 } from 'lucide-react'
 import { useSessionGuard } from '@/lib/freehold/use-session'
 import { useT } from '@/lib/i18n/provider'
@@ -17,6 +18,7 @@ const tabs = [
   { key: 'paim.nav.developers', href: '/freehold-intelligence/ai-manager/developers',               Icon: HardHat         },
   { key: 'paim.nav.pages',      href: '/freehold-intelligence/ai-manager/pages',                    Icon: Globe           },
   { key: 'paim.nav.content',    href: '/freehold-intelligence/ai-manager/content',                  Icon: PenLine         },
+  { key: 'paim.nav.builder',    href: '/freehold-intelligence/ai-manager/builder',                  Icon: LayoutPanelTop  },
   { key: 'paim.nav.microsites', href: '/freehold-intelligence/ai-manager/microsites',               Icon: MonitorSmartphone },
   { key: 'paim.nav.topics',     href: '/freehold-intelligence/ai-manager/topics',                   Icon: Hash            },
   { key: 'paim.nav.insights',   href: '/freehold-intelligence/ai-manager/insights',                 Icon: Lightbulb       },

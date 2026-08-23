@@ -5,6 +5,8 @@ import { COMPANY_EMAIL, COMPANY_PHONE, COMPANY_PHONE_E164, COMPANY_WHATSAPP_URL 
 import { Phone, Mail, MapPin, MessageCircle, Instagram, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { ContactEnquiryForm } from "@/components/contact-enquiry-form"
+import { getPublishedFrontLayout } from "@/lib/freehold/front-layout"
+import { FrontCanvas } from "@/components/front/render"
 
 export const metadata = {
   title: `Contact ${BRAND.legalName} UAE | Dubai Real Estate Advisors`,
@@ -40,7 +42,7 @@ const contactChannels = [
     value: COMPANY_PHONE,
     helper: "Mon–Sat · 9:00 AM – 7:00 PM (GST)",
     href: `tel:${COMPANY_PHONE_E164}`,
-    accent: "from-primary/20 to-primary/[0.05] text-[#D4AC50] border-primary/25",
+    accent: "from-primary/20 to-primary/[0.05] fp-accent border-primary/25",
   },
   {
     icon: Mail,
@@ -65,17 +67,20 @@ const contactChannels = [
 export default async function ContactPage() {
   // Web Studio → Content overrides; built-in words are the fallback.
   const content = await getPageContent('contact')
-  return (
-    <>
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-[#0A1F17] pt-32 pb-24 text-white md:pt-40 md:pb-32">
+  // Web Studio → Page Builder. Null = the built-in order and colors.
+  const layout = await getPublishedFrontLayout('contact')
+
+  const sections: Record<string, React.ReactNode> = {
+
+    hero: (
+      <section className="relative overflow-hidden fp-dark-bg pt-32 pb-24 text-white md:pt-40 md:pb-32">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute right-1/4 top-0 h-[280px] w-[600px] bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(212,175,55,0.18),transparent)]" />
           <div className="absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(212,175,55,0.10),transparent_55%)] blur-[80px]" />
         </div>
         <div className="container relative z-10">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#F0D792] backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] fp-accent-soft backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Senior advisors online now
             </span>
@@ -88,8 +93,9 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* CHANNELS — premium dark cards */}
+    channels: (
       <section className="relative bg-foreground py-20 text-white md:py-24">
         <div className="container">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
@@ -110,15 +116,16 @@ export default async function ContactPage() {
                   <h3 className="mt-1.5 font-serif text-xl font-semibold text-white">{c.label}</h3>
                   <p className="mt-3 text-[14px] font-medium text-white/85">{c.value}</p>
                   <p className="mt-1.5 text-[12px] leading-relaxed text-white/45">{c.helper}</p>
-                  <ArrowRight className="mt-5 h-4 w-4 text-white/30 transition-all group-hover:translate-x-1 group-hover:text-[#D4AC50]" />
+                  <ArrowRight className="mt-5 h-4 w-4 text-white/30 transition-all group-hover:translate-x-1 group-hover:fp-accent" />
                 </a>
               )
             })}
           </div>
         </div>
       </section>
+    ),
 
-      {/* FORM + INFO */}
+    form: (
       <section className="relative bg-background py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_40%_30%_at_20%_50%,rgba(198,155,62,0.04),transparent)]" />
         <div className="container relative z-10">
@@ -190,8 +197,9 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* CTA strip */}
+    cta: (
       <section className="relative overflow-hidden bg-foreground py-20 text-white md:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(212,175,55,0.10),transparent)]" />
         <div className="container relative z-10 text-center">
@@ -214,6 +222,8 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
-    </>
-  )
+    ),
+  }
+
+  return <FrontCanvas page="contact" layout={layout} sections={sections} />
 }

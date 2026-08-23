@@ -11,6 +11,8 @@ import { COMPANY_WHATSAPP_URL } from "@/lib/site"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { getTenantBrand } from "@/lib/tenancy/server"
+import { getPublishedFrontLayout } from "@/lib/freehold/front-layout"
+import { FrontCanvas } from "@/components/front/render"
 
 /**
  * Per request, not per build: this title is what a tenant's browser tab, search
@@ -168,14 +170,18 @@ export default async function Home() {
   const intelligenceData = await getIntelligenceBlockData()
   // Web Studio → Content. Empty store = the built-in words, unchanged.
   const content = await getPageContent('home')
+  // Web Studio → Page Builder. Null = the built-in order and colors.
+  const layout = await getPublishedFrontLayout('home')
 
-  return (
-    <div className="overflow-x-clip">
+  // Every real section, keyed for the layout. The JSX is the built-in
+  // design, unchanged; a published layout only orders, hides, recolors and
+  // interleaves — it never owns the markup.
+  const sections: Record<string, React.ReactNode> = {
 
-      {/* ── Mobile entry ──────────────────────────────────────────────── */}
-      <div className="block lg:hidden bg-[#0A1F17] px-5 pt-12 pb-8 text-white">
+    mobileEntry: (
+      <div className="block lg:hidden fp-dark-bg px-5 pt-12 pb-8 text-white">
         <div className="mb-6">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AC50]">{BRAND.company}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] fp-accent">{BRAND.company}</span>
           <h1 className="mt-2 text-[30px] font-bold leading-[1.08] text-white font-serif">
             {content.heroTitle ?? <>Invest smarter in<br/>Dubai real estate.</>}
           </h1>
@@ -196,7 +202,7 @@ export default async function Home() {
               href={`/chat?q=${encodeURIComponent(q)}`}
               className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3.5 text-[13px] text-white/65 transition hover:bg-white/[0.07]"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[#D4AC50]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/20 fp-accent">
                 <SparklesIcon className="h-3 w-3" />
               </span>
               {q}
@@ -211,9 +217,10 @@ export default async function Home() {
           Open AI Assistant
         </Link>
       </div>
+    ),
 
-      {/* Mobile quick links */}
-      <div className="block lg:hidden bg-[#0A1F17] px-5 pb-8 border-t border-white/[0.04]">
+    mobileLinks: (
+      <div className="block lg:hidden fp-dark-bg px-5 pb-8 border-t border-white/[0.04]">
         <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/25">Browse</p>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5">
           {mobileQuickLinks.map((link) => (
@@ -227,14 +234,16 @@ export default async function Home() {
           ))}
         </div>
       </div>
+    ),
 
-      {/* ── Desktop hero ─────────────────────────────────────────────── */}
+    hero: (
       <div className="hidden lg:block">
         <HeroWithMotion heroPrompts={heroPrompts} heroTitle={content.heroTitle} heroSubtitle={content.heroSubtitle} />
       </div>
+    ),
 
-      {/* ── Developer trust strip ────────────────────────────────────── */}
-      <div className="relative border-y border-white/[0.04] bg-[#0A1F17] py-6">
+    developers: (
+      <div className="relative border-y border-white/[0.04] fp-dark-bg py-6">
         <div className="container">
           <div className="flex flex-col items-center gap-4 sm:flex-row">
             <p className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.25em] text-white/25">
@@ -255,28 +264,30 @@ export default async function Home() {
           </div>
         </div>
       </div>
+    ),
 
-      {/* ── Intelligence block ───────────────────────────────────────── */}
+    intelligence: (
       <div className="hidden md:block">
         <IntelligenceBlock data={intelligenceData} />
       </div>
+    ),
 
-      {/* ── Featured properties ──────────────────────────────────────── */}
+    featured: (
       <div className="relative overflow-hidden bg-foreground">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_40%_at_50%_0%,rgba(198,155,62,0.06),transparent)]" />
         <FeaturedProperties />
       </div>
+    ),
 
-      {/* ── Market snapshot ──────────────────────────────────────────── */}
-      <MarketSnapshot />
+    market: <MarketSnapshot />,
 
-      {/* ── Freehold Advantage bento grid ───────────────────────────── */}
+    advantage: (
       <div className="hidden md:block">
-        <section className="relative overflow-hidden bg-[#0A1F17] py-24 text-white md:py-32">
+        <section className="relative overflow-hidden fp-dark-bg py-24 text-white md:py-32">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_20%_60%,rgba(198,155,62,0.06),transparent)]" />
           <div className="container relative z-10">
             <div className="mx-auto mb-16 max-w-2xl text-center">
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AC50]">
+              <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.22em] fp-accent">
                 The {BRAND.company} Advantage
               </p>
               <h2 className="font-serif text-4xl font-bold text-white md:text-5xl lg:text-6xl">
@@ -295,7 +306,7 @@ export default async function Home() {
                   >
                     <div className="relative z-10 flex h-full flex-col justify-between">
                       <div>
-                        <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/12 text-[#D4AC50]">
+                        <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/12 fp-accent">
                           <Icon className="h-5 w-5" />
                         </div>
                         <h3 className="font-serif mb-3 text-2xl font-bold text-white">{item.title}</h3>
@@ -305,7 +316,7 @@ export default async function Home() {
                         <div className="mt-8">
                           <Link
                             href={item.href}
-                            className="inline-flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#D4AC50] transition-all group-hover:gap-4"
+                            className="inline-flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.15em] fp-accent transition-all group-hover:gap-4"
                           >
                             {item.cta} <ArrowRightIcon />
                           </Link>
@@ -321,9 +332,10 @@ export default async function Home() {
           </div>
         </section>
       </div>
+    ),
 
-      {/* ── Why Freehold trust band ──────────────────────────────────── */}
-      <section className="relative bg-[#F2EFE8] py-20 md:py-28">
+    trust: (
+      <section className="relative fp-cream-bg py-20 md:py-28">
         <div className="pointer-events-none absolute inset-0 opacity-[0.012]"
           style={{ backgroundImage: "radial-gradient(circle, #152E24 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
         <div className="container relative z-10">
@@ -352,18 +364,19 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* ── Private Advisory + form ──────────────────────────────────── */}
+    advisory: (
       <section className="relative overflow-hidden bg-foreground py-20 text-white md:py-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_5%_50%,rgba(198,155,62,0.06),transparent)]" />
         <div className="container relative z-10">
           <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
             {/* Left: content */}
             <div>
-              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D4AC50]">Private Advisory</p>
+              <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] fp-accent">Private Advisory</p>
               <h2 className="font-serif text-3xl font-bold leading-[1.06] text-white md:text-5xl">
                 Buy, sell, rent, or invest<br className="hidden lg:block" />
-                <span className="italic text-[#D4AC50]"> with clear advice.</span>
+                <span className="italic fp-accent"> with clear advice.</span>
               </h2>
               <p className="mt-5 max-w-md text-base leading-relaxed text-white/40">
                 Speak with {BRAND.company} for project sales, secondary market, rentals, commercial, or owner valuation support.
@@ -373,7 +386,7 @@ export default async function Home() {
                 {advisorySteps.map(([num, title, body]) => (
                   <div key={num} className="flex items-start gap-5">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.04]">
-                      <span className="font-serif text-base font-bold text-[#D4AC50]">{num}</span>
+                      <span className="font-serif text-base font-bold fp-accent">{num}</span>
                     </div>
                     <div>
                       <h4 className="mb-1 text-[15px] font-bold text-white">{title}</h4>
@@ -400,14 +413,16 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    ),
 
-      {/* ── Blog / insights ──────────────────────────────────────────── */}
-      <div className="border-t border-foreground/[0.04] bg-[#F2EFE8] py-20 md:py-24">
+    blog: (
+      <div className="border-t border-foreground/[0.04] fp-cream-bg py-20 md:py-24">
         <BlogSection />
       </div>
+    ),
 
-      {/* ── Final CTA ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0A1F17] py-24 text-white md:py-32">
+    cta: (
+      <section className="relative overflow-hidden fp-dark-bg py-24 text-white md:py-32">
         {/* Background layers */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_50%,rgba(198,155,62,0.07),transparent)]" />
@@ -418,8 +433,8 @@ export default async function Home() {
           <div className="mx-auto max-w-3xl text-center">
             {/* Badge */}
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.08] px-4 py-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#D4AC50]" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D4AC50]">
+              <span className="h-1.5 w-1.5 rounded-full fp-accent-bg" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] fp-accent">
                 {BRAND.legalName} UAE
               </span>
             </div>
@@ -445,7 +460,7 @@ export default async function Home() {
                 "Off-plan expertise",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 text-[12px] text-white/45">
-                  <CheckIcon className="h-3.5 w-3.5 text-[#D4AC50]" />
+                  <CheckIcon className="h-3.5 w-3.5 fp-accent" />
                   {item}
                 </div>
               ))}
@@ -480,7 +495,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+    ),
+  }
 
-    </div>
-  )
+  return <FrontCanvas page="home" layout={layout} sections={sections} className="overflow-x-clip" />
 }
