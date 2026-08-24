@@ -70,7 +70,7 @@ export function SiteHeader() {
 
   // "/business" is the platform site — it carries its own header and speaks to
   // operators, not property buyers, so the property nav stays off it.
-  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business", "/signup"]
+  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business", "/signup", "/ctrl", "/portal"]
   const isMarketCommandPath = pathname === "/market" || /^\/market\/p-/.test(pathname || "")
   if (pathname?.startsWith("/crm") || pathname === "/chat" || isMarketCommandPath || commandPaths.some((path) => pathname === path || pathname?.startsWith(`${path}/`))) {
     return null
