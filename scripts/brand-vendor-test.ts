@@ -38,6 +38,10 @@ console.log('\n── the default identity is the platform, not the client ─�
     && /NEXT_PUBLIC_BRAND_PROJECTS,\s*''/.test(brand)
     && /NEXT_PUBLIC_BRAND_CLIENTS,\s*''/.test(brand)
     && /NEXT_PUBLIC_BRAND_RERA_ORN,\s*''/.test(brand))
+  check("social-link fields default to empty (a deployment never links out to the client's socials)",
+    /NEXT_PUBLIC_BRAND_FACEBOOK,\s*''/.test(brand)
+    && /NEXT_PUBLIC_BRAND_INSTAGRAM,\s*''/.test(brand)
+    && /NEXT_PUBLIC_BRAND_LINKEDIN,\s*''/.test(brand))
 }
 
 console.log('\n── vendor-facing marketing pages ship no hardcoded client numbers ──')
@@ -56,6 +60,30 @@ console.log('\n── vendor-facing marketing pages ship no hardcoded client num
     const src = read(f)
     const hits = FORBIDDEN.filter((s) => src.includes(s))
     check(`${f} carries no hardcoded client claim`, hits.length === 0, hits.join(', '))
+  }
+}
+
+console.log('\n── no vendor surface links out to the client (socials / domain) ──')
+{
+  // The footer and contact page once hardcoded the client's Facebook / Instagram
+  // / LinkedIn; two back-end surfaces hardcoded the client's domain as a fallback
+  // (Google keyword-plan final URL, and the brochure-export footer). All must
+  // read the brand config so a vendor / white-label deployment shows its OWN
+  // identity, and withholds a social link it has not been given.
+  const SURFACES = [
+    'components/site-footer.tsx',
+    'app/contact/page.tsx',
+    'app/api/google/keyword-plan/route.ts',
+    'app/freehold-intelligence/drive/editor/doc/[id]/page.tsx',
+  ]
+  // The client's own handles / domain. 'freehold' ALONE is fine — that is the
+  // internal lib/freehold/* namespace, not a user-visible claim; these are the
+  // client-identity tokens only.
+  const CLIENT_REFS = ['freeholdproperty', 'facebook.com/freehold', 'freehold-property-uae']
+  for (const f of SURFACES) {
+    const src = read(f).toLowerCase()
+    const hits = CLIENT_REFS.filter((s) => src.includes(s))
+    check(`${f} carries no hardcoded client social/domain`, hits.length === 0, hits.join(', '))
   }
 }
 

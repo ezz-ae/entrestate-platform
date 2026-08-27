@@ -57,12 +57,15 @@ const contactChannels = [
     icon: Instagram,
     eyebrow: "Social",
     label: "Instagram",
-    value: "@freeholdproperty",
+    value: BRAND.instagram ? `@${BRAND.instagram.split('/').filter(Boolean).pop()}` : "",
     helper: "Market notes, launches, behind-the-scenes",
-    href: "https://www.instagram.com/freeholdproperty/",
+    href: BRAND.instagram,
     accent: "from-rose-500/20 to-rose-500/[0.05] text-rose-300 border-rose-400/25",
   },
-]
+  // The Instagram channel is WITHHELD when the brand sets no instagram URL — a
+  // vendor deployment never surfaces the client's handle. WhatsApp / call / email
+  // hrefs are always present, so only the empty-href Instagram row is dropped.
+].filter((c) => c.href)
 
 export default async function ContactPage() {
   // Web Studio → Content overrides; built-in words are the fallback.

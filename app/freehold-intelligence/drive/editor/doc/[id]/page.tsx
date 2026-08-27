@@ -14,6 +14,7 @@ import { AiEditorRail } from '@/components/freehold/drive/ai-editor-rail'
 import { AiUnavailable, DOC_LIMIT, type ArtifactAdapter, type PresetChip } from '@/lib/freehold/drive-ai-rail'
 import type { DriveKind } from '@/lib/freehold/drive'
 import { useAutosaveDraft } from '@/lib/freehold/use-autosave-draft'
+import { BRAND } from '@/lib/freehold/brand'
 
 type Item = { id: string; kind: DriveKind; title: string; content: string | null; url: string | null }
 
@@ -218,7 +219,7 @@ export default function DriveDocEditor() {
       cover = `<header class="cover"><div class="eyebrow">${escapeHtml(title || 'Brochure')}</div><h1>${lines[0] || ''}</h1>${lines.length > 1 ? `<p class="by">${lines.slice(1).join('<br>')}</p>` : ''}</header>`
       first.remove()
     }
-    return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title || 'document')}</title><style>${BROCHURE_CSS}</style></head><body dir="auto">${cover}<main>${host.innerHTML}</main><footer class="foot"><b>${escapeHtml(title || '')}</b><span>freeholdproperty.ae</span></footer></body></html>`
+    return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title || 'document')}</title><style>${BROCHURE_CSS}</style></head><body dir="auto">${cover}<main>${host.innerHTML}</main><footer class="foot"><b>${escapeHtml(title || '')}</b><span>${escapeHtml(BRAND.domain)}</span></footer></body></html>`
   }
   function downloadHtml() {
     const blob = new Blob([brochureHtml()], { type: 'text/html' })

@@ -13,6 +13,7 @@
  */
 import { NextResponse } from 'next/server'
 import { requireSession } from '@/lib/freehold/api-auth'
+import { BRAND } from '@/lib/freehold/brand'
 import { MANAGEMENT_ROLES, type Role } from '@/lib/freehold/session-types'
 import { getInventoryPropertiesFromDB } from '@/lib/inventory-data'
 import { readOpportunityScores } from '@/lib/freehold/opportunity'
@@ -38,7 +39,9 @@ const READ_ROLES: Role[] = [...MANAGEMENT_ROLES, 'marketing']
 function origin(): string {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim()
   if (raw && /^https:\/\//.test(raw)) return raw.replace(/\/$/, '')
-  return 'https://www.freeholdproperty.ae'
+  // Fallback is the deployment's OWN brand domain, never the client's — a
+  // keyword plan's final URL must point at the account that runs the campaign.
+  return `https://www.${BRAND.domain}`
 }
 
 /**

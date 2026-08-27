@@ -128,12 +128,16 @@ export function SiteFooter() {
             </div>
 
             <div className="flex items-center gap-2.5 pt-2">
+              {/* Social links are brand-driven and WITHHELD when unset — a vendor
+                  or white-label deployment never links out to the client's socials
+                  (this footer once hardcoded the client's Facebook/Instagram/LinkedIn).
+                  WhatsApp derives from the brand phone, so it always shows. */}
               {[
-                { icon: <FacebookIcon />, href: "https://www.facebook.com/FreeholdProperty/" },
-                { icon: <InstagramIcon />, href: "https://www.instagram.com/freeholdproperty/" },
-                { icon: <LinkedinIcon />, href: "https://www.linkedin.com/company/freehold-property-uae/" },
-                { icon: <MessageCircleIcon />, href: COMPANY_WHATSAPP_URL }
-              ].map((social, i) => (
+                { icon: <FacebookIcon />, href: BRAND.facebook },
+                { icon: <InstagramIcon />, href: BRAND.instagram },
+                { icon: <LinkedinIcon />, href: BRAND.linkedin },
+                { icon: <MessageCircleIcon />, href: COMPANY_WHATSAPP_URL },
+              ].filter((social) => social.href).map((social, i) => (
                 <a
                   key={i}
                   href={social.href}

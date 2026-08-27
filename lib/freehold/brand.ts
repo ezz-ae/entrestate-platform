@@ -23,6 +23,9 @@
  *   NEXT_PUBLIC_BRAND_ADDRESS        → office address (footer, JSON-LD)
  *   NEXT_PUBLIC_BRAND_LEAD_PREFIX    → lead serial prefix (fresh databases only)
  *   NEXT_PUBLIC_BRAND_TIMEZONE       → IANA timezone of the operation
+ *   NEXT_PUBLIC_BRAND_FACEBOOK       → Facebook page URL (footer icon; withheld if unset)
+ *   NEXT_PUBLIC_BRAND_INSTAGRAM      → Instagram profile URL (footer + contact; withheld)
+ *   NEXT_PUBLIC_BRAND_LINKEDIN       → LinkedIn company URL (footer icon; withheld)
  *
  * All variables are NEXT_PUBLIC_* and are inlined at build time, so this
  * module is safe to import from both server and client components.
@@ -87,6 +90,12 @@ export interface BrandConfig {
   /** RERA broker registration (ORN). The vendor platform is not a licensed
    *  brokerage, so this is empty ⇒ the "RERA licensed" claim is withheld. */
   reraOrn: string
+  /** Facebook page URL. A brand link — empty ⇒ the icon is withheld. */
+  facebook: string
+  /** Instagram profile URL (footer icon + contact channel). Empty ⇒ withheld. */
+  instagram: string
+  /** LinkedIn company URL. Empty ⇒ withheld. */
+  linkedin: string
 }
 
 const domain = env(process.env.NEXT_PUBLIC_BRAND_DOMAIN, 'entrestate.com')
@@ -121,6 +130,12 @@ export const BRAND: BrandConfig = {
   projectsMapped: env(process.env.NEXT_PUBLIC_BRAND_PROJECTS, ''),
   clientsServed: env(process.env.NEXT_PUBLIC_BRAND_CLIENTS, ''),
   reraOrn: env(process.env.NEXT_PUBLIC_BRAND_RERA_ORN, ''),
+  // Social links — empty by default so a vendor / white-label deployment never
+  // links out to the client's socials (the footer once pointed at the client's
+  // Facebook/Instagram/LinkedIn). Set per deployment; withheld until then.
+  facebook: env(process.env.NEXT_PUBLIC_BRAND_FACEBOOK, ''),
+  instagram: env(process.env.NEXT_PUBLIC_BRAND_INSTAGRAM, ''),
+  linkedin: env(process.env.NEXT_PUBLIC_BRAND_LINKEDIN, ''),
 }
 
 /** Full product name, e.g. "Freehold Intelligence". */
