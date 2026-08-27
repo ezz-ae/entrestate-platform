@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { AISearchBar } from "@/components/ai-search-bar"
+import { BRAND } from "@/lib/freehold/brand"
 
 interface HeroWithMotionProps {
   heroPrompts: string[]
@@ -13,12 +14,20 @@ interface HeroWithMotionProps {
   heroSubtitle?: string
 }
 
+// Brokerage claims (projects mapped, years in market) come from the brand
+// config and are WITHHELD when empty — the platform never ships another
+// company's numbers. The market figures are not brand claims and always show.
 const trustMetrics = [
-  { value: "3,500+",  label: "Projects mapped",   suffix: "" },
-  { value: "8.6%",   label: "Avg rental yield",   suffix: "" },
-  { value: "72%",    label: "Golden Visa ready",  suffix: "" },
-  { value: "19 yrs", label: "Market expertise",   suffix: "" },
-]
+  BRAND.projectsMapped ? { value: BRAND.projectsMapped, label: "Projects mapped" } : null,
+  { value: "8.6%", label: "Avg rental yield" },
+  { value: "72%",  label: "Golden Visa ready" },
+  BRAND.yearsExperience ? { value: `${BRAND.yearsExperience} yrs`, label: "Market expertise" } : null,
+].filter(Boolean) as Array<{ value: string; label: string }>
+
+const metricsGridClass =
+  trustMetrics.length >= 4 ? "grid-cols-2 sm:grid-cols-4"
+    : trustMetrics.length === 3 ? "grid-cols-3"
+      : "grid-cols-2"
 
 const StarIcon = () => (
   <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -58,7 +67,8 @@ export function HeroWithMotion({ heroPrompts, heroTitle, heroSubtitle }: HeroWit
       <div className="container relative z-10 py-24 md:py-32">
         <div className="mx-auto max-w-4xl text-center">
 
-          {/* Social proof pill */}
+          {/* Social proof — a client claim; shown only when a deployment sets it. */}
+          {BRAND.clientsServed ? (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -69,9 +79,10 @@ export function HeroWithMotion({ heroPrompts, heroTitle, heroSubtitle }: HeroWit
               {[...Array(5)].map((_, i) => <StarIcon key={i} />)}
             </div>
             <span className="text-[11px] font-medium text-white/50">
-              Trusted by <span className="text-white/80 font-semibold">2,400+</span> investors worldwide
+              Trusted by <span className="text-white/80 font-semibold">{BRAND.clientsServed}</span> investors worldwide
             </span>
           </motion.div>
+          ) : null}
 
           {/* Main headline */}
           <motion.div
@@ -129,7 +140,7 @@ export function HeroWithMotion({ heroPrompts, heroTitle, heroSubtitle }: HeroWit
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.38 }}
-            className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-white/[0.06] sm:grid-cols-4"
+            className={`mt-14 grid ${metricsGridClass} gap-px overflow-hidden rounded-2xl bg-white/[0.06]`}
           >
             {trustMetrics.map((metric, i) => (
               <div

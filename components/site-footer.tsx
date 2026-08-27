@@ -191,7 +191,7 @@ export function SiteFooter() {
         <div className="mt-16 border-t border-white/[0.04] pt-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <p className="text-center text-[10px] font-medium uppercase tracking-[0.12em] text-white/35 md:text-left">
-              &copy; {new Date().getFullYear()} {BRAND.legalName} UAE &middot; RERA ORN: 28628 &middot; Business Bay &middot; DUBAI
+              &copy; {new Date().getFullYear()} {BRAND.legalName}{BRAND.reraOrn ? ` · RERA ORN: ${BRAND.reraOrn}` : ''} &middot; {BRAND.address}
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/38 md:gap-8">
               <Link href="/privacy" className="transition-colors hover:text-[#D4AC50]">Privacy Policy</Link>

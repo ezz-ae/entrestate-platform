@@ -27,8 +27,15 @@
  * All variables are NEXT_PUBLIC_* and are inlined at build time, so this
  * module is safe to import from both server and client components.
  *
- * Defaults below are the Freehold production values: a deployment that sets
- * none of these variables behaves exactly as before.
+ * Defaults below are the VENDOR (Entrestate) values — the platform's own
+ * identity. This repo was forked from a client (Freehold), and for a while its
+ * defaults were that client's, so any deployment that never set the env wore
+ * the wrong company. The defaults now name the platform; a white-label client
+ * sets NEXT_PUBLIC_BRAND_* to their own, and the Freehold client runs its own
+ * deployment (ezz-ae/ORE) entirely. Claims that belong to a specific brokerage
+ * (years in market, projects, clients, RERA licence) default to EMPTY and are
+ * withheld unless a deployment sets them — the platform never ships another
+ * company's unverifiable numbers.
  */
 
 const env = (value: string | undefined, fallback: string): string => {
@@ -71,13 +78,22 @@ export interface BrandConfig {
   privacyUrl: string
   /** IANA timezone the operation runs in. */
   timezone: string
+  /** Years in market, e.g. "19". A brokerage claim — empty ⇒ withheld. */
+  yearsExperience: string
+  /** Projects mapped, e.g. "3,500+". Prefer live data; empty ⇒ withheld. */
+  projectsMapped: string
+  /** Clients / investors served, e.g. "2,400+". Empty ⇒ withheld. */
+  clientsServed: string
+  /** RERA broker registration (ORN). The vendor platform is not a licensed
+   *  brokerage, so this is empty ⇒ the "RERA licensed" claim is withheld. */
+  reraOrn: string
 }
 
-const domain = env(process.env.NEXT_PUBLIC_BRAND_DOMAIN, 'freeholdproperty.ae')
+const domain = env(process.env.NEXT_PUBLIC_BRAND_DOMAIN, 'entrestate.com')
 const phoneE164 = env(process.env.NEXT_PUBLIC_BRAND_PHONE_E164, '+971504173622')
 
 export const BRAND: BrandConfig = {
-  company: env(process.env.NEXT_PUBLIC_BRAND_COMPANY, 'Freehold'),
+  company: env(process.env.NEXT_PUBLIC_BRAND_COMPANY, 'Entrestate'),
   product: env(process.env.NEXT_PUBLIC_BRAND_PRODUCT, 'Intelligence'),
   /* Entrestate's own accent — the blue of the third square in the tri-dot
    * wordmark. The previous default was #D4AF37, the FREEHOLD brand this repo
@@ -86,19 +102,25 @@ export const BRAND: BrandConfig = {
    * deployment sets NEXT_PUBLIC_BRAND_ACCENT and is unaffected. */
   accent: env(process.env.NEXT_PUBLIC_BRAND_ACCENT, '#3B82F6'),
   domain,
-  legalName: env(process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME, 'Freehold Property'),
+  legalName: env(process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME, 'Entrestate'),
   tagline: env(process.env.NEXT_PUBLIC_BRAND_TAGLINE, 'Authorized Personnel Only'),
   phone: env(process.env.NEXT_PUBLIC_BRAND_PHONE, '+971 50 417 3622'),
   phoneE164,
   whatsappNumber: phoneE164.replace(/\D/g, ''),
   email: env(process.env.NEXT_PUBLIC_BRAND_EMAIL, `info@${domain}`),
-  emailFrom: env(process.env.NEXT_PUBLIC_BRAND_EMAIL_FROM, 'Freehold'),
+  emailFrom: env(process.env.NEXT_PUBLIC_BRAND_EMAIL_FROM, 'Entrestate'),
   supportEmail: env(process.env.NEXT_PUBLIC_BRAND_SUPPORT_EMAIL, `support@${domain}`),
   legalEmail: env(process.env.NEXT_PUBLIC_BRAND_LEGAL_EMAIL, `legal@${domain}`),
   address: env(process.env.NEXT_PUBLIC_BRAND_ADDRESS, 'Business Bay, Dubai, UAE'),
   leadPrefix: env(process.env.NEXT_PUBLIC_BRAND_LEAD_PREFIX, 'FH'),
   privacyUrl: `https://${domain}/privacy`,
   timezone: env(process.env.NEXT_PUBLIC_BRAND_TIMEZONE, 'Asia/Dubai'),
+  // Brokerage claims — empty by default so the platform never ships another
+  // company's unverifiable numbers. A licensed-brokerage deployment sets them.
+  yearsExperience: env(process.env.NEXT_PUBLIC_BRAND_YEARS, ''),
+  projectsMapped: env(process.env.NEXT_PUBLIC_BRAND_PROJECTS, ''),
+  clientsServed: env(process.env.NEXT_PUBLIC_BRAND_CLIENTS, ''),
+  reraOrn: env(process.env.NEXT_PUBLIC_BRAND_RERA_ORN, ''),
 }
 
 /** Full product name, e.g. "Freehold Intelligence". */

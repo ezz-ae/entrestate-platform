@@ -174,7 +174,9 @@ export default async function ContactPage() {
                   </div>
                 </div>
 
-                <p className="text-[11px] uppercase tracking-[0.16em] text-foreground/40">RERA ORN: {content.rera ?? '28628'}</p>
+                {(content.rera ?? BRAND.reraOrn) ? (
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-foreground/40">RERA ORN: {content.rera ?? BRAND.reraOrn}</p>
+                ) : null}
               </div>
             </aside>
 

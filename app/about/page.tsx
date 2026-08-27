@@ -2,22 +2,20 @@ import { getPageContent } from "@/lib/freehold/site-content"
 import { Button } from "@/components/ui/button"
 import { BRAND } from "@/lib/freehold/brand"
 
-// Byte-identical default: this page historically used a slightly different
-// public name than BRAND.legalName. Keep the exact legacy text unless the
-// deployment explicitly re-brands via NEXT_PUBLIC_BRAND_* env vars.
-const REBRANDED = Boolean(process.env.NEXT_PUBLIC_BRAND_COMPANY?.trim() || process.env.NEXT_PUBLIC_BRAND_LEGAL_NAME?.trim())
-const LEGAL_ENTITY = REBRANDED ? BRAND.legalName : "Freehold Properties LLC"
+// The company name is the brand config's — the platform's own by default, a
+// client's when they set NEXT_PUBLIC_BRAND_*. No hardcoded client legacy name.
+const LEGAL_ENTITY = BRAND.legalName
 import { Target, Eye, ArrowRight, Quote } from "lucide-react"
 import Link from "next/link"
 import { getPublishedFrontLayout } from "@/lib/freehold/front-layout"
 import { FrontCanvas } from "@/components/front/render"
 
 export const metadata = {
-  title: `About ${BRAND.legalName} UAE | 19 Years in Dubai Real Estate`,
-  description: `${LEGAL_ENTITY} — 19 years of Dubai real estate. Sales, leasing, investments, consultancy, and market intelligence for global investors.`,
+  title: `About ${BRAND.legalName} — Dubai Real Estate`,
+  description: `${LEGAL_ENTITY} — Dubai real estate advisory and market intelligence: sales, leasing, investments, and consultancy for global investors.`,
   alternates: { canonical: "/about" },
   openGraph: {
-    title: `About ${BRAND.legalName} UAE | 19 Years in Dubai Real Estate`,
+    title: `About ${BRAND.legalName} — Dubai Real Estate`,
     description: "Full-service Dubai brokerage with deep market knowledge and ethical practice — sales, leasing, advisory, and valuation.",
     url: "/about",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: `About ${BRAND.legalName} UAE` }],
@@ -44,12 +42,13 @@ const chapters = [
   },
 ]
 
+// Brokerage track-record claims — brand-driven and withheld when empty, so the
+// platform never attributes another company's numbers to itself.
 const stats = [
-  { value: "19", suffix: "yrs", label: "in the Dubai market" },
-  { value: "3,500", suffix: "+", label: "Projects mapped" },
-  { value: "1,530", suffix: "+", label: "Clients served" },
-  { value: "285", suffix: "+", label: "Properties closed" },
-]
+  BRAND.yearsExperience ? { value: BRAND.yearsExperience, suffix: "yrs", label: "in the Dubai market" } : null,
+  BRAND.projectsMapped ? { value: BRAND.projectsMapped, suffix: "", label: "Projects mapped" } : null,
+  BRAND.clientsServed ? { value: BRAND.clientsServed, suffix: "", label: "Clients served" } : null,
+].filter(Boolean) as Array<{ value: string; suffix: string; label: string }>
 
 const principles = [
   { number: "01", title: "Conviction over volume", body: "We curate, we don't carpet-bomb. A shortlist of five with reasoning beats fifty without." },
@@ -83,7 +82,7 @@ export default async function AboutPage() {
                 <span className="freehold-text-gradient italic">decoded.</span></>}
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-white/55">
-                {content.heroIntro ?? `${LEGAL_ENTITY} is a private advisory and brokerage firm built around one idea — clients should never have to guess. Nineteen years inside the Dubai market, 3,500+ projects mapped, and a team of senior advisors who own every brief end-to-end.`}
+                {content.heroIntro ?? `${LEGAL_ENTITY} is built around one idea — clients should never have to guess. Deep Dubai market coverage, projects mapped and scored from the transaction record, and senior advisors who own every brief end-to-end.`}
               </p>
 
               <div className="mt-12 flex flex-wrap items-center gap-10">

@@ -29,7 +29,7 @@ const services = [
     icon: Search,
     eyebrow: "01 · Acquisition",
     title: "Property Search & Acquisition",
-    description: "3,500+ verified Dubai listings curated to your brief. AI-assisted search, viewings, negotiation, and closing.",
+    description: "Verified Dubai listings curated to your brief. AI-assisted search, viewings, negotiation, and closing.",
     features: ["Personalized shortlist in 24 hrs", "Virtual & in-person viewings", "Negotiation and offer management", "Due diligence and verification", "Transaction coordination"],
   },
   {
@@ -84,7 +84,7 @@ const services = [
 ]
 
 const principles = [
-  { number: "01", title: "Local Expertise", body: "19 years inside the Dubai market with direct developer relationships across launches and resale." },
+  { number: "01", title: "Local Expertise", body: "Deep Dubai market knowledge with direct developer relationships across launches and resale." },
   { number: "02", title: "Global Perspective", body: "Investors served across 50+ countries with cross-border documentation and remote closings." },
   { number: "03", title: "Technology-Driven", body: "AI shortlists, ROI modeling, and live market signals — built so decisions don't rely on guesswork." },
 ]
