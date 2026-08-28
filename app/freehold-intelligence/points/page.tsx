@@ -47,7 +47,10 @@ export default async function TokensPage() {
   // The plan rides the host-resolved brand payload — 'realtor' only when this
   // request's host is a tenant whose saas_tenants row says so.
   const plan = (await getTenantBrand())?.plan ?? 'company'
-  if (plan !== 'realtor') redirect('/freehold-intelligence')
+  // The wallet page is the money surface for BOTH the one-person plans — the
+  // realtor's "Tokens" and the personal account's "Fund". A company uses the
+  // Finance desk instead, so it is bounced to the hub.
+  if (plan !== 'realtor' && plan !== 'account') redirect('/freehold-intelligence')
 
   const cookieStore = await cookies()
   const user = await verifySession(cookieStore.get(SESSION_COOKIE)?.value)

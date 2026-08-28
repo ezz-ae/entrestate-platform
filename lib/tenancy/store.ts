@@ -32,7 +32,7 @@ export type TenantStatus = 'trial' | 'active' | 'suspended'
  * schema, own catalogue copy) whose few-clicks feel comes from surface
  * gating, not from a different tenancy shape.
  */
-export type TenantPlan = 'company' | 'realtor'
+export type TenantPlan = 'company' | 'realtor' | 'account'
 
 export interface SaasTenant {
   id: string
@@ -82,8 +82,8 @@ const mapTenant = (r: TenantRow): SaasTenant => ({
   accent: r.accent,
   logo: r.logo,
   // Unknown values collapse to 'company' (the full surface set is the safe
-  // default — gating only ever REMOVES surfaces for 'realtor').
-  plan: r.plan === 'realtor' ? 'realtor' : 'company',
+  // default — gating only ever REMOVES surfaces for 'realtor' / 'account').
+  plan: r.plan === 'realtor' ? 'realtor' : r.plan === 'account' ? 'account' : 'company',
   status: (['trial', 'active', 'suspended'].includes(r.status) ? r.status : 'suspended') as TenantStatus,
   trialEndsAt: r.trial_ends_at,
   createdAt: r.created_at,
@@ -199,7 +199,7 @@ export async function createTenant(input: {
   const product = (input.product ?? '').trim().slice(0, 24) || 'Lead Machine'
   const accent = /^#[0-9a-fA-F]{6}$/.test(input.accent ?? '') ? (input.accent as string) : DEFAULT_ACCENT
   const logo = (input.logo ?? '').startsWith('data:image/') ? (input.logo as string) : ''
-  const plan: TenantPlan = input.plan === 'realtor' ? 'realtor' : 'company'
+  const plan: TenantPlan = input.plan === 'realtor' ? 'realtor' : input.plan === 'account' ? 'account' : 'company'
   // Lowercased at the boundary so the stored value and every lookup agree.
   // An absent owner is stored as NULL, never as '' — an empty string would
   // match an empty lookup and hand a stranger somebody's workspace.

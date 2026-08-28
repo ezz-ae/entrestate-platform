@@ -3,7 +3,7 @@
 import { Toaster } from 'sonner'
 import { usePathname, redirect } from 'next/navigation'
 import { useBrand } from '@/components/whitelabel/brand-provider'
-import { realtorAllowsPath, REALTOR_HOME } from '@/lib/freehold/apps'
+import { realtorAllowsPath, REALTOR_HOME, accountAllowsPath, ACCOUNT_HOME } from '@/lib/freehold/apps'
 import { SpacesNav } from '@/components/freehold/spaces-nav'
 import { TrialBanner } from '@/components/freehold/trial-banner'
 import type { TrialState } from '@/lib/tenancy/trial'
@@ -28,6 +28,9 @@ function FreeholdShell({ children, trial }: { children: React.ReactNode; trial: 
   // so nav and guard cannot disagree. Anything outside it, including the hub
   // itself, lands on the campaign desk: that IS the realtor's home.
   if (plan === 'realtor' && !realtorAllowsPath(pathname)) redirect(REALTOR_HOME)
+  // Same defense in depth for the personal account plan: its home is the hub
+  // briefing, and anything outside its module allow-list bounces back there.
+  if (plan === 'account' && !accountAllowsPath(pathname)) redirect(ACCOUNT_HOME)
 
   if (!ready) {
     return (

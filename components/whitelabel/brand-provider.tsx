@@ -30,7 +30,7 @@ export interface RuntimeBrand {
    * Always resolved here (never optional) so gating code can branch on it
    * without null-guards; non-tenant modes are 'company' by definition.
    */
-  plan: 'company' | 'realtor'
+  plan: 'company' | 'realtor' | 'account'
 }
 
 /** The static Freehold brand — the default when no workspace override is set. */
@@ -56,7 +56,7 @@ export interface BrandSnapshot {
    * demo cookie path has no tenant row and simply omits it. Absent means
    * 'company' — the full surface set.
    */
-  plan?: 'company' | 'realtor'
+  plan?: 'company' | 'realtor' | 'account'
 }
 
 const BRAND_STORE_KEY = 'fh_last_brand_v1'

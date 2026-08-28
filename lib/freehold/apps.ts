@@ -18,7 +18,7 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   Users, UsersRound, Megaphone, DollarSign, TrendingUp, Bot, Package,
-  ShieldCheck, Settings, BookOpen, BarChart3, UserCircle, Clapperboard, CalendarDays, HardDrive,
+  ShieldCheck, Settings, BookOpen, BarChart3, UserCircle, Clapperboard, CalendarDays, HardDrive, Wallet,
 } from 'lucide-react'
 import type { Role } from './session-types'
 import { MANAGEMENT_ROLES } from './session-types'
@@ -44,6 +44,9 @@ export interface AppDef {
   brokerHide?: boolean
   /** visible ONLY to brokers — e.g. the personal agent workspace */
   brokerOnly?: boolean
+  /** the personal-ACCOUNT plan's own surface (e.g. Fund) — never reached through
+   *  company/realtor role visibility; only the account plan lists it explicitly. */
+  accountOnly?: boolean
   /** explicit allow-list of roles — single source of truth; when set it takes
    *  precedence over the flags above and MUST match the section's route guard. */
   roles?: Role[]
@@ -70,6 +73,18 @@ export const SETTINGS_ROLES: Role[] = ['admin', 'director', 'ceo']
 export const TEAM_APP_ROLES: Role[] = [...MGMT_ROLES, 'team_leader']
 
 export const APPS: AppDef[] = [
+  // Fund — the personal account's money surface: balance, top-up, activity.
+  // ACCOUNT PLAN ONLY (a company sees Finance, a realtor sees Tokens), so it is
+  // accountOnly and leads the account spine. Reuses the EXISTING wallet page —
+  // nothing new is built here; the account plan just mounts it.
+  {
+    id: 'fund', label: 'Fund', sub: 'Balance · Top-up · Activity',
+    href: '/freehold-intelligence/points', Icon: Wallet,
+    metric: 'Your balance & spend', badge: 0, accent: '#3B82F6',
+    card: 'border-blue-400/15 hover:border-blue-400/30',
+    icon: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+    accountOnly: true,
+  },
   {
     id: 'crm', label: 'CRM', sub: 'Leads · Agents · Pipeline',
     href: '/freehold-intelligence/crm', Icon: Users,
@@ -215,7 +230,7 @@ export const APPS: AppDef[] = [
  * 'realtor' is the one-person "Meta for Realtors" workspace: same tenancy
  * rails, but the surface shrinks to what a solo ad-running agent needs.
  */
-export type TenantPlan = 'company' | 'realtor'
+export type TenantPlan = 'company' | 'realtor' | 'account'
 
 /**
  * The realtor's few-clicks workspace, by app id. Plan — not role — is the
@@ -257,8 +272,45 @@ export function realtorAllowsPath(pathname: string): boolean {
   return REALTOR_ALLOWED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
 
+/**
+ * The personal ACCOUNT plan — the individual's Account Hub. Same tenancy rails
+ * as realtor/company, but the surface is the account primitives — the shell the
+ * company system never had for one person. Every module here is the EXISTING
+ * full app (CRM, Integrations, Drive, Calendar, Settings), MOUNTED, not rebuilt,
+ * with Fund (the wallet) as the account's own money surface and the hook that
+ * ties them together. AI chat is the Expert dock, always present in the shell.
+ */
+const ACCOUNT_APP_IDS: string[] = ['fund', 'crm', 'integrations', 'drive', 'calendar', 'settings']
+
+/** The account's home — the existing hub briefing, reused. */
+export const ACCOUNT_HOME = '/freehold-intelligence'
+
+/**
+ * Route prefixes an account plan may open — DERIVED from its module entries
+ * (href + match), plus the personal surfaces every plan keeps. Nav and route
+ * guard both read THIS list, so they can never disagree. The bare hub home is
+ * NOT a prefix here (it would open every sub-route); accountAllowsPath allows
+ * it exactly instead.
+ */
+export const ACCOUNT_ALLOWED_PREFIXES: string[] = [
+  ...new Set(
+    APPS.filter((a) => ACCOUNT_APP_IDS.includes(a.id)).flatMap((a) => [a.href, ...(a.match ?? [])]),
+  ),
+  '/freehold-intelligence/settings/connect',
+  '/freehold-intelligence/help',
+]
+
+/** Whether an account-plan workspace may open this pathname. */
+export function accountAllowsPath(pathname: string): boolean {
+  if (pathname === ACCOUNT_HOME) return true
+  return ACCOUNT_ALLOWED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
+}
+
 /** Whether a role may access an app — single source of truth for nav + guards. */
 export function appAllowsRole(a: AppDef, role?: Role): boolean {
+  // Account-plan surfaces (Fund) are never reached through company/realtor role
+  // visibility — only the account plan lists them (see visibleApps).
+  if (a.accountOnly)    return false
   if (a.roles)          return !!role && a.roles.includes(role)
   if (a.brokerOnly)     return role === 'broker'
   if (a.managementOnly) return role ? MANAGEMENT_ROLES.includes(role) : false
@@ -280,6 +332,7 @@ export function rolesForApp(id: string): Role[] {
 /** Apps a given role is allowed to see; plan='realtor' overrides role. */
 export function visibleApps(role?: Role, plan?: TenantPlan): AppDef[] {
   if (plan === 'realtor') return APPS.filter((a) => REALTOR_APP_IDS.includes(a.id))
+  if (plan === 'account') return APPS.filter((a) => ACCOUNT_APP_IDS.includes(a.id))
   return APPS.filter((a) => appAllowsRole(a, role))
 }
 
