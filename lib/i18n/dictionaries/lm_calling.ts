@@ -16,6 +16,24 @@
 type Dict = Record<string, string>
 
 const en: Dict = {
+  // ── the hiring desk (calling/team-panel.tsx) ──
+  'lm.team.title': 'Your Visual Sales Team',
+  'lm.team.subtitle': 'Who is on payroll, how far they are trained, and what stands between each of them and the phone.',
+  'lm.team.loading': 'Loading the team…',
+  'lm.team.loadFailed': 'Could not load the team.',
+  'lm.team.actionFailed': 'That change did not go through.',
+  'lm.team.ready': 'Ready to take calls.',
+  'lm.team.notHired': 'Not hired yet. A call needs someone on payroll.',
+  'lm.team.adsOnly': 'On an ads token — answers forms, never the phone. Hire them to call.',
+  'lm.team.training': 'Trained to {level}%. Keep teaching: {threshold}% before they may call.',
+  'lm.team.noVoice': 'No voice agent of their own yet, so they would call as someone else.',
+  'lm.team.voiceShared': 'Shares a voice with a colleague. Give each their own before they call the same buyer.',
+  'lm.team.end': 'End',
+  'lm.team.train': 'Teach +5',
+  'lm.team.term.weekly': 'Weekly',
+  'lm.team.term.monthly': 'Monthly',
+  'lm.team.term.yearly': 'Yearly',
+  'lm.team.term.ad_hourly': 'Ads only',
   // ── screen ──
   'lm.call.title': 'Lead Calling',
   'lm.call.subtitle': 'A voice call to a lead who agreed to be called, on a script the desk wrote.',
@@ -112,6 +130,24 @@ const en: Dict = {
 }
 
 const ar: Dict = {
+  // ── the hiring desk ──
+  'lm.team.title': 'فريق المبيعات المرئي',
+  'lm.team.subtitle': 'مَن على كشف الرواتب، وإلى أين وصل تدريبه، وما الذي يقف بينه وبين الهاتف.',
+  'lm.team.loading': 'جارٍ تحميل الفريق…',
+  'lm.team.loadFailed': 'تعذّر تحميل الفريق.',
+  'lm.team.actionFailed': 'لم يتم تنفيذ التغيير.',
+  'lm.team.ready': 'جاهز لاستقبال المكالمات.',
+  'lm.team.notHired': 'لم يتم توظيفه بعد. المكالمة تحتاج شخصاً على كشف الرواتب.',
+  'lm.team.adsOnly': 'برصيد إعلانات فقط — يرد على النماذج ولا يتصل. وظّفه ليتصل.',
+  'lm.team.training': 'تدريبه {level}%. واصل التعليم: يحتاج {threshold}% قبل أن يتصل.',
+  'lm.team.noVoice': 'ليس له صوت خاص به بعد، فسيتصل بصوت شخص آخر.',
+  'lm.team.voiceShared': 'يشارك زميلاً في الصوت نفسه. أعطِ كلاً منهما صوته قبل أن يتصلا بالعميل نفسه.',
+  'lm.team.end': 'إنهاء',
+  'lm.team.train': 'تعليم ٥+',
+  'lm.team.term.weekly': 'أسبوعي',
+  'lm.team.term.monthly': 'شهري',
+  'lm.team.term.yearly': 'سنوي',
+  'lm.team.term.ad_hourly': 'إعلانات فقط',
   'lm.call.title': 'الاتصال بالعملاء',
   'lm.call.subtitle': 'مكالمة صوتية لعميل وافق على الاتصال به، بنص كتبه المكتب.',
   'lm.call.templates': 'أنواع المكالمات',
@@ -202,6 +238,24 @@ const ar: Dict = {
 }
 
 const ru: Dict = {
+  // ── the hiring desk ──
+  'lm.team.title': 'Ваша визуальная команда продаж',
+  'lm.team.subtitle': 'Кто в штате, насколько обучен и что мешает каждому выйти на телефон.',
+  'lm.team.loading': 'Загружаем команду…',
+  'lm.team.loadFailed': 'Не удалось загрузить команду.',
+  'lm.team.actionFailed': 'Изменение не прошло.',
+  'lm.team.ready': 'Готов принимать звонки.',
+  'lm.team.notHired': 'Ещё не нанят. Для звонка нужен человек в штате.',
+  'lm.team.adsOnly': 'Только рекламный токен — отвечает в формах,но не звонит. Наймите, чтобы звонил.',
+  'lm.team.training': 'Обучен на {level}%. Продолжайте: нужно {threshold}% до звонков.',
+  'lm.team.noVoice': 'Пока нет собственного голоса — позвонит голосом другого.',
+  'lm.team.voiceShared': 'Делит голос с коллегой. Дайте каждому свой, прежде чем звонить одному покупателю.',
+  'lm.team.end': 'Завершить',
+  'lm.team.train': 'Обучить +5',
+  'lm.team.term.weekly': 'Еженедельно',
+  'lm.team.term.monthly': 'Ежемесячно',
+  'lm.team.term.yearly': 'Ежегодно',
+  'lm.team.term.ad_hourly': 'Только реклама',
   'lm.call.title': 'Обзвон лидов',
   'lm.call.subtitle': 'Голосовой звонок лиду, который согласился на звонок, по сценарию, написанному отделом.',
   'lm.call.templates': 'Типы звонков',

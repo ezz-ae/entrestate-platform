@@ -27,6 +27,7 @@ import {
   type CallBranch,
 } from '@/lib/freehold/call-templates'
 import { CallingStatusStrip } from './status-strip'
+import { TeamPanel } from './team-panel'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +58,17 @@ export default async function CallingPage() {
       <div className="mt-8">
         <CallingStatusStrip />
       </div>
+
+      {/* Who is on payroll. Without this the calling gates could only ever
+          answer "nobody is employed" — the roster was unreachable. */}
+      <Section className="mt-8">
+        <PanelHeader
+          title={t('lm.team.title')}
+          icon={<PhoneCall className="h-3.5 w-3.5 text-gold" />}
+        />
+        <p className="mt-2 text-sm leading-relaxed text-slate-400">{t('lm.team.subtitle')}</p>
+        <div className="mt-4"><TeamPanel /></div>
+      </Section>
 
       {/* ── The gate, before the library, because it is what decides whether
              any of the library ever gets spoken. ─────────────────────────── */}
