@@ -19,13 +19,25 @@
  * enforcement is a sentence is a rule that gets broken. Prompts are a
  * request. This module is a check.
  *
+ * ONE REVIEWER, NOT TWO. The number half of this module was the ORIGINAL
+ * tripwire, and lib/freehold/evidence.ts says in its own header that it
+ * "replaces it": the old test blocked a reply only when NONE of its figures
+ * were grounded, so a reply quoting one real spend and inventing nine others
+ * passed untouched. Both then existed — one wired, one exported with a green
+ * guard suite and called by nothing. That is worse than dead code: an audit
+ * of "how many nets check our numbers" answered two, the answer was one, and
+ * the loose net was the one a future engineer would most plausibly wire in,
+ * DOWNGRADING the check while believing they had added one.
+ *
+ * So the weak figure path is gone and verifyAnswer() now composes the LIVE
+ * auditor. There is one review, it is named, and any door — the chat panel,
+ * the MCP bridge, an employee handing over work — asks the same question.
+ *
  * WHAT IT VERIFIES, and deliberately nothing more:
  *
- *  1. NUMBERS. Every figure of two digits or more in the user-visible answer
- *     must appear in the grounding corpus — the live context, the results of
- *     the tools called this turn, and the user's own message. A number the
- *     model produced from nowhere is the money lie, and it is the one thing
- *     that is both exactly checkable and exactly catastrophic.
+ *  1. NUMBERS, via auditFigures() in evidence.ts: per-figure provenance
+ *     against this turn's sources, with derived figures (a CPL computed from
+ *     a real spend and a real lead count) recognised rather than accused.
  *
  *  2. NAMED CAMPAIGNS. A phrase of the shape "<Name> campaign" must match a
  *     campaign this workspace actually has. Narrow on purpose: it is the
@@ -41,80 +53,8 @@
  * Pure — no I/O, no model. Runs in `pnpm guards`.
  */
 
-/**
- * Below this, a number is not worth checking. "Two ad sets", "3 designs" and
- * "the first one" are reasoning a model may do out loud, and flagging them
- * would bury the figure that actually matters. Every fabricated number in the
- * transcript above — 45, 50, 699,999 — is two digits or more.
- */
-export const MIN_CHECKED_DIGITS = 2
+import { auditFigures, type EvidenceReport } from './evidence'
 
-/** A year is a date, not a metric, and appears constantly in property copy
- *  ("handover 2027"). Checked separately or not at all — never as evidence of
- *  a fabricated figure. */
-const YEAR = /^(19|20)\d{2}$/
-
-/**
- * Every number a reader could act on, normalised so that "AED 699,999",
- * "699999" and "699,999" are one thing.
- *
- * Thousands separators and currency symbols are stripped; decimals are kept,
- * because 4.2 and 42 are different claims. Percent signs are dropped — "45%"
- * and "45" are the same figure wearing a unit, and a corpus that stores one
- * must match the other.
- */
-export function numbersIn(text: string): string[] {
-  const out: string[] = []
-  const src = String(text ?? '')
-  // Digits with optional thousands separators and an optional decimal tail.
-  for (const m of src.matchAll(/\d[\d,]*(?:\.\d+)?/g)) {
-    const raw = m[0].replace(/,/g, '')
-    if (!raw) continue
-    const digits = raw.replace(/\D/g, '')
-    if (digits.length < MIN_CHECKED_DIGITS) continue
-    if (YEAR.test(raw)) continue
-    // Trailing zeros after a decimal point are the same number: 45.0 is 45.
-    const norm = raw.includes('.') ? String(Number(raw)) : raw.replace(/^0+(?=\d)/, '')
-    if (norm) out.push(norm)
-  }
-  return [...new Set(out)]
-}
-
-/**
- * The haystack an answer's figures must be found in.
- *
- * Everything the model was legitimately given: the live context, whatever the
- * tools returned this turn, and the USER'S OWN MESSAGE — a user who asks
- * "leads in the last 3 hours" has put 3 into the conversation, and quoting it
- * back is not a fabrication.
- */
-export function groundingCorpus(parts: {
-  context?: unknown
-  toolResults?: unknown[]
-  userMessage?: string
-}): Set<string> {
-  const text = [
-    typeof parts.context === 'string' ? parts.context : JSON.stringify(parts.context ?? {}),
-    ...(parts.toolResults ?? []).map((r) => (typeof r === 'string' ? r : JSON.stringify(r ?? {}))),
-    String(parts.userMessage ?? ''),
-  ].join(' ')
-  return new Set(numbersIn(text))
-}
-
-/** Figures in the answer that appear nowhere the model was allowed to look. */
-export function ungroundedNumbers(answer: string, corpus: Set<string>): string[] {
-  return numbersIn(answer).filter((n) => !corpus.has(n))
-}
-
-/**
- * Campaign names the answer asserts, in the one shape that produced the live
- * failure: a capitalised phrase immediately followed by the word "campaign".
- *
- * Deliberately narrow. A general proper-noun detector would flag every area,
- * developer and building in Dubai and be switched off within a week; this
- * pattern matches the sentence a model writes when it is inventing a campaign
- * to be helpful about.
- */
 export function campaignNamesClaimed(answer: string): string[] {
   const out: string[] = []
   const src = String(answer ?? '')
@@ -155,28 +95,39 @@ export type GroundingFault = (typeof GROUNDING_FAULTS)[number]
 export interface GroundingVerdict {
   ok: boolean
   faults: GroundingFault[]
-  /** The offending figures and names, for the server log — never for the user,
-   *  who is owed an answer rather than a diagnostic. */
+  /** Figures that could not be traced to this turn's sources. Server log and
+   *  the correction sentence — never a raw diagnostic dumped on the user. */
   numbers: string[]
   campaigns: string[]
+  /** The figure auditor's own verdict, so a caller can tell "every number was
+   *  invented" from "one of nine was" and correct in different words. */
+  figures: EvidenceReport | null
 }
 
 /**
  * The check itself.
  *
- * A verdict, not a rewrite: what to DO about a failed answer is the route's
+ * A VERDICT, NOT A REWRITE: what to DO about a failed answer is the caller's
  * decision, and it is a different question in a chat panel than in an MCP
  * bridge. This says only whether the answer can be stood behind.
+ *
+ * `sources` is everything this turn actually looked at — tool results and the
+ * live context. Passing an empty list means nothing can be traced, so every
+ * figure reads as ungrounded; that is the honest result, not a bug.
  */
 export function verifyAnswer(params: {
   answer: string
-  corpus: Set<string>
+  /** Tool results and live context for this turn. */
+  sources: string[]
   knownCampaigns: string[]
 }): GroundingVerdict {
-  const numbers = ungroundedNumbers(params.answer, params.corpus)
+  const figures = auditFigures(params.answer, params.sources)
+  const numbers = figures.figures.filter((f) => f.status === 'ungrounded').map((f) => f.value)
   const campaigns = unknownCampaigns(params.answer, params.knownCampaigns)
   const faults: GroundingFault[] = []
-  if (numbers.length > 0) faults.push('number')
+  // 'no_figures' and 'clean' are both fine; only a reply carrying figures it
+  // cannot trace is a fault.
+  if (figures.verdict === 'fabricated' || figures.verdict === 'tainted') faults.push('number')
   if (campaigns.length > 0) faults.push('campaign')
-  return { ok: faults.length === 0, faults, numbers, campaigns }
+  return { ok: faults.length === 0, faults, numbers, campaigns, figures }
 }

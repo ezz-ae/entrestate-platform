@@ -22,7 +22,7 @@ import type { Role as SessionRole } from '@/lib/freehold/session-types'
 import type { Role } from '@/types/freehold-mcp'
 import { APP_ROUTES } from '@/lib/freehold/app-routes.generated'
 import { auditFigures, evidenceLine, METRIC_SHAPED, type EvidenceReport } from '@/lib/freehold/evidence'
-import { unknownCampaigns } from '@/lib/freehold/answer-grounding'
+import { verifyAnswer } from '@/lib/freehold/answer-grounding'
 
 export const runtime = 'nodejs'
 
@@ -734,45 +734,55 @@ The user is currently on ${body.page ?? 'an unknown page'} — prefer that surfa
       if (!Array.isArray(c)) return []
       return c.map((x) => String((x as { name?: unknown })?.name ?? '')).filter(Boolean)
     })()
-    if (knownCampaignNames.length > 0) {
-      const invented = unknownCampaigns(blocksToText(blocks), knownCampaignNames)
-      if (invented.length > 0) {
-        console.error('[expert] invented campaign name(s):', invented.join(', '))
-        blocks = [{
-          type: 'text',
-          content:
-            `I have to correct myself — there is no campaign called "${invented[0]}" in this account, `
-            + `so everything I just said about it was invented rather than looked up. `
-            + `What you actually have: ${knownCampaignNames.slice(0, 6).join(', ')}`
-            + `${knownCampaignNames.length > 6 ? ` and ${knownCampaignNames.length - 6} more` : ''}. `
-            + `Ask me about one of those and I will answer from the real numbers.`,
-        }]
-      }
-    }
 
-    let evidence: EvidenceReport | null = null
+    // ONE REVIEW, ONE PLACE. verifyAnswer composes both nets — the figure
+    // auditor (evidence.ts) and the entity check — so this route cannot drift
+    // from the MCP bridge or from an employee handing over work: they all ask
+    // the same question of the same reviewer. What to DO about a fault is
+    // still decided here, because a chat panel owes the reader a sentence and
+    // a bridge owes its caller a status.
+    const review = verifyAnswer({
+      answer: blocksToText(blocks),
+      sources: [toolResultsText, JSON.stringify(fullContext)],
+      knownCampaigns: knownCampaignNames,
+    })
+
+    let evidence: EvidenceReport | null = review.figures
+
     const replyJson = JSON.stringify(blocks)
-    // NOT GATED ON HOLDING TOOLS ANY MORE. It was, and that was the hole the
-    // Zada Tower answer walked through: a session whose role carries no tools
-    // was audited by nothing at all — and that is precisely the session most
-    // likely to fabricate, because the model has no way to fetch and fills the
-    // gap from itself. Grounding is a property of the CONTEXT, which every
-    // session has, not of the toolbelt.
-    if (METRIC_SHAPED.test(replyJson)) {
-      evidence = auditFigures(replyJson, [toolResultsText, JSON.stringify(fullContext)])
-      if (evidence.verdict === 'fabricated' || evidence.verdict === 'tainted') {
-        const untraceable = evidence.figures.filter((f) => f.status === 'ungrounded').map((f) => f.value)
-        blocks = [{
-          type: 'text',
-          content:
-            (evidence.verdict === 'fabricated'
-              ? 'I have to correct myself — none of the figures I was about to show came from your live data, so I will not present them. '
-              : `I have to correct myself — some of those figures (${untraceable.slice(0, 4).join(', ')}) did not come from your live data, so I will not present the report with them in it. `) +
-            (resultNotes.length
-              ? `What actually happened this turn:\n${resultNotes.join('\n')}\n\nAsk me to check again and I will report only figures I can trace — and say so plainly if there are none.`
-              : 'No data-returning check completed this turn. Ask me to check the campaigns again and I will report only figures I can trace — and say so plainly if there are none.'),
-        }]
-      }
+
+    // The entity fault first: a name that does not exist makes every sentence
+    // about it worthless, whatever its figures did.
+    if (review.campaigns.length > 0) {
+      console.error('[expert] invented campaign name(s):', review.campaigns.join(', '))
+      blocks = [{
+        type: 'text',
+        content:
+          `I have to correct myself — there is no campaign called "${review.campaigns[0]}" in this account, `
+          + `so everything I just said about it was invented rather than looked up. `
+          + `What you actually have: ${knownCampaignNames.slice(0, 6).join(', ')}`
+          + `${knownCampaignNames.length > 6 ? ` and ${knownCampaignNames.length - 6} more` : ''}. `
+          + `Ask me about one of those and I will answer from the real numbers.`,
+      }]
+    } else if (METRIC_SHAPED.test(replyJson) && evidence
+      && (evidence.verdict === 'fabricated' || evidence.verdict === 'tainted')) {
+      // NOT GATED ON HOLDING TOOLS. It was, and that was the hole the Zada
+      // Tower answer walked through: a session whose role carries no tools was
+      // audited by nothing at all — and that is precisely the session most
+      // likely to fabricate, because the model has no way to fetch and fills
+      // the gap from itself. Grounding is a property of the CONTEXT, which
+      // every session has, not of the toolbelt.
+      const untraceable = review.numbers
+      blocks = [{
+        type: 'text',
+        content:
+          (evidence.verdict === 'fabricated'
+            ? 'I have to correct myself — none of the figures I was about to show came from your live data, so I will not present them. '
+            : `I have to correct myself — some of those figures (${untraceable.slice(0, 4).join(', ')}) did not come from your live data, so I will not present the report with them in it. `) +
+          (resultNotes.length
+            ? `What actually happened this turn:\n${resultNotes.join('\n')}\n\nAsk me to check again and I will report only figures I can trace — and say so plainly if there are none.`
+            : 'No data-returning check completed this turn. Ask me to check the campaigns again and I will report only figures I can trace — and say so plainly if there are none.'),
+      }]
     }
     const metricsGrounded = evidence?.verdict === 'clean'
 
