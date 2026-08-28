@@ -1,6 +1,7 @@
 import { query } from '@/lib/db'
 import { listConversations } from '@/lib/freehold/notebook-conversations'
 import { getNetworkBenchmarks } from '@/lib/entrestate/targeting-base'
+import { retrieveAccountKnowledge } from '@/lib/freehold/account-knowledge'
 
 /**
  * The Notebook's grounding engine. Builds the workspace-sources block the AI
@@ -28,6 +29,10 @@ export type NotebookSources = {
   all_conversations?: boolean
   market_intel?: boolean
   campaigns?: boolean
+  /** The account's OWN knowledge base (links/files/text it taught the system).
+   *  Generic and domain-free — this is the source that lets the same engine
+   *  ground on any business, not just real estate. See account-knowledge.ts. */
+  account_knowledge?: boolean
 }
 
 export type NotebookUpload = { name: string; content?: string }
@@ -38,6 +43,9 @@ export interface NotebookContextOpts {
   /** Session role — brokers get their own pipeline, management the team's. */
   role?: string
   brokerId?: string | null
+  /** Account identity for its own knowledge base (brokerId ?? email ?? tenant);
+   *  falls back to userEmail when unset. */
+  accountRef?: string
 }
 
 const fmtAED = (n: number | null | undefined): string => {
@@ -295,18 +303,21 @@ export async function buildNotebookContext(
 ): Promise<string> {
   if (!sources) return ''
   const blocks: string[] = []
-  const [proj, leads, market, camps, convs] = await Promise.all([
+  const acctRef = opts.accountRef || userEmail
+  const [proj, leads, market, camps, convs, knowledge] = await Promise.all([
     sources.live_projects ? projectsBlock(opts.message ?? '') : Promise.resolve(null),
     sources.crm_leads ? leadsBlock(opts.role, opts.brokerId) : Promise.resolve(null),
     sources.market_intel ? marketBlock() : Promise.resolve(null),
     sources.campaigns ? campaignsBlock() : Promise.resolve(null),
     sources.all_conversations && userEmail ? conversationsBlock(userEmail) : Promise.resolve(null),
+    sources.account_knowledge && acctRef ? retrieveAccountKnowledge(acctRef, opts.message) : Promise.resolve(null),
   ])
   if (proj) blocks.push(proj)
   if (leads) blocks.push(leads)
   if (market) blocks.push(market)
   if (camps) blocks.push(camps)
   if (convs) blocks.push(convs)
+  if (knowledge) blocks.push(knowledge)
   if (sources.uploads) {
     const up = uploadsBlock(uploads)
     if (up) blocks.push(up)
