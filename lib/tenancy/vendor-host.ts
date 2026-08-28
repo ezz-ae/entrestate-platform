@@ -45,6 +45,13 @@ export const PRODUCT_DOORS: Readonly<Record<string, string>> = {
   listings: '/business/listing-to-landing',
   landing: '/business/listing-to-landing',
   landings: '/business/listing-to-landing',
+  // Leadformer lives inside Entrestate rather than on its own domain: it is
+  // real-estate-only for now, and a door costs nothing while a separate
+  // deployment would cost the reuse of this engine (the Visual Sales Team, the
+  // grounding, the pool). If it outgrows the vertical it moves out — the name
+  // is reserved in reserved.ts so that move stays available.
+  leadformer: '/business/leadformer',
+  leadform: '/business/leadformer',
 }
 
 /**

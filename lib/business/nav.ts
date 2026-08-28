@@ -40,6 +40,14 @@ export const PRODUCTS: NavItem[] = [
     label: 'Meta for Realtors',
     blurb: 'A full system for professional Meta lead ads — our off-plan inventory, your budget, a few clicks.',
   },
+  {
+    // Leadformer — a door at leadformer.entrestate.com (PRODUCT_DOORS in
+    // lib/tenancy/vendor-host.ts), inside the platform rather than on its own
+    // domain while it is real-estate-only.
+    href: '/business/leadformer',
+    label: 'Leadformer',
+    blurb: 'A lead form that talks back — your Visual Sales Team answers, qualifies, and turns the good ones into calls.',
+  },
 ]
 
 export const PLATFORM: NavItem[] = [

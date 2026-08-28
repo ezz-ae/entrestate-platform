@@ -29,6 +29,7 @@ export const APP_ROUTES: readonly string[] = [
   "/business/how-it-works",
   "/business/landing-pages",
   "/business/lead-machine",
+  "/business/leadformer",
   "/business/listing-to-landing",
   "/business/mega-brokerage",
   "/business/meta-for-realtors",

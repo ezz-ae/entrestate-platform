@@ -43,6 +43,11 @@ export const RESERVED_SUBDOMAINS = new Set([
   // Listing-to-Landing; meta/ads = Meta for Realtors), never tenants.
   'entrestate', 'freehold', 'ore', 'machine', 'leadmachine', 'lead-machine',
   'meta', 'ads', 'listing', 'listings', 'landing', 'landings',
+  // Leadformer — the conversational lead form and its Visual Sales Team. It
+  // lives inside Entrestate as a product door (real-estate only for now); if it
+  // outgrows the vertical it moves out on its own domain, and reserving the
+  // name now is what keeps that move possible.
+  'leadformer', 'leadform',
 ])
 
 /** True when `sub` is a well-formed, non-reserved tenant subdomain. */

@@ -77,8 +77,19 @@ async function main(): Promise<void> {
     check('listing. serves Listing-to-Landing',
       listing.kind === 'rewrite' && listing.to === '/business/listing-to-landing', show(listing))
 
+    const leadformer = vendorHostAction('leadformer.entrestate.com', '/')
+    check('leadformer. serves Leadformer without changing the address',
+      leadformer.kind === 'rewrite' && leadformer.to === '/business/leadformer', show(leadformer))
+
     check('every door points at a page under /business',
       Object.values(PRODUCT_DOORS).every((p) => p.startsWith('/business/')), show(PRODUCT_DOORS))
+
+    // A door's name must be unclaimable, or a tenant could sign up as the
+    // product and shadow it. Every door is reserved, checked as a set so a new
+    // door added without its reservation fails here rather than in production.
+    const { RESERVED_SUBDOMAINS } = await import('../lib/tenancy/reserved')
+    const unreserved = Object.keys(PRODUCT_DOORS).filter((d) => !RESERVED_SUBDOMAINS.has(d))
+    check('every product door is a reserved subdomain', unreserved.length === 0, unreserved.join(','))
 
     // A door is only a front page. Deeper paths follow the ordinary rules, so
     // a door cannot become a second, uncanonical copy of the whole site.
