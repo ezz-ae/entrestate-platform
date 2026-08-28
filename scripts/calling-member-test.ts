@@ -35,23 +35,28 @@ const fail = (m: string, got = '') => { failures++; console.error(`  ✗ ${m}${g
 const check = (m: string, cond: boolean, got = '') => (cond ? ok(m) : fail(m, got))
 
 const route = readFileSync(join(process.cwd(), 'app/api/calling/route.ts'), 'utf8')
+// The gate sequence moved into lib/calling/place.ts so the coordinator chat can
+// run the SAME one (see chat tools calling_*). The guard follows the logic: the
+// order is asserted where it now lives, and the route is checked for being a
+// thin wrapper that cannot bypass it.
+const place = readFileSync(join(process.cwd(), 'lib/calling/place.ts'), 'utf8')
 
 console.log('\n── rule 1: the lead gate still runs first ──')
 {
-  const iPlan = route.indexOf('planCall(lead')
-  const iAssign = route.indexOf('assignCaller(')
+  const iPlan = place.indexOf('const plan = planCall(')
+  const iAssign = place.indexOf('const assigned = assignCaller(')
   check('planCall is still called', iPlan > -1)
   check('assignCaller runs AFTER it', iAssign > iPlan, `plan@${iPlan} assign@${iAssign}`)
-  check('a lead refusal still short-circuits', /if \(!plan\.go\) return refuseLead/.test(route))
+  check('a lead refusal still short-circuits', /if \(!plan\.go\) return refuse\('lead'/.test(place))
 }
 
 console.log('\n── rule 2: the roster comes from the payroll ──')
 {
-  check('the route reads the employment roster', /getRosterState\(/.test(route))
-  check('…and hands it to assignCaller', /assignCaller\([\s\S]{0,400}roster,/.test(route))
-  check('a roster refusal is answered as a roster problem', /refuseRoster\(/.test(route))
+  check('the route reads the employment roster', /getRosterState\(/.test(place))
+  check('…and hands it to assignCaller', /assignCaller\(/.test(place))
+  check('a roster refusal is answered as a roster problem', /refuse\('roster'/.test(place))
   check('…and never blames the lead for it',
-    /assigned\.leadRefused[\s\S]{0,120}refuseRoster/.test(route))
+    /assigned\.leadRefused[\s\S]{0,160}refuse\('roster'/.test(place))
   check('every roster refusal has a sentence to render',
     CALLER_REFUSALS.every((r) => (CALLER_REFUSAL_SENTENCES[r] ?? '').length > 10))
 }
@@ -59,11 +64,11 @@ console.log('\n── rule 2: the roster comes from the payroll ──')
 console.log('\n── rule 3: the member dials as themselves ──')
 {
   check('the default connection agent no longer reaches placeCall',
-    !/agentId:\s*connection\.agentId/.test(route))
-  check('the chosen member’s own agent does', /agentId:\s*agent\.agentId/.test(route))
-  check('a member with no agent of their own is refused', /memberAgentMissing/.test(route))
-  check('the refusal names the variable to set', /CALL_AGENT_MEMBER_/.test(route))
-  check('a shared agent is refused too (agentReadyMembers)', /agentReadyMembers\(/.test(route))
+    !/agentId:\s*connection\.agentId/.test(place) && !/agentId:\s*connection\.agentId/.test(route))
+  check('the chosen member’s own agent does', /agentId:\s*agent\.agentId/.test(place))
+  check('a member with no agent of their own is refused', /memberAgentMissing/.test(place))
+  check('the refusal names the variable to set', /CALL_AGENT_MEMBER_/.test(place))
+  check('a shared agent is refused too (agentReadyMembers)', /agentReadyMembers\(/.test(place))
 }
 
 console.log('\n── the agent binding itself ──')
@@ -86,10 +91,27 @@ console.log('\n── the agent binding itself ──')
 
 console.log('\n── rule 4: the answer says who called ──')
 {
-  check('the placed-call response carries the member', /memberId:\s*member\.id/.test(route))
-  check('…and the alternates for a second attempt', /alternates:\s*assigned\.alternates/.test(route))
-  check('the provider metadata records who spoke', /member_id:\s*member\.id/.test(route))
-  check('the request may name who the lead already refused', /avoidMemberIds/.test(route))
+  check('the placed-call response carries the member', /memberId:\s*r\.memberId/.test(route))
+  check('…and the alternates for a second attempt', /alternates:\s*r\.alternates/.test(route))
+  check('the provider metadata records who spoke', /member_id:\s*member\.id/.test(place))
+  check('the request may name who the lead already refused', /avoidMemberIds/.test(route) && /avoidMemberIds/.test(place))
+}
+
+console.log('\n── one sequence, however many doors ──')
+{
+  // The route must DELEGATE. A second copy of a compliance order is one copy
+  // that gets edited and one that does not.
+  check('the route places through the shared sequence', /placeLeadCall\(/.test(route))
+  check('…and keeps no gate of its own', !/planCall\(/.test(route) && !/assignCaller\(/.test(route))
+  // GET legitimately reads the provider's number list (listNumbers). What the
+  // route may not do is DIAL — that is provider.placeCall, and it lives in one file.
+  check('…and never dials directly', !/provider\.placeCall\(/.test(route))
+  check('only the shared sequence dials', /provider\.placeCall\(/.test(place))
+
+  // place.ts is the only thing that dials, and the dry run stops before it.
+  const iDial = place.indexOf('provider.placeCall(')
+  const iDry = place.indexOf('if (input.dryRun)')
+  check('a dry run stops BEFORE the dial', iDry > -1 && iDial > -1 && iDry < iDial, `dry@${iDry} dial@${iDial}`)
 }
 
 if (failures) { console.error(`\n${failures} calling-member guard(s) broken.`); process.exit(1) }

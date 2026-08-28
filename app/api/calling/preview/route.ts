@@ -24,12 +24,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSession } from '@/lib/freehold/api-auth'
 import { MANAGEMENT_ROLES } from '@/lib/freehold/session-types'
-import { callingConnection } from '@/lib/calling/provider'
-import { isCallType, loadCallableLead, RAIL_REFUSAL_SENTENCES } from '@/lib/calling/gates'
-import { normaliseE164 } from '@/lib/calling/caller-id'
-import { assignCaller, CALLER_REFUSAL_SENTENCES, type CallerRefusal } from '@/lib/freehold/lead-caller'
-import { getRosterState } from '@/lib/freehold/sales-employment'
-import { resolveCallAgent, bindTeamAgents, agentReadyMembers } from '@/lib/freehold/visual-sales-voice'
+import { placeLeadCall } from '@/lib/calling/place'
 import { getMember, totalRate } from '@/lib/freehold/visual-sales-team'
 
 const ALLOWED = [...MANAGEMENT_ROLES, 'marketing', 'team_leader', 'broker'] as const
@@ -57,63 +52,38 @@ export async function GET(req: NextRequest) {
   if ('res' in auth) return auth.res
 
   const url = new URL(req.url)
-  const leadId = (url.searchParams.get('leadId') ?? '').trim()
-  const templateId = (url.searchParams.get('templateId') ?? '').trim()
   const langParam = url.searchParams.get('language')
-  const language = langParam === 'ar' || langParam === 'ru' ? langParam : 'en'
-  const avoidMemberIds = (url.searchParams.get('avoid') ?? '')
-    .split(',').map((s) => s.trim()).filter(Boolean)
 
-  if (!leadId || !isCallType(templateId)) {
-    return NextResponse.json(blocked('unknownTemplate', RAIL_REFUSAL_SENTENCES.unknownTemplate, false), { status: 400 })
+  // The SAME sequence the POST runs, stopped one line before the dial.
+  // dryRun is set here and nowhere else in this file, and this file imports no
+  // provider factory — a preview that could ring a phone is not a preview.
+  const r = await placeLeadCall({
+    leadId: (url.searchParams.get('leadId') ?? '').trim(),
+    templateId: (url.searchParams.get('templateId') ?? '').trim(),
+    language: langParam === 'ar' || langParam === 'ru' ? langParam : 'en',
+    avoidMemberIds: (url.searchParams.get('avoid') ?? '').split(',').map((x) => x.trim()).filter(Boolean),
+    placedBy: auth.user.email,
+    dryRun: true,
+  })
+
+  if (r.placed) {
+    // Unreachable: dryRun is hardcoded true above. Typed so a future edit that
+    // drops it fails here instead of quietly placing calls from a GET.
+    return NextResponse.json(blocked('previewDialled', 'A preview must never place a call.', false), { status: 500 })
   }
 
-  const lead = await loadCallableLead(leadId)
-  if (!lead) {
-    return NextResponse.json(blocked('leadNotFound', RAIL_REFUSAL_SENTENCES.leadNotFound, true), { status: 404 })
-  }
-  if (lead.phone && !normaliseE164(lead.phone)) {
-    return NextResponse.json(blocked('phoneUnusable', RAIL_REFUSAL_SENTENCES.phoneUnusable, true))
-  }
-
-  // Connection state is a read. Reported before the roster because "nothing is
-  // connected" is not the team's fault and has one obvious fix.
-  const connection = await callingConnection()
-  if (!connection.connected) {
-    return NextResponse.json(blocked('notConnected', RAIL_REFUSAL_SENTENCES.notConnected, false))
+  if (!r.wouldPlace) {
+    return NextResponse.json(
+      blocked(r.reason, r.message, r.kind === 'lead'),
+      { status: r.status >= 500 ? r.status : 200 },
+    )
   }
 
-  const now = new Date()
-  const decision = assignCaller(
-    { ...lead, language, avoidMemberIds },
-    templateId,
-    now,
-    await getRosterState(now),
-  )
-
-  if (!decision.go) {
-    const message = decision.leadRefused
-      ? decision.sentence
-      : CALLER_REFUSAL_SENTENCES[decision.refusal as CallerRefusal] ?? decision.sentence
-    return NextResponse.json(blocked(decision.refusal, message, decision.leadRefused))
-  }
-
-  // The chosen member must own their voice agent — the same refusal POST makes,
-  // shown here so nobody presses a button that was always going to refuse.
-  const member = getMember(decision.memberId)!
-  const agent = resolveCallAgent(member)
-  if (!agent.agentId || !agentReadyMembers(bindTeamAgents()).includes(member.id)) {
-    return NextResponse.json(blocked(
-      'memberAgentMissing',
-      `${member.name} has no voice agent of their own. Set CALL_AGENT_MEMBER_${member.id.toUpperCase()} so they do not call as someone else.`,
-      false,
-    ))
-  }
-
+  const member = getMember(r.memberId)!
   const preview: Preview = {
     ready: true,
     member: { id: member.id, name: member.name, title: member.title, rate: totalRate(member) },
-    alternates: decision.alternates
+    alternates: r.alternates
       .map((id) => getMember(id))
       .filter((m): m is NonNullable<typeof m> => !!m)
       .map((m) => ({ id: m.id, name: m.name })),

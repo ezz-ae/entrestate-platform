@@ -38,7 +38,8 @@ import {
   RAIL_REFUSALS, RAIL_REFUSAL_SENTENCES, countDoNotCall, describeCallWindows,
   isCallType, loadCallableLead, planCall, type RailRefusal,
 } from '@/lib/calling/gates'
-import { recordPlacedCall, countPlacedCalls } from '@/lib/calling/call-log'
+import { countPlacedCalls } from '@/lib/calling/call-log'
+import { placeLeadCall } from '@/lib/calling/place'
 import { assignCaller, CALLER_REFUSAL_SENTENCES, type CallerRefusal } from '@/lib/freehold/lead-caller'
 import { getRosterState } from '@/lib/freehold/sales-employment'
 import { resolveCallAgent, bindTeamAgents, agentReadyMembers } from '@/lib/freehold/visual-sales-voice'
@@ -173,144 +174,40 @@ export async function POST(req: NextRequest) {
   if ('res' in auth) return auth.res
 
   const body = (await req.json().catch(() => ({}))) as PlaceBody
-  const leadId = String(body.leadId ?? '').trim()
-  const templateId = String(body.templateId ?? '').trim()
-  if (!leadId || !templateId) {
-    return NextResponse.json({ placed: false, error: 'leadId and templateId are required' }, { status: 400 })
-  }
-  if (!isCallType(templateId)) return refuseRail('unknownTemplate')
 
-  // ── Decided from our own data. Nothing has been sent anywhere yet. ───────
-
-  const lead = await loadCallableLead(leadId)
-  if (!lead) return refuseRail('leadNotFound')
-
-  // A number that will not normalise is refused on its own terms. planCall
-  // would call it present and the provider would reject it after we had
-  // already spent a request saying the lead was callable.
-  const to = lead.phone ? normaliseE164(lead.phone) : null
-  if (lead.phone && !to) return refuseRail('phoneUnusable')
-
-  const now = new Date()
-  const plan = planCall(lead, templateId, now)
-  if (!plan.go) return refuseLead(plan.refusal, plan.sentence)
-  if (!to) return refuseRail('phoneUnusable') // planCall proved phone is present; this proves it is dialable
-
-  // ── WHO makes this call. ─────────────────────────────────────────────────
-  // Until this block existed the answer was "the connection's single default
-  // agent", so every member of the Visual Sales Team reached every lead in the
-  // same voice — the fixed-voice promise broken at the one place a lead can
-  // hear it. assignCaller() runs the roster gates (employed, trained to
-  // READINESS_THRESHOLD, own voice, speaks the language, not the person this
-  // lead already turned down); the lead gate above still outranks all of them.
-  const roster = await getRosterState(now)
-  const language = (body.language === 'ar' || body.language === 'ru') ? body.language : 'en'
-  const assigned = assignCaller(
-    { ...lead, language, avoidMemberIds: Array.isArray(body.avoidMemberIds) ? body.avoidMemberIds.map(String) : [] },
-    templateId,
-    now,
-    roster,
-  )
-  if (!assigned.go) {
-    // A lead-side refusal can only come from planCall, which already returned
-    // above; anything reaching here is about the roster.
-    return assigned.leadRefused
-      ? refuseLead(assigned.refusal, assigned.sentence)
-      : refuseRoster(assigned.refusal as CallerRefusal)
-  }
-
-  // The chosen member must have their OWN provider agent. No fallback to the
-  // connection default on purpose: dialling as somebody else is the failure
-  // this whole block exists to end, and a wrong voice is worse than a refusal
-  // an operator can fix in one environment variable.
-  const member = getMember(assigned.memberId)!
-  const agent = resolveCallAgent(member)
-  if (!agent.agentId || !agentReadyMembers(bindTeamAgents()).includes(member.id)) {
-    return refuseRoster(
-      'memberAgentMissing',
-      `${member.name} has no voice agent of their own. Set CALL_AGENT_MEMBER_${member.id.toUpperCase()} so they do not call as someone else.`,
-    )
-  }
-
-  // ── Provider state. Reads only — nothing here dials. ─────────────────────
-
-  const connection = await callingConnection()
-  if (!connection.connected) return refuseRail('notConnected')
-
-  let callerIds: CallerId[]
-  try {
-    callerIds = await callerIdsForTenant()
-  } catch (e) {
-    if (e instanceof CallingConfigError) return refuseRail('notConnected')
-    const status = e instanceof CallingApiError ? e.status : 502
-    return NextResponse.json(
-      { placed: false, error: e instanceof Error ? e.message : 'The voice provider did not answer.' },
-      { status: status >= 400 && status < 600 ? status : 502 },
-    )
-  }
-
-  const resolved = resolveCallerId({
-    requested: body.callerId ?? null,
-    available: callerIds,
+  // The whole gate sequence lives in lib/calling/place.ts so the coordinator
+  // chat can run the SAME one — two copies of a compliance order is one copy
+  // that gets edited and one that does not.
+  const r = await placeLeadCall({
+    leadId: String(body.leadId ?? '').trim(),
+    templateId: String(body.templateId ?? '').trim(),
+    language: body.language,
+    avoidMemberIds: Array.isArray(body.avoidMemberIds) ? body.avoidMemberIds.map(String) : [],
+    placedBy: auth.user.email,
+    callerId: body.callerId ?? null,
     allowPlatformFallback: body.allowPlatformFallback === true,
   })
-  if (!resolved.ok) {
-    const map = {
-      caller_id_unverified: 'callerIdUnverified',
-      caller_id_unknown: 'callerIdUnknown',
-      caller_id_none: 'callerIdNone',
-    } as const
-    return refuseRail(map[resolved.refusal])
+
+  if (!r.placed) {
+    if (r.wouldPlace) {
+      // Unreachable here — this route never dry-runs — but typed so a future
+      // edit that passes dryRun cannot silently return a 200 "placed".
+      return NextResponse.json({ placed: false, reason: 'dryRun', message: 'Preview only.' }, { status: 409 })
+    }
+    return NextResponse.json({ placed: false, reason: r.reason, message: r.message }, { status: r.status })
   }
 
-  // Belt and braces. resolveCallerId already refuses an unverified number;
-  // this line means a future edit to that function cannot make a spoofed call
-  // reachable from here without also deleting an obvious guard.
-  const from = resolved.callerId
-  if (!from.providerNumberId || !from.verifiedAt) return refuseRail('callerIdUnverified')
-
-  // ── Every gate passed. This is the only line in the file that dials. ─────
-
-  try {
-    const provider = await getCallingProvider()
-    const call = await provider.placeCall({
-      to,
-      fromNumberId: from.providerNumberId,
-      templateId,
-      agentId: agent.agentId,
-      metadata: { lead_id: lead.id, template_id: templateId, placed_by: auth.user.email, member_id: member.id },
-    })
-
-    await recordPlacedCall({
-      callId: call.callId,
-      provider: provider.id,
-      leadId: lead.id,
-      templateId,
-      fromE164: from.e164,
-      toE164: to,
-      status: call.status,
-      placedBy: auth.user.email,
-    })
-
-    return NextResponse.json({
-      placed: true,
-      callId: call.callId,
-      status: call.status,
-      from: from.e164,
-      to,
-      templateId,
-      maxDurationSec: plan.maxDurationSec,
-      // Who the lead actually spoke to, and who else was free — so a second
-      // call can avoid the same person (lead-caller.ts, avoidMemberIds).
-      memberId: member.id,
-      alternates: assigned.alternates,
-    })
-  } catch (e) {
-    if (e instanceof CallingConfigError) return refuseRail('notConnected')
-    const status = e instanceof CallingApiError ? e.status : 502
-    return NextResponse.json(
-      { placed: false, error: e instanceof Error ? e.message : 'The call could not be placed.' },
-      { status: status >= 400 && status < 600 ? status : 502 },
-    )
-  }
+  return NextResponse.json({
+    placed: true,
+    callId: r.callId,
+    status: r.status,
+    from: r.from,
+    to: r.to,
+    templateId: r.templateId,
+    maxDurationSec: r.maxDurationSec,
+    // Who the lead actually spoke to, and who else was free — so a second call
+    // can avoid the same person (lib/freehold/lead-caller.ts, avoidMemberIds).
+    memberId: r.memberId,
+    alternates: r.alternates,
+  })
 }

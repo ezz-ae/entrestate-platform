@@ -41,17 +41,20 @@ console.log('\n── the preview cannot dial ──')
   check('it never imports the provider factory', !/getCallingProvider/.test(imports))
   check('it never calls placeCall', !/placeCall\s*\(/.test(preview))
   check('it never writes a call log', !/recordPlacedCall\s*\(/.test(preview))
-  check('it reads connection state only', /callingConnection\(/.test(preview))
+  check('it touches no provider surface at all', !/callingConnection\(|listNumbers\(/.test(preview))
 }
 
 console.log('\n── it makes the same decision the POST makes ──')
 {
-  check('same assignment function', /assignCaller\(/.test(preview))
-  check('same payroll roster', /getRosterState\(/.test(preview))
-  check('same per-member agent requirement', /agentReadyMembers\(/.test(preview))
-  check('…and names the same variable when it is missing', /CALL_AGENT_MEMBER_/.test(preview))
-  check('it says whose problem the block is', /aboutLead/.test(preview))
-  check('it refuses an unknown template', /isCallType\(/.test(preview))
+  // It no longer re-implements the gates: it runs lib/calling/place.ts, the one
+  // sequence, stopped one line before the dial. That is stronger than parity —
+  // it is identity.
+  check('it runs the shared sequence', /placeLeadCall\(/.test(preview))
+  check('…as a dry run', /dryRun:\s*true/.test(preview))
+  check('it keeps no gate of its own', !/planCall\(/.test(preview) && !/assignCaller\(/.test(preview))
+  check('a placed result from a dry run is treated as a bug, not a success',
+    /if \(r\.placed\)/.test(preview) && /must never place a call/.test(preview))
+  check('it says whose problem the block is', /aboutLead|kind === 'lead'/.test(preview))
   check('it requires a session like the POST', /requireSession\(/.test(preview))
 }
 

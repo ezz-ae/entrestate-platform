@@ -119,7 +119,96 @@ const LAUNCH_LEAD_LANGUAGES = ['en', 'ar', 'ru'] as const
 const strArr = (v: unknown, cap = 30): string[] =>
   Array.isArray(v) ? [...new Set(v.map(s).filter(Boolean))].slice(0, cap) : []
 
+import { placeLeadCall } from '@/lib/calling/place'
+import { CALL_TYPES } from '@/lib/freehold/call-templates'
+import { listEmployment, rosterFrom } from '@/lib/freehold/sales-employment'
+import { rosterReadiness } from '@/lib/freehold/lead-caller'
+import { SALES_TEAM, totalRate, READINESS_THRESHOLD } from '@/lib/freehold/visual-sales-team'
+
 export const COORDINATOR_TOOLS: CoordinatorTool[] = [
+  // ── calling_agent — the Visual Sales Team on the phone ─────────────────────
+  //
+  // The chat could plan a campaign, design a creative and build a form, and
+  // could not make a phone ring. These three tools fix that WITHOUT a second
+  // dialler: they run lib/calling/place.ts, the same sequence POST /api/calling
+  // runs, so consent, the do-not-call list, Dubai hours, the roster and the
+  // member's own voice agent are checked once and identically whichever door
+  // the request came through.
+  {
+    name: 'calling_team_status', agent: 'crm_agent',
+    description: 'The Visual Sales Team: who is employed, how far each is trained, and the one thing standing between each of them and the phone. Use before promising a call.',
+    params: '{}', roles: EVERYONE,
+    schema: z.object({}),
+    run: async () => {
+      const rows = await listEmployment()
+      const roster = rosterFrom(rows, new Date())
+      const ready = new Map(rosterReadiness(roster).map((r) => [r.memberId, r]))
+      const hired = new Map(rows.map((r) => [r.memberId, r]))
+      return {
+        threshold: READINESS_THRESHOLD,
+        team: SALES_TEAM.map((m) => ({
+          id: m.id, name: m.name, title: m.title, rate: totalRate(m),
+          languages: m.languages,
+          employed: roster.employed.includes(m.id),
+          term: hired.get(m.id)?.term ?? null,
+          trainedLevel: hired.get(m.id)?.trainedLevel ?? m.baseLevel,
+          ready: ready.get(m.id)?.ready ?? false,
+          blocker: ready.get(m.id)?.blocker ?? null,
+        })),
+      }
+    },
+  },
+  {
+    name: 'calling_who_can_call', agent: 'crm_agent',
+    description: 'Dry run: who WOULD call this lead with this template, or the exact reason nobody can (no consent, Friday prayer, nobody trained, no voice). Rings nothing. Always use this before calling_place_call.',
+    params: '{ "leadId": string, "templateId": one of the call types, "language"?: "en"|"ar"|"ru" }',
+    roles: EVERYONE,
+    schema: z.object({
+      leadId: z.string(),
+      templateId: z.string().describe(`one of: ${CALL_TYPES.join(', ')}`),
+      language: z.enum(['en', 'ar', 'ru']).optional(),
+    }),
+    run: async (args, ctx) => {
+      const r = await placeLeadCall({
+        leadId: s(args.leadId), templateId: s(args.templateId),
+        language: args.language as 'en' | 'ar' | 'ru' | undefined,
+        placedBy: ctx.email, dryRun: true,
+      })
+      if (r.placed) return { error: 'A dry run must never place a call.' }
+      return r.wouldPlace
+        ? { canCall: true, caller: r.memberName, memberId: r.memberId, alternates: r.alternates, maxDurationSec: r.maxDurationSec }
+        : { canCall: false, reason: r.reason, because: r.message, whose: r.kind }
+    },
+  },
+  {
+    name: 'calling_place_call', agent: 'crm_agent', destructive: true,
+    description: 'Place ONE real phone call to a lead, spoken by the team member the roster selects. It rings a real person and costs money. Run calling_who_can_call first and tell the user who will speak before you confirm.',
+    params: '{ "leadId": string, "templateId": one of the call types, "language"?: "en"|"ar"|"ru", "avoidMemberIds"?: string[], "confirm": true }',
+    roles: OPERATORS,
+    schema: z.object({
+      leadId: z.string(),
+      templateId: z.string().describe(`one of: ${CALL_TYPES.join(', ')}`),
+      language: z.enum(['en', 'ar', 'ru']).optional(),
+      avoidMemberIds: z.array(z.string()).optional()
+        .describe('members this lead already turned down — they do not call back'),
+      confirm: z.boolean().optional().describe('set true only after the user explicitly confirmed this exact call'),
+    }),
+    run: async (args, ctx) => {
+      const r = await placeLeadCall({
+        leadId: s(args.leadId), templateId: s(args.templateId),
+        language: args.language as 'en' | 'ar' | 'ru' | undefined,
+        avoidMemberIds: strArr(args.avoidMemberIds, 12),
+        placedBy: ctx.email,
+      })
+      if (!r.placed) {
+        return r.wouldPlace
+          ? { ok: false, refused: 'dryRun' }
+          : { ok: false, refused: r.reason, because: r.message, whose: r.kind }
+      }
+      return { ok: true, callId: r.callId, status: r.status, caller: r.memberName, to: r.to, maxDurationSec: r.maxDurationSec }
+    },
+  },
+
   // ── ads_agent ──────────────────────────────────────────────────────────────
   {
     name: 'ads_list_campaigns', agent: 'ads_agent',
@@ -980,7 +1069,10 @@ export function parseToolCall(
 }
 
 /** At level 2, actions that ACTIVATE spend still need an explicit human yes. */
-const L2_STILL_CONFIRM = new Set(['ads_resume_campaign'])
+// A phone call cannot be un-rung, and it reaches a person who did not choose
+// this moment. Like resuming spend, it still needs the user's own words at
+// autonomy 2 — only full autopilot may place one unattended.
+const L2_STILL_CONFIRM = new Set(['ads_resume_campaign', 'calling_place_call'])
 
 /**
  * Execute one tool call with role + autonomy enforcement. Never throws.
