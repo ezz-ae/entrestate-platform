@@ -136,10 +136,17 @@ export const APPS: AppDef[] = [
     card: 'border-amber-500/15 hover:border-amber-500/30',
     icon: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
   },
-  // Drive — the one home for everything you make + one Editor that opens any
-  // asset. Takes Notebook's spine slot; Notebook now lives inside Drive.
+  // Assets — the one home for everything you make + one Editor that opens any
+  // asset. Takes Notebook's spine slot; Notebook now lives inside it.
+  //
+  // Named Assets, not Drive: the store sells it as Assets (app-store.ts) and
+  // the promise is a STORE, not a folder — every upload surface in the system
+  // lands here, so an image attached on the ads desk is in the library the
+  // moment it is attached. The id and href stay 'drive' on purpose: they are
+  // load-bearing (routes, `match`, REALTOR_APP_IDS, saved links), and renaming
+  // a route to match a label is how live links die.
   {
-    id: 'drive', label: 'Drive', sub: 'Assets · Editor · Notebook',
+    id: 'drive', label: 'Assets', sub: 'Images · Video · Deployments · Editor',
     href: '/freehold-intelligence/drive', Icon: HardDrive,
     metric: 'Everything you create & edit', badge: 0, accent: '#2DD4BF',
     card: 'border-teal-400/15 hover:border-teal-400/30',
@@ -157,7 +164,9 @@ export const APPS: AppDef[] = [
     spine: false,
   },
   {
-    id: 'creative-studio', label: 'Creative Studio', sub: 'Agentic · Video · Landings · Ads',
+    // Creative Hub — where the making tools live (app-store.ts sells it under
+    // that name). Id and href stay 'creative-studio': load-bearing routes.
+    id: 'creative-studio', label: 'Creative Hub', sub: 'Agentic · Video · Landings · Ads',
     href: '/freehold-intelligence/creative-studio', Icon: Clapperboard,
     metric: 'Visual AI workflow builder', badge: 0, accent: '#A78BFA',
     card: 'border-violet-400/15 hover:border-violet-400/30',
