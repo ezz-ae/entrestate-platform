@@ -2,7 +2,7 @@ import { cookies, headers } from "next/headers"
 import { BRAND } from "@/lib/freehold/brand"
 import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto"
 import { promisify } from "node:util"
-import { query } from "@/lib/db"
+import { query, assertDatabaseConfigured } from "@/lib/db"
 import { ensureUsersTable, type UserProfileRecord } from "@/lib/data"
 import { verifySession as verifyPlatformSession, SESSION_COOKIE as PLATFORM_SESSION_COOKIE } from "@/lib/freehold/auth-edge"
 
@@ -300,3 +300,32 @@ export const clearSessionCookie = () => ({
   value: "",
   maxAge: 0,
 })
+
+/**
+ * IS THERE ALREADY AN ADMIN? — the gate the first-run bootstrap hangs on.
+ *
+ * `/api/auth/bootstrap-admin` exists to mint the FIRST admin on a fresh
+ * deployment, and the docs have always said it "disables itself once an admin
+ * exists" (docs/route-auth-matrix.md, DEPLOYMENT.md §5.1). The code never
+ * checked. Because the upsert behind it is `ON CONFLICT (email) DO UPDATE SET
+ * role = EXCLUDED.role, password_hash = ...`, that missing check meant anyone
+ * holding the setup key could POST an EXISTING owner's email and silently
+ * replace their password and elevate them — an account takeover, using a
+ * long-lived environment variable as the only secret.
+ *
+ * Fails CLOSED on purpose, and this is the whole subtlety: `query()` returns
+ * `[]` when no connection string is configured (the build-time fallback), so a
+ * naive count would read "no admins" on an UNCONFIGURED database and wave the
+ * bootstrap straight through. assertDatabaseConfigured() turns that ambiguity
+ * into a loud error — the lesson of "an unreachable database and an empty one
+ * were the same value to every caller". A database we cannot read is never a
+ * database we mint an admin into.
+ */
+export async function adminExists(): Promise<boolean> {
+  assertDatabaseConfigured("the admin bootstrap check")
+  await ensureAuthTables()
+  const rows = await query<{ id: string }>(
+    `SELECT id FROM freehold_site_users WHERE role = 'admin' LIMIT 1`,
+  )
+  return rows.length > 0
+}

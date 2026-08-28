@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { randomUUID } from "node:crypto"
 import {
+  adminExists,
   buildSessionCookie,
   createSession,
   getUserByEmailForAuth,
@@ -45,6 +46,24 @@ export async function POST(req: NextRequest) {
 
     if (setupKey !== expectedKey) {
       return NextResponse.json({ error: "Invalid setup key." }, { status: 403 })
+    }
+
+    // FIRST ADMIN ONLY. Documented since day one (docs/route-auth-matrix.md,
+    // DEPLOYMENT.md §5.1: "endpoint disables itself once an admin exists") and
+    // never implemented. The upsert below is ON CONFLICT (email) DO UPDATE with
+    // role and password_hash, so without this gate anyone holding the setup key
+    // could post an EXISTING owner's email and replace their password — account
+    // takeover, with a long-lived env var as the only secret. Losing a password
+    // is what /api/auth/request-reset is for; it is never what a bootstrap
+    // endpoint is for. adminExists() fails closed on an unreadable database.
+    if (await adminExists()) {
+      return NextResponse.json(
+        {
+          error:
+            "An admin already exists — first-run bootstrap is closed. Use password reset, or have an existing admin add the user in Team.",
+        },
+        { status: 409 },
+      )
     }
 
     const existing = await getUserByEmailForAuth(email)
