@@ -31,6 +31,20 @@ Check before you push. `git remote -v` must say `entrestate-platform`:
 git remote -v | grep -q entrestate-platform || echo "WRONG REPO — STOP"
 ```
 
+### The databases are separate too, and that is now enforced
+
+The client's database runs their live business — more than ten live campaigns,
+leads arriving today. This repository carries every one of its table names,
+because the two products are the same software, so the only thing keeping our
+rows out of theirs is which connection string `DATABASE_URL` holds.
+
+`lib/tenancy/db-owner.ts` turns that from a convention into a lock. Each
+deployment sets `DB_OWNER` (`entrestate` here, `freehold` there); the database
+remembers who claimed it in `deployment_owner`; a mismatch refuses to start. It
+will claim ONLY a database that is both unmarked and EMPTY — a populated,
+unclaimed database is somebody's working system and is refused without a single
+write. Unset `DB_OWNER` leaves the check dormant.
+
 The tenancy code is written so this repository's own behaviour is opt-in:
 `NEXT_PUBLIC_TENANT_BASE_DOMAIN` is unset on the Freehold deployment, and every
 vendor rule (see `lib/tenancy/vendor-host.ts`) returns `pass` without it. That
