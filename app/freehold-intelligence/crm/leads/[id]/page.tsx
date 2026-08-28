@@ -17,6 +17,7 @@ import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { brokerOwnerKeys } from '@/lib/freehold/lead-access'
 import { getServerT } from '@/lib/i18n/server'
 import { LeadExpertStrip } from '@/components/freehold/lead-expert-strip'
+import { LeadCallCard } from '@/components/freehold/lead-call-card'
 import { MachineVerdictLeadChip } from '@/components/freehold/machine-verdict-notifier'
 
 // Tries to fetch live lead from DB; maps it to the CRM shape used by the rest of this page.
@@ -234,6 +235,11 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
           {/* Ask the Expert about this lead */}
           <LeadExpertStrip id={lead.id} name={lead.name} />
+
+          {/* Who can call this lead, and why not. The card previews through
+              GET /api/calling/preview (a dry run that cannot dial) before it
+              ever offers a button. */}
+          <LeadCallCard leadId={lead.id} leadName={lead.name} />
 
           {/* The Ads Machine's open feedback question about THIS lead, if the
               viewer owns it (or is management) — answered inline. */}
