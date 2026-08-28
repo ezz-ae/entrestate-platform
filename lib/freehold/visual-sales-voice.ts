@@ -172,3 +172,79 @@ export function missingVoiceKeys(
     .filter((m) => resolveVoice(m, env).quality === 'fallback')
     .map((m) => ({ memberId: m.id, suggestedKey: voiceKeysFor(m)[0] }))
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// THE CALLING PROVIDER'S OWN HANDLE.
+//
+// The block above resolves a Fish Audio VOICE — the reference the form and the
+// chat speak with. A live phone call goes through a different seam
+// (lib/calling/provider.ts) whose unit is an AGENT: a provider-side object that
+// already carries a voice plus its conversational configuration. The two are
+// not interchangeable, and pretending they were would put a voice id in a field
+// the provider reads as an agent id and fail at dial time.
+//
+// This is the addition the VoiceProvider type was left explicit for: "a second
+// one is an addition, never a silent swap".
+//
+// ONE AGENT PER MEMBER, OR NO CALL. The connection carries a single default
+// agent, and until now every call in the product went out as that one agent —
+// so Sara, Saeed and Hessa all reached the buyer in the same voice, which is
+// the fixed-voice promise broken at the only place it is audible. There is
+// deliberately no language-level fallback here (unlike the voice block above):
+// a shared agent is exactly the failure, so an unset member has no agent and
+// the caller refuses rather than dialling as somebody else.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AgentBinding {
+  memberId: string
+  /** The provider's agent id. Empty when nothing is configured for this member. */
+  agentId: string
+  sourceKey: string | null
+}
+
+/** The one key that can give a member their own agent. */
+export function agentKeyFor(member: TeamMember): string {
+  return `CALL_AGENT_MEMBER_${member.id.toUpperCase().replace(/-/g, '_')}`
+}
+
+/** Resolve one member's provider agent. Pure apart from the env read. */
+export function resolveCallAgent(
+  member: TeamMember,
+  env: Record<string, string | undefined> = process.env,
+): AgentBinding {
+  const key = agentKeyFor(member)
+  const value = (env[key] || '').trim()
+  return value
+    ? { memberId: member.id, agentId: value, sourceKey: key }
+    : { memberId: member.id, agentId: '', sourceKey: null }
+}
+
+/** Bind the whole roster's agents. */
+export function bindTeamAgents(
+  env: Record<string, string | undefined> = process.env,
+  team: TeamMember[] = SALES_TEAM,
+): AgentBinding[] {
+  return team.map((m) => resolveCallAgent(m, env))
+}
+
+/**
+ * Two members pointed at ONE provider agent. Same failure as a shared voice and
+ * reported the same way, because on a call it is the same thing the lead hears.
+ */
+export function agentCollisions(bindings: AgentBinding[]): VoiceCollision[] {
+  const byAgent = new Map<string, string[]>()
+  for (const b of bindings) {
+    if (!b.agentId) continue
+    byAgent.set(b.agentId, [...(byAgent.get(b.agentId) ?? []), b.memberId])
+  }
+  return [...byAgent.entries()]
+    .filter(([, ids]) => ids.length > 1)
+    .map(([refId, memberIds]) => ({ refId, memberIds }))
+}
+
+/** Members whose provider agent is set and unshared — the ones a dialler may
+ *  actually speak as. */
+export function agentReadyMembers(bindings: AgentBinding[]): string[] {
+  const colliding = new Set(agentCollisions(bindings).flatMap((c) => c.memberIds))
+  return bindings.filter((b) => b.agentId && !colliding.has(b.memberId)).map((b) => b.memberId)
+}

@@ -39,6 +39,10 @@ import {
   isCallType, loadCallableLead, planCall, type RailRefusal,
 } from '@/lib/calling/gates'
 import { recordPlacedCall, countPlacedCalls } from '@/lib/calling/call-log'
+import { assignCaller, CALLER_REFUSAL_SENTENCES, type CallerRefusal } from '@/lib/freehold/lead-caller'
+import { getRosterState } from '@/lib/freehold/sales-employment'
+import { resolveCallAgent, bindTeamAgents, agentReadyMembers } from '@/lib/freehold/visual-sales-voice'
+import { getMember } from '@/lib/freehold/visual-sales-team'
 
 // Brokers place their own calls; management and marketing place them on behalf
 // of a team. Nobody outside this list can reach a lead's phone through the
@@ -64,6 +68,23 @@ function refuseRail(reason: RailRefusal) {
   return NextResponse.json(
     { placed: false, reason, message: RAIL_REFUSAL_SENTENCES[reason] },
     { status: RAIL_STATUS[reason] },
+  )
+}
+
+/**
+ * Refusals that belong to the ROSTER — nobody employed, trained, voiced or
+ * speaking this language. 409 like the lead refusals, because the request was
+ * well formed and the answer is still no; but the message points at hiring and
+ * training rather than at the lead, so a broker fixes the right thing.
+ */
+function refuseRoster(reason: CallerRefusal | 'memberAgentMissing', message?: string) {
+  return NextResponse.json(
+    {
+      placed: false,
+      reason,
+      message: message ?? CALLER_REFUSAL_SENTENCES[reason as CallerRefusal],
+    },
+    { status: 409 },
   )
 }
 
@@ -138,6 +159,13 @@ interface PlaceBody {
   callerId?: string
   /** Opt in to the vendor's number. Off by default — it is not the client's number. */
   allowPlatformFallback?: boolean
+  /** The language this call happens in. Anything else is read as English —
+   *  a guess about a language nobody on the team speaks would be refused by
+   *  assignCaller anyway, and refusing early on a typo helps nobody. */
+  language?: 'en' | 'ar' | 'ru'
+  /** Members this lead has already turned down, so the re-engagement is a
+   *  different person on the line (lib/freehold/lead-caller.ts). */
+  avoidMemberIds?: string[]
 }
 
 export async function POST(req: NextRequest) {
@@ -163,9 +191,46 @@ export async function POST(req: NextRequest) {
   const to = lead.phone ? normaliseE164(lead.phone) : null
   if (lead.phone && !to) return refuseRail('phoneUnusable')
 
-  const plan = planCall(lead, templateId, new Date())
+  const now = new Date()
+  const plan = planCall(lead, templateId, now)
   if (!plan.go) return refuseLead(plan.refusal, plan.sentence)
   if (!to) return refuseRail('phoneUnusable') // planCall proved phone is present; this proves it is dialable
+
+  // ── WHO makes this call. ─────────────────────────────────────────────────
+  // Until this block existed the answer was "the connection's single default
+  // agent", so every member of the Visual Sales Team reached every lead in the
+  // same voice — the fixed-voice promise broken at the one place a lead can
+  // hear it. assignCaller() runs the roster gates (employed, trained to
+  // READINESS_THRESHOLD, own voice, speaks the language, not the person this
+  // lead already turned down); the lead gate above still outranks all of them.
+  const roster = await getRosterState(now)
+  const language = (body.language === 'ar' || body.language === 'ru') ? body.language : 'en'
+  const assigned = assignCaller(
+    { ...lead, language, avoidMemberIds: Array.isArray(body.avoidMemberIds) ? body.avoidMemberIds.map(String) : [] },
+    templateId,
+    now,
+    roster,
+  )
+  if (!assigned.go) {
+    // A lead-side refusal can only come from planCall, which already returned
+    // above; anything reaching here is about the roster.
+    return assigned.leadRefused
+      ? refuseLead(assigned.refusal, assigned.sentence)
+      : refuseRoster(assigned.refusal as CallerRefusal)
+  }
+
+  // The chosen member must have their OWN provider agent. No fallback to the
+  // connection default on purpose: dialling as somebody else is the failure
+  // this whole block exists to end, and a wrong voice is worse than a refusal
+  // an operator can fix in one environment variable.
+  const member = getMember(assigned.memberId)!
+  const agent = resolveCallAgent(member)
+  if (!agent.agentId || !agentReadyMembers(bindTeamAgents()).includes(member.id)) {
+    return refuseRoster(
+      'memberAgentMissing',
+      `${member.name} has no voice agent of their own. Set CALL_AGENT_MEMBER_${member.id.toUpperCase()} so they do not call as someone else.`,
+    )
+  }
 
   // ── Provider state. Reads only — nothing here dials. ─────────────────────
 
@@ -212,8 +277,8 @@ export async function POST(req: NextRequest) {
       to,
       fromNumberId: from.providerNumberId,
       templateId,
-      agentId: connection.agentId ?? '',
-      metadata: { lead_id: lead.id, template_id: templateId, placed_by: auth.user.email },
+      agentId: agent.agentId,
+      metadata: { lead_id: lead.id, template_id: templateId, placed_by: auth.user.email, member_id: member.id },
     })
 
     await recordPlacedCall({
@@ -235,6 +300,10 @@ export async function POST(req: NextRequest) {
       to,
       templateId,
       maxDurationSec: plan.maxDurationSec,
+      // Who the lead actually spoke to, and who else was free — so a second
+      // call can avoid the same person (lead-caller.ts, avoidMemberIds).
+      memberId: member.id,
+      alternates: assigned.alternates,
     })
   } catch (e) {
     if (e instanceof CallingConfigError) return refuseRail('notConnected')
