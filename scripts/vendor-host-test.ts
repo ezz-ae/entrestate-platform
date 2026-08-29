@@ -19,6 +19,11 @@
  * second copy is loaded for the switched-off case.
  */
 
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
+
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
 const fail = (m: string, got: string) => { failures++; console.error(`  ✗ ${m}\n      got: ${got}`) }
@@ -61,6 +66,44 @@ async function main(): Promise<void> {
     }
     check('files are never treated as page routes',
       vendorHostAction('entrestate.com', '/og-image.png').kind === 'pass')
+  }
+
+  console.log('\n── every door the operator is told to use actually opens ──')
+  {
+    // Reported live: "https://entrestate.com/login, /ctrl — anything — takes you
+    // to the business page; the only thing working is /server." The allowlist
+    // had not grown with the application, so surfaces built later were being
+    // redirected away by a rule written before they existed. Each one below is
+    // an address a person is handed — by a commit message, by the proxy's own
+    // redirect, or by their own fingers — so each is asserted individually.
+    const doors: Array<[string, string]> = [
+      ['/login', 'the address people type; app/login/page.tsx sends it to /server'],
+      ['/ctrl', 'the partner control plane, named after this very domain'],
+      ['/ctrl/projects', 'and everything under it'],
+      ['/portal/acme', 'the partner storefront, a capability URL with no login'],
+      ['/activate', 'where the proxy sends visitors when WHITE_LABEL is on'],
+      ['/wl-admin', 'the vendor key console'],
+    ]
+    for (const [p, why] of doors) {
+      check(`${p} opens — ${why}`, vendorHostAction('entrestate.com', p).kind === 'pass',
+        show(vendorHostAction('entrestate.com', p)))
+    }
+
+    // /login must not become a second sign-in screen: one file, one redirect.
+    const alias = read('app/login/page.tsx')
+    check('app/login/page.tsx exists and only redirects', /redirect\('\/server'\)/.test(alias))
+    check('…and holds no password field of its own', !/password|input/i.test(alias))
+  }
+
+  console.log('\n── the brokerage’s own pages are still not the vendor’s ──')
+  {
+    // These read as a licensed brokerage — advisory, Golden Visa, the Business
+    // Bay office. They are the property site, so they keep redirecting even
+    // though they sit next to the vendor routes in app/.
+    for (const p of ['/about', '/services', '/contact']) {
+      const a = vendorHostAction('entrestate.com', p)
+      check(`${p} → the platform site`, a.kind === 'redirect' && a.to === '/business', show(a))
+    }
   }
 
   console.log('\n── product doors keep their short address ──')
@@ -124,6 +167,51 @@ async function main(): Promise<void> {
     )) as typeof import('../lib/tenancy/vendor-host')
     for (const p of ['/', '/projects', '/blog']) {
       check(`with tenancy off, ${p} is untouched`, fresh.vendorHostAction('freeholdproperty.ae', p).kind === 'pass')
+    }
+  }
+
+  console.log('\n── no route can be swallowed by this rule again ──')
+  {
+    // The bug was not a wrong entry, it was a list nobody was forced to update:
+    // routes were added to app/ for months and inherited "redirect to /business"
+    // by default. So the two lists must together account for every top-level
+    // route in app/ — a new one fails here, at build time, and has to be called
+    // either the vendor's or the brokerage's on purpose.
+    const { VENDOR_PREFIXES, PROPERTY_SITE_PREFIXES } = await import('../lib/tenancy/vendor-host')
+    const vendor = new Set(VENDOR_PREFIXES)
+    const property = new Set(PROPERTY_SITE_PREFIXES)
+
+    const routes = readdirSync(join(process.cwd(), 'app'), { withFileTypes: true })
+      .filter((e) => e.isDirectory())
+      // Route groups (parens) and private folders (underscore) are not URLs.
+      .filter((e) => !e.name.startsWith('(') && !e.name.startsWith('_'))
+      .map((e) => `/${e.name}`)
+
+    check('app/ has routes to classify', routes.length > 10, String(routes.length))
+    const unclassified = routes.filter((r) => !vendor.has(r) && !property.has(r))
+    check('every top-level route in app/ is classified', unclassified.length === 0,
+      `${unclassified.join(', ')} — decide in lib/tenancy/vendor-host.ts whether these belong to the vendor or the brokerage`)
+    const both = routes.filter((r) => vendor.has(r) && property.has(r))
+    check('and none is claimed by both lists', both.length === 0, both.join(', '))
+
+    // The reverse: an entry that names nothing is a leftover, and leftovers are
+    // how a list stops being read. Two paths exist only in proxy.ts and are
+    // named here with their reason rather than quietly tolerated.
+    const PROXY_ONLY = new Map([
+      ['/crm', 'proxy.ts rewrites the crm. subdomain onto this prefix'],
+      ['/market', 'proxy.ts redirects the retired dashboard to /projects'],
+    ])
+    const onDisk = new Set(routes)
+    const dead = [...vendor, ...property].filter((p) => !onDisk.has(p) && !PROXY_ONLY.has(p))
+    check('no entry names a route that does not exist', dead.length === 0, dead.join(', '))
+
+    // And each classification is the behaviour, not just a comment.
+    for (const p of VENDOR_PREFIXES) {
+      check(`${p} passes, as its list says`, vendorHostAction('entrestate.com', p).kind === 'pass')
+    }
+    for (const p of PROPERTY_SITE_PREFIXES) {
+      const a = vendorHostAction('entrestate.com', p)
+      check(`${p} redirects, as its list says`, a.kind === 'redirect' && a.to === '/business', show(a))
     }
   }
 
