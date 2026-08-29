@@ -1548,10 +1548,10 @@ export interface BlogPost extends BlogPostSummary {
  * BLOG READS FAIL SOFT — a missing table is "no posts", never a 500.
  *
  * These four run on the PUBLIC homepage of every tenant. `freehold_site_blog_posts`
- * is created lazily by the editor and is not in the tenant provisioning list
- * (lib/tenancy/provision.ts), so a workspace whose owner has never opened the blog
- * has no such relation — and an unguarded SELECT threw 42P01 straight through the
- * server render. That took the whole homepage of skyline.entrestate.com down with
+ * is in no provisioning list (lib/tenancy/provision.ts) and — checked, not assumed —
+ * NOTHING in this codebase creates or writes it: there is no blog editor. On any
+ * database that did not inherit the table it simply does not exist, and an
+ * unguarded SELECT threw 42P01 straight through the server render. That took the whole homepage of skyline.entrestate.com down with
  * a 500 over a section that had nothing to show anyway.
  *
  * Same posture as getLandingMap in lib/inventory-data.ts: a lazily-created table is

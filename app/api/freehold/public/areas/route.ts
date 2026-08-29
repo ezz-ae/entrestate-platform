@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
+import { ensureAreaProfilesTable } from '@/lib/freehold/ensure-inherited-tables'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 300
@@ -15,6 +16,10 @@ type AreaRow = {
 
 export async function GET() {
   try {
+    // The table has to exist before an empty deployment can honestly answer
+    // "no areas yet". It used to 500 with source:'error' on a fresh database,
+    // and an empty database is not an error.
+    await ensureAreaProfilesTable()
     const rows = await query<AreaRow>(`
       SELECT slug, name, area_type, avg_yield, avg_score, project_count
       FROM freehold_site_area_profiles
