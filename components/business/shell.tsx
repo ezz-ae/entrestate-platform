@@ -145,7 +145,17 @@ export function BusinessFooter() {
   const cols: Array<{ label: string; items: typeof PRODUCTS }> = [
     { label: 'Products', items: PRODUCTS },
     { label: 'Platform', items: PLATFORM },
-    { label: 'Company', items: COMPANY },
+    {
+      label: 'Company',
+      items: [
+        ...COMPANY,
+        // The other half of the one-account bridge: the business footer names
+        // the discovery side the same way the Terminal's footer names this
+        // store. Footer-only — the header tour stays a tour of THIS site.
+        // Never "free" (the owner's word ban) — named for what it gives.
+        { href: 'https://terminal.entrestate.com', label: 'The Terminal', blurb: 'Market discovery, with every account.' },
+      ],
+    },
   ]
   return (
     <footer className="border-t border-white/[0.07] bg-app">

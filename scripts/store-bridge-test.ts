@@ -46,6 +46,22 @@ const rendered = publicStore
 if (/freehold/i.test(rendered)) {
   fail("the public store page renders the client's name — the client is a client, not the brand")
 }
+// The owner's word ban, standing: "بلاش نستخدم فري لأنها دايماً بتعطي انطباع
+// بالغير أهمية" — the included layer is NAMED (market discovery), never called
+// free. \bfree\b so "Freehold" in an internal path can never trip this; the
+// selling surfaces here are the store page and the business shell (footer).
+const shellRendered = readFileSync("components/business/shell.tsx", "utf8")
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/^\s*\/\/.*$/gm, "")
+  .replace(/^import .*$/gm, "")
+for (const [name, src] of [["store page", rendered], ["business shell", shellRendered]] as const) {
+  if (/\bfree\b/i.test(src)) {
+    fail(`the ${name} says the cheap word — name what the account gives instead`)
+  }
+  if (src.includes("مجان")) {
+    fail(`the ${name} says the cheap word in Arabic`)
+  }
+}
 if (!routeCode.includes('"/business/store"')) {
   fail("the catalog must point the Terminal at /business/store — never into the client's workspace")
 }
