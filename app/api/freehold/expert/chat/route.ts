@@ -12,6 +12,8 @@ import {
   toolsForRole, renderToolDocs, parseToolCall, runCoordinatorTool,
   type CoordinatorRole, type ToolCtx,
 } from '@/lib/freehold/coordinator-tools'
+import { getStaff, toolsWithEmployee } from '@/lib/freehold/marketing-employee'
+import { getHired } from '@/lib/freehold/sales-employment'
 import { MASTER_SYSTEM_PROMPT, detectMode, laneGuidance, autonomyGuidance, stripThinking } from '@/lib/freehold/agent-router'
 import { runExpertSdk } from '@/lib/freehold/expert-agent-run'
 import { getAutonomyLevel } from '@/lib/freehold/agent-autonomy'
@@ -480,7 +482,39 @@ SCREEN TRUTH: before presenting any entity (an ad, campaign, lead, form) as "thi
     // ── Coordinator tools (Vertex-ADK style): the one chat can CALL REAL
     //    specialist tools — ads / landing / crm / creative / research. Only
     //    authenticated users get tools; the toolset is role-gated server-side.
-    const tools = sessionUser ? toolsForRole(role as CoordinatorRole) : []
+    // ── The chat can run AS AN EMPLOYEE ─────────────────────────────────────
+    //
+    // lib/freehold/marketing-employee.ts described a hired marketing manager
+    // with her own specialist lanes and had no caller at all: the employee you
+    // could hire could not be spoken to. This is that wiring, and it is
+    // deliberately the ONLY one — one chat, one face, specialist lanes behind
+    // it, exactly as agent-router.ts insists (duplicate agent brains are how
+    // this codebase got its built-twice scars).
+    //
+    // toolsWithEmployee INTERSECTS with the role: hiring somebody can never
+    // grant a permission the person chatting does not already have, and an
+    // employee who is not on the payroll drives nothing rather than quietly
+    // falling back to the full set.
+    const requestedEmployee = String(
+      (body.context as Record<string, unknown> | undefined)?.employeeId ?? '',
+    ).trim()
+    const employee = requestedEmployee ? getStaff(requestedEmployee) : undefined
+    const hired = sessionUser && employee ? await getHired() : []
+    const tools = !sessionUser
+      ? []
+      : employee
+        ? toolsWithEmployee(role as CoordinatorRole, employee.id, hired)
+        : toolsForRole(role as CoordinatorRole)
+
+    // Said out loud rather than left to the tool list: a chat with no tools and
+    // no explanation reads as a broken assistant, not as an unhired employee.
+    const employeeGuidance = !requestedEmployee
+      ? ''
+      : !employee
+        ? `\n\nAN EMPLOYEE WAS REQUESTED WHO IS NOT IN THE CATALOGUE (${requestedEmployee}). Say so plainly and answer as the coordinator; do not invent a colleague.`
+        : tools.length === 0
+          ? `\n\nYOU ARE ${employee.name.toUpperCase()}, AND YOU ARE NOT ON THIS ACCOUNT'S PAYROLL — or your lanes are outside what this user's role may do. You have NO tools this turn. Say that plainly, name what you would do once hired (${employee.duties.join(', ')}), and do not describe any action as done.`
+          : `\n\nYOU ARE ${employee.name.toUpperCase()} — ${employee.title}, ${employee.yearsExperience} years, ${employee.industries.join(' / ')}. ${employee.brief} You speak ${employee.languages.join(' and ')}. You work through your own specialists and nobody else's: the tools below are your whole job. Anything outside them belongs to a colleague — say whose, and do not attempt it. In particular you do NOT reach leads yourself; the front office owns the form, the call and the follow-up, with their own consent and hours gates.`
     const toolCtx: ToolCtx = { role: role as CoordinatorRole, email: sessionUser?.email ?? '', brokerId, autonomy }
     const toolProtocol = tools.length === 0 ? '' : `
 
@@ -497,7 +531,7 @@ Tools marked ⚠destructive change live campaigns/money/content: set "confirm": 
 The user is currently on ${body.page ?? 'an unknown page'} — prefer that surface's specialist when routing.
 Your tools:${renderToolDocs(tools)}`
 
-    const systemPrompt = `${skill.systemPrompt}\n\n${MASTER_SYSTEM_PROMPT}${roleGuidance}${modeGuidance}${refGuidance}${pageGuidance}${attachmentGuidance}${languageGuidance}${tools.length ? `\n\n${autonomyGuidance(autonomy)}` : ''}${toolProtocol}\n${BLOCK_PROTOCOL}`
+    const systemPrompt = `${skill.systemPrompt}\n\n${MASTER_SYSTEM_PROMPT}${roleGuidance}${modeGuidance}${refGuidance}${pageGuidance}${attachmentGuidance}${languageGuidance}${employeeGuidance}${tools.length ? `\n\n${autonomyGuidance(autonomy)}` : ''}${toolProtocol}\n${BLOCK_PROTOCOL}`
 
     // Behind EXPERT_USE_AI_SDK: the same guidance, but tools are called
     // natively by the AI SDK (no JSON tool_call protocol). The confirm rule and
