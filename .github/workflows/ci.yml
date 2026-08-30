@@ -44,16 +44,10 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: "1"
 
-      # THE SECOND BUILD ROOT. apps/terminal is its own Vercel project
-      # (entrestate-os) with its own package.json and lockfile — there is no
-      # pnpm workspace joining them, so the install above does not touch it and
-      # every gate above is blind to it. It shipped with
-      # `typescript: { ignoreBuildErrors: true }` and 423 uncaught type errors.
-      # These two steps are the first verification that half of this repository
-      # has ever had in CI. The ratchet fails only when the debt GROWS.
-      - name: Install (terminal)
-        run: pnpm install --frozen-lockfile
-        working-directory: apps/terminal
-
-      - name: Type debt ratchet (terminal)
-        run: pnpm typecheck:terminal
+      # There used to be two more steps here, installing and type-checking
+      # apps/terminal as "the second build root". It was not one: apps/terminal
+      # was a vendored copy of the Terminal, and the Vercel project entrestate-os
+      # builds ezz-ae/Entrestate_os from its own root. So CI installed 22 MB and
+      # ratcheted type debt for a directory nobody deployed, on every push, while
+      # the deployed Terminal had no CI at all. It has its own now, in its own
+      # repository (Entrestate OS CI / build_and_test).

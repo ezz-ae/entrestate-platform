@@ -28,10 +28,13 @@
  * Collapse them and the meaning stops reading as meaning: everything glows, so
  * nothing does.
  *
- * Generated into both build roots by scripts/gen-tokens.ts — apps/terminal has
- * its own package.json and Vercel root, so a shared import is not available
- * without a workspace conversion that this file deliberately does not require.
- * EDIT THIS FILE, never the generated copies; the guard fails if they drift.
+ * Generated into app/tokens.css by scripts/gen-tokens.ts. It used to be
+ * generated into a second copy under apps/terminal too, on the belief that the
+ * Terminal built from this repository; it does not (ezz-ae/Entrestate_os builds
+ * from its own root), so that copy was written into a directory nobody deployed
+ * while the real Terminal's tokens went unmanaged. Sharing these with the
+ * Terminal again needs a published package, not a generated file.
+ * EDIT THIS FILE, never the generated copy; the guard fails if they drift.
  */
 
 :root {

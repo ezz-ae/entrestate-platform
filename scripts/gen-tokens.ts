@@ -1,12 +1,17 @@
 /**
- * Copy design/tokens.css into both build roots.
+ * Copy design/tokens.css into the build root.
  *
- * apps/terminal has its own package.json, its own lockfile and its own Vercel
- * root directory, and this repo has no pnpm workspace — so the two apps cannot
- * share an import without a build-infrastructure change riding along with a
- * design one. A generated copy keeps the design change shippable on its own,
- * and scripts/design-tokens-test.ts fails the build if the copies ever drift
- * from the source, which is the failure mode a hand-copied file would invite.
+ * This used to write two copies, the second into apps/terminal/app/tokens.css.
+ * apps/terminal was a full vendored copy of the Terminal, kept here because the
+ * Terminal was believed to build from entrestate-platform/apps/terminal. It
+ * never did — the Vercel project entrestate-os builds ezz-ae/Entrestate_os from
+ * its root — so that copy was a design token generated into a directory nobody
+ * deploys, while the real Terminal's tokens went unmanaged the whole time.
+ *
+ * Sharing tokens across the two products again needs a published package, not a
+ * file written across a repository boundary that does not exist.
+ * scripts/design-tokens-test.ts still fails the build if the remaining copy
+ * drifts from the source, which is the failure mode a hand-copied file invites.
  *
  * Runs at the head of `pnpm guards`, the same way the chain already opens with
  * gen-app-routes.ts.
@@ -17,7 +22,7 @@ import { dirname, join } from 'node:path'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 export const TOKEN_SOURCE = 'design/tokens.css'
-export const TOKEN_COPIES = ['app/tokens.css', 'apps/terminal/app/tokens.css']
+export const TOKEN_COPIES = ['app/tokens.css']
 
 const BANNER =
   '/* GENERATED FROM design/tokens.css BY scripts/gen-tokens.ts — DO NOT EDIT.\n' +
