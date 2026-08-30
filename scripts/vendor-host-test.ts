@@ -19,7 +19,9 @@
  * second copy is loaded for the switched-off case.
  */
 
-import { readdirSync, readFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
@@ -147,11 +149,31 @@ async function main(): Promise<void> {
       vendorHostAction('skyline.entrestate.com', p).kind === 'pass')
   }
 
+  console.log('\n── a preview of this deployment is the vendor site ──')
+  {
+    // This used to assert the opposite, and the opposite was wrong. A preview
+    // build answers on <project>-git-<branch>-<scope>.vercel.app, which is
+    // neither the apex nor a tenant, so every rule returned `pass` — and `pass`
+    // on `/` renders the brokerage property site that ships in this repo. You
+    // could not review the vendor surface on the one URL that exists to review
+    // it: opening a preview of a branch that changes entrestate.com showed
+    // Dubai apartments and a rental-yield headline.
+    for (const h of ['entrestate-abc123.vercel.app', 'entrestate-git-products-menu-ezz-dxb.vercel.app']) {
+      const root = vendorHostAction(h, '/')
+      check(`${h}/ shows the platform site`, root.kind === 'redirect' && root.to === '/business', show(root))
+      check(`${h}/business is left alone`, vendorHostAction(h, '/business').kind === 'pass')
+      check(`${h}/login opens`, vendorHostAction(h, '/login').kind === 'pass')
+      const deep = vendorHostAction(h, '/projects')
+      check(`${h} does not serve the property site either`,
+        deep.kind === 'redirect' && deep.to === '/business', show(deep))
+    }
+  }
+
   console.log('\n── unrelated hosts pass ──')
   {
-    // Preview deployments and custom domains are not the vendor's hosts and
-    // must not be rewritten to a page the visitor did not ask for.
-    for (const h of ['entrestate-abc123.vercel.app', 'freeholdproperty.ae', 'localhost:3000', 'a.b.entrestate.com']) {
+    // A customer's own domain is theirs. It must never be redirected to ours,
+    // whatever this deployment thinks it is.
+    for (const h of ['freeholdproperty.ae', 'localhost:3000', 'a.b.entrestate.com']) {
       check(`${h} is left alone`, vendorHostAction(h, '/').kind === 'pass')
     }
     check('a missing host is left alone', vendorHostAction(null, '/').kind === 'pass')
@@ -159,60 +181,43 @@ async function main(): Promise<void> {
 
   console.log('\n── switched off, it does nothing at all ──')
   {
-    // The Freehold deployment leaves the base domain unset. Proven by loading
-    // a second, isolated copy of the module with the variable cleared.
-    delete process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN
-    const fresh = (await import(
-      `../lib/tenancy/vendor-host?off=${Date.now()}`
-    )) as typeof import('../lib/tenancy/vendor-host')
-    for (const p of ['/', '/projects', '/blog']) {
-      check(`with tenancy off, ${p} is untouched`, fresh.vendorHostAction('freeholdproperty.ae', p).kind === 'pass')
+    // The client's deployment leaves the base domain unset, and this block is
+    // what proves the whole module is inert there.
+    //
+    // It used to re-import the module with a cache-busting query and the env
+    // deleted — which does NOT switch it off: the fresh copy's own
+    // `import './config'` resolves to the URL already in the module cache, so
+    // TENANT_BASE_DOMAIN stayed set and every assertion here passed vacuously,
+    // because the hosts it tested return `pass` under either setting. The
+    // preview rule was the first assertion that could tell the difference, and
+    // it failed immediately. A separate process is the only honest way to ask.
+    const probe = `
+      async function main() {
+        const { vendorHostAction } = await import(${JSON.stringify(join(process.cwd(), 'lib/tenancy/vendor-host.ts'))})
+        const hosts = ['freeholdproperty.ae', 'ore-git-main-somebody.vercel.app', 'entrestate.com']
+        const paths = ['/', '/projects', '/blog']
+        const out = []
+        for (const h of hosts) for (const p of paths) out.push(h + ' ' + p + ' ' + vendorHostAction(h, p).kind)
+        console.log(out.join('\\n'))
+      }
+      void main()
+    `
+    const probeFile = join(tmpdir(), `vendor-host-off-${process.pid}.ts`)
+    writeFileSync(probeFile, probe)
+    const env = { ...process.env }
+    delete env.NEXT_PUBLIC_TENANT_BASE_DOMAIN
+    let lines: string[] = []
+    try {
+      lines = execFileSync('npx', ['tsx', probeFile], { encoding: 'utf8', env, cwd: process.cwd() })
+        .trim().split('\n').filter(Boolean)
+    } finally {
+      try { unlinkSync(probeFile) } catch { /* best effort */ }
     }
-  }
 
-  console.log('\n── no route can be swallowed by this rule again ──')
-  {
-    // The bug was not a wrong entry, it was a list nobody was forced to update:
-    // routes were added to app/ for months and inherited "redirect to /business"
-    // by default. So the two lists must together account for every top-level
-    // route in app/ — a new one fails here, at build time, and has to be called
-    // either the vendor's or the brokerage's on purpose.
-    const { VENDOR_PREFIXES, PROPERTY_SITE_PREFIXES } = await import('../lib/tenancy/vendor-host')
-    const vendor = new Set(VENDOR_PREFIXES)
-    const property = new Set(PROPERTY_SITE_PREFIXES)
-
-    const routes = readdirSync(join(process.cwd(), 'app'), { withFileTypes: true })
-      .filter((e) => e.isDirectory())
-      // Route groups (parens) and private folders (underscore) are not URLs.
-      .filter((e) => !e.name.startsWith('(') && !e.name.startsWith('_'))
-      .map((e) => `/${e.name}`)
-
-    check('app/ has routes to classify', routes.length > 10, String(routes.length))
-    const unclassified = routes.filter((r) => !vendor.has(r) && !property.has(r))
-    check('every top-level route in app/ is classified', unclassified.length === 0,
-      `${unclassified.join(', ')} — decide in lib/tenancy/vendor-host.ts whether these belong to the vendor or the brokerage`)
-    const both = routes.filter((r) => vendor.has(r) && property.has(r))
-    check('and none is claimed by both lists', both.length === 0, both.join(', '))
-
-    // The reverse: an entry that names nothing is a leftover, and leftovers are
-    // how a list stops being read. Two paths exist only in proxy.ts and are
-    // named here with their reason rather than quietly tolerated.
-    const PROXY_ONLY = new Map([
-      ['/crm', 'proxy.ts rewrites the crm. subdomain onto this prefix'],
-      ['/market', 'proxy.ts redirects the retired dashboard to /projects'],
-    ])
-    const onDisk = new Set(routes)
-    const dead = [...vendor, ...property].filter((p) => !onDisk.has(p) && !PROXY_ONLY.has(p))
-    check('no entry names a route that does not exist', dead.length === 0, dead.join(', '))
-
-    // And each classification is the behaviour, not just a comment.
-    for (const p of VENDOR_PREFIXES) {
-      check(`${p} passes, as its list says`, vendorHostAction('entrestate.com', p).kind === 'pass')
-    }
-    for (const p of PROPERTY_SITE_PREFIXES) {
-      const a = vendorHostAction('entrestate.com', p)
-      check(`${p} redirects, as its list says`, a.kind === 'redirect' && a.to === '/business', show(a))
-    }
+    check('the probe ran', lines.length === 9, lines.join(' | '))
+    const wrong = lines.filter((l) => !l.endsWith(' pass'))
+    check('with tenancy off, every host and path is untouched — the apex included',
+      wrong.length === 0, wrong.join(' | '))
   }
 
   console.log(

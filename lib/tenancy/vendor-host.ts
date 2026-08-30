@@ -138,12 +138,34 @@ const isFile = (pathname: string): boolean => {
   return last.includes('.')
 }
 
+/**
+ * A PREVIEW OF THIS DEPLOYMENT IS THE VENDOR'S OWN SITE.
+ *
+ * Preview builds answer on `<project>-git-<branch>-<scope>.vercel.app`, which is
+ * not the apex and not a tenant, so every rule here used to return `pass` — and
+ * `pass` on `/` renders the brokerage property site that ships in this repo.
+ * The result: you could not review the vendor surface on the one URL that
+ * exists to review it. Opening a preview of a branch that changes
+ * entrestate.com showed Dubai apartments, Golden Visa and a rental-yield
+ * headline, and the whole point of a preview is to look at the change.
+ *
+ * So a *.vercel.app host is treated as the apex. This is safe by construction:
+ * the entire module is dormant unless NEXT_PUBLIC_TENANT_BASE_DOMAIN is set,
+ * which the client's deployment does not set — their previews are untouched,
+ * exactly as their production is. A custom domain still returns null, because
+ * a customer's own domain is theirs and must never be redirected to ours.
+ */
+function isPreviewHost(host: string): boolean {
+  return host.endsWith('.vercel.app')
+}
+
 /** The subdomain of a vendor host, or '' for the apex. Null when not ours. */
 function vendorSubdomain(rawHost: string): string | null {
   const host = rawHost.trim().toLowerCase().split(':')[0]
   if (!host) return null
   if (host === TENANT_BASE_DOMAIN) return ''
   if (host === `www.${TENANT_BASE_DOMAIN}`) return ''
+  if (isPreviewHost(host)) return ''
   if (!host.endsWith(`.${TENANT_BASE_DOMAIN}`)) return null
   const label = host.slice(0, -(TENANT_BASE_DOMAIN.length + 1))
   return label.includes('.') ? null : label
