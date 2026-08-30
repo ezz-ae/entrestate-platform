@@ -16,17 +16,13 @@
  * the gauntlet runs against installed packages, and this runs against the two
  * files that decide what gets installed.
  *
- * IT COVERS BOTH BUILD ROOTS, and that is not symmetry for its own sake. There
- * are two Vercel projects in this repository — `entrestate` at the root and
- * `entrestate-os` with Root Directory `apps/terminal` — each with its OWN
- * package.json and its OWN pnpm-lock.yaml, because there is no pnpm workspace
- * joining them. The incident above hit both projects at once, and the first
- * version of this guard checked only the root. The Terminal half is the more
- * dangerous one to leave open: `pnpm guards`, `pnpm typecheck` and `pnpm i18n`
- * all run against the platform root and mention `apps/terminal` zero times,
- * the Terminal's build sets `typescript: { ignoreBuildErrors: true }`, and it
- * is not the deployment anybody watches. A frozen-lockfile failure there is
- * silent until somebody opens terminal.entrestate.com.
+ * IT COVERS ONE BUILD ROOT, and it used to claim two. The second was
+ * `apps/terminal`, on the belief that the Vercel project `entrestate-os` built
+ * from entrestate-platform/apps/terminal. It never did — that project builds
+ * ezz-ae/Entrestate_os from its own root — so this guard was reading a
+ * package.json/pnpm-lock.yaml pair that no install has ever used, and reporting
+ * on it as though it were the Terminal. The Terminal's lockfile is guarded in
+ * the Terminal's own repository, which is the only place the check can be true.
  *
  * Pure — reads four files, no install, no network. Runs in `pnpm guards`.
  */
@@ -46,7 +42,11 @@ const cwd = process.cwd()
  */
 const ROOTS = [
   { dir: '.', label: 'platform (Vercel project: entrestate)' },
-  { dir: 'apps/terminal', label: 'terminal (Vercel project: entrestate-os)' },
+  // apps/terminal used to be listed here as a second build root. It was a
+  // vendored copy of the Terminal, and the Vercel project entrestate-os builds
+  // ezz-ae/Entrestate_os from its own root instead — so this was checking a
+  // lockfile pair that no install ever used. The Terminal's own lockfile is
+  // guarded in its own repository.
 ] as const
 
 for (const { dir, label } of ROOTS) {

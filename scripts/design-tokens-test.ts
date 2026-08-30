@@ -94,7 +94,7 @@ console.log('\n── one token source, generated into both build roots ──')
   // languages diverged in the first place, so the copies are generated and
   // then asserted identical rather than trusted.
   const src = readFileSync(join(ROOT, 'design/tokens.css'), 'utf8')
-  for (const rel of ['app/tokens.css', 'apps/terminal/app/tokens.css']) {
+  for (const rel of ['app/tokens.css']) {
     let copy = ''
     try { copy = readFileSync(join(ROOT, rel), 'utf8') } catch { /* reported below */ }
     const body = copy.slice(copy.indexOf('*/') + 2).trimStart()
