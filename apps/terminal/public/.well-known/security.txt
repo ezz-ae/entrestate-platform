@@ -1,4 +1,0 @@
-Contact: mailto:support@entrestate.com
-Preferred-Languages: en, ar
-Canonical: https://www.entrestate.com/.well-known/security.txt
-Policy: https://www.entrestate.com/privacy

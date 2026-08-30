@@ -33,11 +33,19 @@ const PLANS: Plan[] = [
     who: 'For brokerages',
     basis: 'Monthly, per workspace',
     // The one subscription price in the company. It is ALSO the Terminal's
-    // Team tier literal (apps/terminal/lib/pricing/plans.ts) — the owner
-    // mapped that tier onto this product — and scripts/terminal-price-test.ts
-    // asserts the two surfaces name the same number, so neither can be edited
-    // alone. Change the price THERE first; this line fails the guard until it
-    // agrees.
+    // Team tier literal — the owner mapped that tier onto this product — and
+    // that literal lives in a DIFFERENT REPOSITORY: ezz-ae/Entrestate_os,
+    // lib/pricing/plans.ts, where lib/payments/tap.ts reads it straight into
+    // the charge. It is frozen there by tests/pricing-money.test.ts.
+    //
+    // This used to say apps/terminal/lib/pricing/plans.ts and be cross-checked
+    // by scripts/terminal-price-test.ts. Both pointed at a vendored copy of
+    // that repository which nothing deployed, so the cross-check passed while
+    // the two numbers were free to drift — and the same stale read hid a live
+    // defect, /checkout?tier=realtor quoting this AED 999 for the one-agent
+    // product. No guard here can reach across the repository boundary, so the
+    // rule is written instead: change the price in Entrestate_os FIRST, then
+    // here and in scripts/build-onepager.ts, in one sitting.
     price: 'AED 999 / month · AED 9,588 / year',
     line: 'Makes leads from your listings, then works them to the deal.',
     includes: [
