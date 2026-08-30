@@ -52,6 +52,11 @@ const PUBLIC_API_EXACT = new Set([
   // entry the fail-closed API wall 401s every logged-out visitor — the
   // "AI site can't help" complaint: only signed-in staff could ever reach it.
   "/api/ai/chat",
+  // The App Store catalog, read by the Terminal's account area. Names,
+  // taglines, tiers and plan gates only — no engine internals, no PII, no
+  // session. The single source of truth stays lib/freehold/app-store.ts;
+  // serving it is how the Terminal shows the store without copying it.
+  "/api/store/catalog",
 ])
 const PUBLIC_API_PREFIXES = [
   "/api/freehold/public/",      // public catalogue (projects, areas, developers, search)
