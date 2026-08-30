@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Section, Grid, Eyebrow, PageHeader, H3, P } from "@/components/business/ui"
 import { STORE } from "@/lib/freehold/app-store"
+import { getTerminalUser } from "@/lib/terminal-session"
 
 /**
  * THE ENTRESTATE APP STORE — the public one.
@@ -41,7 +42,10 @@ export const metadata = {
   alternates: { canonical: "/business/store" },
 }
 
-export default function EntrestateStorePage() {
+export default async function EntrestateStorePage() {
+  // Phase 1 of the account foundation: the shared .entrestate.com session —
+  // recognition is a bonus, never a gate (null renders the anonymous page).
+  const terminalUser = await getTerminalUser()
   const live = STORE.filter((product) => product.status === "live")
   const planned = STORE.filter((product) => product.status === "planned")
 
@@ -57,6 +61,18 @@ export default function EntrestateStorePage() {
           { k: "Being built", v: `${planned.length} more` },
         ]}
       />
+
+      {terminalUser ? (
+        <Section className="pb-10">
+          <div className="flex items-center gap-3 bg-surface px-5 py-3.5 outline outline-1 outline-[#3B82F6]/25">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#3B82F6]" />
+            <p className="text-[0.875rem] text-ink-muted">
+              Signed in as <span className="text-white">{terminalUser.name ?? terminalUser.email ?? "your Terminal account"}</span>
+              {" — apps you add here land on this same account."}
+            </p>
+          </div>
+        </Section>
+      ) : null}
 
       <Section className="pb-16">
         <Eyebrow className="mb-4">Available now</Eyebrow>
