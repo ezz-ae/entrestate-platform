@@ -34,7 +34,11 @@
  * connection we cannot interrogate is not one we may write to.
  */
 
-import { query, assertDatabaseConfigured } from '@/lib/db'
+// unguardedQuery, not query: lib/db.ts now asks this module whether the
+// database may be touched before it hands out a connection, so reading the
+// marker through the ordinary door would ask the question in order to answer
+// it. This is the only caller of that door.
+import { unguardedQuery, assertDatabaseConfigured } from '@/lib/db'
 
 /**
  * Who this deployment is, from the environment. Not NEXT_PUBLIC: it is a
@@ -92,20 +96,20 @@ export function decideOwner(params: {
 }
 
 async function readMarker(): Promise<string | null> {
-  await query(`CREATE TABLE IF NOT EXISTS ${TABLE} (
+  await unguardedQuery(`CREATE TABLE IF NOT EXISTS ${TABLE} (
     id integer PRIMARY KEY DEFAULT 1 CHECK (id = 1),
     owner text NOT NULL,
     claimed_at timestamptz NOT NULL DEFAULT now()
   )`)
-  const rows = await query<{ owner: string }>(`SELECT owner FROM ${TABLE} WHERE id = 1`)
+  const rows = await unguardedQuery<{ owner: string }>(`SELECT owner FROM ${TABLE} WHERE id = 1`)
   return rows[0]?.owner ?? null
 }
 
 async function looksPopulated(): Promise<boolean> {
   for (const t of POPULATED_MARKERS) {
-    const [present] = await query<{ ok: boolean }>(`SELECT to_regclass($1) IS NOT NULL AS ok`, [t])
+    const [present] = await unguardedQuery<{ ok: boolean }>(`SELECT to_regclass($1) IS NOT NULL AS ok`, [t])
     if (!present?.ok) continue
-    const [row] = await query<{ n: string }>(`SELECT count(*)::text AS n FROM ${t} LIMIT 1`)
+    const [row] = await unguardedQuery<{ n: string }>(`SELECT count(*)::text AS n FROM ${t} LIMIT 1`)
     if (Number(row?.n ?? 0) > 0) return true
   }
   return false
@@ -128,7 +132,7 @@ export async function checkDatabaseOwner(): Promise<OwnerVerdict> {
     const verdict = decideOwner({ declared: DB_OWNER, marker, populated })
     // Claim ONLY a database that is both unmarked and empty.
     if (verdict.ok && verdict.reason === 'claimed') {
-      await query(
+      await unguardedQuery(
         `INSERT INTO ${TABLE} (id, owner) VALUES (1, $1) ON CONFLICT (id) DO NOTHING`,
         [DB_OWNER],
       )
@@ -136,12 +140,15 @@ export async function checkDatabaseOwner(): Promise<OwnerVerdict> {
     cached = verdict
     return verdict
   } catch (e) {
-    // A database we cannot interrogate is not one we may write to.
-    cached = {
+    // A database we cannot interrogate is not one we may write to — but this
+    // verdict is NOT cached. Now that lib/db.ts gates every connection on this
+    // answer, caching a momentary outage would turn one unreachable second into
+    // a dead process until somebody redeployed. Fail closed for this call, ask
+    // again on the next one.
+    return {
       ok: false, reason: 'unreadable', found: null,
       detail: `Could not verify which deployment owns this database: ${e instanceof Error ? e.message : String(e)}`,
     }
-    return cached
   }
 }
 

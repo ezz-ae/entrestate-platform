@@ -19,6 +19,7 @@
  * decideOwner() is split out pure precisely so this runs with no database.
  */
 import { readFileSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { join } from 'node:path'
 import { decideOwner } from '../lib/tenancy/db-owner'
 
@@ -72,11 +73,65 @@ console.log('\n── the module cannot write its way into someone else’s data
     (src.match(/INSERT INTO/g) ?? []).length === 1)
   check('it never updates or deletes anything', !/\bUPDATE\b|\bDELETE\b|\bDROP\b/.test(src))
   check('an unreadable database fails closed rather than open',
-    /catch[\s\S]{0,200}ok: false, reason: 'unreadable'/.test(src))
+    /catch[\s\S]{0,800}ok: false, reason: 'unreadable'/.test(src))
   check('the populated check looks at tables that only fill in a real system',
     /freehold_site_leads[\s\S]{0,80}freehold_site_users[\s\S]{0,80}freehold_site_projects/.test(src))
   check('the owner variable is server-side only (a browser has no business reading it)',
     !/NEXT_PUBLIC_DB_OWNER/.test(src))
+}
+
+console.log('\n── and the lock is actually turned ──')
+{
+  // This module decided the question correctly from the day it was written and
+  // nothing ever asked it. Every assertion below exists because "the code is
+  // there" was, for a while, the whole of the separation.
+  const db = readFileSync(join(process.cwd(), 'lib/db.ts'), 'utf8')
+  const owner = readFileSync(join(process.cwd(), 'lib/tenancy/db-owner.ts'), 'utf8')
+
+  check('lib/db.ts asks the question at all', /assertDatabaseIsOurs/.test(db))
+
+  // acquireClient is the single door every read and write goes through, so the
+  // gate belongs there and nowhere shallower.
+  const acquire = db.slice(db.indexOf('async function acquireClient'))
+  const gateAt = acquire.indexOf('await assertDatabaseIsOurs()')
+  const connectAt = acquire.indexOf('getPool().connect()')
+  check('the gate is inside acquireClient', gateAt > -1)
+  check('…and runs before a connection is used', gateAt > -1 && connectAt > gateAt,
+    `gate@${gateAt} connect@${connectAt}`)
+
+  check('an undeclared deployment is untouched — no query, no cost',
+    /if \(!DB_OWNER_DECLARED\) return/.test(db))
+  check('the owner variable is read server-side only', !/NEXT_PUBLIC_DB_OWNER/.test(db))
+
+  // A momentary outage must not become a permanent refusal now that every
+  // connection depends on this answer.
+  check('a failed gate is forgotten so the next connection retries',
+    /ownerGate\.catch\(\(\) => \{ ownerGate = null \}\)/.test(db))
+  check('an unreadable verdict is not cached',
+    !/cached = \{[\s\S]{0,120}'unreadable'/.test(owner))
+
+  // Asking the question through the ordinary door would ask it in order to
+  // answer it.
+  check('the check reads through unguardedQuery', /unguardedQuery/.test(owner))
+  check('…and never through the gated query()', !/\bawait query[<(]/.test(owner))
+  check('unguardedQuery runs in the default schema, not a tenant\'s',
+    /unguardedQuery[\s\S]{0,400}rawQuery<T>\(DEFAULT_SCHEMA/.test(db))
+}
+
+console.log('\n── nothing else may use the ungated door ──')
+{
+  // One caller is a documented exception; two is a hole.
+  // This file is excluded: naming the door in order to guard it is not using it.
+  const out = execSync(
+    "grep -rln 'unguardedQuery' --include='*.ts' --include='*.tsx' app lib scripts components || true",
+    { encoding: 'utf8' },
+  ).trim()
+  const files = (out ? out.split('\n') : [])
+    .filter(Boolean)
+    .filter((f) => f !== 'scripts/db-owner-test.ts')
+    .sort()
+  check('only lib/db.ts and the owner check name it',
+    files.join(',') === 'lib/db.ts,lib/tenancy/db-owner.ts', files.join(','))
 }
 
 if (failures) { console.error(`\n${failures} db-owner guard(s) broken.`); process.exit(1) }
