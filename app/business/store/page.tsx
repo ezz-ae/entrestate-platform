@@ -17,6 +17,12 @@ import { STORE } from "@/lib/freehold/app-store"
  * both render lib/freehold/app-store.ts, so a price or a plan gate can never
  * disagree between them. The Terminal's account area links HERE.
  *
+ * THE COPY RULE, from the owner: benefit before description — always. The
+ * first headline here was "The tools are the product.", a sentence about US;
+ * his correction: "خلينا نركز في المحتوى دايماً على الفايدة مش على الوصف" and
+ * he wrote the replacement himself. Every line on this page states what the
+ * reader GETS, not what the software is.
+ *
  * DRESS CODE. The first cut of this page wore the OTHER design system's
  * tokens (bg-card, text-primary, rounded-2xl) — on /business those resolve
  * to the light theme, and the live page rendered washed-out grey cards on
@@ -41,8 +47,8 @@ export default function EntrestateStorePage() {
     <>
       <PageHeader
         eyebrow="Entrestate App Store"
-        title="The tools are the product."
-        lede="Search and market data stay free on the Terminal. These are the working tools we sell — each one runs inside your own workspace, on your own account."
+        title="Everything you need to find the next qualified lead."
+        lede="Search and market data stay free on the Terminal. These apps do the selling work — ads that find buyers, pages that capture them, follow-up that closes them — inside your own workspace, on your own account."
         meta={[
           { k: "Search & data", v: "Free on the Terminal" },
           { k: "Available now", v: `${live.length} apps` },
