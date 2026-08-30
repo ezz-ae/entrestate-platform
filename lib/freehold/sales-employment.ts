@@ -36,6 +36,7 @@
 
 import { ensureOnce, query } from '@/lib/db'
 import { SALES_TEAM, READINESS_THRESHOLD, getMember } from './visual-sales-team'
+import { getStaff } from './marketing-employee'
 import type { RosterState } from './lead-caller'
 
 /**
@@ -102,9 +103,32 @@ export function rosterFrom(rows: Employment[], at: Date): RosterState {
   for (const e of rows) {
     // Training is recorded for every hire, including ad-only ones: a member
     // taught on ads is still taught when they are later employed.
-    trained[e.memberId] = e.trainedLevel || getMember(e.memberId)?.baseLevel || 0
+    trained[e.memberId] = e.trainedLevel || catalogueMember(e.memberId)?.baseLevel || 0
   }
   return { employed: live.map((e) => e.memberId), trained }
+}
+
+/**
+ * WHO WORKS HERE — a different question from who may take a call.
+ *
+ * rosterFrom().employed answers "may be put on a call right now" and therefore
+ * excludes ad_hourly, which cannot. That is correct for lead-caller.ts and
+ * wrong for everything else: a marketing manager paid by the hour is on the
+ * payroll and must be able to do her job. Kept as its own function rather than
+ * a second field on RosterState, so the calling tests are not made to answer a
+ * question calling does not ask.
+ *
+ * Being hired is not a route around the calling gates: assignCaller() also
+ * requires training, a voice binding and a distinct language, and staff have no
+ * voice binding at all.
+ */
+export function hiredFrom(rows: Employment[], at: Date): string[] {
+  return rows.filter((e) => !isExpired(e, at)).map((e) => e.memberId)
+}
+
+/** Everyone on the payroll right now, in any term. Fails closed to []. */
+export async function getHired(at: Date = new Date()): Promise<string[]> {
+  return hiredFrom(await listEmployment(), at)
 }
 
 const mapRow = (r: Record<string, unknown>): Employment => ({
@@ -133,6 +157,27 @@ export async function getRosterState(at: Date = new Date()): Promise<RosterState
   return rosterFrom(await listEmployment(), at)
 }
 
+/**
+ * ONE PAYROLL, TWO CATALOGUES.
+ *
+ * The Visual Sales Team and the marketing employee are hired the same way and
+ * paid from the same table, because "who works here" is one question and a
+ * second table would let two screens disagree about the answer. They differ
+ * only in what a hire unlocks: a sales member can be put on a call
+ * (lib/freehold/lead-caller.ts), a staff member drives specialist lanes in the
+ * chat (lib/freehold/marketing-employee.ts).
+ *
+ * baseLevel is a calling concept, so staff have none — 0. That is not a
+ * penalty: assignCaller() also requires a voice binding, and staff have none of
+ * those either, so a marketing manager can never be selected for a call however
+ * she is paid.
+ */
+function catalogueMember(id: string): { baseLevel: number } | null {
+  const sales = getMember(id)
+  if (sales) return { baseLevel: sales.baseLevel }
+  return getStaff(id) ? { baseLevel: 0 } : null
+}
+
 /** Hire a member, or change their term. Unknown ids are refused — a payroll row
  *  for somebody who is not in the catalogue is a row nothing can ever pay. */
 export async function employMember(
@@ -140,10 +185,10 @@ export async function employMember(
   term: EmploymentTerm,
   endsAt: string | null,
 ): Promise<Employment | null> {
-  if (!getMember(memberId)) return null
+  if (!catalogueMember(memberId)) return null
   if (!EMPLOYMENT_TERMS.includes(term)) return null
   await ensureTable()
-  const base = getMember(memberId)!.baseLevel
+  const base = catalogueMember(memberId)!.baseLevel
   const rows = await query<Record<string, unknown>>(
     `INSERT INTO ${TABLE} (member_id, term, ends_at, trained_level, updated_at)
      VALUES ($1, $2, $3, $4, now())
@@ -165,7 +210,7 @@ export async function endEmployment(memberId: string): Promise<void> {
 /** Record what a member has learned in this account. Clamped, because a level
  *  above 100 would silently pass every readiness gate forever. */
 export async function setTrainedLevel(memberId: string, level: number): Promise<number | null> {
-  if (!getMember(memberId)) return null
+  if (!catalogueMember(memberId)) return null
   const clamped = Math.max(0, Math.min(100, Math.round(Number(level) || 0)))
   await ensureTable()
   await query(

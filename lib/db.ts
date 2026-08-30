@@ -9,6 +9,39 @@ const schema = process.env.DB_SCHEMA || "public"
 /** The non-tenant schema — control plane, shared catalogue, Freehold itself. */
 export const DEFAULT_SCHEMA = schema
 
+/**
+ * WHOSE DATABASE IS THIS — enforced here because here is where connections are
+ * handed out.
+ *
+ * lib/tenancy/db-owner.ts decides the question and has since it was written. It
+ * was never asked: nothing called it, so a deployment could be pointed at the
+ * client's live database and the only thing that would happen is that it would
+ * work. A lock nobody turns is a comment.
+ *
+ * acquireClient() is the one place every read and write passes through, so the
+ * question is asked once there, before the first connection is used for
+ * anything. Unset DB_OWNER leaves it dormant — no query, no cost, no change —
+ * which is exactly how the client's deployment runs.
+ */
+const DB_OWNER_DECLARED = (process.env.DB_OWNER || "").trim().toLowerCase()
+
+let ownerGate: Promise<void> | null = null
+
+async function assertDatabaseIsOurs(): Promise<void> {
+  if (!DB_OWNER_DECLARED) return
+  if (!ownerGate) {
+    // Imported lazily: db-owner reads the database through this module, and a
+    // top-level import would make the cycle load-bearing at module-eval time.
+    ownerGate = import("@/lib/tenancy/db-owner").then((m) => m.assertDatabaseOwner())
+    // A database that was briefly unreachable must not wedge the process for
+    // the rest of its life. Forget a failed gate so the next connection asks
+    // again; a real mismatch is re-decided from db-owner's own cache and costs
+    // nothing, while a blip gets a second chance.
+    ownerGate.catch(() => { ownerGate = null })
+  }
+  return ownerGate
+}
+
 // Two env vars name the same thing and `||` picks a winner without saying so.
 // If a deploy carries a stale NEON_DATABASE_URL next to a freshly corrected
 // DATABASE_URL, every read and write lands in the old database while
@@ -253,8 +286,12 @@ export async function resolveActiveSchema(): Promise<string> {
  * so a connection can never carry one tenant's search_path into another
  * tenant's (or the shared schema's) query.
  */
-async function acquireClient(schemaName: string): Promise<PoolClient> {
+async function acquireClient(schemaName: string, skipOwnerGate = false): Promise<PoolClient> {
   assertValidSchemaName(schemaName)
+  // Before anything is read or written, settle whose database this is. The
+  // ownership check's own queries pass skipOwnerGate — they are the one caller
+  // that must reach the database before the question has an answer.
+  if (!skipOwnerGate) await assertDatabaseIsOurs()
   // Tenant schemas resolve "tenant first, shared fallback"; the default
   // schema stays exactly itself.
   const searchPath = schemaName === DEFAULT_SCHEMA ? DEFAULT_SCHEMA : `${schemaName}, ${DEFAULT_SCHEMA}`
@@ -276,8 +313,9 @@ async function rawQuery<T extends QueryResultRow = QueryResultRow>(
   schemaName: string,
   text: string,
   params: unknown[] = [],
+  skipOwnerGate = false,
 ): Promise<T[]> {
-  const client = await acquireClient(schemaName)
+  const client = await acquireClient(schemaName, skipOwnerGate)
   try {
     const result = await client.query<T>(text, params)
     return result.rows
@@ -333,6 +371,27 @@ export function assertDatabaseConfigured(who = 'this operation'): void {
 export async function query<T extends QueryResultRow = QueryResultRow>(text: string, params: unknown[] = []) {
   if (!rawConnectionString) { warnOnMissingConnection(); return [] as T[] }
   return rawQuery<T>(await resolveActiveSchema(), text, params)
+}
+
+/**
+ * The ownership check's own connection — and nothing else's.
+ *
+ * lib/tenancy/db-owner.ts has to read the database in order to decide whether
+ * this deployment may read the database. Routed through query() that is an
+ * infinite regress, so it gets a door that skips the gate. It also runs in
+ * DEFAULT_SCHEMA rather than resolving the request's tenant: ownership is a
+ * property of the database, not of a schema inside it, and resolveActiveSchema
+ * would itself query.
+ *
+ * If a second caller ever appears here, the honest question is why it needs to
+ * touch a database whose owner is still undecided.
+ */
+export async function unguardedQuery<T extends QueryResultRow = QueryResultRow>(
+  text: string,
+  params: unknown[] = [],
+) {
+  if (!rawConnectionString) { warnOnMissingConnection(); return [] as T[] }
+  return rawQuery<T>(DEFAULT_SCHEMA, text, params, true)
 }
 
 /** A single-connection query bound to an open transaction. */

@@ -21,6 +21,8 @@
  *
  * Pure: the catalogue and the tool registry. No database, no session.
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import {
   STAFF, SPECIALIST_AGENTS, getStaff, staffIds, agentsOnDuty,
   toolsWithEmployee, effectiveDuties, STAFF_TOP_SKILLS,
@@ -117,6 +119,43 @@ console.log('\n── one face: no second brain was created ──')
   check('the employee reaches fewer tools than the coordinator holds',
     reachable.length > 0 && reachable.length < COORDINATOR_TOOLS.length,
     `${reachable.length}/${COORDINATOR_TOOLS.length}`)
+}
+
+console.log('\n── and the employee can be spoken to ──')
+{
+  // This module described a hirable marketing manager with her own lanes and
+  // had no caller at all: the employee you could hire could not be reached.
+  // Every assertion here exists because "the code is there" was, for a while,
+  // the whole of the feature.
+  const route = readFileSync(join(process.cwd(), 'app/api/freehold/expert/chat/route.ts'), 'utf8')
+  const code = route.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
+
+  check('the one chat can run as an employee', /toolsWithEmployee\(/.test(code))
+  check('…resolved from the catalogue, never from the request body alone',
+    /getStaff\(requestedEmployee\)/.test(code))
+
+  // getRosterState().employed answers "may take a call" and excludes ad_hourly.
+  // Reading it here would unhire an hourly marketer who is plainly on the
+  // payroll, so the payroll question has its own function.
+  check('the payroll is read with getHired(), not the calling roster',
+    /getHired\(\)/.test(code) && !/getRosterState\(\)[\s\S]{0,120}toolsWithEmployee/.test(code))
+
+  check('the employee is named in the system prompt', /employeeGuidance/.test(code))
+  const promptLine = code.match(/const systemPrompt = `[^`]*`/)?.[0] ?? ''
+  check('…and that guidance actually reaches the prompt',
+    promptLine.includes('${employeeGuidance}'), promptLine.slice(0, 80))
+
+  // Fails closed in both directions.
+  check('an employee who is not on the payroll drives nothing',
+    toolsWithEmployee('owner', 'nour', []).length === 0)
+  check('an id that is not in the catalogue drives nothing',
+    toolsWithEmployee('owner', 'ghost', ['ghost']).length === 0)
+  check('no employee named means the coordinator is unchanged',
+    toolsWithEmployee('owner', null, []).length === COORDINATOR_TOOLS.filter((t) => t.roles.includes('owner')).length)
+
+  // The one boundary the card is built around.
+  check('a hired Nour still cannot reach a lead herself',
+    !toolsWithEmployee('owner', 'nour', ['nour']).some((t) => t.agent === 'crm_agent'))
 }
 
 if (failures) { console.error(`\n${failures} marketing-employee guard(s) broken.`); process.exit(1) }

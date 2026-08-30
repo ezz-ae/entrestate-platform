@@ -215,6 +215,42 @@ export const STORE: StoreProduct[] = [
   },
 ]
 
+/**
+ * What each capability means, in the words a buyer would use.
+ *
+ * The union is the contract between products and surfaces; this is the same
+ * union said out loud, because a storefront that lists "meta-lookalike" is
+ * asking a broker to read a variable name. Kept beside the union rather than in
+ * the page so a capability added later cannot ship without one — the guard
+ * suite fails on a missing label.
+ *
+ * These are what the product DOES, never what it achieves: no figures, no
+ * outcomes. Everything numeric this platform shows is evidence-gated
+ * (lib/freehold/min-evidence.ts) and a catalogue is the last place to break that.
+ */
+export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
+  'meta-campaigns': 'Build and run Meta campaigns',
+  'meta-forms': "Meta's own instant forms",
+  'meta-audiences': 'Saved and custom audiences',
+  'meta-lookalike': 'Lookalike expansion from a list',
+  'meta-deep-analysis': 'Placement, creative and audience analysis',
+  'google-campaigns': 'Search and display campaigns',
+  'google-automation': 'The self-running loop: keywords, bids, pausing',
+  'landing-generate': 'Generate a page for a project',
+  'landing-edit': 'Edit any page it generates',
+  'landing-own': 'You own what it makes — exportable, yours',
+  'assets-store': 'One store every upload lands in',
+  'assets-images': 'Image library',
+  'assets-video': 'Video library',
+  'assets-deploy': 'What is deployed, and where',
+  'calling-templates': 'The seven reasons to call',
+  'calling-voice': 'A hired member places the call',
+  'leadform-conversational': 'A form that talks back',
+  'leadform-team': 'Your Visual Sales Team answers inside it',
+}
+
+export const capabilityLabel = (c: CapabilityId): string => CAPABILITY_LABELS[c] ?? c
+
 export const productIds = (): string[] => STORE.map((p) => p.id)
 export const getProduct = (id: string): StoreProduct | undefined => STORE.find((p) => p.id === id)
 export const liveProducts = (): StoreProduct[] => STORE.filter((p) => p.status === 'live')

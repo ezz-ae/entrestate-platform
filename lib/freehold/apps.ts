@@ -18,7 +18,7 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   Users, UsersRound, Megaphone, DollarSign, TrendingUp, Bot, Package,
-  ShieldCheck, Settings, BookOpen, BarChart3, UserCircle, Clapperboard, CalendarDays, HardDrive, Wallet,
+  ShieldCheck, Settings, BookOpen, BarChart3, UserCircle, Clapperboard, CalendarDays, HardDrive, Wallet, Store,
 } from 'lucide-react'
 import type { Role } from './session-types'
 import { MANAGEMENT_ROLES } from './session-types'
@@ -211,6 +211,23 @@ export const APPS: AppDef[] = [
     card: 'border-[#D4AF37]/20 hover:border-[#D4AF37]/40',
     icon: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/25',
     managementOnly: true,
+  },
+  // The App Store. lib/freehold/app-store.ts described nine products for weeks
+  // with no surface reading it, so a customer could not see what the platform
+  // sells from inside the platform. Management-only: what an account owns is an
+  // owner's decision, not a broker's, and the page is a catalogue rather than a
+  // checkout (there is nothing to charge with yet).
+  //
+  // Off the spine deliberately — a store is somewhere you go on purpose, not a
+  // tab competing with the work every day.
+  {
+    id: 'store', label: 'App Store', sub: 'Products · What each one turns on',
+    href: '/freehold-intelligence/store', Icon: Store,
+    metric: 'What Entrestate sells', badge: 0, accent: '#D4AF37',
+    card: 'border-[#D4AF37]/15 hover:border-[#D4AF37]/35',
+    icon: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/20',
+    roles: SETTINGS_ROLES,
+    spine: false,
   },
   // The broker's personal workspace — only brokers see this tab.
   // Managers can still visit /agent but don't need a spine tab for it.

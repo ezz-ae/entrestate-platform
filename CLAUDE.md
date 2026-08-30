@@ -45,6 +45,14 @@ will claim ONLY a database that is both unmarked and EMPTY — a populated,
 unclaimed database is somebody's working system and is refused without a single
 write. Unset `DB_OWNER` leaves the check dormant.
 
+Enforced in `lib/db.ts`: `acquireClient()` is the one door every read and write
+passes through, so the question is settled there before the first connection is
+used. The check reads through `unguardedQuery()` — the only caller of it —
+because asking through the ordinary door would ask the question in order to
+answer it. `scripts/db-owner-test.ts` asserts the wiring, not just the decision:
+this module decided correctly for weeks while nothing called it, and a lock
+nobody turns is a comment.
+
 The tenancy code is written so this repository's own behaviour is opt-in:
 `NEXT_PUBLIC_TENANT_BASE_DOMAIN` is unset on the Freehold deployment, and every
 vendor rule (see `lib/tenancy/vendor-host.ts`) returns `pass` without it. That
