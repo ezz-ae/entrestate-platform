@@ -21,7 +21,9 @@ import { STORE } from "@/lib/freehold/app-store"
  * first headline here was "The tools are the product.", a sentence about US;
  * his correction: "خلينا نركز في المحتوى دايماً على الفايدة مش على الوصف" and
  * he wrote the replacement himself. Every line on this page states what the
- * reader GETS, not what the software is.
+ * reader GETS, not what the software is. And the included layer is never
+ * called "free" — his word ban: "بلاش نستخدم فري لأنها دايماً بتعطي انطباع
+ * بالغير أهمية" — it is named for what it is: market discovery.
  *
  * DRESS CODE. The first cut of this page wore the OTHER design system's
  * tokens (bg-card, text-primary, rounded-2xl) — on /business those resolve
@@ -48,9 +50,9 @@ export default function EntrestateStorePage() {
       <PageHeader
         eyebrow="Entrestate App Store"
         title="Everything you need to find the next qualified lead."
-        lede="Search and market data stay free on the Terminal. These apps do the selling work — ads that find buyers, pages that capture them, follow-up that closes them — inside your own workspace, on your own account."
+        lede="Market discovery — search, data, the advisor — comes with the Terminal account. These apps do the selling work — ads that find buyers, pages that capture them, follow-up that closes them — inside your own workspace, on your own account."
         meta={[
-          { k: "Search & data", v: "Free on the Terminal" },
+          { k: "Market discovery", v: "With every account" },
           { k: "Available now", v: `${live.length} apps` },
           { k: "Being built", v: `${planned.length} more` },
         ]}

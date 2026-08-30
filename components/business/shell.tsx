@@ -150,9 +150,10 @@ export function BusinessFooter() {
       items: [
         ...COMPANY,
         // The other half of the one-account bridge: the business footer names
-        // the free side the same way the Terminal's footer names this store.
-        // Footer-only — the header tour stays a tour of THIS site.
-        { href: 'https://terminal.entrestate.com', label: 'The free Terminal', blurb: 'Market search and data, free for every account.' },
+        // the discovery side the same way the Terminal's footer names this
+        // store. Footer-only — the header tour stays a tour of THIS site.
+        // Never "free" (the owner's word ban) — named for what it gives.
+        { href: 'https://terminal.entrestate.com', label: 'The Terminal', blurb: 'Market discovery, with every account.' },
       ],
     },
   ]
