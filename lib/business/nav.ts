@@ -4,11 +4,27 @@
  * no nav is a page nobody reads, so every route lives here or not at all.
  */
 
+/**
+ * Which preview the products menu shows beside a product. Declared here rather
+ * than in the component so the list of products and the list of previews are
+ * one decision: scripts/business-nav-test.ts fails when a product has no
+ * preview, which is how a sixth product cannot quietly ship with an empty panel
+ * next to its name.
+ */
+export type PreviewKind =
+  | 'lead-machine'
+  | 'mega-brokerage'
+  | 'landing-pages'
+  | 'meta-for-realtors'
+  | 'leadformer'
+
 export interface NavItem {
   href: string
   label: string
   /** One line, plain, shown in the mega-menu under the label. */
   blurb: string
+  /** Products only — the panel rendered beside the list on hover. */
+  preview?: PreviewKind
 }
 
 export interface NavGroup {
@@ -19,6 +35,7 @@ export interface NavGroup {
 export const PRODUCTS: NavItem[] = [
   {
     href: '/business/lead-machine',
+    preview: 'lead-machine',
     label: 'Lead Machine',
     blurb: 'Makes leads from your listings, then works them to the deal — the whole system, your brand.',
   },
@@ -27,16 +44,19 @@ export const PRODUCTS: NavItem[] = [
     // permanent redirect in next.config.mjs, and the product door at
     // listing.entrestate.com (PRODUCT_DOORS in lib/tenancy/vendor-host.ts).
     href: '/business/mega-brokerage',
+    preview: 'mega-brokerage',
     label: 'Mega Brokerage Platform',
     blurb: 'Your public site and the desk behind it — one catalogue, a page per project, ads and CRM.',
   },
   {
     href: '/business/landing-pages',
+    preview: 'landing-pages',
     label: 'Landing Pages',
     blurb: 'A page per project, built from your own stock, with the form wired into the CRM.',
   },
   {
     href: '/business/meta-for-realtors',
+    preview: 'meta-for-realtors',
     label: 'Meta for Realtors',
     blurb: 'A full system for professional Meta lead ads — our off-plan inventory, your budget, a few clicks.',
   },
@@ -45,6 +65,7 @@ export const PRODUCTS: NavItem[] = [
     // lib/tenancy/vendor-host.ts), inside the platform rather than on its own
     // domain while it is real-estate-only.
     href: '/business/leadformer',
+    preview: 'leadformer',
     label: 'Leadformer',
     blurb: 'A lead form that talks back — your Visual Sales Team answers, qualifies, and turns the good ones into calls.',
   },
@@ -125,9 +146,9 @@ export const COMPANY: NavItem[] = [
     blurb: 'Short guides to how each part behaves, in plain broker language.',
   },
   {
-    // The Decision Terminal is the family's data product — same repo now,
-    // its own deployment. Absolute URL until terminal.entrestate.com resolves.
-    href: 'https://m.entrestate.com',
+    // The Decision Terminal is the family's data product — its own repo and
+    // its own deployment, so an absolute URL rather than a route of this app.
+    href: 'https://terminal.entrestate.com',
     label: 'Decision Terminal',
     blurb: 'Dubai market intelligence on DLD data — scored projects, live signals.',
   },
