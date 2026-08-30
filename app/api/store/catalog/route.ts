@@ -57,7 +57,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     {
-      store_url: "/freehold-intelligence/store",
+      store_url: "/business/store",
       products,
     },
     { headers: corsHeaders(request.headers.get("origin")) },

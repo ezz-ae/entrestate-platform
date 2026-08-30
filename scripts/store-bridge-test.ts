@@ -35,6 +35,24 @@ if (/access-control-allow-origin.*\*/.test(routeCode)) {
   fail("CORS must reflect an allowlisted origin, never *")
 }
 
+// 4. The store the Terminal links to is ENTRESTATE's public page — the
+//    client's name never appears on it, and the client's in-workspace store
+//    (inside his signed-in shell) is not the page prospects are sent to.
+const publicStore = readFileSync("app/business/store/page.tsx", "utf8")
+const rendered = publicStore
+  .replace(/\/\*[\s\S]*?\*\//g, "")
+  .replace(/^\s*\/\/.*$/gm, "")
+  .replace(/^import .*$/gm, "")
+if (/freehold/i.test(rendered)) {
+  fail("the public store page renders the client's name — the client is a client, not the brand")
+}
+if (!routeCode.includes('"/business/store"')) {
+  fail("the catalog must point the Terminal at /business/store — never into the client's workspace")
+}
+if (routeCode.includes("freehold-intelligence")) {
+  fail("the catalog points into the client's signed-in workspace")
+}
+
 const proxy = readFileSync("proxy.ts", "utf8")
 if (!proxy.includes('"/api/store/catalog"')) {
   fail("/api/store/catalog is not on the public API allowlist — the fail-closed wall will 401 the Terminal")
