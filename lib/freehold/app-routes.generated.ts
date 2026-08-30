@@ -42,6 +42,7 @@ export const APP_ROUTES: readonly string[] = [
   "/business/platform/landing-pages",
   "/business/pricing",
   "/business/security",
+  "/business/store",
   "/chat",
   "/contact",
   "/ctrl",

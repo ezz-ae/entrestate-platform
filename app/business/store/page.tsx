@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { Section, Grid, Eyebrow, PageHeader, H3, P } from "@/components/business/ui"
 import { STORE } from "@/lib/freehold/app-store"
 
 /**
@@ -16,6 +16,14 @@ import { STORE } from "@/lib/freehold/app-store"
  * Same catalog, second reader: this page and the client's in-workspace page
  * both render lib/freehold/app-store.ts, so a price or a plan gate can never
  * disagree between them. The Terminal's account area links HERE.
+ *
+ * DRESS CODE. The first cut of this page wore the OTHER design system's
+ * tokens (bg-card, text-primary, rounded-2xl) — on /business those resolve
+ * to the light theme, and the live page rendered washed-out grey cards on
+ * the dark vendor ground. Everything visual here now comes from
+ * components/business/ui and the home page's tile vocabulary (bg-surface,
+ * hairline outlines, ink-muted text, the one blue accent), so this page
+ * reads as a page of the business site, not a guest wearing the wrong suit.
  */
 
 export const metadata = {
@@ -30,63 +38,75 @@ export default function EntrestateStorePage() {
   const planned = STORE.filter((product) => product.status === "planned")
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 pb-24 pt-16">
-      <header className="max-w-2xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Entrestate App Store</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-          The tools are the product.
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          Search and market data stay free on the Terminal. These are the working tools we sell —
-          each one runs inside your own workspace, on your own account.
-        </p>
-      </header>
+    <>
+      <PageHeader
+        eyebrow="Entrestate App Store"
+        title="The tools are the product."
+        lede="Search and market data stay free on the Terminal. These are the working tools we sell — each one runs inside your own workspace, on your own account."
+        meta={[
+          { k: "Search & data", v: "Free on the Terminal" },
+          { k: "Available now", v: `${live.length} apps` },
+          { k: "Being built", v: `${planned.length} more` },
+        ]}
+      />
 
-      <section aria-label="Available now" className="mt-12">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Available now</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Section className="pb-16">
+        <Eyebrow className="mb-4">Available now</Eyebrow>
+        <Grid cols={3}>
           {live.map((product) => (
             <article
               key={product.id}
               id={product.id}
-              className="flex flex-col rounded-2xl border border-border/60 bg-card/60 p-6"
+              className="group flex flex-col bg-surface p-8 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="font-semibold">{product.name}</h3>
-                <span className="rounded-full border border-border/60 bg-muted/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <H3>{product.name}</H3>
+                <span className="mt-0.5 shrink-0 rounded-full bg-white/[0.05] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted ring-1 ring-white/[0.07]">
                   {product.tier === "lite" ? "Lite" : "Full"}
                 </span>
               </div>
-              <p className="mt-2 flex-1 text-sm text-muted-foreground">{product.tagline}</p>
+              <div className="mt-3 flex-1">
+                <P>{product.tagline}</P>
+              </div>
               <Link
                 href="/signup"
-                className="mt-5 inline-flex items-center text-sm font-semibold text-primary hover:underline"
+                className="mt-6 inline-flex items-baseline gap-1.5 text-[0.875rem] font-medium text-[#3B82F6]"
               >
-                Start with this app <ArrowRight className="ml-1 h-4 w-4" />
+                Start with this app
+                <span aria-hidden className="opacity-0 transition group-hover:opacity-100">
+                  →
+                </span>
               </Link>
             </article>
           ))}
-        </div>
-      </section>
+        </Grid>
+      </Section>
 
       {planned.length > 0 ? (
-        <section aria-label="Being built" className="mt-12">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Being built</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Section className="pb-24">
+          <Eyebrow className="mb-4">Being built</Eyebrow>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {planned.map((product) => (
               <article
                 key={product.id}
                 id={product.id}
-                className="rounded-2xl border border-dashed border-border/60 bg-muted/20 p-6"
+                className="border border-dashed border-white/[0.12] p-8"
               >
-                <h3 className="font-semibold text-muted-foreground">{product.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground/80">{product.tagline}</p>
-                <p className="mt-4 text-xs text-muted-foreground">In build — it appears here the day it opens.</p>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-[1.0625rem] font-semibold leading-snug text-ink-muted">{product.name}</h3>
+                  <span className="mt-0.5 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint">
+                    In build
+                  </span>
+                </div>
+                <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-faint">{product.tagline}</p>
+                <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+                  It appears here the day it opens.
+                </p>
               </article>
             ))}
           </div>
-        </section>
+        </Section>
       ) : null}
-    </main>
+    </>
   )
 }
