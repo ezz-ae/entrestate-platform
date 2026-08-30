@@ -26,6 +26,7 @@ import {
   type StoreProduct,
 } from '../lib/freehold/app-store'
 import { APPS } from '../lib/freehold/apps'
+import { CAPABILITY_LABELS, capabilityLabel } from '../lib/freehold/app-store'
 
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
@@ -136,6 +137,48 @@ console.log('\n── the seven call intents the store sells actually exist ─�
   for (const intent of ['reengagement', 'first_contact', 'follow_up', 'invitation', 'general_interest', 'qualification', 'launch_announcement']) {
     check(`call intent "${intent}" exists in call-templates.ts`, src.includes(`'${intent}'`))
   }
+}
+
+console.log('\n── every capability can be read by a person ──')
+{
+  // The union is the contract; the labels are the same union said out loud. A
+  // capability with no label reaches a customer as a variable name.
+  const caps = new Set(STORE.flatMap((p) => p.capabilities))
+  const unlabelled = [...caps].filter((c) => !CAPABILITY_LABELS[c] || capabilityLabel(c) === c)
+  check('every capability a product grants has a plain-words label',
+    unlabelled.length === 0, unlabelled.join(', '))
+
+  // Same rule as the marketing menu: a capability says what the product DOES,
+  // never what it achieves. Every number this platform shows is evidence-gated.
+  const FIGURE = /(\d[\d,.]*\s*%)|(AED|USD|\$)\s*\d|(\bROI\b)|(\bCPL\b)|(\d+\s*x\b)/i
+  const claims = Object.values(CAPABILITY_LABELS).filter((l) => FIGURE.test(l))
+  check('no capability label claims a result', claims.length === 0, claims.join(' | '))
+}
+
+console.log('\n── the catalogue has a reader ──')
+{
+  // This file described nine products, enforced three rules about them, and was
+  // imported by nothing but its own guard: a catalogue with no storefront is a
+  // spreadsheet. The same shape as db-owner deciding correctly while nothing
+  // called it, and the copilot naming tables nobody could resolve. So the store
+  // is required to have a surface, and the surface is required to be reachable.
+  const page = 'app/freehold-intelligence/store/page.tsx'
+  const src = (() => { try { return readFileSync(join(process.cwd(), page), 'utf8') } catch { return '' } })()
+  check(`${page} exists`, src.length > 0)
+  check('…and it reads the catalogue', /from '@\/lib\/freehold\/app-store'/.test(src))
+  check('…and it renders the capability labels, not the ids', /capabilityLabel\(/.test(src))
+  // Comments stripped first: the page's own header explains that it has no
+  // checkout, and a guard that reads its explanation as evidence fails on the
+  // fix rather than on the defect.
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ')
+  check('…and it never offers to charge anybody', !/\b(buy now|checkout|purchase|pay now)\b/i.test(code))
+
+  const app = APPS.find((a) => a.id === 'store')
+  check('the store is registered as an app', !!app)
+  check('…pointing at the page', app?.href === '/freehold-intelligence/store', app?.href ?? 'missing')
+  check('…and gated to the roles that decide what an account owns',
+    Array.isArray(app?.roles) && app!.roles!.length > 0 && !app!.roles!.includes('broker'),
+    JSON.stringify(app?.roles))
 }
 
 if (failures) { console.error(`\n${failures} app-store guard(s) broken.`); process.exit(1) }
