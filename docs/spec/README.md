@@ -75,7 +75,7 @@ claim exists, the named part does not · **SPEC-ONLY** — no code yet ·
 |---|---|---|
 | Trilingual Listing-to-Landing pages with layout flipping | **IMPLEMENTED** | `lib/landing-theme.ts`, `lib/landing-blocks.ts`, `lib/landing-pages.ts`, `lib/freehold/front-layout.ts`, `components/front/*`, guards `scripts/lp-*-test.ts`; i18n `lib/i18n/dictionaries/*` |
 | Drag-and-drop page builder | **IMPLEMENTED** (buried) | `app/freehold-intelligence/ai-manager/builder/page.tsx` — mounted only inside the client-workspace path; surfacing it as the Web Designer app is task #90 |
-| Active/idle micro-behavioral telemetry (`active_telemetry`, `idle_telemetry`, `useBehavioralTelemetry`) | **SPEC-ONLY** | `telemetry-implementation-guide.md` is paste-ready code; nothing of it is in the repo |
+| Active/idle micro-behavioral telemetry (`active_telemetry`, `idle_telemetry`, `useBehavioralTelemetry`) | **IMPLEMENTED** (2026-08-31) | Tables `freehold_site_active_telemetry` / `freehold_site_idle_telemetry`; hook `lib/freehold/use-behavioral-telemetry.ts` mounted in `app/lp/[slug]/_tracker.tsx` on the analytics session id; public door `app/api/lp-telemetry` (clamped, budgeted; on `proxy.ts` allowlist); server `lib/freehold/behavioral-telemetry.ts`. One deliberate departure from the guide: the browser never sends a leadId — rows are session-keyed and `/api/leads` makes the link server-side. Premium hovers (`payment-plan`, `roi`, ≥ 15 s) and focus-after-idle feed Engine 06's ingest rate (`ingest_intent`) and Engine 07's ICI ledger. Guard `scripts/behavioral-telemetry-test.ts` |
 | OS routes `/storyboard`, `/image-playground`, `/timeline` | **MISSING** | not in `Entrestate_os/app`; `/api/time-table/artifacts` exists |
 | Spend rules `lib/meta/spend-authority.ts`, CI gauntlet `.github/workflows/ci.yml` | **IMPLEMENTED** | both exist |
 
@@ -93,11 +93,9 @@ table as where the shape currently is.
 ## Before the jury reads the submission (v16)
 
 Claims in `dubai-it-submission-v16.md` measured against this repository:
-1. ICI and the Temporal Anomaly Gate — **now operating** (2026-08-31, this
-   table's Engine 06/07 rows, with the guards that pin them). The
-   active/idle telemetry tables (`active_telemetry`, `idle_telemetry`,
-   `useBehavioralTelemetry`) are still spec-only; the guide is paste-ready
-   code and is the next build.
+1. ICI, the Temporal Anomaly Gate, and the active/idle telemetry — **now
+   operating** (2026-08-31, this table's Engine 04/06/07 rows, with the
+   guards that pin them).
 2. "25 % arbitrage markup" — **now true** (2026-08-31): the owner ruled for
    the submission's number and the default became exactly cost × 1.25
    (`lib/ctrl/pricing.ts`, guarded).

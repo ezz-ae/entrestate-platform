@@ -12,6 +12,7 @@ import { scoreLeadSession } from "@/lib/freehold/behaviour-score"
 import { WON_STATUSES } from "@/lib/freehold/lead-stages"
 import { registerInboundTouch } from "@/lib/freehold/inbound-touch"
 import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
+import { linkTelemetryToLead } from "@/lib/freehold/behavioral-telemetry"
 import {
   getLeadershipLeadRecipients,
   sendInternalLeadAlertEmail,
@@ -159,6 +160,9 @@ export async function POST(req: NextRequest) {
          WHERE id = $1`,
         [leadId, clickIntent],
       ).catch(() => undefined)
+      // ENGINE 04: this session's behaviour now belongs to this person —
+      // link before the ICI reads it, so focus-after-idle counts today.
+      await linkTelemetryToLead(leadId, toText(body.sessionId))
       // ENGINE 07: the second inquiry is the signal. Compared with the first
       // (ICI), escalated to Rate 8 with the 15-minute clock when convergent,
       // revived when the lead had been marked lost. Awaited: it is the reason
@@ -327,6 +331,8 @@ export async function POST(req: NextRequest) {
     // matching lead.created rules. Never throws — intake must not be blocked.
     if (!isRepeatInquiry) {
       await handleNewLead(leadId)
+      // Engine 04 → 06: claim the session's behaviour, then rate on it.
+      await linkTelemetryToLead(leadId, toText(body.sessionId))
       // Engine 06: the baseline rate from the inbound facts (1–3).
       void recomputeLeadRate(leadId, "ingest")
       if (returningBuyerOf) {

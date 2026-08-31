@@ -475,7 +475,7 @@ function PaymentPlanSection({ d, L, p }: { d: Record<string, unknown>; L: Dict; 
   ].filter(s => s.pct > 0)
 
   return (
-    <section className="border-t px-5 py-20 sm:px-8" style={{ borderTopColor: p.divider }}>
+    <section data-telemetry="payment-plan" className="border-t px-5 py-20 sm:px-8" style={{ borderTopColor: p.divider }}>
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div>
@@ -548,7 +548,7 @@ function RoiSection({ d, page, L, p }: { d: Record<string, unknown>; page: Landi
   if (!yield_ && !annual && !monthly && !fiveYr) return null
 
   return (
-    <section className="border-t px-5 py-20 sm:px-8" style={{ borderTopColor: p.divider, background: p.bgAlt }}>
+    <section data-telemetry="roi" className="border-t px-5 py-20 sm:px-8" style={{ borderTopColor: p.divider, background: p.bgAlt }}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-gold/60">{L['roi.eyebrow']}</div>
         <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto]">

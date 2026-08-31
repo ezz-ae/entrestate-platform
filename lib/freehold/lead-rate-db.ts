@@ -48,6 +48,7 @@ import {
   computeLeadRate, RATE_WON, type RateFacts, type RateResult, type RateReason,
 } from '@/lib/freehold/lead-rate'
 import { detectBulkStatusEvent, BULK_STATUS_WINDOW_MINUTES, type StatusTransition } from '@/lib/freehold/anomaly-gate'
+import { telemetrySignals } from '@/lib/freehold/behavioral-telemetry'
 import { triggerLearningLoop } from '@/lib/freehold/learning-loop'
 
 /** Engine 07 §3.1: a convergent buyer must be touched inside this window. */
@@ -83,7 +84,8 @@ export const ensureLeadRateSchema = () =>
         ADD COLUMN IF NOT EXISTS value_rating int,
         ADD COLUMN IF NOT EXISTS behaviour_score int,
         ADD COLUMN IF NOT EXISTS buyer_intent text,
-        ADD COLUMN IF NOT EXISTS click_intent text
+        ADD COLUMN IF NOT EXISTS click_intent text,
+        ADD COLUMN IF NOT EXISTS lp_session_id text
     `)
     await query(`
       CREATE TABLE IF NOT EXISTS freehold_site_lead_status_history (
@@ -193,6 +195,7 @@ interface FactRow {
   created_at: string
   last_contact_at: string | null
   value_rated_at: string | null
+  lp_session_id: string | null
   rate: number | string | null
   rate_reason: string | null
   assigned_broker_id: string | null
@@ -238,7 +241,7 @@ export async function loadRateFacts(leadId: string, now = Date.now()): Promise<L
     `SELECT l.status, l.blocked, l.master_lead, l.value_rating, l.behaviour_score, l.buyer_intent,
             l.click_intent, l.interest, l.message, l.phone, l.email, l.utm_source, l.budget_aed,
             l.convergent_at::text, l.created_at::text, l.last_contact_at::text, l.value_rated_at::text,
-            l.rate, l.rate_reason, l.assigned_broker_id, l.name,
+            l.rate, l.rate_reason, l.assigned_broker_id, l.name, l.lp_session_id,
             (SELECT COUNT(*) FROM freehold_site_lead_activity a
               WHERE a.lead_id = l.id AND a.activity_type = ANY($2::text[]))::int AS contact_count,
             EXISTS (SELECT 1 FROM freehold_site_lead_activity a
@@ -268,6 +271,12 @@ export async function loadRateFacts(leadId: string, now = Date.now()): Promise<L
     dealClosed = d?.won === true
   } catch { dealClosed = false }
 
+  // Engine 04's record of how this person actually read the pages — by lead
+  // id once /api/leads made the link, by session id before it. Fail-soft.
+  const behaviour = await telemetrySignals(leadId, r.lp_session_id).catch(() => ({
+    premiumHover: false, focusAfterIdle: false, activeEvents: 0, idleEvents: 0,
+  }))
+
   return {
     facts: {
       status: r.status,
@@ -278,6 +287,8 @@ export async function loadRateFacts(leadId: string, now = Date.now()): Promise<L
       behaviourScore: num(r.behaviour_score),
       buyerIntent: r.buyer_intent,
       clickIntent: r.click_intent,
+      premiumEngagement: behaviour.premiumHover,
+      focusAfterIdle: behaviour.focusAfterIdle,
       interest: r.interest,
       message: r.message,
       phone: r.phone,

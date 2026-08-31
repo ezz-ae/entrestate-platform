@@ -48,6 +48,7 @@ import {
   armNeglectClock, ensureLeadRateSchema, recomputeLeadRate, recordStatusTransition, writeRateLedger,
   NEGLECT_WINDOW_MINUTES,
 } from '@/lib/freehold/lead-rate-db'
+import { telemetrySignals } from '@/lib/freehold/behavioral-telemetry'
 
 export interface InboundTouch {
   /** The lead that already exists — the survivor of the merge. */
@@ -158,6 +159,14 @@ export async function registerInboundTouch(touch: InboundTouch): Promise<Inbound
     const second = await describe(touch.inquiry)
     const ici = intentConvergence(first, second)
 
+    // Engine 07 §3.1, the Parallel Telemetry Validation: has this person's
+    // browser been seen returning to an idle tab on our pages? Recorded with
+    // the ICI so the escalation carries its behavioural evidence, and read
+    // again by the rate (focus-after-idle is an ingest intent signal).
+    const behaviour = await telemetrySignals(lead.id).catch(() => ({
+      premiumHover: false, focusAfterIdle: false, activeEvents: 0, idleEvents: 0,
+    }))
+
     const status = (lead.status ?? 'new').toLowerCase()
     const returningBuyer = WON_STATUSES.has(status)
     let revived = false
@@ -178,6 +187,7 @@ export async function registerInboundTouch(touch: InboundTouch): Promise<Inbound
       detail: {
         ici: ici.ici, typeMatch: ici.typeMatch, areaMatch: ici.areaMatch, sameProject: ici.sameProject,
         first: ici.first, second: ici.second, source: touch.source, revived, returningBuyer,
+        focusAfterIdle: behaviour.focusAfterIdle, premiumHover: behaviour.premiumHover,
       },
     })
 
