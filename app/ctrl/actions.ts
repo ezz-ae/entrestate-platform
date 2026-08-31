@@ -32,7 +32,8 @@ export async function setPricingAction(formData: FormData) {
      ON CONFLICT (tenant_id) DO UPDATE SET multiplier = $2, floor_fils = $3, fixed_fils = $4`,
     [
       tenantId,
-      Number.isFinite(multiplier) && multiplier > 0 ? multiplier : 1.5,
+      // 1.25 = the submission's 25 % margin, the owner's ruling (2026-08-31).
+      Number.isFinite(multiplier) && multiplier > 0 ? multiplier : 1.25,
       Number.isFinite(floorAed) && floorAed > 0 ? Math.round(floorAed * 100) : 15000,
       fixedAed !== null && Number.isFinite(fixedAed) && fixedAed > 0 ? Math.round(fixedAed * 100) : null,
     ],

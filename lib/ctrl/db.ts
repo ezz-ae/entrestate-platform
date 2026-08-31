@@ -73,13 +73,16 @@ const DDL = `
   );
 
   -- Pricing: THE NUMBER THE PARTNER NEVER SEES COMPUTED. fixed_fils wins when
-  -- set, otherwise price = max(floor_fils, round(cost * multiplier)).
+  -- set, otherwise price = round(cost * multiplier); floor_fils is the price
+  -- only when no cost is computable. 1.25 is the submission's 25 % margin,
+  -- adopted by the owner's ruling (2026-08-31) — see lib/ctrl/pricing.ts.
   CREATE TABLE IF NOT EXISTS ctrl_pricing_rules (
     tenant_id   text PRIMARY KEY REFERENCES ctrl_tenants(id),
-    multiplier  double precision NOT NULL DEFAULT 1.5,
+    multiplier  double precision NOT NULL DEFAULT 1.25,
     floor_fils  bigint NOT NULL DEFAULT 15000,
     fixed_fils  bigint
   );
+  ALTER TABLE ctrl_pricing_rules ALTER COLUMN multiplier SET DEFAULT 1.25;
 
   -- The append-only ledger. amount_fils is ALWAYS positive; kind says which way
   -- the money moved. ref is the idempotency key.
