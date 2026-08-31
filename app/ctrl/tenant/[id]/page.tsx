@@ -89,7 +89,7 @@ export default async function CtrlTenantPage({ params }: { params: Promise<{ id:
           <button type="submit">Save</button>
         </form>
         <p className="dim" style={{ marginTop: 8 }}>
-          Fixed wins when set. Otherwise price = max(floor, our campaign CPL × multiplier), frozen onto each lead at arrival.
+          Fixed wins when set. Otherwise price = our campaign CPL × multiplier (25 % margin by default), frozen onto each lead at arrival; the floor is the price only when no CPL is measurable yet.
         </p>
       </div>
 

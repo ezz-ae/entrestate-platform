@@ -29,7 +29,7 @@ claim exists, the named part does not · **SPEC-ONLY** — no code yet ·
 | Broker credits with confirmed top-ups | **IMPLEMENTED** | `lib/freehold/credits-db.ts`, `lib/freehold/credit-topups.ts`; tables `broker_credit_accounts`, `credit_ledger`, `credit_topup_requests` |
 | Lead-by-lead marketplace ledger (`/ctrl`) | **IMPLEMENTED** | `lib/ctrl/wallet.ts` (append-only, fils, idempotent on `ref`, debit transactional with delivery), `lib/ctrl/marketplace.ts`, table `ctrl_wallet_entries` |
 | One `wallet_transactions` table | **MISMATCH** | No such table. THREE ledgers exist (above). Ruling in `docs/ACCOUNT-FOUNDATION.md`: Ads Coin is the account wallet; the other two become feeders. |
-| Marketplace price = cost × **1.25** (25 % arbitrage) | **MISMATCH** | `lib/ctrl/pricing.ts`: `DEFAULT_RULE = { multiplier: 1.5, floorFils: 15000 }` — 50 % with a 150 AED floor, or a per-tenant `fixed_fils`. The submission's "25 %" is not what ships. |
+| Marketplace price = cost × **1.25** (25 % arbitrage) | **IMPLEMENTED (by ruling)** | The owner chose the submission's number (2026-08-31, "اعتمد التقديم"): `lib/ctrl/pricing.ts` `DEFAULT_RULE.multiplier = 1.25`, price = round(cost × 1.25) with no clamp; the 150 AED floor prices only a lead whose cost is unmeasurable; per-tenant `fixed_fils` still wins when set. Pinned in `scripts/ctrl-marketplace-test.ts`. |
 | Spend Governor halts over-CPL agent campaigns | **IMPLEMENTED** | `lib/meta/spend-authority.ts` (+ `lib/freehold/ads-machine*.ts`) |
 | Surcharge & Margin Index (≈5 % AI overhead burn) | **PARTIAL** | surcharge/margin logic exists in `lib/freehold/bundle.ts`, `ads-machine-engine.ts`, `creative-explore.ts`; no "SMI" as a named index |
 | "100 % subscription-free" SaaS mode | **MISMATCH (by decision)** | The owner's model (2026-08-30): each app has its own economics — tokens **or** subscription **or** included; `lib/freehold/app-store.ts` carries `plans`. Say "pay for what works, no seat fee", never "subscription-free". And never "free" (owner's word ban — `scripts/store-bridge-test.ts`). |
@@ -98,9 +98,9 @@ Claims in `dubai-it-submission-v16.md` measured against this repository:
    active/idle telemetry tables (`active_telemetry`, `idle_telemetry`,
    `useBehavioralTelemetry`) are still spec-only; the guide is paste-ready
    code and is the next build.
-2. "25 % arbitrage markup" — the shipping default is 50 % over cost with a
-   150 AED floor, per-tenant configurable. A money rule: the owner decides
-   which number is true before either the code or the words move.
+2. "25 % arbitrage markup" — **now true** (2026-08-31): the owner ruled for
+   the submission's number and the default became exactly cost × 1.25
+   (`lib/ctrl/pricing.ts`, guarded).
 3. "100 % subscription-free" — the App Store sells apps on their own terms
    (tokens, subscription, or included).
 

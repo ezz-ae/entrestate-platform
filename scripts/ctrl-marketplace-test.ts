@@ -16,10 +16,32 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { maskLead, maskName } from '../lib/ctrl/marketplace'
+import { priceLeadFils, DEFAULT_RULE } from '../lib/ctrl/pricing'
 
 let failures = 0
 const check = (m: string, cond: boolean, got = '') =>
   cond ? console.log(`  ✓ ${m}`) : (failures++, console.error(`  ✗ ${m}\n      got: ${got}`))
+
+// ── 0. The margin is the submission's margin — the owner's ruling ───────────
+// engine-11-cash-v4.md: P_lead = C_gen × 1.25 ("25 % Arbitrage Margin"). The
+// code shipped 1.5× with a 150 AED clamp until 2026-08-31, when the owner was
+// asked which number is true and chose the submission's ("اعتمد التقديم").
+// Pinned so the claim and the code can never drift apart silently again.
+console.log('\n── the marketplace margin is 25 %, exactly ──')
+{
+  check('the default multiplier is the spec\'s 1.25', DEFAULT_RULE.multiplier === 1.25, String(DEFAULT_RULE.multiplier))
+  check('a 100 AED lead sells at exactly 125 AED — no clamp lifting it',
+    priceLeadFils(10000, DEFAULT_RULE) === 12500, String(priceLeadFils(10000, DEFAULT_RULE)))
+  check('a cheap week is a cheap lead: 40 AED cost → 50 AED, not the floor',
+    priceLeadFils(4000, DEFAULT_RULE) === 5000, String(priceLeadFils(4000, DEFAULT_RULE)))
+  check('no measurable cost → the floor, never zero',
+    priceLeadFils(null, DEFAULT_RULE) === DEFAULT_RULE.floorFils && priceLeadFils(0, DEFAULT_RULE) === DEFAULT_RULE.floorFils)
+  check('a fixed price wins over everything',
+    priceLeadFils(10000, { ...DEFAULT_RULE, fixedFils: 9900 }) === 9900)
+  const db = readFileSync(join(process.cwd(), 'lib/ctrl/db.ts'), 'utf8')
+  check('the database default agrees with the code default', db.includes('DEFAULT 1.25'))
+  check('…and existing databases are moved to it', db.includes('ALTER COLUMN multiplier SET DEFAULT 1.25'))
+}
 
 // ── 1. The mask, against hostile fixtures ───────────────────────────────────
 console.log('\n── a masked preview cannot reach the person ──')
