@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Section, Grid, Eyebrow, PageHeader, H3, P } from "@/components/business/ui"
 import { STORE } from "@/lib/freehold/app-store"
 import { getTerminalUser } from "@/lib/terminal-session"
+import { ensureBusinessAccount, listAccountApps, type AppRequestStatus } from "@/lib/terminal-account"
 
 /**
  * THE ENTRESTATE APP STORE — the public one.
@@ -46,6 +47,12 @@ export default async function EntrestateStorePage() {
   // Phase 1 of the account foundation: the shared .entrestate.com session —
   // recognition is a bonus, never a gate (null renders the anonymous page).
   const terminalUser = await getTerminalUser()
+  // Phase 2: recognition lands on a ROW. Find-or-create the business account
+  // and read what it already asked for, so the cards tell the truth instead
+  // of offering the same start twice. All fail-soft — the store renders for
+  // everyone whether or not the account layer is reachable.
+  const account = terminalUser ? await ensureBusinessAccount(terminalUser) : null
+  const requested: Map<string, AppRequestStatus> = account ? await listAccountApps(account.id) : new Map()
   const live = STORE.filter((product) => product.status === "live")
   const planned = STORE.filter((product) => product.status === "planned")
 
@@ -92,15 +99,21 @@ export default async function EntrestateStorePage() {
               <div className="mt-3 flex-1">
                 <P>{product.tagline}</P>
               </div>
-              <Link
-                href="/signup"
-                className="mt-6 inline-flex items-baseline gap-1.5 text-[0.875rem] font-medium text-[#3B82F6]"
-              >
-                Start with this app
-                <span aria-hidden className="opacity-0 transition group-hover:opacity-100">
-                  →
-                </span>
-              </Link>
+              {requested.get(product.id) === "active" ? (
+                <p className="mt-6 text-[0.875rem] font-medium text-emerald-400">On your account — open the Terminal.</p>
+              ) : requested.get(product.id) === "requested" ? (
+                <p className="mt-6 text-[0.875rem] font-medium text-ink-muted">On your account&apos;s list — the team is on it.</p>
+              ) : (
+                <Link
+                  href={`/business/store/start?app=${product.id}`}
+                  className="mt-6 inline-flex items-baseline gap-1.5 text-[0.875rem] font-medium text-[#3B82F6]"
+                >
+                  Start with this app
+                  <span aria-hidden className="opacity-0 transition group-hover:opacity-100">
+                    →
+                  </span>
+                </Link>
+              )}
             </article>
           ))}
         </Grid>
