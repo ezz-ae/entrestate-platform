@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Section, Grid, Eyebrow, PageHeader, H3, P } from "@/components/business/ui"
-import { STORE } from "@/lib/freehold/app-store"
+import { STORE, BILLING_LABELS } from "@/lib/freehold/app-store"
 import { getTerminalUser } from "@/lib/terminal-session"
 import { ensureBusinessAccount, listAccountApps, type AppRequestStatus } from "@/lib/terminal-account"
 
@@ -98,6 +98,21 @@ export default async function EntrestateStorePage() {
               </div>
               <div className="mt-3 flex-1">
                 <P>{product.tagline}</P>
+                {/* Phase 4 — the app's own economics, as catalog facts: how it
+                    charges, what ships inside it, what it installs onto. */}
+                <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted">
+                  {BILLING_LABELS[product.billing]}
+                </p>
+                {(product.includes ?? []).length > 0 ? (
+                  <p className="mt-1.5 text-[0.8125rem] text-ink-faint">
+                    Ships with {(product.includes ?? []).map((id) => STORE.find((x) => x.id === id)?.name ?? id).join(", ")} inside.
+                  </p>
+                ) : null}
+                {(product.installsOn ?? []).length > 0 ? (
+                  <p className="mt-1.5 text-[0.8125rem] text-ink-faint">
+                    Installs onto {(product.installsOn ?? []).map((id) => STORE.find((x) => x.id === id)?.name ?? id).join(", ")}.
+                  </p>
+                ) : null}
               </div>
               {requested.get(product.id) === "active" ? (
                 <p className="mt-6 text-[0.875rem] font-medium text-emerald-400">On your account — open the Terminal.</p>
