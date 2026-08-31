@@ -125,6 +125,21 @@ Per-app economics, from the owner's model:
    `scripts/account-mapping-test.ts`.)*
 3. **One wallet** — Ads Coin as the settle point; top-up flow surfaced on
    the account; credits/ctrl adapters documented and scheduled.
+   *(Delivered 2026-08-31 — `lib/account-wallet.ts`: the account's wallet is
+   an Ads Coin wallet, find-or-create as kind `broker` + ownerId = the
+   business-account id (one per account via the existing (kind, owner_id)
+   unique index; a new WalletKind waits until the account wallet needs
+   different RULES, not just an address). `/business/account` shows the
+   balance from the ledger, takes top-up REQUESTS (AED 100–1,000,000, a
+   `freehold_wallet_requests` row, leadership emailed) and the movement
+   trail; coin moves ONLY through the finance screen's decideRequest.
+   Adapters, documented and scheduled: broker credits and the /ctrl ledger
+   remain FEEDERS — each stays the record of its own domain, and their
+   settlement into Ads Coin is an operations act through the same request →
+   approve path, never an automatic sync; folding either table into the
+   wallet is scheduled behind phase 4's billing fields, where each app's
+   economics decide what settles when. Guard
+   `scripts/account-wallet-test.ts`.)*
 4. **Catalog economics** — billing/includes/installsOn fields + store UI
    speaking them (guarded).
 5. **Terminal surfaces on the foundation** — dashboards/agents/design/social
