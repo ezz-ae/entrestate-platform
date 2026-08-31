@@ -8,7 +8,7 @@ to hand a new white-label customer when they ask "what does each seat get?"
   `lib/freehold/session-types.ts` (`Role`, `MANAGEMENT_ROLES`). Route guards
   (`useSessionGuard`) and API guards (`requireSession(roles)`) read the same
   lists, so nav, pages and APIs can never drift.
-- **White-label note:** nothing here is Freehold-specific. Roles are generic
+- **White-label note:** nothing here is brand-specific. Roles are generic
   seats; brand colour is one token (`--color-gold`). To re-skin for another
   brokerage, change the brand token and (optionally) rename role labels — the
   access rules carry over unchanged.

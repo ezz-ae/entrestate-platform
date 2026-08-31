@@ -1,6 +1,6 @@
 # Changelog
 
-Client-facing feature history for Freehold Intelligence. This mirrors the
+Client-facing feature history for the platform. This mirrors the
 in-app **What's new** panel (account menu → What's new), whose source of truth
 is `lib/freehold/changelog.ts`.
 
@@ -42,7 +42,7 @@ shipped. Routine bug fixes and internal plumbing are intentionally excluded
 
 ## v2 — 2026-07-01 · Connect your own ad & messaging accounts
 - **Connect Meta Ads in-app** — paste your token in Integrations → Meta Ads,
-  pick your ad account + Facebook Page, and launch real campaigns from Freehold.
+  pick your ad account + Facebook Page, and launch real campaigns from the workspace.
 - **Connect WhatsApp in-app** — connect your WhatsApp Business number in
   Integrations → WhatsApp and the CRM can message leads directly.
 - **Advertise a project in one click** — from an inventory project or a generated

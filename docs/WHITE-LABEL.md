@@ -4,9 +4,10 @@ How to stand up a **branded demo** of this system for a prospect: they open a
 login page, redeem an access key you gave them, set their brand name + logo, and
 enter the full platform pre-loaded with realistic data — their company, live.
 
-This is the **same codebase** as Freehold, deployed separately with one flag on.
-When `NEXT_PUBLIC_WHITE_LABEL` is unset (the Freehold production deployment),
-none of this activates and the product behaves exactly as before.
+This is the **same codebase** as the live platform, deployed separately with
+one flag on. When `NEXT_PUBLIC_WHITE_LABEL` is unset (every ordinary
+deployment, this repository's production included), none of this activates and
+the product behaves exactly as before.
 
 **Model:** one shared demo dataset, re-skinned per workspace · one key = one
 branded workspace.
@@ -18,7 +19,7 @@ branded workspace.
 The white-label build lives in `main`. To run it as its own product:
 
 ```bash
-# in the new empty repo you created (e.g. ezz-ae/freehold-whitelabel)
+# in the new empty repo you created (e.g. ezz-ae/entrestate-whitelabel)
 git clone https://github.com/ezz-ae/ore.git .
 git remote set-url origin https://github.com/ezz-ae/<new-repo>.git
 git push -u origin main
@@ -37,7 +38,7 @@ deployment:
 | --- | --- |
 | `NEXT_PUBLIC_WHITE_LABEL` | `1` — turns on the demo mode (activation gate, runtime brand) |
 | `WL_ADMIN_SECRET` | a long random string you keep — authorises minting keys |
-| `NEON_DATABASE_URL` | a **fresh, empty** Neon database — never Freehold's |
+| `NEON_DATABASE_URL` | a **fresh, empty** Neon database — never a live deployment's |
 
 Also set the usual `FH_SESSION_SECRET` (session signing) and any AI keys you
 want the demo's AI features to use. Everything else keeps its defaults.
@@ -57,7 +58,8 @@ an activity feed, Meta + Google campaigns, and broker credits.
 - **Idempotent** — re-running does nothing (a sentinel detects it's seeded).
 - **Re-seed fresh:** `… pnpm seed:demo --reset` (wipes the demo rows first).
 - **Safety:** the script refuses to run unless `NEXT_PUBLIC_WHITE_LABEL=1`. It
-  can never seed Freehold's database.
+  can never seed a live deployment's database (and `lib/tenancy/db-owner.ts`
+  refuses a database another deployment already claimed).
 
 ## 4. Mint access keys
 
@@ -105,8 +107,8 @@ The key is now `redeemed` and can't be reused.
 - Minting keys requires `WL_ADMIN_SECRET` (fails closed if unset).
 - `/activate` and `/api/wl/*` are public; everything else still requires the
   platform session — the demo session is a CEO-scoped **demo** identity.
-- The seed and the whole subsystem are inert without the flag, so pulling this
-  code into Freehold changes nothing there.
+- The seed and the whole subsystem are inert without the flag, so a deployment
+  that takes this code as an upstream merge is unaffected by it.
 - The public footer's legal line (legal entity + RERA licence) is intentionally
   **not** re-branded — a demo brand must not claim a real licence.
 

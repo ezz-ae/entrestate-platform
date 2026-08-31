@@ -21,7 +21,7 @@ lead-form leads flowing into the CRM, image uploads to the ad account.
 
 **Get a long-lived access token (recommended: System User — never expires):**
 1. Go to **business.facebook.com → Settings (⚙) → Users → System users**.
-2. **Add** a system user (name it e.g. `freehold-intelligence`, role: Admin).
+2. **Add** a system user (name it e.g. `entrestate-intelligence`, role: Admin).
 3. **Add assets** to it: the **Ad account** (Manage) and the **Facebook Page** (Manage).
 4. Click **Generate new token** → choose the business app → select scopes:
    - `ads_management` (create/manage campaigns)
@@ -92,7 +92,7 @@ recent HubSpot contacts into the CRM (deduped by email).
 **Get the token (Private App — 2 minutes):**
 1. In HubSpot: **Settings (⚙) → Integrations → Private Apps → Create a
    private app.**
-2. Name it (e.g. `Freehold Intelligence`), open the **Scopes** tab and enable:
+2. Name it (e.g. `Entrestate Intelligence`), open the **Scopes** tab and enable:
    - `crm.objects.contacts.read`
    - `crm.objects.contacts.write`
 3. **Create app → Copy the token** (starts with `pat-…`).

@@ -1,4 +1,4 @@
-# Freehold Intelligence — User Guide
+# Entrestate — User Guide
 
 A practical guide to **using** the platform: what each area does and how to get
 things done. (This is not a setup/deploy doc — it's for the people using the

@@ -57,6 +57,59 @@ console.log('\n── the index links resolve, and the map answers the repo ques
   check('the spec table points at the kit\'s new home', spec.includes('docs/award/'))
 }
 
+console.log('\n── the docs wear this platform\'s name, not the client\'s ──')
+{
+  /**
+   * The owner's finding, verbatim: "مبقاش الريد مي بتقول فريهولد صح" — the
+   * README still opened with the client's company name, months after the
+   * separation. The docs are read by teammates, prospects and juries; a
+   * document that names another company as the product is a defect, not a
+   * cosmetic one.
+   *
+   * The distinction this pin holds: `freehold` as an IDENTIFIER is legal and
+   * deliberately frozen (lib/freehold/*, /freehold-intelligence/*,
+   * /api/freehold/*, freehold_site_* tables, freehold-logo.png, the
+   * client's own repo ezz-ae/ORE, and the Arabic transliteration named in
+   * lib/landing-i18n.ts) — renaming those would break the client's upstream
+   * merge path, which is the whole argument of ADR 0001. `Freehold` as a
+   * BRAND NAME — the product's name, the company in a title, "the Freehold
+   * story" — is not.
+   */
+  // CLAUDE.md is the ONE exemption, and for the opposite reason: its job is to
+  // name the client company loudly ("THIS REPO IS NOT FREEHOLD") so nobody
+  // pushes there by accident. Pinned below as a requirement, not a tolerance.
+  const DOCS = [
+    'README.md', 'CHANGELOG.md', 'DEPLOYMENT.md',
+    ...fs.readdirSync(path.join(ROOT, 'docs')).filter((f) => f.endsWith('.md')).map((f) => `docs/${f}`),
+  ]
+  // Identifier spellings that stay. Everything else that says the word is copy.
+  const IDENTIFIER = /lib\/freehold|components\/freehold|app\/freehold|freehold-intelligence|api\/freehold|freehold_site|freehold_|freehold-logo|freeholdproperty|freehold-whitelabel|ezz-ae\/ORE|`freehold`|فريهولد/i
+  const offenders: string[] = []
+  for (const rel of DOCS) {
+    if (!exists(rel)) continue
+    read(rel).split('\n').forEach((line, i) => {
+      if (!/freehold/i.test(line)) return
+      // Strip every legal identifier spelling, then ask if the word survives.
+      const stripped = line.replace(new RegExp(IDENTIFIER.source, 'gi'), '')
+      if (/freehold/i.test(stripped)) offenders.push(`${rel}:${i + 1}`)
+    })
+  }
+  check('no document names the client company as this product', offenders.length === 0, offenders.join(', '))
+
+  const claude = read('CLAUDE.md')
+  check('CLAUDE.md still shouts the separation — the one place the client is named on purpose', claude.includes('THIS REPO IS NOT FREEHOLD') && claude.includes('ezz-ae/ORE'))
+
+  const readme = read('README.md')
+  check('the README opens as Entrestate', /^# Entrestate/m.test(readme))
+  check('…and explains why the freehold path names are frozen rather than hiding them', readme.includes('frozen\nhistoric identifiers') || readme.includes('frozen historic identifiers') || readme.includes('**frozen'))
+  check('…points at the Terminal repo and the ADR that governs the pair', readme.includes('Entrestate_os') && readme.includes('docs/adr/0001-two-repositories.md'))
+  check('…and states the real gauntlet, guards included', readme.includes('pnpm guards'))
+
+  const deploy = read('DEPLOYMENT.md')
+  check('the deployment playbook lists the brand defaults that actually ship', deploy.includes('`Entrestate` | All visible naming'))
+  check('…and does not promise another company\'s behaviour as the default', !/runs exactly as the original/i.test(deploy))
+}
+
 if (failures > 0) {
   console.error(`\n${failures} documentation rule(s) broken.`)
   process.exit(1)
