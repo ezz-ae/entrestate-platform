@@ -203,7 +203,9 @@ export default function PricingPage() {
 
       <StatBand
         items={[
-          { value: '14 days', label: 'Free trial', note: 'No card taken.' },
+          // "Trial period", never "Free trial" — the word ban (بلاش نستخدم فري)
+          // applies to every selling surface, including a stat label.
+          { value: '14 days', label: 'Trial period', note: 'No card taken.' },
           { value: '0%', label: 'of your ad spend', note: 'We take no percentage.' },
           { value: '3', label: 'languages in every plan', note: 'English, العربية, Русский' },
         ]}
