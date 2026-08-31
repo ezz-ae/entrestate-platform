@@ -10,6 +10,7 @@ import { brokerOwnerKeys } from '@/lib/freehold/lead-access'
 import { query, ensureOnce } from '@/lib/db'
 import { ensureLeadsTable, ensureLeadActivityTable } from '@/lib/data'
 import { notify } from '@/lib/freehold/notifications'
+import { ensureLeadRateSchema, recomputeLeadRate, sweepNeglectDeadlines } from '@/lib/freehold/lead-rate-db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -81,6 +82,12 @@ interface DbLead {
   meta_ad_id?: string | null
   archived: boolean | null
   blocked: boolean | null
+  rate: number | string | null
+  rate_reason: string | null
+  master_lead: boolean | null
+  convergent_at: string | null
+  neglect_deadline_at: string | null
+  seed_quarantined_at: string | null
 }
 
 function dbLeadToCRM(
@@ -175,6 +182,15 @@ function dbLeadToCRM(
     // consumer can now tell the difference.
     archived: row.archived === true,
     blocked: row.blocked === true,
+    /** Engine 06 — the 0–10 control signal and why it is what it is. Null
+        until the engine has evaluated the row once ("New" on the screen,
+        never an estimate). */
+    rate: row.rate === null || row.rate === undefined ? null : Number(row.rate),
+    rateReason: row.rate_reason ?? null,
+    masterLead: row.master_lead === true,
+    convergentAt: row.convergent_at ?? null,
+    neglectDeadlineAt: row.neglect_deadline_at ?? null,
+    seedQuarantinedAt: row.seed_quarantined_at ?? null,
   }
 }
 
@@ -246,6 +262,12 @@ export async function GET() {
     await ensureLeadsTable()
     await ensureDismissColumn()
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS value_rating int`).catch(() => undefined)
+    // ENGINE 07's neglect gate holds even when the schedule slips: opening
+    // the list is a natural moment to settle any deadline that has passed.
+    // Awaited so the list reflects the redistribution it just caused;
+    // fail-soft inside, so a gate failure can never hide the leads.
+    await ensureLeadRateSchema().catch(() => undefined)
+    await sweepNeglectDeadlines()
     const isBroker = user.role === 'broker'
     const ownerKeys = brokerOwnerKeys(user)
 
@@ -254,7 +276,9 @@ export async function GET() {
                       status, priority, created_at::text, last_contact_at::text, country,
                       budget_aed, interest, message, landing_slug, updated_at::text,
                       snooze_until::text, lead_code, duplicate_dismissed_at::text,
-                      utm_id, utm_campaign, value_rating, meta_ad_id, archived, blocked
+                      utm_id, utm_campaign, value_rating, meta_ad_id, archived, blocked,
+                      rate, rate_reason, master_lead, convergent_at::text, neglect_deadline_at::text,
+                      seed_quarantined_at::text
                FROM freehold_site_leads`
 
     if (isBroker && ownerKeys.length) {
@@ -368,6 +392,8 @@ export async function POST(req: Request) {
     )
     // Real notification: new lead waiting (broadcast to management).
     notify('lead_new', { name }, { href: '/freehold-intelligence/crm/inbox' }).catch(() => {})
+    // Engine 06: the baseline rate from the facts the form gave.
+    void recomputeLeadRate(id, 'ingest', { actor: user.email })
     // Log creation on the lead's real activity timeline (best-effort).
     try {
       await ensureLeadActivityTable()

@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto"
 import { query } from "@/lib/db"
 import { ensureLeadActivityTable, ensureLeadsTable, type LeadRecord } from "@/lib/data"
 import { getSessionUser, isAdminRole, logActivity } from "@/lib/auth"
+import { CONTACT_ACTIVITY } from "@/lib/freehold/authority"
+import { acknowledgeLead, evaluateActorBurst, recomputeLeadRate, recordStatusTransition } from "@/lib/freehold/lead-rate-db"
 
 export const runtime = "nodejs"
 
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
     await ensureLeadActivityTable()
 
     const leads = await query<LeadRecord>(
-      `SELECT id, assigned_broker_id FROM freehold_site_leads WHERE id = $1 LIMIT 1`,
+      `SELECT id, assigned_broker_id, status FROM freehold_site_leads WHERE id = $1 LIMIT 1`,
       [leadId],
     )
     const lead = leads[0]
@@ -55,6 +57,13 @@ export async function POST(req: NextRequest) {
         `UPDATE freehold_site_leads SET ${updates.join(", ")} WHERE id = $${params.length}`,
         params,
       )
+      // The second door onto a lead's status: the same immutable history and
+      // the same anomaly gate as the CRM's own PATCH route.
+      if (status && status !== (lead.status ?? null)) {
+        await recordStatusTransition({ leadId, actor: user.id, actorRole: user.role, fromStatus: lead.status ?? null, toStatus: status })
+        void evaluateActorBurst(user.id, user.role)
+      }
+      if (markContacted) void acknowledgeLead(leadId, null)
     }
 
     if (note || status || activityType) {
@@ -75,6 +84,10 @@ export async function POST(req: NextRequest) {
     }
 
     await logActivity("lead_updated", user.id, { leadId, status })
+
+    // Engine 06/07: a contact stops the neglect clock; every touch re-rates.
+    if (activityType && (CONTACT_ACTIVITY as readonly string[]).includes(activityType)) void acknowledgeLead(leadId, null)
+    void recomputeLeadRate(leadId, "activity", { actor: user.id })
 
     return NextResponse.json({ success: true })
   } catch (error) {

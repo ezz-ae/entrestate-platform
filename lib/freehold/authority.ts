@@ -56,6 +56,9 @@ export const CONTACT_ACTIVITY = [
 export type AuthorityAction =
   | 'lead.reassign'
   | 'lead.delete'
+  /** Engine 07's gates, acting on their own — see lib/freehold/lead-rate-db.ts. */
+  | 'lead.quarantine'
+  | 'lead.redistribute'
   | 'campaign.delete'
   | 'campaign.edit'
   | 'member.role'
@@ -72,6 +75,8 @@ export type AuthorityReason =
   | 'not_your_team'       // denied: the lead's broker does not report to you
   | 'insufficient_role'   // denied: this role never has this power
   | 'unassigned'          // allowed: nobody holds it, so nobody is being harmed
+  | 'neglect_gate'        // allowed: a convergent buyer went 15 minutes untouched (Engine 07)
+  | 'anomaly_gate'        // allowed: a bulk status event — quarantine / neglect-cleaning reversal
 
 export interface AuthorityDecision {
   allowed: boolean

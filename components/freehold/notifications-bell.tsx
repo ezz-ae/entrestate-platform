@@ -39,6 +39,7 @@ export function NotificationsBell() {
     const name = String(r.meta?.name ?? r.meta?.lead ?? r.meta?.id ?? '')
     if (r.type === 'lead_new') return t('notif.leadNew', { name })
     if (r.type === 'lead_assigned') return t('notif.leadAssigned')
+    if (r.type === 'lead_convergent') return t('notif.leadConvergent', { name, minutes: String(r.meta?.minutes ?? 15) })
     if (r.type === 'deal_approved') return t('notif.dealApproved')
     return r.type
   }

@@ -12,6 +12,10 @@ import { statusForDenial } from '@/lib/freehold/authority'
 import { reportLeadToMeta } from '@/lib/freehold/lead-writeback'
 import { openRatingClaim } from '@/lib/freehold/points-db'
 import { outcomeOf } from '@/lib/freehold/points'
+import { MANAGEMENT_ROLES } from '@/lib/freehold/session-types'
+import {
+  acknowledgeLead, evaluateActorBurst, recomputeLeadRate, recordStatusTransition, setMasterLead,
+} from '@/lib/freehold/lead-rate-db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -143,6 +147,22 @@ export async function PATCH(
   let body: Record<string, unknown>
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Bad request' }, { status: 400 }) }
 
+  // WHAT THE ROW SAYS BEFORE THIS WRITE. The status history (Engine 07's
+  // anomaly gate reads it) needs the from-status, and the broker ownership
+  // check needs the owner — one read serves both.
+  let current: { status: string | null; assigned_broker_id: string | null }
+  try {
+    await ensureLeadsTable()
+    const rows = await query<{ status: string | null; assigned_broker_id: string | null }>(
+      `SELECT status, assigned_broker_id FROM freehold_site_leads WHERE id = $1`,
+      [id]
+    )
+    if (rows.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    current = rows[0]
+  } catch {
+    return NextResponse.json({ error: 'DB unavailable' }, { status: 503 })
+  }
+
   // Brokers may only modify their own leads, and may not reassign them away.
   const isBroker = user.role === 'broker'
   const ownerKeys = brokerOwnerKeys(user)
@@ -150,19 +170,18 @@ export async function PATCH(
     if ('assigned_broker_id' in body) {
       return NextResponse.json({ error: 'Brokers cannot reassign leads' }, { status: 403 })
     }
-    try {
-      await ensureLeadsTable()
-      const owner = await query<{ assigned_broker_id: string | null }>(
-        `SELECT assigned_broker_id FROM freehold_site_leads WHERE id = $1`,
-        [id]
-      )
-      if (owner.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-      if (!ownerKeys.includes(owner[0].assigned_broker_id ?? '')) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
-    } catch {
-      return NextResponse.json({ error: 'DB unavailable' }, { status: 503 })
+    if (!ownerKeys.includes(current.assigned_broker_id ?? '')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
+  }
+
+  // ── THE HUMAN 10 ────────────────────────────────────────────────────────
+  // Rate 10 (master lead) is the one rung no rule may climb to — see
+  // lib/freehold/lead-rate.ts. It is a management act, and it is written
+  // through setMasterLead so the actor's name lands on the timeline.
+  const masterFlag = 'master_lead' in body ? body.master_lead === true : null
+  if (masterFlag !== null && !MANAGEMENT_ROLES.includes(user.role)) {
+    return NextResponse.json({ error: 'Only management may mark a master lead' }, { status: 403 })
   }
 
   // ── Reassignment authority ──────────────────────────────────────────────
@@ -283,7 +302,9 @@ export async function PATCH(
   // first arrived and would never be protected.
   if ('assigned_broker_id' in body) updates.push(`assigned_at = now()`)
 
-  if (updates.length === 0) return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+  if (updates.length === 0 && masterFlag === null) {
+    return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+  }
 
   updates.push(`updated_at = now()`)
   values.push(id)
@@ -296,6 +317,23 @@ export async function PATCH(
       values
     )
     await logPatchActivity(id, body, user.email)
+
+    // ── ENGINE 06 + 07 ─────────────────────────────────────────────────────
+    // The status transition goes to the immutable history with the exact
+    // second and the actor, the anomaly gate looks at this actor's last ten
+    // minutes, a logged contact stops the neglect clock, and the Rate is
+    // re-evaluated from the row as it now stands. All best-effort: a rate
+    // that cannot be written must never fail the broker's own update.
+    const nextStatus = typeof body.status === 'string' && body.status ? body.status : null
+    if (nextStatus && nextStatus !== (current.status ?? null)) {
+      await recordStatusTransition({
+        leadId: id, actor: user.email, actorRole: user.role, fromStatus: current.status, toStatus: nextStatus,
+      })
+      void evaluateActorBurst(user.email, user.role)
+    }
+    if ('last_contact_at' in body && body.last_contact_at) void acknowledgeLead(id, null)
+    if (masterFlag !== null) await setMasterLead(id, masterFlag, user.email)
+    else void recomputeLeadRate(id, 'crm_patch', { actor: user.email })
     // THE OTHER HALF OF THE SIGNAL. Meta only ever learns that a form was
     // submitted; whether the lead was real is decided here, in the CRM, and
     // until now that judgment never travelled back — so the optimiser kept

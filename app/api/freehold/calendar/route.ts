@@ -12,6 +12,7 @@ import {
   type CalendarKind,
   type Viewer,
 } from "@/lib/calendar"
+import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -121,6 +122,8 @@ export async function POST(req: NextRequest) {
       } catch (error) {
         console.error("[calendar] viewing_scheduled activity failed", error)
       }
+      // A booked viewing is a rung on the Rate ladder (Engine 06 §4.2).
+      void recomputeLeadRate(event.leadId, "viewing", { actor: user.email })
     }
     return NextResponse.json({ event }, { status: 201 })
   } catch (error) {

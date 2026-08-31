@@ -17,6 +17,7 @@ import { MANAGEMENT_ROLES, type Role } from '@/lib/freehold/session-types'
 import { query } from '@/lib/db'
 import { ensureLeadsTable } from '@/lib/data'
 import { planLeadImport, normalisePhone, normaliseEmail, type RawLead } from '@/lib/freehold/lead-import'
+import { recomputeLeadRates } from '@/lib/freehold/lead-rate-db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -95,6 +96,9 @@ export async function POST(req: NextRequest) {
         params,
       )
       inserted = res.length
+      // Engine 06: every imported row gets its baseline rate. Sequential and
+      // best-effort in the background — an import must return, not rate.
+      void recomputeLeadRates(res.map((r) => r.id), 'ingest')
     }
 
     return NextResponse.json({

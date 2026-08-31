@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { query } from '@/lib/db'
 import { getProfileByHandle } from '@/lib/freehold/agent-profiles'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
+import { mergeInboundDuplicate } from '@/lib/freehold/inbound-touch'
+import { recomputeLeadRate } from '@/lib/freehold/lead-rate-db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -42,16 +44,23 @@ export async function POST(req: Request, { params }: { params: Promise<{ handle:
   }
 
   try {
+    const id = randomUUID()
     await query(
       `INSERT INTO freehold_site_leads
          (id, name, phone, email, source, status, priority, assigned_broker_id, interest, message)
        VALUES ($1, $2, $3, $4, 'Bio Link', 'new', 'warm', $5, $6, $7)`,
       [
-        randomUUID(), name, phone || null, email || null, profile.brokerId,
+        id, name, phone || null, email || null, profile.brokerId,
         String(body.interest ?? '').trim().slice(0, 160) || null,
         String(body.message ?? '').trim().slice(0, 1000) || null,
       ],
     )
+    // Engine 07 folds a person the CRM already holds into their existing
+    // lead; Engine 06 rates a genuinely new one. Fire-and-forget: the visitor
+    // is waiting for "thank you", not for the engines.
+    void mergeInboundDuplicate(id, { source: 'Bio Link' }).then((survivor) => {
+      if (!survivor) void recomputeLeadRate(id, 'ingest')
+    })
     return NextResponse.json({ ok: true }, { status: 201 })
   } catch {
     return NextResponse.json({ error: 'Could not submit right now.' }, { status: 500 })

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { query } from '@/lib/db'
+import { CONTACT_ACTIVITY } from '@/lib/freehold/authority'
+import { acknowledgeLead, recomputeLeadRate } from '@/lib/freehold/lead-rate-db'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,6 +70,10 @@ export async function POST(req: Request) {
        VALUES ($1, $2, $3, $4, $5)`,
       [id, body.leadId, body.activityType, body.description ?? null, user.email]
     )
+    // A logged touch is what the neglect clock waits for, and what the Rate
+    // counts. Best-effort, after the write the caller came for.
+    if ((CONTACT_ACTIVITY as readonly string[]).includes(body.activityType)) void acknowledgeLead(body.leadId, null)
+    void recomputeLeadRate(body.leadId, 'activity', { actor: user.email })
     return NextResponse.json({ ok: true, id })
   } catch {
     return NextResponse.json({ error: 'Failed to log activity' }, { status: 500 })

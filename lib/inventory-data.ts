@@ -128,7 +128,7 @@ function extractPermitExpiry(payload: Record<string, unknown> | null): string | 
   return null
 }
 
-function extractUnitTypes(payload: Record<string, unknown> | null): string[] {
+export function extractUnitTypes(payload: Record<string, unknown> | null): string[] {
   if (!payload) return []
   if (Array.isArray(payload.unitTypes)) return payload.unitTypes as string[]
   if (Array.isArray(payload.units)) {

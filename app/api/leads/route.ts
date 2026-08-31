@@ -9,6 +9,9 @@ import { handleNewLead } from "@/lib/automation/engine"
 import { sendLeadConversion } from "@/lib/meta/capi"
 import { parseIntent } from "@/lib/meta/intent"
 import { scoreLeadSession } from "@/lib/freehold/behaviour-score"
+import { WON_STATUSES } from "@/lib/freehold/lead-stages"
+import { registerInboundTouch } from "@/lib/freehold/inbound-touch"
+import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
 import {
   getLeadershipLeadRecipients,
   sendInternalLeadAlertEmail,
@@ -31,18 +34,29 @@ interface ExistingLeadRow {
   status: string | null
 }
 
+/**
+ * The person behind this submission, if the CRM already holds them. Open
+ * leads first (a repeat inquiry), then lost ones (Engine 07 revives them),
+ * then won ones last (a returning buyer — who gets a NEW card, see below).
+ * Archived rows are not people we hold; they were merged somewhere else.
+ */
 async function findExistingLead(phone: string, email: string): Promise<ExistingLeadRow | null> {
   const digits = phoneKey(phone)
   const normalizedEmail = email.toLowerCase()
   if (!digits && !normalizedEmail) return null
   const rows = await query<ExistingLeadRow>(
     `SELECT id, status FROM freehold_site_leads
-     WHERE status NOT IN ('closed', 'converted', 'lost')
+     WHERE archived IS NOT TRUE
        AND (
          ($1 <> '' AND RIGHT(regexp_replace(phone, '\\D', '', 'g'), 9) = $1)
          OR ($2 <> '' AND LOWER(email) = $2)
        )
-     ORDER BY created_at DESC
+     ORDER BY CASE
+                WHEN status IN ('closed', 'converted') THEN 2
+                WHEN status = 'lost' THEN 1
+                ELSE 0
+              END ASC,
+              created_at DESC
      LIMIT 1`,
     [digits, normalizedEmail],
   ).catch(() => [] as ExistingLeadRow[])
@@ -110,8 +124,11 @@ export async function POST(req: NextRequest) {
     const existing = await findExistingLead(phone, email)
     let leadId: string = randomUUID()
     let isRepeatInquiry = false
+    // A past BUYER submitting again is a new opportunity, not a duplicate:
+    // they get a fresh card, and the old one is told they are back.
+    const returningBuyerOf = existing && WON_STATUSES.has((existing.status ?? '').toLowerCase()) ? existing.id : null
 
-    if (existing) {
+    if (existing && !returningBuyerOf) {
       isRepeatInquiry = true
       leadId = existing.id
       await ensureLeadActivityTable()
@@ -142,6 +159,18 @@ export async function POST(req: NextRequest) {
          WHERE id = $1`,
         [leadId, clickIntent],
       ).catch(() => undefined)
+      // ENGINE 07: the second inquiry is the signal. Compared with the first
+      // (ICI), escalated to Rate 8 with the 15-minute clock when convergent,
+      // revived when the lead had been marked lost. Awaited: it is the reason
+      // this door answers "we have you" instead of creating a duplicate, and
+      // it never throws.
+      await registerInboundTouch({
+        leadId,
+        inquiry: { projectSlug, interest, message, landingSlug },
+        source,
+        attribution: { campaign: toText(utm.id), ad: toText(utm.content), adset: toText(utm.term) },
+        logActivity: false,
+      })
     }
 
     // Layer 8 → Layer 9: score the landing session this lead came from.
@@ -298,6 +327,16 @@ export async function POST(req: NextRequest) {
     // matching lead.created rules. Never throws — intake must not be blocked.
     if (!isRepeatInquiry) {
       await handleNewLead(leadId)
+      // Engine 06: the baseline rate from the inbound facts (1–3).
+      void recomputeLeadRate(leadId, "ingest")
+      if (returningBuyerOf) {
+        void registerInboundTouch({
+          leadId: returningBuyerOf,
+          inquiry: { projectSlug, interest, message, landingSlug },
+          source,
+          attribution: { new_row: leadId },
+        })
+      }
     }
 
     const project = projectSlug ? await getProjectBySlug(projectSlug) : null
