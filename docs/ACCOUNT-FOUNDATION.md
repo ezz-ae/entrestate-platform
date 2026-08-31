@@ -115,8 +115,14 @@ Per-app economics, from the owner's model:
 
 1. **Session recognition** — platform middleware verifies the shared Neon
    session; the business site greets the Terminal account by name.
+   *(Delivered — `lib/terminal-session.ts`, the store's recognition strip.)*
 2. **Account mapping** — identity → business account (find-or-create), the
    /me App Store section deep-links straight into install flows.
+   *(Delivered 2026-08-31 — `lib/terminal-account.ts`: `entrestate_accounts`
+   find-or-create on sight, `entrestate_account_apps` requests with a
+   leadership alert per request; `/business/store/start?app=…` is the flow,
+   the store cards read the account's own state. Guard
+   `scripts/account-mapping-test.ts`.)*
 3. **One wallet** — Ads Coin as the settle point; top-up flow surfaced on
    the account; credits/ctrl adapters documented and scheduled.
 4. **Catalog economics** — billing/includes/installsOn fields + store UI
