@@ -27,6 +27,12 @@
  *
  *   Anything about origin or nationality. Not read, not stored, not a lever.
  *   See lib/freehold/audience-pattern.ts.
+ *
+ * ONE THING DELIBERATELY REFUSED. A lead the temporal anomaly gate has
+ * quarantined (seed_quarantined_at — see lib/freehold/anomaly-gate.ts) is
+ * not read at all: its status was set in a burst nobody meant as a judgment,
+ * and neither the seed nor the exclusion may be built on it. This is the
+ * write-side twin of the training-integrity subtraction below.
  */
 import { query } from '@/lib/db'
 import { getUntrustedLeadIds } from '@/lib/freehold/training-integrity'
@@ -46,23 +52,25 @@ export async function loadLeadEvidence(): Promise<SeedLead[]> {
   const base = `id, email, phone, status, blocked,
                 value_rating AS "valueRating",
                 behaviour_score AS "behaviourScore"`
+  const where = `WHERE archived IS NOT TRUE AND seed_quarantined_at IS NULL`
   let rows: SeedLead[] = []
   try {
     rows = await query<SeedLead>(
       `SELECT ${base}, deal_value_aed AS "dealValueAed"
-         FROM freehold_site_leads WHERE archived IS NOT TRUE`,
+         FROM freehold_site_leads ${where}`,
     )
   } catch {
-    // deal_value_aed is created by the deals feature; behaviour_score and
-    // value_rating by two others. Ensure them, then retry with the REAL data
-    // before degrading — a seed with no deal weights is still a seed, and
-    // returning [] here would read as "you have no buyers".
+    // deal_value_aed is created by the deals feature; behaviour_score,
+    // value_rating and seed_quarantined_at by three others. Ensure them, then
+    // retry with the REAL data before degrading — a seed with no deal weights
+    // is still a seed, and returning [] here would read as "you have no buyers".
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS behaviour_score int`).catch(() => undefined)
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS value_rating int`).catch(() => undefined)
+    await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS seed_quarantined_at timestamptz`).catch(() => undefined)
     try {
       rows = await query<SeedLead>(
         `SELECT ${base}, NULL::numeric AS "dealValueAed"
-           FROM freehold_site_leads WHERE archived IS NOT TRUE`,
+           FROM freehold_site_leads ${where}`,
       )
     } catch { return [] }
   }

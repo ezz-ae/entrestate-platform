@@ -18,6 +18,9 @@ import { brokerOwnerKeys } from '@/lib/freehold/lead-access'
 import { getServerT } from '@/lib/i18n/server'
 import { LeadExpertStrip } from '@/components/freehold/lead-expert-strip'
 import { LeadCallCard } from '@/components/freehold/lead-call-card'
+import { LeadRateBadge, LeadRateCard } from '@/components/freehold/lead-rate'
+import { acknowledgeLead, ensureLeadRateSchema } from '@/lib/freehold/lead-rate-db'
+import { MANAGEMENT_ROLES } from '@/lib/freehold/session-types'
 import { MachineVerdictLeadChip } from '@/components/freehold/machine-verdict-notifier'
 
 // Tries to fetch live lead from DB; maps it to the CRM shape used by the rest of this page.
@@ -31,6 +34,8 @@ async function getLiveLead(id: string, ownerKeys: string[] | null): Promise<CRML
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS click_intent text`).catch(() => undefined)
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS duplicate_dismissed_at timestamptz`).catch(() => undefined)
     await query(`ALTER TABLE freehold_site_leads ADD COLUMN IF NOT EXISTS value_rating int`).catch(() => undefined)
+    // Engine 06/07 columns and their tables — the row is read with them below.
+    await ensureLeadRateSchema().catch(() => undefined)
     const queryParams: unknown[] = [id]
     let ownerFilter = ''
     if (ownerKeys && ownerKeys.length) { queryParams.push(ownerKeys); ownerFilter = ' AND assigned_broker_id = ANY($2)' }
@@ -47,12 +52,15 @@ async function getLiveLead(id: string, ownerKeys: string[] | null): Promise<CRML
       click_intent: string | null;
       duplicate_dismissed_at: string | null;
       value_rating: number | null;
+      rate: number | string | null; rate_reason: string | null; master_lead: boolean | null;
+      convergent_at: string | null; neglect_deadline_at: string | null; seed_quarantined_at: string | null;
     }>(
       `SELECT id, name, phone, email, source, project_slug, assigned_broker_id,
               status, priority, budget_aed, interest, message, created_at::text, landing_slug, lead_code,
               utm_source, utm_campaign, utm_id, last_contact_at::text, snooze_until::text,
               behaviour_score, buyer_intent, purchase_probability, budget_confidence, click_intent,
-              duplicate_dismissed_at::text, value_rating
+              duplicate_dismissed_at::text, value_rating,
+              rate, rate_reason, master_lead, convergent_at::text, neglect_deadline_at::text, seed_quarantined_at::text
        FROM freehold_site_leads WHERE id = $1${ownerFilter} LIMIT 1`,
       queryParams
     )
@@ -89,6 +97,12 @@ async function getLiveLead(id: string, ownerKeys: string[] | null): Promise<CRML
       viewingProperty: null, notes: [], taggedProjects: r.project_slug ? [r.project_slug] : [],
       leadCode: r.lead_code ?? null, snoozeUntil: r.snooze_until ?? null,
       valueRating: r.value_rating ?? null,
+      rate: r.rate === null || r.rate === undefined ? null : Number(r.rate),
+      rateReason: r.rate_reason ?? null,
+      masterLead: r.master_lead === true,
+      convergentAt: r.convergent_at ?? null,
+      neglectDeadlineAt: r.neglect_deadline_at ?? null,
+      seedQuarantinedAt: r.seed_quarantined_at ?? null,
       behaviourScore: r.behaviour_score, buyerIntent: r.buyer_intent,
       purchaseProbability: r.purchase_probability, budgetConfidence: r.budget_confidence,
       clickIntent: r.click_intent,
@@ -125,6 +139,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
   // Real DB leads only — no seed/mock fallback.
   const lead = await getLiveLead(id, ownerKeys)
   if (!lead) notFound()
+
+  // ENGINE 07: the owner opening the card is the acknowledgement the
+  // 15-minute neglect clock waits for. Management viewing it is not — they
+  // are not the one who has to call.
+  if (ownerKeys && lead.neglectDeadlineAt) {
+    await acknowledgeLead(lead.id, ownerKeys)
+    lead.neglectDeadlineAt = null
+  }
+  const canMaster = !!sessionUser && (MANAGEMENT_ROLES as string[]).includes(sessionUser.role)
 
   const tone = urgencyTone(lead.urgency)
   const dateLocale = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-AE'
@@ -213,6 +236,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           <span className="rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-sm text-slate-400">
             {lead.stage}
           </span>
+          <LeadRateBadge rate={lead.rate ?? null} reason={lead.rateReason ?? null} neglectDeadlineAt={lead.neglectDeadlineAt ?? null} />
           <span className="text-sm text-slate-500">{lead.source}</span>
           {lead.leadCode && (
             <span className="rounded-full border border-gold/20 bg-gold/[0.06] px-2.5 py-0.5 font-mono text-xs text-gold/80">
@@ -232,6 +256,18 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
         {/* Main column */}
         <div className="space-y-5">
+
+          {/* Engine 06 — the Rate, its reason, and Engine 07's marks. */}
+          <LeadRateCard
+            leadId={lead.id}
+            rate={lead.rate ?? null}
+            reason={lead.rateReason ?? null}
+            masterLead={lead.masterLead === true}
+            convergentAt={lead.convergentAt ?? null}
+            neglectDeadlineAt={lead.neglectDeadlineAt ?? null}
+            seedQuarantinedAt={lead.seedQuarantinedAt ?? null}
+            canMaster={canMaster}
+          />
 
           {/* Ask the Expert about this lead */}
           <LeadExpertStrip id={lead.id} name={lead.name} />

@@ -3,6 +3,8 @@ import { getProjectBySlug } from "@/lib/data"
 import { generateProjectPdf } from "@/lib/pdf"
 import { query } from "@/lib/db"
 import { randomUUID } from "node:crypto"
+import { mergeInboundDuplicate } from "@/lib/freehold/inbound-touch"
+import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
 
 async function ensureLeadsTable() {
   await query(
@@ -35,11 +37,15 @@ export async function POST(req: Request) {
 
     if (name && phone) {
       await ensureLeadsTable()
+      const leadId = randomUUID()
       await query(
         `INSERT INTO freehold_site_leads (id, name, phone, email, source, project_slug)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        [randomUUID(), name, phone, email || null, source || "project-download", slug],
+        [leadId, name, phone, email || null, source || "project-download", slug],
       )
+      void mergeInboundDuplicate(leadId, { source: source || "project-download" }).then((survivor) => {
+        if (!survivor) void recomputeLeadRate(leadId, "ingest")
+      })
     }
 
     const pdfBuffer = await generateProjectPdf(project)

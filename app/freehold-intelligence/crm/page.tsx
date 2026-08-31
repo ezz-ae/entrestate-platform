@@ -19,6 +19,7 @@ import { LeadRate, LeadAssign, LeadSource } from '@/components/freehold/lead-row
  *  a second copy of a permission is how two screens start disagreeing. */
 const ASSIGN_ROLES = ['admin', 'sales_manager', 'director', 'ceo']
 import { LeadValueBadge } from '@/components/freehold/lead-value-chips'
+import { LeadRateBadge } from '@/components/freehold/lead-rate'
 import { useT } from '@/lib/i18n/provider'
 import { loadCrmView, saveCrmView } from './_lib/view-prefs'
 import { Monogram } from '@/components/freehold/monogram'
@@ -202,8 +203,11 @@ export default function FreeholdCrmPage() {
     return leads
       .filter(l => stageFilter === 'all' || l.pipelineStage === stageFilter)
       .filter(l => !q || [l.name, l.projectInterest, l.assignedAgent, l.source].some(f => f.toLowerCase().includes(q)))
+      // "Worst first" ranks by the engine's Rate (Engine 06) and then by the
+      // broker's own value judgment — the two readings of the same lead, the
+      // machine's and the human's, with the unrated after the rated.
       .sort((a, b) => rankByValue
-        ? (a.valueRating ?? 99) - (b.valueRating ?? 99)
+        ? ((a.rate ?? 99) - (b.rate ?? 99)) || ((a.valueRating ?? 99) - (b.valueRating ?? 99))
         : b.intentScore - a.intentScore)
   }, [leads, query, stageFilter, rankByValue])
 
@@ -419,6 +423,10 @@ export default function FreeholdCrmPage() {
                   {/* Avatar + name (+ the value judgment at a glance) */}
                   <div className="flex min-w-0 items-center gap-2.5">
                     <Monogram name={lead.name} size={32} round="lg" />
+                    {/* Two readings side by side: the engine's Rate (with the
+                        15-minute clock when Engine 07 armed it) and the
+                        broker's value judgment. */}
+                    <LeadRateBadge rate={lead.rate ?? null} reason={lead.rateReason ?? null} neglectDeadlineAt={lead.neglectDeadlineAt ?? null} />
                     <LeadValueBadge value={lead.valueRating ?? null} />
                     <div className="min-w-0">
                       <Link

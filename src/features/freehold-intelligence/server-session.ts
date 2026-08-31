@@ -132,6 +132,15 @@ export type CRMLeadIntelligence = {
       though nobody had ever archived or blocked anything. */
   archived?: boolean
   blocked?: boolean
+  /** Engine 06 — the 0–10 Rate as a control signal (lib/freehold/lead-rate.ts),
+      the reason code behind it, and Engine 07's marks on the row. Null rate =
+      not yet evaluated, shown as "New", never estimated. */
+  rate?: number | null
+  rateReason?: string | null
+  masterLead?: boolean
+  convergentAt?: string | null
+  neglectDeadlineAt?: string | null
+  seedQuarantinedAt?: string | null
 }
 
 export type NotebookOutput = {

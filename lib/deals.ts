@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { query, ensureOnce } from "@/lib/db"
+import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -667,7 +668,13 @@ export async function finalApproveDeal(
      WHERE id = $1 AND status = 'pending_step2' RETURNING ${SELECT}`,
     [id, approver.name, notes || null],
   )
-  return rows[0] ? mapRow(rows[0]) : null
+  const deal = rows[0] ? mapRow(rows[0]) : null
+  // ENGINE 06 §4.4 — the programmatic closure check. An approved deal record
+  // is the objective win: the lead's rate becomes 9 and the learning loop
+  // reseeds the audience (lib/freehold/lead-rate.ts, learning-loop.ts).
+  // Fire-and-forget: the approval is the human act and must never wait on it.
+  if (deal?.leadId) void recomputeLeadRate(deal.leadId, "deal", { actor: approver.name })
+  return deal
 }
 
 export async function rejectDeal(

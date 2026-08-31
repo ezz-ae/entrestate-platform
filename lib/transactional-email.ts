@@ -633,7 +633,7 @@ ${BRAND.company}`
  * Best-effort; never throws into the mutation that triggered it.
  */
 export async function emailLeadMovementToInbox(
-  kind: "assigned" | "unassigned" | "stage" | "priority",
+  kind: "assigned" | "unassigned" | "stage" | "priority" | "convergent" | "redistributed" | "revived",
   lead: { id: string; name?: string | null },
   detail: string,
 ) {

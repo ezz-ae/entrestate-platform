@@ -25,6 +25,8 @@ import {
   searchProjects,
 } from "@/lib/data"
 import { query } from "@/lib/db"
+import { registerInboundTouch } from "@/lib/freehold/inbound-touch"
+import { recomputeLeadRate } from "@/lib/freehold/lead-rate-db"
 import {
   getLeadershipLeadRecipients,
   sendInternalLeadAlertEmail,
@@ -280,6 +282,13 @@ const persistAiLead = async (input: {
         message,
       ],
     )
+    // Engine 07: the chat is a door like any other — a second inquiry is
+    // compared with the first and escalated when convergent.
+    void registerInboundTouch({
+      leadId: existing[0].id,
+      inquiry: { projectSlug: projectSlug || null, interest: interest || null, message },
+      source: "ai-chat",
+    })
     return existing[0]
   }
 
@@ -300,6 +309,7 @@ const persistAiLead = async (input: {
       message,
     ],
   )
+  void recomputeLeadRate(leadId, "ingest")
 
   return { id: leadId, ai_ack_sent_at: null, ai_ack_project_slug: null }
 }

@@ -60,6 +60,8 @@ import { RAIL_REFUSALS } from '../lib/calling/gates'
 import { lm_calling } from '../lib/i18n/dictionaries/lm_calling'
 import { TRIAL_STATES } from '../lib/tenancy/trial'
 import { trial as trialDict } from '../lib/i18n/dictionaries/trial'
+import { RATE_REASONS, RATE_BANDS } from '../lib/freehold/lead-rate'
+import { crm as crmDict } from '../lib/i18n/dictionaries/crm'
 
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
@@ -345,6 +347,15 @@ console.log('\n\u2500\u2500 trial states \u2500\u2500')
     const loud = SILENT.filter((k) => trialDict[locale][`trial.state.${k}`]?.trim())
     check(`${locale}: …and they really are silent`, loud.length === 0, loud.join(', '))
   }
+}
+
+console.log('\n── lead rate reasons and bands ──')
+{
+  // The Rate badge and card render t(`crm.rate.reason.${reason}`) and
+  // t(`crm.rate.band.${band}`) — a new rung on the ladder cannot ship
+  // without its words in every language.
+  family('crm.rate.reason', 'crm.rate.reason.', RATE_REASONS, crmDict)
+  family('crm.rate.band', 'crm.rate.band.', RATE_BANDS, crmDict)
 }
 
 if (failures > 0) {

@@ -42,7 +42,7 @@ interface LogRow {
 }
 
 /** Every action the authority layer records. Kept in sync with AuthorityAction. */
-const ACTIONS = ['lead.reassign', 'lead.delete', 'campaign.delete', 'campaign.edit', 'member.role', 'member.suspend'] as const
+const ACTIONS = ['lead.reassign', 'lead.delete', 'lead.quarantine', 'lead.redistribute', 'campaign.delete', 'campaign.edit', 'member.role', 'member.suspend'] as const
 type Outcome = 'all' | 'allowed' | 'denied'
 
 const PAGE_SIZE = 200

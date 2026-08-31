@@ -6,6 +6,8 @@ import { listLeadFormsMerged } from '@/lib/meta/form-registry'
 import type { MetaFormLead } from '@/lib/meta/types'
 import { captureForLead } from '@/lib/freehold/snapshot-capture'
 import { handleNewLead } from '@/lib/automation/engine'
+import { mergeInboundDuplicate } from '@/lib/freehold/inbound-touch'
+import { recomputeLeadRate } from '@/lib/freehold/lead-rate-db'
 import {
   getLeadershipLeadRecipients,
   sendInternalLeadAlertEmail,
@@ -187,9 +189,18 @@ export async function syncLeadsToCrm(formId: string, leads: MetaFormLead[]): Pro
         adsetId: lead.adset_id || null,
         adId: lead.ad_id || null,
       }).catch(() => false)
+      // ENGINE 07: the same person through a second form is one lead, not
+      // two. If an older open row holds them, this row folds into it (archived
+      // with a pointer) and the survivor is escalated or not by the ICI. A
+      // merged row is not distributed and not announced — the convergent path
+      // does its own, sharper announcing.
+      const survivor = await mergeInboundDuplicate(inserted[0].id, { source: `meta_form:${formId}` })
+      if (survivor) continue
       await handleNewLead(inserted[0].id).catch((error) => {
         console.error('[meta-leads] automation handoff failed', error)
       })
+      // Engine 06: the baseline rate from the inbound facts.
+      void recomputeLeadRate(inserted[0].id, 'ingest')
       // TELL SOMEBODY. A lead arriving from the website triggers an internal
       // email and a WhatsApp alert (see app/api/leads). A lead arriving from a
       // Meta ad — the channel this company actually spends money on — landed in

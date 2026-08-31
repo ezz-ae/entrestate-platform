@@ -7,6 +7,7 @@ import {
   hubspotConfiguredAsync, upsertContact, listRecentContacts,
   HubspotConfigError, HubspotApiError,
 } from '@/lib/hubspot/client'
+import { recomputeLeadRate } from '@/lib/freehold/lead-rate-db'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -69,12 +70,14 @@ export async function POST(req: Request) {
       for (const c of contacts) {
         if (!c.email || known.has(c.email)) { skipped++; continue }
         try {
+          const hubspotLeadId = randomUUID()
           await query(
             `INSERT INTO freehold_site_leads (id, name, email, phone, source, status)
              VALUES ($1, $2, $3, $4, 'hubspot', 'new')`,
-            [randomUUID(), c.name || 'HubSpot contact', c.email, c.phone || null],
+            [hubspotLeadId, c.name || 'HubSpot contact', c.email, c.phone || null],
           )
           known.add(c.email)
+          void recomputeLeadRate(hubspotLeadId, 'ingest')
           pulled++
         } catch { skipped++ }
       }

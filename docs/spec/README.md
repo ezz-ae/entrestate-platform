@@ -11,7 +11,7 @@ the repo — it is presentation material, not code truth.
 A spec that says *OPERATIONS ACTIVE* about a feature the code does not have
 is the most expensive kind of buried thing: it becomes a claim in a
 submission the jury will read. So every claim below carries its status
-**as verified against this repository on 2026-08-31**, with the file that
+**as verified against this repository on 2026-08-31** (Engine 06/07 rows updated the same day, after the build), with the file that
 proves it or the absence that disproves it. Update the table when the code
 moves; never the other way round.
 
@@ -47,20 +47,27 @@ claim exists, the named part does not · **SPEC-ONLY** — no code yet ·
 
 | Claim | Status | Evidence |
 |---|---|---|
-| Normalization + de-duplication of inbound leads | **PARTIAL** | Meta leads deduped by `meta_lead_id` (`lib/freehold/meta-lead-sync.ts`); phone/email normalization in `lib/freehold/lead-import.ts`; no cross-channel "duplicate = intent signal" merge |
-| Intent Convergence Index (ICI ≥ 0.5 → Rate 8, 15-minute neglect trigger) | **SPEC-ONLY** | no ICI anywhere in code |
-| Temporal Anomaly Gate (>5 status changes in <10 min → quarantine + redistribution) | **SPEC-ONLY** | no `lead_status_history`, no anomaly detector |
-| Success-based lookalike-to-agent routing | **PARTIAL** | `lib/freehold/visual-sales-routing.ts`, `lib/freehold/agent-router.ts` route; the `wins`-per-audience query as written is not present |
-| Claimed files `components/freehold/crm-table.tsx`, `app/api/freehold/leads/rate` | **MISSING** | neither path exists (`lib/deals.ts` does) |
+| Normalization + de-duplication of inbound leads, duplicate = intent signal, silent merge | **IMPLEMENTED** (2026-08-31) | `lib/freehold/inbound-touch.ts` — `registerInboundTouch` (the second inquiry lands on the existing lead's timeline with its campaign/ad attribution), `mergeInboundDuplicate` (a second row from the Meta sync / bio link / PDF door folds into the older open lead, archived with a pointer). Doors: `app/api/leads/route.ts` (`findExistingLead` now finds lost leads too, past buyers get a fresh card), `lib/freehold/meta-lead-sync.ts`, `app/api/ai/chat/route.ts`, `app/api/freehold/public/agent/[handle]/lead/route.ts`, `app/api/pdf/project/route.ts` |
+| Intent Convergence Index (ICI ≥ 0.5 → Rate 8, 15-minute neglect trigger) | **IMPLEMENTED** | `lib/freehold/intent-convergence.ts` — `ICI = 0.5·match(type) + 0.5·match(area)`, trilingual area/asset vocabulary, unknown ≠ match; `armNeglectClock` / `acknowledgeLead` / `sweepNeglectDeadlines` in `lib/freehold/lead-rate-db.ts` (`NEGLECT_WINDOW_MINUTES = 15`); the owner opening the card or logging a contact stops the clock; the cron `app/api/cron/lead-rate` (every 15 min) and the CRM list GET settle overdue clocks by redistributing to a top performer. Guard `scripts/intent-convergence-test.ts` |
+| Lost lead re-engages → revived to New | **IMPLEMENTED** | `registerInboundTouch` (status → `new`, transition recorded, rate recomputed, inbox emailed) |
+| Temporal Anomaly Gate (≥5 leads in 10 min → quarantine + ledger + management + redistribution on neglect-cleaning) | **IMPLEMENTED** | `lib/freehold/anomaly-gate.ts` (pure: `detectBulkStatusEvent`, `isNeglectTransition`, `BULK_STATUS_THRESHOLD = 5`, `BULK_STATUS_WINDOW_MINUTES = 10`), `evaluateActorBurst` in `lead-rate-db.ts` runs after every status write (`app/api/freehold/crm/leads/[id]/route.ts`, `app/api/leads/activity/route.ts`); `seed_quarantined_at` is honoured by `lib/freehold/lead-evidence.ts` (no quarantined lead reaches any audience); actions land in `freehold_site_authority_log` as `lead.quarantine` / `lead.redistribute` with reason `anomaly_gate`; the read-side twin that already existed is `lib/freehold/training-integrity.ts` (retrospective burst subtraction). Guard `scripts/anomaly-gate-test.ts` |
+| Temporal status logs (`lead_status_history`) | **IMPLEMENTED** | table `freehold_site_lead_status_history` (lead, actor, actor_role, from, to, exact second) — insert-only, written by `recordStatusTransition` |
+| Success-based lookalike-to-agent routing | **PARTIAL** | `lib/automation/distribution.ts` strategy `performance` (top closers first) is what both gates route with; `lib/freehold/visual-sales-routing.ts`, `lib/freehold/agent-router.ts` route by other rules; the per-audience `wins` query as written is not present |
+| Claimed files `components/freehold/crm-table.tsx`, `app/api/freehold/leads/rate` | **IMPLEMENTED (real names)** | the CRM table is `app/freehold-intelligence/crm/page.tsx` (rows render `LeadRateBadge` from `components/freehold/lead-rate.tsx`); `app/api/freehold/leads/rate/route.ts` exists (GET the rate + ledger, POST re-evaluate / master flag) |
 
 ## Engine 06 — Lead Intelligence / Rate Engine (`engine-06-lead-rate-v6.md`)
 
 | Claim | Status | Evidence |
 |---|---|---|
-| 0-to-10 decimal Rate on every lead (1–8 open, 9 won, 10 master) as a control signal | **SPEC-ONLY** | the lead pipeline in code is a status set (`new · contacted · qualified · viewing · negotiation · won · lost`, e.g. `lib/freehold/lead-import.ts`, `lib/deals.ts`); no numeric rate field, no 1–5-star slider, no `interaction_logs` table |
-| Behaviour-based scoring inputs | **PARTIAL** | `lib/freehold/behaviour-score.ts` scores behaviour; it does not write a rate |
-| Rate 9 → Learning Engine → audience reseed | **SPEC-ONLY** | no won-deal trigger into audience seeds; `lib/meta/spend-authority.ts` and `lib/google/` exist but do not reseed on a rate transition |
-| Claimed file `components/freehold/crm-table.tsx` | **MISSING** | (same absence as Engine 07) |
+| 0-to-10 Rate on every lead (1–3 inbound, 4–7 engaged, 8 open cap, 9 won, 10 master) as a control signal | **IMPLEMENTED** (2026-08-31) | `lib/freehold/lead-rate.ts` — pure `computeLeadRate`, `RATE_OPEN_CAP = 8`, `RATE_WON = 9`, `RATE_MASTER = 10`, decay one point per 14 idle days (floor 1; won/master/blocked never decay); columns `rate`, `rate_reason`, `rate_updated_at`, `rate_checked_at`, `master_lead` on `freehold_site_leads`; ledger `freehold_site_lead_rate_ledger` (every change, every ICI evaluation, with coefficients); written by `recomputeLeadRate` (`lib/freehold/lead-rate-db.ts`) from the CRM PATCH, every activity route, the calendar (viewing), the deal approval (`lib/deals.ts`) and all eight inbound doors. Guard `scripts/lead-rate-test.ts` |
+| Human-in-the-loop cap: 9 and 10 never set autonomously | **IMPLEMENTED** | 9 requires a won status or an approved deal record; 10 requires `master_lead`, settable only by management through `app/api/freehold/leads/rate` (POST `masterLead`) or the CRM PATCH; pinned by the guard ("everything at once is still 8") |
+| No fake ratings | **IMPLEMENTED** | a never-evaluated lead carries `rate = NULL` and renders "New"; the baseline (1–3) is computed from facts on the row (dialable phone, valid email, clean UTM, investor intent, deep read, off-hours) |
+| Behaviour-based scoring inputs | **IMPLEMENTED** | `behaviour_score` ≥ 60 (a deep read, `DEEP_READ_SCORE`) lifts the inbound baseline to 3; `buyer_intent`, `click_intent` and the enquiry text (استثمار / invest / инвест…) are read in `ingestRate` |
+| Rate 9 → Learning Engine → audience reseed | **IMPLEMENTED** | `lib/freehold/learning-loop.ts` — `triggerLearningLoop` fires once when the rate crosses into 9 (`recomputeLeadRate`), refreshes the seed / avoid audiences through `syncRatingAudiences` (hashed, weighted, append-only), debounced 10 minutes, receipt on the lead timeline (`learning_loop`) |
+| Copy / Avoid / Unrated cohorts | **IMPLEMENTED (pre-existing)** | `lib/freehold/seed-cohort.ts` `splitCohorts`, fed by `lib/freehold/lead-evidence.ts` — now also refusing quarantined rows |
+| Sorted "worst first" with badges in the CRM | **IMPLEMENTED** | `app/freehold-intelligence/crm/page.tsx` — the "worst first" rank sorts by Rate then value rating; `LeadRateBadge` on every row with the 15-minute clock; `LeadRateCard` on `app/freehold-intelligence/crm/leads/[id]/page.tsx` with the reason, the band, the master toggle (management) and the quarantine note; words in `lib/i18n/dictionaries/crm.ts` (`crm.rate.*`, three languages, families pinned in `scripts/dynamic-keys-test.ts`) |
+| Rate 8 cluster → Spend Governor budget authorization | **PARTIAL** | `lib/meta/spend-authority.ts` governs spend; it does not yet read `rate` per ad set. Next: a `rate ≥ 8` count per `meta_adset_id` as an input to the authorization limit |
+| Claimed file `components/freehold/crm-table.tsx` | **IMPLEMENTED (real name)** | `components/freehold/lead-rate.tsx` + the CRM page above |
 
 ## Engine 04 — Creative Intelligence Engine (`engine-04-creative-v3.md`)
 
@@ -85,14 +92,17 @@ table as where the shape currently is.
 
 ## Before the jury reads the submission (v16)
 
-Claims in `dubai-it-submission-v16.md` that this table contradicts today:
-1. ICI, Temporal Anomaly Gates, and the active/idle telemetry tables are
-   presented as operating features — they are spec-only.
+Claims in `dubai-it-submission-v16.md` measured against this repository:
+1. ICI and the Temporal Anomaly Gate — **now operating** (2026-08-31, this
+   table's Engine 06/07 rows, with the guards that pin them). The
+   active/idle telemetry tables (`active_telemetry`, `idle_telemetry`,
+   `useBehavioralTelemetry`) are still spec-only; the guide is paste-ready
+   code and is the next build.
 2. "25 % arbitrage markup" — the shipping default is 50 % over cost with a
-   150 AED floor, per-tenant configurable.
+   150 AED floor, per-tenant configurable. A money rule: the owner decides
+   which number is true before either the code or the words move.
 3. "100 % subscription-free" — the App Store sells apps on their own terms
    (tokens, subscription, or included).
 
-Either build them (ICI and the anomaly gate are two focused modules; the
-telemetry guide is ready code) or soften the words. An unexaggerated
-submission is the owner's own requirement.
+An unexaggerated submission is the owner's own requirement; the table above
+is what may be claimed today, with the file that proves each line.
