@@ -23,7 +23,7 @@ import { join } from 'node:path'
 import {
   STORE, validateStore, getProduct, productIds, liveProducts, plannedProducts,
   productsForPlan, productsForApp, grantedCapabilities, can,
-  type StoreProduct,
+  type StoreProduct, BILLING_LABELS,
 } from '../lib/freehold/app-store'
 import { APPS } from '../lib/freehold/apps'
 import { CAPABILITY_LABELS, capabilityLabel } from '../lib/freehold/app-store'
@@ -74,13 +74,14 @@ console.log('\n── rule 1: lite is a subset, never a second build ──')
 console.log('\n── a malformed product is caught, not shipped ──')
 {
   const bad: StoreProduct[] = [
-    { id: 'x-full', name: 'X', tagline: 't', appId: 'crm', tier: 'full', status: 'live', capabilities: ['meta-campaigns'], plans: ['company'] },
+    { id: 'x-full', name: 'X', tagline: 't', appId: 'crm', tier: 'full', status: 'live', billing: 'subscription', capabilities: ['meta-campaigns'], plans: ['company'] },
     // lite that grants MORE than its full sibling — the exact rot rule 1 exists for
-    { id: 'x-lite', name: 'X Lite', tagline: 't', appId: 'crm', tier: 'lite', status: 'live', capabilities: ['meta-campaigns', 'meta-lookalike'], plans: ['company'], liteOf: 'x-full' },
+    { id: 'x-lite', name: 'X Lite', tagline: 't', appId: 'crm', tier: 'lite', status: 'live', billing: 'subscription', capabilities: ['meta-campaigns', 'meta-lookalike'], plans: ['company'], liteOf: 'x-full' },
     // live product pointing at an app that does not exist
-    { id: 'ghost', name: 'Ghost', tagline: 't', appId: 'nope', tier: 'full', status: 'live', capabilities: ['meta-campaigns'], plans: ['company'] },
+    // includes/installsOn pointing at air — the phase-4 rot validateStore now catches
+    { id: 'ghost', name: 'Ghost', tagline: 't', appId: 'nope', tier: 'full', status: 'live', billing: 'tokens', includes: ['nothing'], installsOn: ['ghost'], capabilities: ['meta-campaigns'], plans: ['company'] },
     // lite with no sibling named
-    { id: 'orphan', name: 'Orphan', tagline: 't', appId: 'crm', tier: 'lite', status: 'live', capabilities: ['meta-campaigns'], plans: ['company'] },
+    { id: 'orphan', name: 'Orphan', tagline: 't', appId: 'crm', tier: 'lite', status: 'live', billing: 'included', capabilities: ['meta-campaigns'], plans: ['company'] },
   ]
   const problems = validateStore(bad)
   check('a lite granting more than full is rejected',
@@ -89,6 +90,33 @@ console.log('\n── a malformed product is caught, not shipped ──')
     problems.some((p) => p.productId === 'ghost' && /not in APPS/.test(p.problem)))
   check('a lite with no full sibling is rejected',
     problems.some((p) => p.productId === 'orphan' && /does not name its full sibling/.test(p.problem)))
+  check('an includes pointing at a product that does not exist is rejected',
+    problems.some((p) => p.productId === 'ghost' && /includes "nothing" which does not exist/.test(p.problem)))
+  check('a product installing onto itself is rejected',
+    problems.some((p) => p.productId === 'ghost' && /installs onto itself/.test(p.problem)))
+}
+
+console.log('\n── phase 4: every app has its own economics ──')
+{
+  check('every product declares a billing mode', STORE.every((p) => ['included', 'tokens', 'subscription'].includes(p.billing)))
+  check('every mode has words a buyer reads', (['included', 'tokens', 'subscription'] as const).every((m) => BILLING_LABELS[m].length > 0))
+  const labels = Object.values(BILLING_LABELS).join(' ')
+  check('…and none of them is the banned word', !/\bfree\b/i.test(labels) && !labels.includes('مجان'), labels)
+  // The owner's two examples, verbatim from the ruling that ordered this phase.
+  const inventory = STORE.find((p) => p.id === 'inventory')
+  const webDesigner = STORE.find((p) => p.id === 'web-designer')
+  const glm = STORE.find((p) => p.id === 'google-lead-machine')
+  check('الانفنتوري بتنزل على جوجل ليد ماشين — Inventory installs onto the machine',
+    !!inventory && (inventory.installsOn ?? []).includes('google-lead-machine'))
+  check('الويب ديزاينر بينزل جواه الانفنتوري — Web Designer ships with Inventory inside',
+    !!webDesigner && (webDesigner.includes ?? []).includes('inventory'))
+  check('the machine that spends money runs on coin, and carries the page-maker inside',
+    !!glm && glm.billing === 'tokens' && (glm.includes ?? []).includes('web-designer'))
+  check('the store of record comes with the account', STORE.find((p) => p.id === 'assets')?.billing === 'included')
+  check('the public store speaks the economics', (() => {
+    const src = readFileSync(join(process.cwd(), 'app/business/store/page.tsx'), 'utf8')
+    return src.includes('BILLING_LABELS[product.billing]') && src.includes('Ships with') && src.includes('Installs onto')
+  })())
 }
 
 console.log('\n── rule 3: surfaces gate on capabilities ──')

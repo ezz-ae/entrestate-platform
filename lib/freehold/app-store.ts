@@ -59,11 +59,28 @@ export type CapabilityId =
   // ── Calling ──
   | 'calling-templates'     // the seven call intents
   | 'calling-voice'         // a hired member places the call itself
+  // ── Inventory ──
+  | 'inventory-scored'      // the scored project/property book — quality-checked stock
   // ── Leadformer ──
   | 'leadform-conversational' // the form that talks back
   | 'leadform-team'           // the Visual Sales Team answers inside it
 
 export type ProductTier = 'full' | 'lite'
+
+/**
+ * PHASE 4 OF THE ACCOUNT FOUNDATION — every app has its own economics. The
+ * owner's ruling, in his words: "كل ابلكيشن له دنيته" — some ride on the
+ * account, some burn coin, some subscribe. The mode is a catalog FACT the
+ * store renders; the amounts stay where money already lives (the wallet, the
+ * plans page) — a mode is not a price.
+ *
+ *   included      comes with the account — named for what it is, NEVER the
+ *                 banned word (see BILLING_LABELS).
+ *   tokens        runs on Ads Coin — the wallet is the meter, pay for what
+ *                 works.
+ *   subscription  a workspace product on a recurring plan.
+ */
+export type BillingMode = 'included' | 'tokens' | 'subscription'
 
 /**
  * `live` — the workspace exists and the product can be sold today.
@@ -84,6 +101,12 @@ export interface StoreProduct {
   capabilities: CapabilityId[]
   /** Which workspace plans may buy it. */
   plans: TenantPlan[]
+  /** How this app charges — see BillingMode above. */
+  billing: BillingMode
+  /** Product ids that ship INSIDE this one ("الويب ديزاينر بينزل جواه الانفنتوري"). */
+  includes?: string[]
+  /** Product ids this one installs ONTO ("الانفنتوري بتنزل على جوجل ليد ماشين"). */
+  installsOn?: string[]
   /** For a lite product: the full product it is a subset of (rule 1). */
   liteOf?: string
   /** Where the capability already lives in code, when it does — so nobody
@@ -98,6 +121,7 @@ export const STORE: StoreProduct[] = [
     name: 'Meta for Realtors',
     tagline: 'Every Meta surface, organised — the whole set, in an order a person can follow.',
     appId: 'ads',
+    billing: 'subscription',
     tier: 'full',
     status: 'live',
     capabilities: ['meta-campaigns', 'meta-forms', 'meta-audiences', 'meta-lookalike', 'meta-deep-analysis'],
@@ -106,6 +130,7 @@ export const STORE: StoreProduct[] = [
   },
   {
     id: 'meta-ads-lite',
+    billing: 'subscription',
     name: 'Meta Ads Lite',
     tagline: 'One dashboard and quick widgets. Forms included — the deep audience work is not.',
     appId: 'ads',
@@ -122,6 +147,7 @@ export const STORE: StoreProduct[] = [
   // ── Google ───────────────────────────────────────────────────────────────
   {
     id: 'google-ads',
+    billing: 'subscription',
     name: 'Google Ads',
     tagline: 'Search and display, run properly — keywords, budgets and the competition view.',
     appId: 'ads',
@@ -133,6 +159,11 @@ export const STORE: StoreProduct[] = [
   },
   {
     id: 'google-lead-machine',
+    // The self-running machine spends real money — the wallet is its meter.
+    // It cannot run without a page per project, so Web Designer ships inside
+    // it (the same reason it grants the landing capabilities below).
+    billing: 'tokens',
+    includes: ['web-designer'],
     name: 'Google Lead Machine',
     tagline: 'Self-running Google ads. Pick the projects; it needs a page for each, then it runs.',
     appId: 'ads',
@@ -149,6 +180,10 @@ export const STORE: StoreProduct[] = [
   // ── Making things ────────────────────────────────────────────────────────
   {
     id: 'web-designer',
+    // The owner's example, verbatim: "الويب ديزاينر بينزل جواه الانفنتوري" —
+    // a page needs stock to sell, so the scored book rides inside.
+    billing: 'subscription',
+    includes: ['inventory'],
     name: 'Web Designer',
     tagline: 'A page per project, generated and edited here — and the account owns what it makes.',
     appId: 'ai-manager',
@@ -160,6 +195,7 @@ export const STORE: StoreProduct[] = [
   },
   {
     id: 'creative-hub',
+    billing: 'subscription',
     name: 'Creative Hub',
     tagline: 'Where the making tools live — video, ads and pages, in one workflow.',
     appId: 'creative-studio',
@@ -171,6 +207,9 @@ export const STORE: StoreProduct[] = [
   },
   {
     id: 'assets',
+    // The store of record comes with the account: an upload that costs extra
+    // is an upload that lands somewhere else, and then there are two.
+    billing: 'included',
     name: 'Assets',
     tagline: 'One home for everything uploaded anywhere — images, video, and what is deployed.',
     appId: 'drive',
@@ -184,9 +223,29 @@ export const STORE: StoreProduct[] = [
     engine: 'app/freehold-intelligence/drive · lib/freehold/blob-upload',
   },
 
+  {
+    id: 'inventory',
+    name: 'Inventory',
+    tagline: 'The scored property book — quality-checked stock, ready to sell from.',
+    appId: 'inventory',
+    tier: 'full',
+    status: 'live',
+    // The owner's example, verbatim: "الانفنتوري بتنزل على جوجل ليد ماشين" —
+    // it installs ONTO the machine (stock feeds campaigns) and rides INSIDE
+    // Web Designer (a page needs stock). Comes with the account: charging for
+    // the book would tax every app that reads it.
+    billing: 'included',
+    installsOn: ['google-lead-machine'],
+    capabilities: ['inventory-scored'],
+    plans: ['company', 'realtor'],
+    engine: 'lib/inventory-data.ts · lib/freehold/inventory-quality.ts · app/freehold-intelligence/inventory',
+  },
+
   // ── Talking to leads ─────────────────────────────────────────────────────
   {
     id: 'lead-caller',
+    // Calls are per-event work — coin is the honest meter.
+    billing: 'tokens',
     name: 'Lead Caller',
     tagline: 'Seven reasons to call, and someone on the team who makes the call.',
     appId: null,
@@ -200,6 +259,7 @@ export const STORE: StoreProduct[] = [
   },
   {
     id: 'leadformer',
+    billing: 'subscription',
     name: 'Leadformer',
     tagline: 'A form that talks back. Not a Meta form — your own, with your team inside it.',
     appId: null,
@@ -228,6 +288,17 @@ export const STORE: StoreProduct[] = [
  * outcomes. Everything numeric this platform shows is evidence-gated
  * (lib/freehold/min-evidence.ts) and a catalogue is the last place to break that.
  */
+/**
+ * The billing mode in a buyer's words. 'included' is NAMED for what it is —
+ * the owner's word ban holds here hardest of all: the store never says the
+ * cheap word about the layer that comes with the account.
+ */
+export const BILLING_LABELS: Record<BillingMode, string> = {
+  included: 'Comes with the account',
+  tokens: 'Runs on coin — pay for what works',
+  subscription: 'Subscription',
+}
+
 export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
   'meta-campaigns': 'Build and run Meta campaigns',
   'meta-forms': "Meta's own instant forms",
@@ -235,6 +306,7 @@ export const CAPABILITY_LABELS: Record<CapabilityId, string> = {
   'meta-lookalike': 'Lookalike expansion from a list',
   'meta-deep-analysis': 'Placement, creative and audience analysis',
   'google-campaigns': 'Search and display campaigns',
+  'inventory-scored': 'The scored property book — quality-checked stock to sell from',
   'google-automation': 'The self-running loop: keywords, bids, pausing',
   'landing-generate': 'Generate a page for a project',
   'landing-edit': 'Edit any page it generates',
@@ -312,6 +384,16 @@ export function validateStore(products: StoreProduct[] = STORE): StoreProblem[] 
     }
     if (p.capabilities.length === 0) problems.push({ productId: p.id, problem: 'grants no capabilities' })
     if (p.plans.length === 0) problems.push({ productId: p.id, problem: 'no plan can buy it' })
+
+    // Phase 4 — the economics fields point at real products, never at air.
+    for (const ref of p.includes ?? []) {
+      if (ref === p.id) problems.push({ productId: p.id, problem: 'includes itself' })
+      else if (!products.some((x) => x.id === ref)) problems.push({ productId: p.id, problem: `includes "${ref}" which does not exist` })
+    }
+    for (const ref of p.installsOn ?? []) {
+      if (ref === p.id) problems.push({ productId: p.id, problem: 'installs onto itself' })
+      else if (!products.some((x) => x.id === ref)) problems.push({ productId: p.id, problem: `installsOn "${ref}" which does not exist` })
+    }
 
     // Rule 1 — lite is a strict subset of its full sibling.
     if (p.tier === 'lite') {

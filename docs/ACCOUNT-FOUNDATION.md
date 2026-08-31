@@ -142,6 +142,16 @@ Per-app economics, from the owner's model:
    `scripts/account-wallet-test.ts`.)*
 4. **Catalog economics** — billing/includes/installsOn fields + store UI
    speaking them (guarded).
+   *(Delivered 2026-08-31 — `lib/freehold/app-store.ts`: `BillingMode`
+   ('included' | 'tokens' | 'subscription') required on every product,
+   `includes` / `installsOn` validated by `validateStore` (a reference to a
+   product that does not exist, or to itself, fails the guard); the owner's
+   two examples verbatim: Inventory (new catalog row, live, comes with the
+   account) `installsOn: ['google-lead-machine']`, Web Designer
+   `includes: ['inventory']`, and the Lead Machine runs on coin with the
+   page-maker inside. `BILLING_LABELS` names 'included' for what it is —
+   never the banned word. The public store card renders all three facts.
+   Pins in `scripts/app-store-test.ts`.)*
 5. **Terminal surfaces on the foundation** — dashboards/agents/design/social
    read entitlements from the business account; nothing rebuilt, everything
    re-pointed.
