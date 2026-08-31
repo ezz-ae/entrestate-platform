@@ -73,6 +73,17 @@ console.log('\n── the standing word rules hold on the new surfaces ──')
   }
 }
 
+console.log('\n── the account serves its own surfaces (phase 5\'s door) ──')
+{
+  const route = stripComments(read('app/api/account/summary/route.ts'))
+  check('the summary is session-gated and fails closed', route.includes('getTerminalUser()') && route.includes('401'))
+  check('…answers only the caller\'s own account', route.includes('ensureBusinessAccount(user)') && !route.includes('searchParams'))
+  check('…states amounts as the ledger\'s display strings', route.includes('balanceAed: wallet.balanceAed'))
+  check('…and never caches a balance', route.includes("'Cache-Control': 'no-store'"))
+  const proxy = read('proxy.ts')
+  check('the wall lets it authenticate itself, like whoami', proxy.includes('"/api/account/summary"'))
+}
+
 console.log('\n── the ruling on the OS routes is on the record ──')
 {
   const readme = read('docs/spec/README.md')

@@ -58,6 +58,11 @@ const PUBLIC_API_EXACT = new Set([
   // session. The single source of truth stays lib/freehold/app-store.ts;
   // serving it is how the Terminal shows the store without copying it.
   "/api/store/catalog",
+  // The account's own summary for its Terminal surfaces (phase 5). Public on
+  // the wall for the same reason as /api/auth/whoami: it authenticates itself
+  // (the shared Neon session via getTerminalUser) and fails closed with 401 —
+  // the wall's WORKSPACE cookie is one a Terminal caller correctly lacks.
+  "/api/account/summary",
 ])
 const PUBLIC_API_PREFIXES = [
   "/api/freehold/public/",      // public catalogue (projects, areas, developers, search)
