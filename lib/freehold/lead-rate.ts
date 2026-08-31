@@ -121,6 +121,10 @@ export interface RateFacts {
   buyerIntent: string | null
   /** Declared intent carried on the ad click (?intent=). */
   clickIntent: string | null
+  /** Engine 04: ≥ 15 s reading a premium section (payment plan, ROI, DLD). */
+  premiumEngagement?: boolean
+  /** Engine 04: an idle/hidden session the visitor came back to. */
+  focusAfterIdle?: boolean
   interest: string | null
   message: string | null
   phone: string | null
@@ -200,6 +204,11 @@ function ingestRate(f: RateFacts): { rate: number; reason: RateReason } {
     f.buyerIntent === 'investor' || f.buyerIntent === 'investor_end_user'
     || !!(f.clickIntent ?? '').trim()
     || (typeof f.behaviourScore === 'number' && f.behaviourScore >= DEEP_READ_SCORE)
+    // Engine 04's micro-behaviour: fifteen seconds parked on the payment plan
+    // or the ROI table, or returning to an idle tab, is declared intent the
+    // visitor performed rather than typed.
+    || f.premiumEngagement === true
+    || f.focusAfterIdle === true
     || declaresInvestmentIntent(f.interest, f.message)
     || isOffHours(f.createdAt)
   return intent ? { rate: 3, reason: 'ingest_intent' } : { rate: 2, reason: 'ingest_verified' }

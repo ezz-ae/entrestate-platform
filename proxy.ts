@@ -29,6 +29,7 @@ const PUBLIC_API_EXACT = new Set([
   "/api/intelligence-block",
   "/api/embed",
   "/api/lp-analytics",          // anonymous landing-page analytics ingestion
+  "/api/lp-telemetry",          // Engine 04 active/idle telemetry — session-keyed, clamped, budgeted in handler
   "/api/leads",                 // public landing-page lead capture (POST)
   "/api/auth/roster",           // login-screen profile picker (names/roles only)
   // Answers "who is this?" from the PLATFORM session and returns a name and an

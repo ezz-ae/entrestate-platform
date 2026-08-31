@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { parseIntent } from '@/lib/meta/intent'
+import { useBehavioralTelemetry } from '@/lib/freehold/use-behavioral-telemetry'
 
 interface TrackerProps {
   slug: string
@@ -66,6 +67,9 @@ export function collectIntent(): string {
 }
 
 export function Tracker({ slug, projectSlug, metaPixelId, googleTagId, googleConversionId, tiktokPixelId }: TrackerProps) {
+  // Engine 04: the active/idle telemetry rides the same session id as the
+  // analytics events, so the server can later join behaviour to the lead.
+  useBehavioralTelemetry({ sessionId: typeof window !== 'undefined' ? getSessionId() : '' })
   useEffect(() => {
     const utm = collectUtm()
     const intent = collectIntent()
