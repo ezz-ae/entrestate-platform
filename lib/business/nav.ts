@@ -90,6 +90,11 @@ export const PLATFORM: NavItem[] = [
 
 export const COMPANY: NavItem[] = [
   {
+    href: '/business/account',
+    label: 'Your account',
+    blurb: 'The wallet, the apps and the workspace — on the one account.',
+  },
+  {
     href: '/business/how-it-works',
     label: 'How it works',
     blurb: 'The full path from a listing to a closed deal, in order.',

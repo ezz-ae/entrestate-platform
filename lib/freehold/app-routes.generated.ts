@@ -12,6 +12,7 @@ export const APP_ROUTES: readonly string[] = [
   "/blog",
   "/blog/*",
   "/business",
+  "/business/account",
   "/business/contact",
   "/business/docs",
   "/business/docs/audiences",
