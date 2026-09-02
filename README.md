@@ -36,34 +36,49 @@ consequences, and they are the product:
    facing their threshold, or a stated *Withheld* — never a bare point
    estimate that a sample of four can produce.
 
-Sold as four products on one system — **Lead Machine**, **Mega Brokerage
-Platform**, **Landing Pages** (inside Lead Machine) and **Meta for Realtors** —
-with two faces on one database and one AI layer: the public storefront and
-landing pages that capture leads, and the workspace where the brokerage runs
-the business.
+Structurally that is two faces on one database and one AI layer: the public
+storefront and landing pages that capture leads, and the workspace where the
+brokerage runs the business. It is sold as four products on one system — Lead
+Machine, Mega Brokerage Platform, Landing Pages and Meta for Realtors.
 
-## Specifications, and the code that implements them
+*The commercial argument — who this is for, how it is paid for, and where it
+is going — is [`COMMERCIAL-VISION.md`](COMMERCIAL-VISION.md), deliberately
+kept out of this file. Nothing there describes shipped code; this file and
+the truth table do.*
 
-The owner's specification set describes the system as twelve engines. Each row
-below is a capability with the module that implements it and the guard suite
-that holds it. The full claim-by-claim table, including what is *not* built,
-is [`docs/spec/README.md`](docs/spec/README.md) — it is written to record
-absence as plainly as presence.
+## Specifications, and what the code actually holds
 
-| Capability | What it does | Implementation |
-| --- | --- | --- |
-| **Lead Rate (0–10)** | One control signal per lead. 0 blocked · 1–3 by ingest quality and intent · 4–7 by status and work done · 8 the open cap · 9 won, a human act that fires the learning loop · 10 master. Idle decay with a floor. | `lib/freehold/lead-rate.ts`, `lead-rate-db.ts` |
-| **Intent Convergence** | A second inquiry is read for what it means: `ICI = 0.5·type + 0.5·area` over ~50 areas in three languages. Convergent profiles escalate; scattered ones merge silently and never escalate. | `lib/freehold/intent-convergence.ts`, `inbound-touch.ts` |
-| **Neglect gate** | An escalated lead unacknowledged within 15 minutes is redistributed by performance, with the reason written to the authority log. | `sweepNeglectDeadlines` in `lib/freehold/lead-rate-db.ts` |
-| **Temporal Anomaly Gate** | Five or more leads moved by one actor inside ten minutes is queue-cleaning, not work: the seeds are quarantined out of every training audience, management is alerted, and the leads are redistributed. | `lib/freehold/anomaly-gate.ts` |
-| **Behavioural telemetry** | How a visitor actually reads a page — hover duration over payment plans and ROI tables, scroll depth, the silence clock, focus-after-idle — as verified intent. Rows are session-keyed; **the browser can never name a lead**, the link is made server-side. | `lib/freehold/behavioral-telemetry.ts`, `/api/lp-telemetry` |
-| **Spend Governor** | Deterministic caps and pauses over autonomous ad spend. The AI proposes; the rules decide; a recorded human approval gates the write. | `lib/meta/spend-authority.ts` |
-| **Ads Coin wallet** | Double-entry ledger, `1 Cash = 1 AED`, equal-and-opposite postings, issue and burn only through the treasury, conservation audited. One wallet per account. | `lib/freehold/wallet.ts`, `lib/account-wallet.ts` |
-| **Lead marketplace** | Lead-by-lead sale with masked previews and no brand leakage. Price is our measured cost × 1.25 — a 25 % margin, frozen onto each lead at arrival. | `lib/ctrl/*` |
-| **App economics** | Every app states how it is paid for: comes with the account, runs on coin, or subscribes — and which apps it ships inside or installs onto. A dangling reference fails the build. | `lib/freehold/app-store.ts` |
-| **One account** | One identity (the Terminal sign-in on the shared `.entrestate.com` session) → one business account → one wallet → app installs, rendered on both products through a served API. | [`docs/ACCOUNT-FOUNDATION.md`](docs/ACCOUNT-FOUNDATION.md) |
-| **Role-gated AI** | One docked Expert, screen-aware, with tools gated server-side by role over a database with no obfuscation layer. | `components/freehold/expert-chat.tsx`, `lib/freehold/coordinator-tools.ts` |
-| **Trilingual by construction** | Every user-facing string is a key present in English, العربية and Русский, RTL-safe. Parity is a build gate, not a translation backlog. | `lib/i18n/dictionaries/*` |
+Every capability below carries a **status**, using the same legend as the
+per-engine truth table in [`docs/spec/README.md`](docs/spec/README.md) — one
+vocabulary across this repository, so a reader never has to reconcile two:
+
+**IMPLEMENTED** — working code, named file, held by a guard ·
+**PARTIAL** — part of the claim exists, a named part does not ·
+**SPEC-ONLY** — specified, no code yet ·
+**CLIENT-RUNTIME** — evidence exists in a client's live deployment, not in
+this repository.
+
+A table with nothing but green would be the least trustworthy thing on this
+page. The rows that are not green are the reason the rest can be believed.
+
+| Capability | Status | What it does | Implementation |
+| --- | --- | --- | --- |
+| **Lead Rate (0–10)** | IMPLEMENTED | One control signal per lead. 0 blocked · 1–3 by ingest quality and intent · 4–7 by status and work done · 8 the open cap · 9 won, a human act that fires the learning loop · 10 master. Idle decay with a floor. | `lib/freehold/lead-rate.ts`, `lead-rate-db.ts`; guard `scripts/lead-rate-test.ts` |
+| **Intent Convergence** | IMPLEMENTED | A second inquiry is read for what it means: `ICI = 0.5·type + 0.5·area` over ~50 areas in three languages. Convergent profiles escalate; scattered ones merge silently and never escalate. | `lib/freehold/intent-convergence.ts`, `inbound-touch.ts`; guard `scripts/intent-convergence-test.ts` |
+| **Neglect gate** | IMPLEMENTED | An escalated lead unacknowledged within 15 minutes is redistributed by performance, with the reason written to the authority log. | `sweepNeglectDeadlines` in `lib/freehold/lead-rate-db.ts` |
+| **Temporal Anomaly Gate** | IMPLEMENTED | Five or more leads moved by one actor inside ten minutes is queue-cleaning, not work: the seeds are quarantined out of every training audience, management is alerted, and the leads are redistributed. | `lib/freehold/anomaly-gate.ts`; guard `scripts/anomaly-gate-test.ts` |
+| **Behavioural telemetry** | IMPLEMENTED | Hover duration over payment plans and ROI tables, scroll depth, the silence clock, focus-after-idle — as verified intent. Rows are session-keyed; **the browser can never name a lead**, the link is made server-side. | `lib/freehold/behavioral-telemetry.ts`, `/api/lp-telemetry`; guard `scripts/behavioral-telemetry-test.ts` |
+| **Spend Governor** | IMPLEMENTED | Deterministic caps and pauses over autonomous ad spend. The AI proposes; the rules decide; a **recorded human approval** gates the write. (No cryptographic signing ships — the ledger entry is the control.) | `lib/meta/spend-authority.ts` |
+| **Ads Coin wallet** | IMPLEMENTED | Double-entry ledger, `1 Cash = 1 AED`, equal-and-opposite postings, issue and burn only through the treasury, conservation audited. One wallet per account. | `lib/freehold/wallet.ts`, `lib/account-wallet.ts` |
+| **Lead marketplace** | IMPLEMENTED | Lead-by-lead sale with masked previews and no brand leakage. Price is our measured cost × 1.25 — a 25 % margin, frozen onto each lead at arrival. | `lib/ctrl/*`; guard `scripts/ctrl-marketplace-test.ts` |
+| **App economics** | IMPLEMENTED | Every app states how it is paid for — comes with the account, runs on coin, or subscribes — and which apps it ships inside or installs onto. A dangling reference fails the build. | `lib/freehold/app-store.ts` |
+| **One account across both products** | IMPLEMENTED | One identity (the Terminal sign-in on the shared `.entrestate.com` session) → one business account → one wallet → app installs, rendered on both products through a served API. | [`docs/ACCOUNT-FOUNDATION.md`](docs/ACCOUNT-FOUNDATION.md) |
+| **Role-gated AI** | IMPLEMENTED | One docked Expert, screen-aware, with tools gated server-side by role over a database with no obfuscation layer. | `components/freehold/expert-chat.tsx`, `lib/freehold/coordinator-tools.ts` |
+| **Trilingual by construction** | IMPLEMENTED | Every user-facing string is a key present in English, العربية and Русский, RTL-safe. Parity is a build gate, not a translation backlog. | `lib/i18n/dictionaries/*`, `pnpm i18n` |
+| **Lookalike-to-agent routing** | **PARTIAL** | Routing by top closers exists and both Engine-07 gates use it. The per-audience `wins` query described in the specification is **not** present. | `lib/automation/distribution.ts` (`performance`) |
+| **Google Ads search machine** | **PARTIAL** | Keyword planning, theme grouping, search harvesting and the Ads API client exist. Fully autonomous compile-and-bid from live query intent is **not** what ships today. | `lib/google/keyword-plan.ts`, `search-harvest.ts`, `client.ts` |
+| **AIMAS — commission-yield bid arbitrage** | **SPEC-ONLY** | A dynamic max-CPC ceiling derived from the matched asset's expected commission, blocking bids above the margin. Designed and specified; **no code in this repository.** | — |
+| **Campaign performance record** | **CLIENT-RUNTIME** | Live spend, CPL and lead-volume figures quoted in investor material are a client deployment's operational record, held in their systems and Meta's exports — not in this code. | see [`docs/award/README.md`](docs/award/README.md) |
 
 The sibling repository [`ezz-ae/Entrestate_os`](https://github.com/ezz-ae/Entrestate_os)
 is the **Terminal** — public market discovery, the account's front door. One
