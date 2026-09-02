@@ -42,6 +42,27 @@ console.log('\n── the award kit is versioned with its verification page ─�
   // The first pass of the verification page did exactly that and told the
   // owner his commit count was five times too high; it was understated.
   check('…counts commits against the remote, not a working copy', verify.includes('1,175') && verify.includes('shallow clones'))
+  check('…and records the fixes as APPLIED rather than owed', verify.includes('APPLIED to the kit'))
+
+  /**
+   * THE KIT ITSELF, not just the page about it.
+   *
+   * The verification page listed five wording fixes for weeks while the kit
+   * still said all five things. A list of corrections nobody applies is
+   * worse than no list: it creates the feeling of having fixed something.
+   * These assertions run over the submission documents themselves.
+   */
+  const kit = KIT.map(read).join('\n')
+  check('the kit never promises a price of nothing on a selling sentence',
+    !/\bcompletely for free\b|\bsubscription-free\b|\bfor free\b/i.test(kit))
+  check('…claims a recorded human approval, not a cryptographic signature',
+    !/cryptographic signature/i.test(kit) && /recorded human approval/i.test(kit))
+  check('…cites files that exist (crm-table.tsx never did)',
+    !/components\/freehold\/crm-table\.tsx/.test(kit))
+  check('…states the commit count measured against the remote',
+    !/1,115/.test(kit) && /1,175|1,411|1,400/.test(kit))
+  check('…and does not claim idle re-focus alone produces a Rate 8',
+    !/boosting their CRM rate to an active \*\*Rate 8\*\*/i.test(kit))
 }
 
 console.log('\n── the index links resolve, and the map answers the repo question ──')

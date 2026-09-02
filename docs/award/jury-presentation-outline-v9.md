@@ -56,7 +56,7 @@
 *   **Key On-Screen Elements**:
     *   Split-screen showing:
         *   **`Entrestate_os` (The Core Kernel)**: Exposing the underlying decision tunnel, raw SQL query structures, and JSON-RPC API interfaces.
-        *   **`entrestate-platform` (The Live Runtime)**: Active white-label deployment on `freeholdproperty.ae` featuring 1,115 development commits.
+        *   **`entrestate-platform` (the business)**: entrestate.com and every `{customer}.entrestate.com` tenant — 1,175 commits, and 120+ enforced guard suites. A client's separate white-label deployment runs the same software under contract, with its own repository, database and domain.
 *   **Presenter Narrative**:
     "This system is not speculative slide-ware. It is a live, production-grade platform actively deployed at **`freeholdproperty.ae`**. 
     
@@ -167,7 +167,7 @@
 *   **Visual Headline**: Zero Embellishment: The Evidence Standard
 *   **Sub-Headline**: *Securing production-grade stability through strict code verification gates.*
 *   **Key On-Screen Elements**:
-    *   List of active terminal commands: `pnpm typecheck` (zero TypeScript errors) | `pnpm i18n` (enforces trilingual parity) | `db-contract-nightly.yml` (nightly Postgres schema validation).
+    *   List of active terminal commands: `pnpm typecheck` (zero TypeScript errors) | `pnpm i18n` (enforces trilingual parity) | `pnpm guards` (120+ enforced rule suites) | `pnpm build`. The Terminal repository adds `db-contract-nightly.yml` (nightly Postgres schema validation against a read-only branch).
     *   Verifiable file-system paths:
         *   **`lib/meta/spend-authority.ts`** (The deterministic Spend Governor).
         *   **`lib/deals.ts`** (The commercial database join structure).

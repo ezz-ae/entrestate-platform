@@ -46,7 +46,7 @@ Entrestate coordinates its ten proprietary engines across three unified layers [
 
 
 #### IV. The Sovereign Token Economy & Dual-Mode Decentralization
-*   **Engine 11 (The Cash & Token Utility Engine)**: Establishes a dual-mode wallet substrate. In *Single-Tenant mode (Freehold Property)*, it manages internal agent-level budgets (`1 Cash = 1 AED`), empowering brokers to act as mini-marketing agencies and route leads directly to their inbox [33]. In *Multi-Tenant SaaS mode (Entrestate.com)*, it enables a **100% pay-as-you-go, subscription-free token model**, allowing agencies to get started with zero monthly subscription fees and pay strictly for action execution (compiling pages, running Google Search campaign injections, or streaming telemetry) [33].
+*   **Engine 11 (The Cash & Token Utility Engine)**: Establishes a dual-mode wallet substrate. In *Single-Tenant mode (Freehold Property)*, it manages internal agent-level budgets (`1 Cash = 1 AED`), empowering brokers to act as mini-marketing agencies and route leads directly to their inbox [33]. In *Multi-Tenant SaaS mode (Entrestate.com)*, it enables a **pay-as-you-go token model with no seat fee**, allowing agencies to start without per-seat licensing and pay strictly for action execution (compiling pages, running Google Search campaign injections, or streaming telemetry) [33].
 *   **Engine 12 (Contextual Chat Engine)**: Operates a Zero-Obfuscation database architecture to preserve relational integrity. Enforces role-sensitive cognitive filters on the docked **Expert AI Chat**, ensuring agents receive sales-pitch comps and administrators receive developer risk and ledger balance audits.
 
 #### III. The Learning & Control Layer: The "Deals Teach Targeting" Loop
