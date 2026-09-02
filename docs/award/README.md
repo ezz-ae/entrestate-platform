@@ -65,7 +65,7 @@ on **2026-09-01**, after the engine builds of 2026-08-31. Companion:
 The campaign telemetry — AED 52,944.33 / 342 leads / AED 30,000 / 175
 comment leads / CPL figures / 842 live leads / the `entertainmeal`
 cold-start — is the **client deployment's operational record**
-(freeholdproperty.ae, `ezz-ae/ORE`, the Meta report PDFs). It lives in the
+(`ezz-ae/ORE` and the Meta report PDFs). It lives in the
 owner's records and Meta's own exports, not in this code, and the
 submission correctly cites those as its evidence. The same goes for
 `app/api/freehold/leads/comment-webhook`: that route ran in the client's

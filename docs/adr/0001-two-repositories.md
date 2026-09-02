@@ -20,7 +20,7 @@ irreversible; the recipe stays valid whenever it is invoked.
 | Host | terminal.entrestate.com | entrestate.com + `*.entrestate.com` tenants |
 | Vercel project | `entrestate-os` | `entrestate` |
 | History | 96 commits | 108 commits (began at the client/vendor separation) |
-| Special relationship | — | **The client's live deployment (`ezz-ae/ORE`, freeholdproperty.ae) takes changes from this repo as upstream merges, on the client's own schedule.** |
+| Special relationship | — | **A client's live deployment (`ezz-ae/ORE`) takes changes from this repo as upstream merges, on their own schedule.** |
 
 They already behave as one product where it matters: one account (the
 shared `.entrestate.com` session, `docs/ACCOUNT-FOUNDATION.md`), one

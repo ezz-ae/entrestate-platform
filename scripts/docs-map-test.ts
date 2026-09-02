@@ -75,11 +75,13 @@ console.log('\n── the docs wear this platform\'s name, not the client\'s ─
    * BRAND NAME — the product's name, the company in a title, "the Freehold
    * story" — is not.
    */
-  // CLAUDE.md is the ONE exemption, and for the opposite reason: its job is to
-  // name the client company loudly ("THIS REPO IS NOT FREEHOLD") so nobody
-  // pushes there by accident. Pinned below as a requirement, not a tolerance.
+  // No exemptions — CLAUDE.md included. The separation warning used to shout
+  // the client's company name in a heading, which put their brand at the top
+  // of a public repository and told every reader this product was theirs. The
+  // warning does its job better with the REPOSITORY IDENTIFIER (`ezz-ae/ORE`),
+  // which is also the exact string the pre-push check greps for.
   const DOCS = [
-    'README.md', 'CHANGELOG.md', 'DEPLOYMENT.md',
+    'README.md', 'CHANGELOG.md', 'DEPLOYMENT.md', 'CLAUDE.md',
     ...fs.readdirSync(path.join(ROOT, 'docs')).filter((f) => f.endsWith('.md')).map((f) => `docs/${f}`),
   ]
   // Identifier spellings that stay. Everything else that says the word is copy.
@@ -97,7 +99,10 @@ console.log('\n── the docs wear this platform\'s name, not the client\'s ─
   check('no document names the client company as this product', offenders.length === 0, offenders.join(', '))
 
   const claude = read('CLAUDE.md')
-  check('CLAUDE.md still shouts the separation — the one place the client is named on purpose', claude.includes('THIS REPO IS NOT FREEHOLD') && claude.includes('ezz-ae/ORE'))
+  // The rule must stay at full strength; only the client's BRAND leaves.
+  check('the separation rule survives, addressed by repo id', /never push, merge, open a pr against, or deploy `ezz-ae\/ORE`/i.test(claude))
+  check('…with the pre-push remote check still in the file', claude.includes('git remote -v | grep -q entrestate-platform'))
+  check('…and the naming rule written down so it is not undone', claude.includes('repository identifier'))
 
   const readme = read('README.md')
   check('the README opens as Entrestate', /^# Entrestate/m.test(readme))

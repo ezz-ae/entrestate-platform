@@ -105,7 +105,7 @@ Historically some code read `NEXT_PUBLIC_SITE_URL` and some read
 `NEXT_PUBLIC_BASE_URL`. These are now unified: `getSiteUrl()` resolves
 `NEXT_PUBLIC_SITE_URL → NEXT_PUBLIC_BASE_URL → METADATA_BASE → Vercel URLs →
 https://www.<BRAND_DOMAIN>`. **Setting `NEXT_PUBLIC_SITE_URL` alone covers
-both.** No hardcoded `freeholdproperty.ae` fallback remains in app code.
+both.** No hardcoded client-domain fallback remains in app code.
 
 ## 4. Lead serial prefix — fresh databases only
 

@@ -9,21 +9,25 @@ Lead Machine) and **Meta for Realtors**. One deployment serves the vendor's own
 hosts and every customer instance at `{customer}.entrestate.com`, isolated
 schema-per-tenant.
 
-## THIS REPO IS NOT FREEHOLD — read this before your first command
+## One rule before your first command: this repo is not `ezz-ae/ORE`
 
-This code began as a fork of `ezz-ae/ORE`, which is **Freehold's live
-deployment**: real campaigns, real spend, real sales, running right now under a
-client contract. The two are now permanently separate and must stay that way.
+This code began as a fork of `ezz-ae/ORE`, a **client's live deployment** —
+real campaigns, real spend, real sales, running right now under contract. The
+two are permanently separate and must stay that way.
 
-| | repo | Vercel project | domains |
-|---|---|---|---|
-| **This repo** | `ezz-ae/entrestate-platform` | `entrestate` | entrestate.com + `*.entrestate.com` |
-| **The client** | `ezz-ae/ORE` | `freehold` | freeholdproperty.ae, fhp.ae |
+| | repo | Vercel project |
+|---|---|---|
+| **This repo** | `ezz-ae/entrestate-platform` | `entrestate` — entrestate.com + `*.entrestate.com` |
+| **The client** | `ezz-ae/ORE` | its own project, its own domains, its own database |
 
 **Never push, merge, open a PR against, or deploy `ezz-ae/ORE`.** Nothing in
 this repository is a reason to touch it. If a change looks like it belongs
 there, it does not — it belongs here, and the client takes it as an upstream
 merge on their own schedule, by their own decision.
+
+The client is named by their **repository identifier only**, here and
+everywhere else in this repo. Their company name is theirs, not a label for
+this product, and this file is public — see `docs/README.md`.
 
 Check before you push. `git remote -v` must say `entrestate-platform`:
 
@@ -39,7 +43,7 @@ because the two products are the same software, so the only thing keeping our
 rows out of theirs is which connection string `DATABASE_URL` holds.
 
 `lib/tenancy/db-owner.ts` turns that from a convention into a lock. Each
-deployment sets `DB_OWNER` (`entrestate` here, `freehold` there); the database
+deployment sets its own `DB_OWNER` (`entrestate` here); the database
 remembers who claimed it in `deployment_owner`; a mismatch refuses to start. It
 will claim ONLY a database that is both unmarked and EMPTY — a populated,
 unclaimed database is somebody's working system and is refused without a single
@@ -54,7 +58,7 @@ this module decided correctly for weeks while nothing called it, and a lock
 nobody turns is a comment.
 
 The tenancy code is written so this repository's own behaviour is opt-in:
-`NEXT_PUBLIC_TENANT_BASE_DOMAIN` is unset on the Freehold deployment, and every
+`NEXT_PUBLIC_TENANT_BASE_DOMAIN` is unset on the client deployment, and every
 vendor rule (see `lib/tenancy/vendor-host.ts`) returns `pass` without it. That
 is a safety net, not permission — the rule above still stands.
 
