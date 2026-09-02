@@ -106,9 +106,63 @@ console.log('\n── the docs wear this platform\'s name, not the client\'s ─
 
   const readme = read('README.md')
   check('the README opens as Entrestate', /^# Entrestate/m.test(readme))
-  check('…and explains why the freehold path names are frozen rather than hiding them', readme.includes('frozen\nhistoric identifiers') || readme.includes('frozen historic identifiers') || readme.includes('**frozen'))
+
+  /**
+   * THE OWNER'S RULING (2026-09-02), verbatim: "ENTRESTATE مش مفتوح للناس
+   * عشان يستخدموه… متكتبش خطوات التسطيب، اكتب مواصفات وفايدة المشروع."
+   *
+   * The repository is public so the product's claims can be CHECKED, not so
+   * the product can be installed. A README that opens with `pnpm install`
+   * tells a jury, an investor and a competitor that this is software to
+   * download — the wrong thing about the business, published on the front
+   * page. So: specifications and value, never setup steps.
+   */
+  const INSTALL_STEPS = [
+    /^\s*(pnpm|npm|yarn|bun)\s+(install|i)\b/m,
+    /^\s*(pnpm|npm|yarn|bun)\s+dev\b/m,
+    /^\s*git\s+clone\b/m,
+    /^\s*cp\s+\.env\.example/m,
+    /localhost:3000/,
+    /##\s*(getting started|run it|installation|setup|quick ?start)/i,
+  ]
+  const offending = INSTALL_STEPS.filter((re) => re.test(readme)).map(String)
+  check('the README carries no installation steps — it is a specification, not a download', offending.length === 0, offending.join(' | '))
+  check('…and says plainly that the product is not installable', /not open-source software and it is not installable/i.test(readme))
+  check('…states what the system is FOR before how it is built', readme.indexOf('What the system is for') < readme.indexOf('## Stack'))
+  check('…carries the specification table with its implementing modules', readme.includes('Specifications, and what the code actually holds') && readme.includes('lib/freehold/lead-rate.ts'))
+  check('…and asserts ownership rather than an open licence', /Proprietary/.test(readme) && /grants no licence/i.test(readme))
+
+  /**
+   * THE EVIDENCE STANDARD, applied outward.
+   *
+   * An external review of these documents named the real defect precisely: a
+   * reader cannot tell a shipped feature from a roadmap item, so they end up
+   * doubting BOTH. The repository already had the cure — docs/spec/README.md
+   * grades every claim — it just was not applied to the front page.
+   *
+   * So the README's capability table must carry a status on every row, use
+   * the SAME legend as the truth table (one vocabulary, not two), and must
+   * not be all-green: a table with no PARTIAL and no SPEC-ONLY row is either
+   * a lie or a table nobody re-checked. Both are worth failing a build over.
+   */
+  const LEGEND = ['IMPLEMENTED', 'PARTIAL', 'SPEC-ONLY', 'CLIENT-RUNTIME']
+  for (const level of LEGEND) check(`the README defines "${level}" before using it`, readme.includes(level), level)
+  const rows = readme.split('\n').filter((l) => l.startsWith('| **') && l.includes('|'))
+  const untagged = rows.filter((l) => !LEGEND.some((v) => l.includes(v)))
+  check(`all ${rows.length} capability rows carry a status`, untagged.length === 0, untagged.map((l) => l.slice(0, 48)).join(' | '))
+  check('…and the table is not all-green — the honest rows are present', /\*\*PARTIAL\*\*/.test(readme) && /\*\*SPEC-ONLY\*\*/.test(readme))
+  check('…AIMAS is stated as unbuilt rather than implied', /AIMAS[\s\S]{0,400}no code in this repository/i.test(readme))
+  check('…and the campaign figures are attributed to the client runtime', /CLIENT-RUNTIME/.test(readme))
+
+  // The pitch lives in its own file, so the README stays the record.
+  const vision = read('COMMERCIAL-VISION.md')
+  check('the commercial argument has its own document', vision.length > 500)
+  check('…which says outright that it is not a description of shipped code', /not be read\s*\n?as a description of shipped code|argument, not the record/i.test(vision))
+  check('…and defers to the README and the truth table', vision.includes('README.md') && vision.includes('docs/spec/README.md'))
+  check('the README hands the pitch off rather than carrying it', readme.includes('COMMERCIAL-VISION.md'))
   check('…points at the Terminal repo and the ADR that governs the pair', readme.includes('Entrestate_os') && readme.includes('docs/adr/0001-two-repositories.md'))
-  check('…and states the real gauntlet, guards included', readme.includes('pnpm guards'))
+  check('…keeps the frozen-identifier explanation', /frozen historic identifiers/.test(readme))
+  check('…and still names the enforced gauntlet', readme.includes('pnpm guards'))
 
   const deploy = read('DEPLOYMENT.md')
   check('the deployment playbook lists the brand defaults that actually ship', deploy.includes('`Entrestate` | All visible naming'))
