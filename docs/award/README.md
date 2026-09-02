@@ -53,13 +53,17 @@ on **2026-09-01**, after the engine builds of 2026-08-31. Companion:
    Cite each against the right repository. (Corrected 2026-09-02: the first
    pass of this page checked only one repository and wrongly called the file
    missing.)
-4. **The commit count.** "1,115 commits" does not match these two
-   repositories (204 as of 2026-09-01: platform 108 + OS 96 — the platform
-   repo's history began at the client/vendor separation). Either say "two
-   repositories, 200+ commits since the platform's separation, 120+
-   enforced guard suites" — the guard count is the more impressive and the
-   more checkable number — or count the pre-separation history explicitly
-   as the client deployment's.
+4. **The commit count — the kit was right and this page was wrong.**
+   Counted against GitHub on 2026-09-02: `entrestate-platform` **1,175** and
+   `Entrestate_os` **236**, so **1,411 commits** across the two. The kit's
+   "1,115" understates it and can simply be raised.
+
+   The first version of this page called that figure wrong and told the owner
+   to write "204" instead. That correction was produced by counting `git
+   rev-list` inside **shallow clones**, which hold a truncated history and
+   will answer confidently with a number that is not the history. The lesson
+   is worth more than the number: a count taken from a working copy is a
+   count of that working copy. Verify totals against the remote.
 5. **"Cryptographic signature" → "recorded human approval."** The spend
    path requires a human decision written to the ledger; no cryptographic
    signing ships. The honest sentence is just as strong.
