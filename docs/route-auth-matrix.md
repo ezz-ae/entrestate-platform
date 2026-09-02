@@ -1,4 +1,4 @@
-# Route Auth Matrix — Freehold / Entrestate (P0)
+# Route Auth Matrix — Entrestate (P0)
 
 **Model:** `proxy.ts` (Next 16's middleware) is now **fail-closed**: every `/api/*` route requires a valid `fh_session` **except** the explicit public allowlist below. New routes are private by default. Sensitive machine endpoints (cron, bootstrap, webhook) are allowlisted at the edge and verify their **own secret/signature in-handler**.
 

@@ -11,7 +11,7 @@ spotlight the parts of the system a user needs on day one.
 | Tour definitions (per role) | `lib/freehold/coach-tours.ts` |
 | Copy (EN/AR/RU) | `lib/i18n/dictionaries/coach.ts` (merged in `dictionaries.ts`) |
 
-- `<CoachProvider>` wraps the Freehold shell (`app/freehold-intelligence/layout.tsx`),
+- `<CoachProvider>` wraps the workspace shell (`app/freehold-intelligence/layout.tsx`),
   inside `I18nProvider` so tours pick up locale + direction.
 - On first sign-in per role it **auto-starts once**, gated by
   `localStorage["fh_coach_seen_<role>_<COACH_VERSION>"]`. Bump `COACH_VERSION`
@@ -26,7 +26,7 @@ spotlight the parts of the system a user needs on day one.
 ## Tours
 
 One tour per role (`broker`, `admin`, `sales_manager`, `director`, `ceo`,
-`marketing`). Every tour ends with the shared tail: **Freehold Expert →
+`marketing`). Every tour ends with the shared tail: **the Expert →
 Account & language → done.**
 
 ## Anchors
@@ -67,7 +67,7 @@ are tracked here.
    empty state (`hub.noUrgent`) shows when nothing is urgent. The static
    `serverSummary` remains the fallback for a fresh workspace.
 
-3. **Freehold Expert role — ✅ fixed (and hardened).**
+3. **Expert role — ✅ fixed (and hardened).**
    `app/api/freehold/expert/chat/route.ts` now derives the MCP role from the
    verified session (`SESSION_TO_EXPERT` map) instead of trusting a client-sent
    `role`. The client no longer sends `role: 'owner'`. This both scopes answers
@@ -95,7 +95,7 @@ are tracked here.
 
 ## AI side Expert — available on every app
 
-The single docked Freehold Expert (`components/freehold/expert-chat.tsx`) is the
+The single docked Expert (`components/freehold/expert-chat.tsx`) is the
 only AI conversation. On-page surfaces never open their own chat — they push a
 prompt into it via `sendToExpert()` (`lib/freehold/expert-bus.ts`). A reusable
 strip, `components/freehold/expert-depth.tsx` (`<ExpertDepth prompts={[…]} />`),

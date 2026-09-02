@@ -2,9 +2,10 @@
 
 The owner's spec-set (NotebookLM Studio, Aug 2026) describes Entrestate as
 twelve engines in three layers. The technical documents live here, next to
-the code they describe; the award / jury kit (submission v16, the PDF binder,
-executive Q&A v14, pitch memo v14, jury outline & script v9) stays outside
-the repo — it is presentation material, not code truth.
+the code they describe; the award / jury kit (submission v16, executive Q&A
+v14, pitch memo v14, jury outline & script v9) is versioned in
+`docs/award/`, with `docs/award/README.md` verifying it claim by claim —
+a submission the jury can check is worth more than one nobody can.
 
 **Why this index exists.** The owner's own words about this phase: "المشروع
 مليان وكبير وضخم — التنظيم يا هيدفن حاجات مهمة يا هينظم ويطلّع المهم يبان".

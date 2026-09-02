@@ -2,13 +2,18 @@
 
 Every client company gets its **own private deployment** of this codebase — its own
 Vercel project, its own Postgres database, its own domain, its own credentials.
-There is **no multi-tenancy**: nothing is shared between deployments.
+There is **no multi-tenancy between white-label deployments**: nothing is shared
+between them. (The vendor's own deployment is the one exception by design — it
+additionally serves `{customer}.entrestate.com` instances schema-per-tenant via
+`lib/tenancy/*`; that behaviour is opt-in through `NEXT_PUBLIC_TENANT_BASE_DOMAIN`
+and stays dormant on every white-label deployment.)
 
 Re-branding is **configuration only**. All user-visible brand surfaces (naming,
 accent colour, contact details, emails, AI prompts, public URLs, lead serials)
 read from `lib/freehold/brand.ts`, which reads `NEXT_PUBLIC_BRAND_*` environment
-variables. A deployment that sets none of them runs exactly as the original
-Freehold deployment does today. Internal identifiers (DB table names
+variables. The defaults **name the platform** (Entrestate) — a deployment that
+sets none of them wears the platform's own brand, never another company's; a
+white-label client sets the full block below. Internal identifiers (DB table names
 `freehold_site_*`, route namespaces `/freehold-intelligence/*` and
 `/api/freehold/*`, the `fh_session` cookie, `FH_*` env prefixes, module paths)
 are deliberately **not** branded — they are invisible to users and stable across
@@ -50,20 +55,24 @@ Set these in the Vercel project (Production). Names are exact.
 | `LEADS_FROM_EMAIL` / `NOTIFICATIONS_FROM_EMAIL` | From addresses for outbound email. Default From is built from the brand config: `"<EMAIL_FROM> <hello@<BRAND_DOMAIN>>"`. |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob storage (brochures, cloud drive, creative-studio assets). |
 
-### Brand (all optional — defaults are the Freehold values)
+### Brand (all optional — defaults name the platform; a client sets its own)
+
+The default column below is what `lib/freehold/brand.ts` ships (it moved off the
+original client's values on 2026-08 so an unconfigured instance can never wear
+another company's name). A white-label deployment sets every row.
 
 | Variable | Default | Drives |
 |---|---|---|
-| `NEXT_PUBLIC_BRAND_COMPANY` | `Freehold` | All visible naming, AI prompts, email signatures. |
+| `NEXT_PUBLIC_BRAND_COMPANY` | `Entrestate` | All visible naming, AI prompts, email signatures. |
 | `NEXT_PUBLIC_BRAND_PRODUCT` | `Intelligence` | Product word (e.g. "Acme **Intelligence**"). |
-| `NEXT_PUBLIC_BRAND_LEGAL_NAME` | `Freehold Property` | Legal entity in footer, titles, prompts (rendered as "… UAE" on public pages). |
+| `NEXT_PUBLIC_BRAND_LEGAL_NAME` | `Entrestate` | Legal entity in footer, titles, prompts (rendered as "… UAE" on public pages). |
 | `NEXT_PUBLIC_BRAND_TAGLINE` | `Authorized Personnel Only` | Sign-in screen sub-text. |
-| `NEXT_PUBLIC_BRAND_ACCENT` | `#D4AF37` | `--color-gold` token → every accent in the product, landing pages and microsites. |
-| `NEXT_PUBLIC_BRAND_DOMAIN` | `freeholdproperty.ae` | Public links, derived URLs (`https://<domain>/privacy`), derived emails, cookie-domain fallback, ICS UIDs. |
+| `NEXT_PUBLIC_BRAND_ACCENT` | `#3B82F6` | `--color-gold` token → every accent in the product, landing pages and microsites. |
+| `NEXT_PUBLIC_BRAND_DOMAIN` | `entrestate.com` | Public links, derived URLs (`https://<domain>/privacy`), derived emails, cookie-domain fallback, ICS UIDs. |
 | `NEXT_PUBLIC_BRAND_PHONE` | `+971 50 417 3622` | Display phone everywhere. |
 | `NEXT_PUBLIC_BRAND_PHONE_E164` | `+971504173622` | `tel:` links; WhatsApp number is derived from it (digits only). |
 | `NEXT_PUBLIC_BRAND_EMAIL` | `info@<domain>` | Public contact email. |
-| `NEXT_PUBLIC_BRAND_EMAIL_FROM` | `Freehold` | Display name on transactional From headers. |
+| `NEXT_PUBLIC_BRAND_EMAIL_FROM` | `Entrestate` | Display name on transactional From headers. |
 | `NEXT_PUBLIC_BRAND_SUPPORT_EMAIL` | `support@<domain>` | Billing/support links. |
 | `NEXT_PUBLIC_BRAND_LEGAL_EMAIL` | `legal@<domain>` | Contract/legal links. |
 | `NEXT_PUBLIC_BRAND_ADDRESS` | `Business Bay, Dubai, UAE` | Footer lines, landing-page footers, JSON-LD street address. |
@@ -79,7 +88,7 @@ does not (and cannot) edit them.
 ### Per-integration (each optional)
 
 Meta, WhatsApp, Google Ads and HubSpot can be connected **in-app**
-(Freehold Intelligence → Integrations); credentials entered there are stored
+(the workspace → Integrations); credentials entered there are stored
 AES-encrypted in the database under `FH_CREDENTIALS_KEY`. Env vars are the
 alternative for infrastructure-managed secrets — either path works:
 
@@ -96,7 +105,7 @@ Historically some code read `NEXT_PUBLIC_SITE_URL` and some read
 `NEXT_PUBLIC_BASE_URL`. These are now unified: `getSiteUrl()` resolves
 `NEXT_PUBLIC_SITE_URL → NEXT_PUBLIC_BASE_URL → METADATA_BASE → Vercel URLs →
 https://www.<BRAND_DOMAIN>`. **Setting `NEXT_PUBLIC_SITE_URL` alone covers
-both.** No hardcoded `freeholdproperty.ae` fallback remains in app code.
+both.** No hardcoded client-domain fallback remains in app code.
 
 ## 4. Lead serial prefix — fresh databases only
 
@@ -118,7 +127,7 @@ this app does.
      -H "Content-Type: application/json" \
      -d '{"setupKey":"<ADMIN_SETUP_KEY>","email":"owner@client.com","password":"<min 8 chars>","name":"Owner"}'
    ```
-2. **Create the team** in-app: Freehold Intelligence → Team. Roles gate
+2. **Create the team** in-app: the workspace → Team. Roles gate
    everything (CRM visibility, AI skills, approvals).
 3. **Connect integrations** in-app (Integrations page): Meta Ads, WhatsApp,
    Google Ads, HubSpot. The status page shows live connected/missing state per
@@ -130,12 +139,16 @@ this app does.
 5. **Populate the project catalog** — a fresh database has **zero projects**:
    - upload developer brochures in-app (AI brochure parsing creates listings), or
    - import rows directly into the projects tables from an existing dataset.
-6. **Replace `data.md`** (repo root) with the client's own AI knowledge file.
-   It is the public AI advisor's knowledge/prompt source; shipping it unchanged
-   means the public chat speaks with Freehold's knowledge base.
+6. **Add `data.md`** (repo root) with the client's own AI knowledge file, if
+   they want one. It is appended to the public AI advisor's system prompt
+   (`loadCodexPrompt()` in `lib/gemini.ts`); the file is **not** in this
+   repository, and its absence is handled — the advisor falls back to the
+   default prompt. Never ship another company's knowledge file.
 7. **Replace brand assets in `public/`** (files, not code):
-   `freehold-logo.png` (header/footer logo), `og-image.png`, `ai-og.png`,
-   `icon.png`, `apple-icon.png`, `favicon.ico`, `site.webmanifest`, `logo.png`.
+   `freehold-logo.png` (the header/footer logo — a frozen *filename*, referenced
+   by `components/whitelabel/brand-provider.tsx` and `lib/pdf.ts`; replace the
+   image, keep the name), `og-image.png`, `ai-og.png`, `icon.png`,
+   `apple-icon.png`, `favicon.ico`, `site.webmanifest`, `logo.png`.
 8. **Verify the crons fire** (Vercel → Crons; all five are defined in
    `vercel.json`, authorised via `CRON_SECRET`):
    - `/api/cron/project-profiles` — Mondays 02:00
@@ -146,13 +159,20 @@ this app does.
 
 ## 6. Honest residue — what config does NOT cover
 
-- **Marketing narrative copy**: the public About/Services/Terms pages carry the
-  Freehold story ("19 years", "3,500+ projects", RERA ORN 28628 in the footer).
-  Brand *names* in them are env-driven, but the narrative facts are content —
-  review and edit these pages (or hide them) per client.
-- **Social links**: Instagram/Facebook/LinkedIn URLs in the site footer and
-  contact page are Freehold's accounts (no brand variable exists for them) —
-  edit or remove per client.
+- **Brokerage claims are withheld, not inherited.** Years in market, projects
+  mapped, clients served and the RERA ORN are brand env vars that default to
+  **empty**, and every surface that shows them (About stats, the footer legal
+  line, the contact page) omits the claim when the value is empty — the
+  platform is not a licensed brokerage and must not wear anyone's licence. A
+  licensed deployment sets `NEXT_PUBLIC_BRAND_YEARS`, `_PROJECTS`, `_CLIENTS`,
+  `_RERA_ORN`.
+- **Social links**: Instagram/LinkedIn are `NEXT_PUBLIC_BRAND_INSTAGRAM` /
+  `_LINKEDIN`, empty by default — the footer and contact page withhold the
+  channel rather than linking someone else's account.
+- **Hardcoded catalogue figures**: a few marketing surfaces still write
+  "3,500+ projects" into copy (`app/chat/page.tsx`,
+  `components/IntelligenceBlock.tsx`). Those are content, not config — review
+  them per client.
 - **Derived accent shades**: landing pages use a few fixed near-gold shades
   (`#E8C547` hover, `#9B8020`/`#C9A227` tier stripes, `#8E6D1A` day-mode text
   remap). The main accent re-skins via `NEXT_PUBLIC_BRAND_ACCENT`; these
@@ -160,5 +180,5 @@ this app does.
 - **Arabic transliteration**: with no brand env set, Arabic copy uses فريهولد.
   A re-branded deployment renders the Latin company name inside Arabic/Russian
   copy (standard practice for brand names).
-- `scripts/smoke.ts` defaults its production target to the Freehold domain —
-  set `PRODUCTION_URL` / `STAGING_URL` when running smoke tests.
+- `scripts/smoke.ts` still defaults its production target to a legacy domain —
+  always set `PRODUCTION_URL` / `STAGING_URL` when running smoke tests.

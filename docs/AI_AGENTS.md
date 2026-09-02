@@ -1,4 +1,4 @@
-# Freehold AI — Agent Map
+# Entrestate AI — Agent Map
 
 How every AI surface in the app is wired, which agent serves it, and the single
 credential that powers all of them.
@@ -30,7 +30,7 @@ output budget on reasoning tokens.
 
 ### 1. Intelligence Server AI — `lib/freehold/server-ai.ts`
 Private operating partner for owner/management/brokers. Role-scoped topics
-(CRM, campaigns, finance, security…). System prompt = the Freehold private server.
+(CRM, campaigns, finance, security…). System prompt = the private workspace server.
 
 - `POST /api/freehold/server-ai/chat`
 - `POST /api/freehold/server/chat`

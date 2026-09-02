@@ -1,4 +1,4 @@
-# Freehold Intelligence — Operations Runbook
+# Entrestate — Operations Runbook
 
 The setup/deploy/operate companion to the [User Guide](./USER-GUIDE.md). For
 **administrators and operators** — how to configure, connect, deploy and
