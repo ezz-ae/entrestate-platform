@@ -169,6 +169,40 @@ console.log('\n── the docs wear this platform\'s name, not the client\'s ─
   check('…and does not promise another company\'s behaviour as the default', !/runs exactly as the original/i.test(deploy))
 }
 
+console.log('\n── the specification documents grade themselves ──')
+{
+  /**
+   * The specs are what a jury reads most closely, and they carried the same
+   * defect the README did — plus contradictions that cost nothing to find:
+   * a heading that said "10 Core Engines" above a list of twelve, a status
+   * line claiming ACTIVE PRODUCTION against a CLIENT's host, a duplicated
+   * Purpose/Core Logic block, two sections both labelled "D", a gauntlet
+   * listing two of its four steps, and an evidence table graded with four
+   * words (BUILT / INTEGRATED / INTELLIGENT / AUTOMATED) that could not be
+   * ranked against each other.
+   *
+   * A specification is allowed to describe what is not built. It is not
+   * allowed to be unclear about which is which, or to contradict itself.
+   */
+  const bp = read('docs/spec/system-architecture-blueprint-v14.md')
+  check('the blueprint counts its engines consistently', !/\b10 Core Engines\b/.test(bp) && bp.includes('12 Core Engines'))
+  check('…does not claim production status against a client host', !/ACTIVE PRODUCTION/.test(bp) && !/freeholdproperty/.test(bp))
+  check('…declares itself a design document and defers to the graded tables', /DESIGN SPECIFICATION/.test(bp) && bp.includes('README.md'))
+  check('…and states the gauntlet that actually runs, guards included', bp.includes('pnpm guards') && bp.includes('pnpm build'))
+  const dupPurpose = (bp.match(/\*\*Purpose\*\*: Turn inventory, audience, and campaign parameters/g) || []).length
+  check('…with the duplicated Engine 04 block gone', dupPurpose === 1, `found ${dupPurpose}`)
+
+  const e4 = read('docs/spec/engine-04-creative-v3.md')
+  const headings = (e4.match(/^### ([A-Z])\./gm) || []).map((h) => h.slice(4, 5))
+  check(`the Engine 04 sections are uniquely lettered (${headings.join('')})`, new Set(headings).size === headings.length, headings.join(''))
+  check('…the retired creative routes are marked RETIRED, not BUILT', /RETIRED/.test(e4) && !/\| \*\*BUILT\*\*/.test(e4))
+  // Only the STATUS CELLS matter — the paragraph above the table names the
+  // retired words deliberately, to say why they were retired.
+  const e4Cells = (e4.match(/\|\s*\*\*[A-Z-]+\*\*[^|]*\|\s*$/gm) || []).join(' ')
+  check('…its evidence table uses the one legend', e4.includes('**IMPLEMENTED**') && !/\*\*(INTELLIGENT|AUTOMATED|BUILT|INTEGRATED)\*\*/.test(e4Cells), e4Cells.slice(0, 80))
+  check('…and the reels row cites the implementation, not the type shim', e4.includes('lib/freehold/gif-encode.ts'))
+}
+
 if (failures > 0) {
   console.error(`\n${failures} documentation rule(s) broken.`)
   process.exit(1)
