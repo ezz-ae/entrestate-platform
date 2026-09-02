@@ -38,6 +38,10 @@ console.log('\n── the award kit is versioned with its verification page ─�
   check('…corrects the idle-refocus overstatement', verify.includes('Idle re-focus alone does not make a Rate 8'))
   check('…names the real files in place of the claimed ones', verify.includes('components/freehold/lead-rate.tsx'))
   check('…and separates client-runtime telemetry from repo-verifiable claims', verify.includes('client deployment'))
+  // A number verified against a SHALLOW clone is a number about that clone.
+  // The first pass of the verification page did exactly that and told the
+  // owner his commit count was five times too high; it was understated.
+  check('…counts commits against the remote, not a working copy', verify.includes('1,175') && verify.includes('shallow clones'))
 }
 
 console.log('\n── the index links resolve, and the map answers the repo question ──')
