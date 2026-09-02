@@ -106,9 +106,34 @@ console.log('\n── the docs wear this platform\'s name, not the client\'s ─
 
   const readme = read('README.md')
   check('the README opens as Entrestate', /^# Entrestate/m.test(readme))
-  check('…and explains why the freehold path names are frozen rather than hiding them', readme.includes('frozen\nhistoric identifiers') || readme.includes('frozen historic identifiers') || readme.includes('**frozen'))
+
+  /**
+   * THE OWNER'S RULING (2026-09-02), verbatim: "ENTRESTATE مش مفتوح للناس
+   * عشان يستخدموه… متكتبش خطوات التسطيب، اكتب مواصفات وفايدة المشروع."
+   *
+   * The repository is public so the product's claims can be CHECKED, not so
+   * the product can be installed. A README that opens with `pnpm install`
+   * tells a jury, an investor and a competitor that this is software to
+   * download — the wrong thing about the business, published on the front
+   * page. So: specifications and value, never setup steps.
+   */
+  const INSTALL_STEPS = [
+    /^\s*(pnpm|npm|yarn|bun)\s+(install|i)\b/m,
+    /^\s*(pnpm|npm|yarn|bun)\s+dev\b/m,
+    /^\s*git\s+clone\b/m,
+    /^\s*cp\s+\.env\.example/m,
+    /localhost:3000/,
+    /##\s*(getting started|run it|installation|setup|quick ?start)/i,
+  ]
+  const offending = INSTALL_STEPS.filter((re) => re.test(readme)).map(String)
+  check('the README carries no installation steps — it is a specification, not a download', offending.length === 0, offending.join(' | '))
+  check('…and says plainly that the product is not installable', /not open-source software and it is not installable/i.test(readme))
+  check('…states what the system is FOR before how it is built', readme.indexOf('What the system is for') < readme.indexOf('## Stack'))
+  check('…carries the specification table with its implementing modules', readme.includes('Specifications, and the code that implements them') && readme.includes('lib/freehold/lead-rate.ts'))
+  check('…and asserts ownership rather than an open licence', /Proprietary/.test(readme) && /grants no licence/i.test(readme))
   check('…points at the Terminal repo and the ADR that governs the pair', readme.includes('Entrestate_os') && readme.includes('docs/adr/0001-two-repositories.md'))
-  check('…and states the real gauntlet, guards included', readme.includes('pnpm guards'))
+  check('…keeps the frozen-identifier explanation', /frozen historic identifiers/.test(readme))
+  check('…and still names the enforced gauntlet', readme.includes('pnpm guards'))
 
   const deploy = read('DEPLOYMENT.md')
   check('the deployment playbook lists the brand defaults that actually ship', deploy.includes('`Entrestate` | All visible naming'))

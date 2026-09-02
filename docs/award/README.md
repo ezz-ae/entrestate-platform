@@ -47,8 +47,12 @@ on **2026-09-01**, after the engine builds of 2026-08-31. Companion:
 3. **Name the real files.** `components/freehold/crm-table.tsx` does not
    exist; the CRM table is `app/freehold-intelligence/crm/page.tsx` with
    `components/freehold/lead-rate.tsx` rendering the Rate. The claimed
-   `db-contract-nightly.yml` is not in these repositories — the CI that
-   exists is `.github/workflows/ci.yml`; cite that.
+   `db-contract-nightly.yml` **does** exist — in `ezz-ae/Entrestate_os`
+   (`.github/workflows/db-contract-nightly.yml`, nightly against a read-only
+   branch), not in this repository, whose CI is `.github/workflows/ci.yml`.
+   Cite each against the right repository. (Corrected 2026-09-02: the first
+   pass of this page checked only one repository and wrongly called the file
+   missing.)
 4. **The commit count.** "1,115 commits" does not match these two
    repositories (204 as of 2026-09-01: platform 108 + OS 96 — the platform
    repo's history began at the client/vendor separation). Either say "two
