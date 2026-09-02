@@ -59,7 +59,7 @@
 * **Speaker Script**:
   > "Many tech products presented for awards exist only as polished interactive mockups or static slide presentations. Entrestate is actively deployed, battle-tested, and currently managing live transactions in the Dubai market [37].
   > 
-  > Our codebase is divided into two highly coordinated repositories representing over **1,115 active production commits** [50, 66].
+  > Our codebase is divided into two coordinated repositories representing over **1,400 production commits** — 1,175 on the business platform and 236 on the Terminal, counted 2026-09-02 [50, 66].
   > 
   > On the left, we have **`Entrestate_os`**—our core mathematical kernel [52]. It acts as our headless decision library, housing our geospatial scoring matrices and our TableSpec query compiler [52, 55].
   > 
@@ -189,7 +189,7 @@ To protect marketing capital under this 100% automated system, we designed **AIM
   * Total Realized Spend: **AED 82,944.33**
   * Total Leads: **517**
   * Blended CPL: **AED 160.43**
-  * Verified Platform Codebase: **1,115 Commits** [50, 66]
+  * Verified Platform Codebase: **1,411 Commits** across two repositories, and **120+ enforced guard suites** — the guard count is the more checkable number [50, 66]
   * Core Slogan: "Listings go in. Deals come out." [27]
 * **Timing**: `9:45 – 10:30` (45 seconds)
 * **Speaker Script**:

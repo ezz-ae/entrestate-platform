@@ -29,7 +29,11 @@ on **2026-09-01**, after the engine builds of 2026-08-31. Companion:
 | CI gauntlet — typecheck, trilingual parity, guards | **TRUE** | `.github/workflows/ci.yml`, `pnpm typecheck · i18n · guards` (120+ suites) |
 | Lookalike-to-agent routing by performance | **PARTIAL** | routing by top closers exists (`lib/automation/distribution.ts` 'performance', both Engine-07 gates use it); the per-audience `wins` query as written is not present |
 
-## The wording fixes the kit still needs (five, all small)
+## The five wording fixes — APPLIED to the kit on 2026-09-02
+
+These are no longer a to-do list. Each fix below has been made in the kit
+files in this folder; the text is kept so a reader can see what changed and
+why, and so the same sentence is not written again.
 
 1. **"free" is banned on every selling surface — including this kit's own
    sentences.** Q&A Q7.1 says "completely for free" three times; the pitch
@@ -81,3 +85,12 @@ runtime; it is not part of this repository, and the kit should cite it as
 client-runtime evidence. AIMAS and the Investor-Score bid gate remain
 DESIGN & SPEC — the submission's own evidence table already says so; the
 jury outline's narration should match it.
+
+
+## The kit is checked by the same guard as everything else
+
+`scripts/docs-map-test.ts` scans these five documents on every merge and
+fails the build if the banned pricing word returns to a selling sentence, if
+`cryptographic signature` reappears on the spend path, or if the retired
+`components/freehold/crm-table.tsx` is cited again. A verification page that
+is only read is a verification page that rots; this one is executed.
