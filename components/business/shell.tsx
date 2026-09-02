@@ -11,7 +11,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { NAV_GROUPS, PRODUCTS, PLATFORM, COMPANY } from '@/lib/business/nav'
+import { NAV_GROUPS, PRODUCTS, PLATFORM, COMPANY, type NavItem } from '@/lib/business/nav'
+import { ProductPreview } from './product-preview'
 
 function Wordmark() {
   // The platform's mark, as it appears on the Terminal: three dots fading to
@@ -30,6 +31,53 @@ function Wordmark() {
         Business
       </span>
     </Link>
+  )
+}
+
+/**
+ * The products menu: the list on the left, the product itself on the right.
+ *
+ * Five names and five sentences ask the reader to imagine five systems, and a
+ * reader who has to imagine usually leaves. The panel beside the list shows
+ * what each one actually is — see components/business/product-preview.tsx for
+ * what is and is not allowed to appear in there.
+ *
+ * The panel is anchored to the Products button, which sits left of centre, so
+ * its width is clamped to the viewport: a fixed 54rem ran off the right edge
+ * at 1280 and clipped the preview it exists to show.
+ *
+ * Pointer and keyboard select the same way: onMouseEnter and onFocus both set
+ * the shown product, so tabbing through the list drives the panel exactly as
+ * hovering does. The panel is aria-hidden — every word it contains is already
+ * in the link the reader is on, and a screen reader should not have to walk
+ * through decorative bars to reach the next product.
+ */
+function ProductsPanel({ items }: { items: NavItem[] }) {
+  const [active, setActive] = useState(items[0]?.href ?? '')
+  const shown = items.find((i) => i.href === active) ?? items[0]
+
+  return (
+    <div className="absolute left-0 top-full flex w-[46rem] max-w-[calc(100vw-3rem)] border border-white/[0.09] bg-surface shadow-2xl shadow-black/60">
+      <div className="w-[18rem] shrink-0 border-r border-white/[0.07] p-2">
+        {items.map((i) => (
+          <Link
+            key={i.href}
+            href={i.href}
+            onMouseEnter={() => setActive(i.href)}
+            onFocus={() => setActive(i.href)}
+            className={`block px-4 py-3 transition ${
+              active === i.href ? 'bg-white/[0.05]' : 'hover:bg-white/[0.03]'
+            }`}
+          >
+            <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
+            <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
+          </Link>
+        ))}
+      </div>
+      <div aria-hidden className="flex flex-1 items-center p-5">
+        {shown?.preview ? <ProductPreview kind={shown.preview} /> : null}
+      </div>
+    </div>
   )
 }
 
@@ -64,18 +112,22 @@ export function BusinessHeader() {
                 {g.label}
               </button>
               {open === g.label ? (
-                <div className="absolute left-0 top-full w-[26rem] border border-white/[0.09] bg-surface p-2 shadow-2xl shadow-black/60">
-                  {g.items.map((i) => (
-                    <Link
-                      key={i.href}
-                      href={i.href}
-                      className="block px-4 py-3 transition hover:bg-white/[0.04]"
-                    >
-                      <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
-                      <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
-                    </Link>
-                  ))}
-                </div>
+                g.label === 'Products' ? (
+                  <ProductsPanel items={g.items} />
+                ) : (
+                  <div className="absolute left-0 top-full w-[26rem] border border-white/[0.09] bg-surface p-2 shadow-2xl shadow-black/60">
+                    {g.items.map((i) => (
+                      <Link
+                        key={i.href}
+                        href={i.href}
+                        className="block px-4 py-3 transition hover:bg-white/[0.04]"
+                      >
+                        <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
+                        <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
+                      </Link>
+                    ))}
+                  </div>
+                )
               ) : null}
             </div>
           ))}
