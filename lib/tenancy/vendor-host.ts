@@ -55,22 +55,81 @@ export const PRODUCT_DOORS: Readonly<Record<string, string>> = {
 }
 
 /**
- * Surfaces that make sense on a vendor host. Everything outside this list is
- * the property-marketing site, which belongs to a brokerage and not to us.
+ * Surfaces that make sense on a vendor host, and the ones that do not.
  *
- * The application itself stays reachable: an operator has to be able to sign
- * in somewhere, and those routes are session-gated with the tenant fence
- * already applied above them in the proxy.
+ * Two lists, not one, and both exported: `scripts/vendor-host-test.ts` proves
+ * they account for EVERY top-level route in app/, so a route added later is
+ * classified deliberately instead of inheriting a default.
+ *
+ * That guard exists because the default already bit. The list below started as
+ * a handful of paths and then the application grew past it: /ctrl arrived in
+ * da5a20e ("the partner plane becomes entrestate.com/ctrl") without being added
+ * here, so the address in its own commit message answered with a redirect to
+ * /business. The control plane, the white-label console and the activation gate
+ * were all unreachable on the domain they were built for, and the only surface
+ * anybody could still open was /server. An allowlist that nobody is forced to
+ * update is a list that silently deletes routes.
  */
-const VENDOR_PREFIXES = [
+export const VENDOR_PREFIXES = [
+  // The vendor's own marketing site, and the way in to buying it.
   '/business',
   '/signup',
+  // Sign-in. Every session-gated page redirects to /server (proxy.ts), and
+  // /login is the address people actually type — app/login/page.tsx redirects
+  // there rather than a second sign-in screen existing to drift out of sync.
   '/server',
+  '/login',
+  // The product. An operator has to be able to run the platform from the
+  // vendor's own domain; these are session-gated above this rule in the proxy.
   '/freehold-intelligence',
   '/crm',
+  // The control plane and its storefront. /ctrl is staff-gated server-side
+  // (app/ctrl/layout.tsx bounces anyone who is not management to /server) and
+  // /portal/[slug] is a deliberate capability URL with no login, so admitting
+  // them here grants nothing that was not already decided in those files.
+  '/ctrl',
+  '/portal',
+  // White-label: the prospect's activation gate and the vendor's key console.
+  // Both self-gate on a secret. /activate is also where the proxy sends
+  // unauthenticated visitors when WHITE_LABEL is on, so redirecting it away
+  // would leave that deployment with no door at all.
+  '/activate',
+  '/wl-admin',
   '/privacy',
   '/terms',
   '/api',
+]
+
+/**
+ * The brokerage-facing property site that ships in this codebase. It belongs to
+ * a licensed brokerage — its own listings, its own RERA number, its own Golden
+ * Visa page — and none of it belongs on the vendor's front door, which is the
+ * whole reason this module exists.
+ *
+ * Named rather than inferred, so the guard can tell "a route we decided is the
+ * property site" apart from "a route nobody has thought about yet".
+ */
+export const PROPERTY_SITE_PREFIXES = [
+  '/projects',
+  '/properties',
+  '/areas',
+  '/developers',
+  '/blog',
+  '/tools',
+  '/chat',
+  '/lp',
+  '/search',
+  '/map',
+  '/site',
+  '/share',
+  // Brokerage identity pages: "Dubai real estate advisory", the Business Bay
+  // office, the brokerage's services. Vendor visitors want /business.
+  '/about',
+  '/services',
+  '/contact',
+  '/a', // agent handles
+  '/l', // short links
+  '/market', // retired dashboard; the proxy sends it to /projects
 ]
 
 /** Files (og-image.png, robots.txt, sitemap.xml…) are never page routes. */
@@ -79,12 +138,34 @@ const isFile = (pathname: string): boolean => {
   return last.includes('.')
 }
 
+/**
+ * A PREVIEW OF THIS DEPLOYMENT IS THE VENDOR'S OWN SITE.
+ *
+ * Preview builds answer on `<project>-git-<branch>-<scope>.vercel.app`, which is
+ * not the apex and not a tenant, so every rule here used to return `pass` — and
+ * `pass` on `/` renders the brokerage property site that ships in this repo.
+ * The result: you could not review the vendor surface on the one URL that
+ * exists to review it. Opening a preview of a branch that changes
+ * entrestate.com showed Dubai apartments, Golden Visa and a rental-yield
+ * headline, and the whole point of a preview is to look at the change.
+ *
+ * So a *.vercel.app host is treated as the apex. This is safe by construction:
+ * the entire module is dormant unless NEXT_PUBLIC_TENANT_BASE_DOMAIN is set,
+ * which the client's deployment does not set — their previews are untouched,
+ * exactly as their production is. A custom domain still returns null, because
+ * a customer's own domain is theirs and must never be redirected to ours.
+ */
+function isPreviewHost(host: string): boolean {
+  return host.endsWith('.vercel.app')
+}
+
 /** The subdomain of a vendor host, or '' for the apex. Null when not ours. */
 function vendorSubdomain(rawHost: string): string | null {
   const host = rawHost.trim().toLowerCase().split(':')[0]
   if (!host) return null
   if (host === TENANT_BASE_DOMAIN) return ''
   if (host === `www.${TENANT_BASE_DOMAIN}`) return ''
+  if (isPreviewHost(host)) return ''
   if (!host.endsWith(`.${TENANT_BASE_DOMAIN}`)) return null
   const label = host.slice(0, -(TENANT_BASE_DOMAIN.length + 1))
   return label.includes('.') ? null : label

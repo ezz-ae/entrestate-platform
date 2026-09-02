@@ -19,6 +19,13 @@
  * second copy is loaded for the switched-off case.
  */
 
+import { execFileSync } from 'node:child_process'
+import { readdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
+const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
+
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
 const fail = (m: string, got: string) => { failures++; console.error(`  ✗ ${m}\n      got: ${got}`) }
@@ -63,6 +70,44 @@ async function main(): Promise<void> {
       vendorHostAction('entrestate.com', '/og-image.png').kind === 'pass')
   }
 
+  console.log('\n── every door the operator is told to use actually opens ──')
+  {
+    // Reported live: "https://entrestate.com/login, /ctrl — anything — takes you
+    // to the business page; the only thing working is /server." The allowlist
+    // had not grown with the application, so surfaces built later were being
+    // redirected away by a rule written before they existed. Each one below is
+    // an address a person is handed — by a commit message, by the proxy's own
+    // redirect, or by their own fingers — so each is asserted individually.
+    const doors: Array<[string, string]> = [
+      ['/login', 'the address people type; app/login/page.tsx sends it to /server'],
+      ['/ctrl', 'the partner control plane, named after this very domain'],
+      ['/ctrl/projects', 'and everything under it'],
+      ['/portal/acme', 'the partner storefront, a capability URL with no login'],
+      ['/activate', 'where the proxy sends visitors when WHITE_LABEL is on'],
+      ['/wl-admin', 'the vendor key console'],
+    ]
+    for (const [p, why] of doors) {
+      check(`${p} opens — ${why}`, vendorHostAction('entrestate.com', p).kind === 'pass',
+        show(vendorHostAction('entrestate.com', p)))
+    }
+
+    // /login must not become a second sign-in screen: one file, one redirect.
+    const alias = read('app/login/page.tsx')
+    check('app/login/page.tsx exists and only redirects', /redirect\('\/server'\)/.test(alias))
+    check('…and holds no password field of its own', !/password|input/i.test(alias))
+  }
+
+  console.log('\n── the brokerage’s own pages are still not the vendor’s ──')
+  {
+    // These read as a licensed brokerage — advisory, Golden Visa, the Business
+    // Bay office. They are the property site, so they keep redirecting even
+    // though they sit next to the vendor routes in app/.
+    for (const p of ['/about', '/services', '/contact']) {
+      const a = vendorHostAction('entrestate.com', p)
+      check(`${p} → the platform site`, a.kind === 'redirect' && a.to === '/business', show(a))
+    }
+  }
+
   console.log('\n── product doors keep their short address ──')
   {
     const machine = vendorHostAction('machine.entrestate.com', '/')
@@ -104,11 +149,31 @@ async function main(): Promise<void> {
       vendorHostAction('skyline.entrestate.com', p).kind === 'pass')
   }
 
+  console.log('\n── a preview of this deployment is the vendor site ──')
+  {
+    // This used to assert the opposite, and the opposite was wrong. A preview
+    // build answers on <project>-git-<branch>-<scope>.vercel.app, which is
+    // neither the apex nor a tenant, so every rule returned `pass` — and `pass`
+    // on `/` renders the brokerage property site that ships in this repo. You
+    // could not review the vendor surface on the one URL that exists to review
+    // it: opening a preview of a branch that changes entrestate.com showed
+    // Dubai apartments and a rental-yield headline.
+    for (const h of ['entrestate-abc123.vercel.app', 'entrestate-git-products-menu-ezz-dxb.vercel.app']) {
+      const root = vendorHostAction(h, '/')
+      check(`${h}/ shows the platform site`, root.kind === 'redirect' && root.to === '/business', show(root))
+      check(`${h}/business is left alone`, vendorHostAction(h, '/business').kind === 'pass')
+      check(`${h}/login opens`, vendorHostAction(h, '/login').kind === 'pass')
+      const deep = vendorHostAction(h, '/projects')
+      check(`${h} does not serve the property site either`,
+        deep.kind === 'redirect' && deep.to === '/business', show(deep))
+    }
+  }
+
   console.log('\n── unrelated hosts pass ──')
   {
-    // Preview deployments and custom domains are not the vendor's hosts and
-    // must not be rewritten to a page the visitor did not ask for.
-    for (const h of ['entrestate-abc123.vercel.app', 'freeholdproperty.ae', 'localhost:3000', 'a.b.entrestate.com']) {
+    // A customer's own domain is theirs. It must never be redirected to ours,
+    // whatever this deployment thinks it is.
+    for (const h of ['freeholdproperty.ae', 'localhost:3000', 'a.b.entrestate.com']) {
       check(`${h} is left alone`, vendorHostAction(h, '/').kind === 'pass')
     }
     check('a missing host is left alone', vendorHostAction(null, '/').kind === 'pass')
@@ -116,15 +181,43 @@ async function main(): Promise<void> {
 
   console.log('\n── switched off, it does nothing at all ──')
   {
-    // The Freehold deployment leaves the base domain unset. Proven by loading
-    // a second, isolated copy of the module with the variable cleared.
-    delete process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN
-    const fresh = (await import(
-      `../lib/tenancy/vendor-host?off=${Date.now()}`
-    )) as typeof import('../lib/tenancy/vendor-host')
-    for (const p of ['/', '/projects', '/blog']) {
-      check(`with tenancy off, ${p} is untouched`, fresh.vendorHostAction('freeholdproperty.ae', p).kind === 'pass')
+    // The client's deployment leaves the base domain unset, and this block is
+    // what proves the whole module is inert there.
+    //
+    // It used to re-import the module with a cache-busting query and the env
+    // deleted — which does NOT switch it off: the fresh copy's own
+    // `import './config'` resolves to the URL already in the module cache, so
+    // TENANT_BASE_DOMAIN stayed set and every assertion here passed vacuously,
+    // because the hosts it tested return `pass` under either setting. The
+    // preview rule was the first assertion that could tell the difference, and
+    // it failed immediately. A separate process is the only honest way to ask.
+    const probe = `
+      async function main() {
+        const { vendorHostAction } = await import(${JSON.stringify(join(process.cwd(), 'lib/tenancy/vendor-host.ts'))})
+        const hosts = ['freeholdproperty.ae', 'ore-git-main-somebody.vercel.app', 'entrestate.com']
+        const paths = ['/', '/projects', '/blog']
+        const out = []
+        for (const h of hosts) for (const p of paths) out.push(h + ' ' + p + ' ' + vendorHostAction(h, p).kind)
+        console.log(out.join('\\n'))
+      }
+      void main()
+    `
+    const probeFile = join(tmpdir(), `vendor-host-off-${process.pid}.ts`)
+    writeFileSync(probeFile, probe)
+    const env = { ...process.env }
+    delete env.NEXT_PUBLIC_TENANT_BASE_DOMAIN
+    let lines: string[] = []
+    try {
+      lines = execFileSync('npx', ['tsx', probeFile], { encoding: 'utf8', env, cwd: process.cwd() })
+        .trim().split('\n').filter(Boolean)
+    } finally {
+      try { unlinkSync(probeFile) } catch { /* best effort */ }
     }
+
+    check('the probe ran', lines.length === 9, lines.join(' | '))
+    const wrong = lines.filter((l) => !l.endsWith(' pass'))
+    check('with tenancy off, every host and path is untouched — the apex included',
+      wrong.length === 0, wrong.join(' | '))
   }
 
   console.log(
