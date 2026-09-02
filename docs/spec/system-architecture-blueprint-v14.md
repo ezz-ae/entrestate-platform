@@ -1,9 +1,20 @@
 # System Architecture Blueprint
 
 **Version**: 8.0.0  
-**Status**: ACTIVE PRODUCTION (Governing decision infrastructure, live CRM performance, and automated Google Ads search arbitrage) [36, 67]  
-**Host Environment**: `freeholdproperty.ae` (Running private white-label workspace at `/freehold-intelligence`) [67]  
-**Primary Repositories**: `ezz-ae/Entrestate_os` & `ezz-ae/entrestate-platform` [67]
+**Document type**: DESIGN SPECIFICATION — the architecture as designed, not a
+statement of what is running.  
+**Repositories**: `ezz-ae/entrestate-platform` (the business) and
+`ezz-ae/Entrestate_os` (the Terminal)  
+**Live hosts**: entrestate.com and terminal.entrestate.com.
+
+> **Read this before the engine descriptions.** This blueprint describes the
+> twelve engines as designed. It is **not** evidence that each one ships. Some
+> are IMPLEMENTED, some PARTIAL, one is SPEC-ONLY, and some figures quoted in
+> commercial material are a **client deployment's** operational record — that
+> deployment runs the same software under contract and is a separate system
+> with its own database and domain. The graded, file-by-file answer is
+> [`README.md`](README.md) in this folder and [`../../README.md`](../../README.md)
+> at the repository root. Where this document and those disagree, they win.
 
 ---
 
@@ -55,7 +66,7 @@ Entrestate organizes its 12 Core Engines across three distinct structural layers
 
 ---
 
-## 3. Structural Specification of the 10 Core Engines
+## 3. Structural Specification of the 12 Core Engines
 
 ### Layer A: The Analytical Substrate
 
@@ -83,9 +94,7 @@ Entrestate organizes its 12 Core Engines across three distinct structural layers
 #### Engine 04 — Creative Intelligence Engine
 *   **Purpose**: Turn inventory, audience, and campaign parameters into executable commercial creative assets [9].
 *   **Core Logic**: Hooks into Google Vertex AI models to dynamically compile trilingual, right-to-left mirrored landing pages (**"Listing-to-Landing"**) and ad creatives [9, 36, 57].
-*   **Two-Way Behavioral Telemetry**: Orchestrates parallel event tracking on landing pages, separating active mouse movements (`active_telemetry`) from idle tab/backgrounding states (`idle_telemetry`) to capture high-resolution, noise-filtered buyer intent on the fly.
-*   **Purpose**: Turn inventory, audience, and campaign parameters into executable commercial creative assets [9].
-*   **Core Logic**: Hooks into Google Vertex AI models to dynamically compile trilingual, right-to-left mirrored landing pages (**"Listing-to-Landing"**) and ad creatives [9, 36, 57]. Incorporates client-side micro-behavioral telemetry (mouse movements, active hovers) and choice-engineered forms for implicit profiling.
+*   **Two-Way Behavioral Telemetry**: Orchestrates parallel event tracking on landing pages, separating active mouse movements (`active_telemetry`) from idle tab/backgrounding states (`idle_telemetry`) to capture high-resolution, noise-filtered buyer intent on the fly. Choice-engineered forms profile implicitly, without asking a demographic question.
 
 #### Engine 05 — Acquisition Engine
 *   **Purpose**: Deploy marketing capital across ad networks via deterministic control systems [10].
@@ -141,7 +150,17 @@ Entrestate organizes its 12 Core Engines across three distinct structural layers
 ---
 
 ## 5. Codebase Verification Gauntlet
-Every code change must pass through the automated CI pipeline before deployment:
-1.  **`pnpm typecheck`**: Strict TypeScript compilation with zero errors [70].
-2.  **`pnpm i18n`**: Audits all dictionary keys across English, Arabic, and Russian to ensure layout parity and RTL mirroring [36, 70].
-3.  **`db-contract-nightly.yml`**: Nightly Postgres schema verification against the live database mapping [62].
+Every change to the business repository passes four steps before merge
+(`.github/workflows/ci.yml`, the `verify` check):
+1.  **`pnpm typecheck`**: strict TypeScript compilation, zero errors.
+2.  **`pnpm i18n`**: every used key resolves in English, Arabic and Russian.
+3.  **`pnpm guards`**: 120+ pure suites in `scripts/*-test.ts` — the rulebook
+    as executable assertions. This is the step that enforces the rules stated
+    throughout this document, and the earlier version of this section omitted it.
+4.  **`pnpm build`**: a production build must succeed.
+
+The Terminal repository runs its own pipeline (40 vitest suites plus
+`scripts/guardian.py`), and its `db-contract-nightly.yml` verifies the Postgres
+schema nightly against a read-only branch. That nightly job belongs to
+`ezz-ae/Entrestate_os`, not to the pipeline above — an earlier version of this
+section listed it as a step here.

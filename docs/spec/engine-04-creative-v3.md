@@ -1,8 +1,16 @@
 # Engine 04 — Creative Intelligence Engine Technical Specification
 **Version:** 1.1.0  
-**Status:** INTEGRATED / INTELLIGENT  
-**Parent System:** Entrestate Intelligence OS (Dubai, United Arab Emirates) [37]  
-**Root Path:** `app/api/time-table/artifacts` [60], `/storyboard` [59], `/image-playground` [59], `/timeline` [59]
+**Document type:** DESIGN SPECIFICATION — graded against the code in §8.  
+**Parent System:** Entrestate (Dubai, United Arab Emirates)  
+**Root paths:** `lib/freehold/` (landing engine, telemetry, gif encoding) in
+`ezz-ae/entrestate-platform`; `app/api/time-table/artifacts` in
+`ezz-ae/Entrestate_os`.
+
+> The creative workspace routes `/storyboard`, `/image-playground` and
+> `/timeline` were **retired from the claim set on 2026-08-31** by the owner's
+> ruling — the Terminal connects to the workspace automation studio and the
+> time-table rather than duplicating creative surfaces. They are no longer part
+> of this specification. Section 8 grades every remaining claim.
 
 ---
 
@@ -76,7 +84,7 @@ The platform enforces programmatic layout rules across its primary languages: En
 ### C. Creative Generation & Multimodal Prompt Engineering
 The system utilizes server-side model overrides from `.env.local` to orchestrate asset design [57, 58]:
 1. **Text Copywriting (`MEDIA_TEXT_MODEL` / Gemini 2.5 Flash)** [57]: Accepts the target audience vector and inventory scoring context to generate trilingual ad copy, headlines, and call-to-actions [36, 57].
-2. **Visual Assessment (`MEDIA_VISION_MODEL` / Gemini 3 Pro Image)** [57]: Used within the `/storyboard` workspace to inspect user-uploaded property photography, perform aesthetic quality grading, and extract high-yield semantic prompts for the dynamic image engine [57, 59].
+2. **Visual Assessment (`MEDIA_VISION_MODEL` / Gemini 3 Pro Image)** [57]: Used to inspect uploaded property photography, perform aesthetic quality grading, and extract high-yield semantic prompts for the dynamic image engine [57, 59].
 3. **Animated Reel Synthesis**: To maintain standard social network engagement, static property renderings are merged with programmatic transaction graphics to compile animated `.gif` loop reels [66].
 
 ---
@@ -93,7 +101,7 @@ The landing pages employ choice-engineered web forms designed to extract profile
 2. **Dynamic Risk-Mapping**: Each chosen parameter maps directly to user risk/return categories (Conservative vs. Balanced vs. Growth) under the hood [54].
 3. **Zero-Friction Submission**: The lead's investment profile is pre-categorized in the database before they even complete contact registration, eliminating manual input friction while generating pre-structured CRM lead cards [12, 14].
 
-### D. Two-Way Programmatic Behavior Analysis & Dedicated Idle State Table
+### F. Two-Way Programmatic Behavior Analysis & Dedicated Idle State Table
 To resolve the noise inherent in real-world web browsing (such as users leaving tabs open while walking away or accidental mouse shakes), Engine 04 deploys a **Two-Way Programmatic Behavior Analysis** framework:
 1. **The Parallel Logging Paths**: 
    * **Active Session Table (`active_telemetry`)**: Records highly focused, non-idle frontend micro-interactions (mouse coordinates, active scroll velocity, precise section hovers).
@@ -149,14 +157,22 @@ To ensure absolute corporate safety and regulatory compliance across the UAE, th
 ---
 
 ## 8. Codebase Evidence & Verification Drawer
-To maintain compliance with the platform’s strict **Evidence Standard**, the implemented code structures must map directly to this specification [23, 24]:
 
-| Claimed Feature | Verification Code Path / File | Implementation Level [23] |
+Graded with the same four-level legend the repository uses everywhere else —
+**IMPLEMENTED** (working code, named file, held by a guard) · **PARTIAL** ·
+**SPEC-ONLY** · **RETIRED** (removed from the claim set). The earlier version
+of this table used four different words — BUILT, INTEGRATED, INTELLIGENT,
+AUTOMATED — which graded nothing, because a reader could not rank them.
+
+| Claimed feature | Verification path | Status |
 | :--- | :--- | :--- |
-| **Trilingual i18n & RTL** | `lib/i18n/dictionaries/*` [70, 71] | **INTEGRATED** [23] |
-| **Model Environment Configuration** | `Entrestate_os` repository: `.env.local` (e.g., `MEDIA_TEXT_MODEL`, `MEDIA_VISION_MODEL`) [57] | **INTEGRATED** [23] |
-| **Dynamic Animated Reels** | `entrestate-platform` repository: `types/` for animated `.gif` conversions [66] | **BUILT** [23] |
-| **Creative Workspace UI** | `Entrestate_os` routes: `/storyboard`, `/image-playground`, `/timeline` [59] | **BUILT** [23] |
-| **Programmatic Asset Generation Endpoint** | `Entrestate_os` API route: `/api/time-table/artifacts` [60] | **INTELLIGENT** [23] |
-| **Spend Governor & Rules Integration** | `lib/meta/spend-authority.ts` [71] | **AUTOMATED** [23] |
-| **Continuous Verification Gauntlet** | `.github/workflows/ci.yml` (tsc, i18n, build validation checks) [70] | **AUTOMATED** [23] |
+| **Trilingual i18n & RTL** | `lib/i18n/dictionaries/*`, enforced by `pnpm i18n` in CI | **IMPLEMENTED** |
+| **Behavioural telemetry — active/idle split** | `lib/freehold/behavioral-telemetry.ts`, `use-behavioral-telemetry.ts`, `/api/lp-telemetry`; guard `scripts/behavioral-telemetry-test.ts` | **IMPLEMENTED** |
+| **Intent-driven landing layout** | `app/lp/[slug]/*` — section order follows the click's intent parameters | **IMPLEMENTED** |
+| **Animated reels (GIF)** | `lib/freehold/gif-encode.ts` (gifenc, in-thread — chosen over gif.js because a separate worker script fights bundling and the CSP) and `lib/freehold/convert.ts` | **IMPLEMENTED** — the earlier table cited `types/`, which holds only the type declaration |
+| **Programmatic asset generation endpoint** | `Entrestate_os`: `app/api/time-table/artifacts` | **IMPLEMENTED** |
+| **Spend Governor integration** | `lib/meta/spend-authority.ts` — the AI proposes, deterministic rules cap and pause, a **recorded human approval** gates the write | **IMPLEMENTED** |
+| **Continuous verification gauntlet** | `.github/workflows/ci.yml`: `pnpm typecheck · i18n · guards · build` | **IMPLEMENTED** |
+| **Model environment configuration** | `MEDIA_TEXT_MODEL`, `MEDIA_VISION_MODEL` read server-side in `Entrestate_os` | **IMPLEMENTED** — variable names only; no values are published |
+| **Listing fitness gate** | The landing/campaign readiness checks block a page with no parseable price | **PARTIAL** — the price and empty-field gates exist; a single named `ListingFitness` module does not |
+| **Creative workspace UI** | `/storyboard`, `/image-playground`, `/timeline` | **RETIRED** 2026-08-31 — still served from the `app/(marketing)` route group pending removal, but no longer claimed |
