@@ -63,6 +63,12 @@ const PUBLIC_API_EXACT = new Set([
   // (the shared Neon session via getTerminalUser) and fails closed with 401 —
   // the wall's WORKSPACE cookie is one a Terminal caller correctly lacks.
   "/api/account/summary",
+  // "Open my workspace" — reads the shared Neon session, proves ownership
+  // against saas_tenants.owner_email, and redirects to the tenant host's
+  // claim endpoint. Public here for the same reason as the line above: the
+  // caller is a Terminal identity, which correctly has no workspace cookie,
+  // and the handler authenticates itself and fails closed to /business/account.
+  "/api/account/workspace/enter",
 ])
 const PUBLIC_API_PREFIXES = [
   "/api/freehold/public/",      // public catalogue (projects, areas, developers, search)

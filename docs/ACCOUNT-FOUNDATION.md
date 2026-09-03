@@ -155,3 +155,34 @@ Per-app economics, from the owner's model:
 5. **Terminal surfaces on the foundation** — dashboards/agents/design/social
    read entitlements from the business account; nothing rebuilt, everything
    re-pointed.
+   *(Workspace door delivered 2026-09-03 — `lib/tenancy/account-workspace.ts`.
+   The gap it closed, in the owner's words: "i can login to the terminal but i
+   cant see the things built for the business account and cant login to it and
+   we cant offer 2 cccounts". Phases 1–4 made the business site RECOGNISE the
+   Terminal identity; nothing let that identity OPEN anything, because the only
+   route to a workspace ran through `lib/tenancy/onboard.ts`, which asks for a
+   name, an email and a password — a second account with a second password to
+   forget.*
+
+   *The fix removes an identity rather than bridging two. `createWorkspaceForAccount`
+   is `signupTenant` minus the password: the owner row inside the tenant schema
+   is written with `password_hash: null`, so `verifyPassword` can never admit
+   anyone as that owner and the Neon session is the only door. `enterWorkspace`
+   mints the SAME short-lived HMAC claim token self-serve signup already used,
+   for the SAME `/api/wl/claim` endpoint on the tenant host — no new cookie, no
+   new session shape, and the replay window stays the token's two minutes on the
+   one host it names. Cookies are host-only; that is a fact of the web, and the
+   claim token is the mechanism this codebase already had for it.*
+
+   *Three conditions gate a token: a verified Neon session, a workspace that is
+   not suspended, and `saas_tenants.owner_email` equal to that session's email.
+   A NULL owner matches nobody — the column is nullable because tenants predate
+   it, and "unknown" must never read as "unclaimed". Every refusal is
+   `not_found`, so the path never discloses which brokerages exist or who runs
+   them. Surfaced on `/business/account`; the wall lets*
+   `/api/account/workspace/enter` *authenticate itself, like* `/api/account/summary`.
+   *Known limitation, stated rather than hidden: ownership is keyed by EMAIL,
+   because that is the only column the control plane has — an owner who changes
+   their email in Neon Auth stops matching their workspace, and the fix is a
+   `neon_user_id` column shipped with whatever first lets an email be edited.
+   Guard `scripts/account-workspace-test.ts`.)*

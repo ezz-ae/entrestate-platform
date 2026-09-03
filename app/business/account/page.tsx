@@ -4,7 +4,9 @@ import { STORE } from "@/lib/freehold/app-store"
 import { getTerminalUser } from "@/lib/terminal-session"
 import { ensureBusinessAccount, listAccountApps } from "@/lib/terminal-account"
 import { readAccountWallet, recentAccountPostings, TOPUP_MIN_AED, TOPUP_MAX_AED } from "@/lib/account-wallet"
-import { submitTopUp } from "./actions"
+import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from "@/lib/tenancy/config"
+import { workspacesForAccount } from "@/lib/tenancy/account-workspace"
+import { submitTopUp, createWorkspace } from "./actions"
 
 /**
  * THE ACCOUNT PAGE — phase 3's surface. One identity (the Terminal's
@@ -26,12 +28,23 @@ export const metadata = {
 
 const TERMINAL_URL = "https://terminal.entrestate.com"
 
+/** What each workspace outcome says, in words, on the page. */
+const WORKSPACE_MESSAGE: Record<string, string> = {
+  taken: "That address is already in use — pick another and the rest carries over.",
+  reserved: "That address is kept for the platform. Any other name works.",
+  invalid_subdomain: "Use letters, numbers and hyphens — that is the whole rule.",
+  company_required: "The workspace needs a name to put on it.",
+  not_found: "That workspace is not on this account.",
+  slow_down: "That is a lot of attempts in a row. Give it a few minutes.",
+  store_unreachable: "That did not save on our side. Nothing was lost — try once more in a minute.",
+}
+
 export default async function BusinessAccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ topup?: string }>
+  searchParams: Promise<{ topup?: string; workspace?: string }>
 }) {
-  const { topup } = await searchParams
+  const { topup, workspace } = await searchParams
   const user = await getTerminalUser()
 
   if (!user) {
@@ -54,6 +67,11 @@ export default async function BusinessAccountPage({
   const postings = account ? await recentAccountPostings(account, 8) : []
   const apps = account ? await listAccountApps(account.id) : new Map<string, string>()
   const appRows = STORE.filter((p) => apps.has(p.id))
+  // The email on the VERIFIED Neon session is the key — see the header of
+  // lib/tenancy/account-workspace.ts for why an email is safe to look up here
+  // and unsafe to look up on a sign-in form.
+  const workspaces = SAAS_TENANCY ? await workspacesForAccount(user.email) : []
+  const workspaceNote = workspace ? WORKSPACE_MESSAGE[workspace] : null
 
   return (
     <>
@@ -67,6 +85,85 @@ export default async function BusinessAccountPage({
           { k: "Apps on the account", v: String(appRows.length) },
         ]}
       />
+
+      {/*
+        THE WORKSPACE. This block exists because the account could be seen and
+        not entered: the workspace lives on its own host with its own cookie,
+        and the only way in was a password nobody set. "Open" mints a
+        two-minute claim token on the tenant host — one account, one password,
+        and it is the one already used to get here.
+      */}
+      {SAAS_TENANCY ? (
+        <Section className="pb-10">
+          <article className="bg-surface p-8 outline outline-1 outline-white/[0.07]">
+            <Eyebrow className="mb-4">Your workspace</Eyebrow>
+
+            {workspaceNote ? (
+              <p className="mb-5 bg-surface px-4 py-3 text-[0.875rem] text-amber-300 outline outline-1 outline-amber-400/25">
+                {workspaceNote}
+              </p>
+            ) : null}
+
+            {workspaces.length > 0 ? (
+              <ul className="divide-y divide-white/[0.06]">
+                {workspaces.map((w) => (
+                  <li key={w.subdomain} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0">
+                    <div>
+                      <p className="text-[0.9375rem] font-medium text-white">{w.company}</p>
+                      <p className="mt-0.5 font-mono text-[11px] tracking-[0.06em] text-ink-faint">
+                        {w.subdomain}.{TENANT_BASE_DOMAIN}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={`font-mono text-[10px] uppercase tracking-[0.14em] ${w.status === "active" ? "text-emerald-400" : "text-ink-muted"}`}>
+                        {w.status === "trial" ? "Trial" : w.status === "active" ? "Active" : "Paused"}
+                      </span>
+                      <a
+                        href={`/api/account/workspace/enter?sub=${encodeURIComponent(w.subdomain)}`}
+                        className="bg-[#3B82F6] px-5 py-2.5 text-[0.875rem] font-semibold text-white"
+                      >
+                        Open the workspace
+                      </a>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <>
+                <H3>Give the work a place to live.</H3>
+                <P className="mt-3">
+                  Your workspace carries the inventory, the campaigns, the leads and the team — on your own address, in
+                  your own brand. It opens with this account: there is no second sign-in to remember.
+                </P>
+                <form action={createWorkspace} className="mt-6 flex flex-wrap items-end gap-3">
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[0.8125rem] text-ink-muted">Company</span>
+                    <input
+                      name="company"
+                      placeholder="Marina Realty"
+                      className="w-56 bg-[#0B0F17] px-3 py-2.5 text-[0.9375rem] text-white outline outline-1 outline-white/[0.12] placeholder:text-ink-faint focus:outline-[#3B82F6]/60"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-[0.8125rem] text-ink-muted">Address</span>
+                    <span className="flex items-center">
+                      <input
+                        name="subdomain"
+                        placeholder="marina"
+                        className="w-40 bg-[#0B0F17] px-3 py-2.5 text-[0.9375rem] text-white outline outline-1 outline-white/[0.12] placeholder:text-ink-faint focus:outline-[#3B82F6]/60"
+                      />
+                      <span className="ml-2 font-mono text-[12px] text-ink-faint">.{TENANT_BASE_DOMAIN}</span>
+                    </span>
+                  </label>
+                  <button type="submit" className="bg-[#3B82F6] px-5 py-2.5 text-[0.875rem] font-semibold text-white">
+                    Create the workspace
+                  </button>
+                </form>
+              </>
+            )}
+          </article>
+        </Section>
+      ) : null}
 
       <Section className="pb-16">
         <Grid cols={2}>
