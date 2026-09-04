@@ -21,6 +21,8 @@ import { probeAdAccountAccess } from '@/lib/meta/client'
 import type { GoogleStoredCreds } from '@/lib/google/client'
 import type { HubspotStoredCreds } from '@/lib/hubspot/client'
 import { callingConnection } from '@/lib/calling/provider'
+import { GEMINI_KEY_NAMES } from '@/lib/gemini-rest'
+import { vertexConfigured } from '@/lib/google/vertex-auth'
 
 export type IntegrationState =
   | 'connected'
@@ -145,8 +147,14 @@ export async function getLiveIntegrationStatuses(
   }
 
   // ── AI (Gemini API or Vertex service account) ──────────────────────────────
-  const geminiOk = hasAny('GEMINI_API_KEY', 'Gemini_API_KEY', 'google_api_key')
-  const vertexOk = has('VERTEX_AI_SERVICE_ACCOUNT_JSON')
+  // The SAME readers the chat uses decide this card. This used to keep its own
+  // shorter list of names, so a deployment keyed under GEMINI_KEY or
+  // GOOGLE_API_KEY (both honoured by geminiApiKey()) — or on Vertex through
+  // VERTEX_AI_API_KEY — ran AI while this page said "No AI provider
+  // configured". A status is only worth showing when it cannot disagree with
+  // the thing it describes.
+  const geminiOk = hasAny(...GEMINI_KEY_NAMES)
+  const vertexOk = vertexConfigured()
   const aiState: IntegrationState =
     geminiOk && vertexOk ? 'connected' : geminiOk || vertexOk ? 'partial' : 'disconnected'
   const aiMissing = [

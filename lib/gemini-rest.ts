@@ -15,21 +15,59 @@ const FALLBACK_MODELS = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-flash-l
 export const VERTEX_SENTINEL = "__vertex_sa__"
 
 /**
+ * EVERY env name that may carry the AI-Studio key, in the order they win.
+ *
+ * ONE LIST, EXPORTED, because three places used to keep their own: this
+ * function (five names), the Integrations page (three of them) and the
+ * /ai-status diagnostic (five, retyped). A deployment configured under a name
+ * the runtime honoured but the status page did not would run AI while the
+ * page said "No AI provider configured" — a status announcing something it
+ * does not know. Read the list; never retype it.
+ *
+ * GOOGLE_GENERATIVE_AI_API_KEY is on it because that is the name @ai-sdk/google
+ * reads by default and the name the Terminal (terminal.entrestate.com, the
+ * other half of the same product) accepts. The two deployments are configured
+ * by the same person under the same key, and the key's name must not be the
+ * reason one of them is offline.
+ */
+export const GEMINI_KEY_NAMES = [
+  "GEMINI_API_KEY",
+  "Gemini_API_KEY",
+  "GOOGLE_API_KEY",
+  "google_api_key",
+  "GEMINI_KEY",
+  "GOOGLE_GENERATIVE_AI_API_KEY",
+] as const
+
+/** The env name the key was found under, or null. Names only — never the value. */
+export function geminiKeyName(): (typeof GEMINI_KEY_NAMES)[number] | null {
+  for (const name of GEMINI_KEY_NAMES) {
+    if ((process.env[name] ?? "").trim()) return name
+  }
+  return null
+}
+
+/**
+ * The raw AI-Studio key under whichever accepted name carries it, or "".
+ * NEVER the Vertex sentinel — this is for callers that put the key in a
+ * request themselves (an x-goog-api-key header, a ?key= query). Callers that
+ * hand the credential to geminiGenerate() want geminiApiKey() below instead,
+ * so a Vertex-only deployment still runs.
+ */
+export function geminiStudioKey(): string {
+  const name = geminiKeyName()
+  return name ? (process.env[name] ?? "").trim() : ""
+}
+
+/**
  * The single source of truth for "what AI credential do I use?" — returns the
- * real AI-Studio key (any accepted casing), else the Vertex sentinel when a
+ * real AI-Studio key (any accepted name), else the Vertex sentinel when a
  * service account is configured, else "". Use this everywhere instead of
  * reading process.env.GEMINI_API_KEY directly, so a deployment with ONLY a
  * Vertex service account still runs AI.
  */
 export function geminiApiKey(): string {
-  const k = (
-    process.env.GEMINI_API_KEY ||
-    process.env.Gemini_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    process.env.google_api_key ||
-    process.env.GEMINI_KEY ||
-    ""
-  ).trim()
+  const k = geminiStudioKey()
   if (k) return k
   if (vertexConfigured()) return VERTEX_SENTINEL
   return ""
