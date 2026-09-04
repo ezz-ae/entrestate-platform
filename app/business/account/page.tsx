@@ -37,6 +37,7 @@ const WORKSPACE_MESSAGE: Record<string, string> = {
   not_found: "That workspace is not on this account.",
   slow_down: "That is a lot of attempts in a row. Give it a few minutes.",
   store_unreachable: "That did not save on our side. Nothing was lost — try once more in a minute.",
+  email_unverified: "Confirm your email on the Terminal first — the workspace is tied to it, so it has to be yours.",
 }
 
 export default async function BusinessAccountPage({
@@ -70,7 +71,7 @@ export default async function BusinessAccountPage({
   // The email on the VERIFIED Neon session is the key — see the header of
   // lib/tenancy/account-workspace.ts for why an email is safe to look up here
   // and unsafe to look up on a sign-in form.
-  const workspaces = SAAS_TENANCY ? await workspacesForAccount(user.email) : []
+  const workspaces = SAAS_TENANCY ? await workspacesForAccount(user) : []
   const workspaceNote = workspace ? WORKSPACE_MESSAGE[workspace] : null
 
   return (
@@ -104,7 +105,18 @@ export default async function BusinessAccountPage({
               </p>
             ) : null}
 
-            {workspaces.length > 0 ? (
+            {!user.emailVerified ? (
+              <>
+                <H3>One step before the workspace.</H3>
+                <P className="mt-3">
+                  The workspace is tied to your email, so the email has to be confirmed first. Open the verification
+                  message from the Terminal, then come back — the form is waiting here.
+                </P>
+                <a href={`${TERMINAL_URL}/account`} className="mt-6 inline-block text-[0.875rem] font-medium text-[#3B82F6]">
+                  Confirm it on the Terminal →
+                </a>
+              </>
+            ) : workspaces.length > 0 ? (
               <ul className="divide-y divide-white/[0.06]">
                 {workspaces.map((w) => (
                   <li key={w.subdomain} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0">

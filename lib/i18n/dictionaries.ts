@@ -646,6 +646,7 @@ const en: Dict = {
   'login.email': 'Email',
   'login.password': 'Password',
   'login.signIn': 'Sign in',
+  'login.openWithEntrestate': 'Open with your Entrestate account',
   'login.remember': 'Keep me signed in',
   'login.error': 'Incorrect email or password',
   // crm
@@ -1362,6 +1363,7 @@ const ar: Dict = {
   'login.email': 'البريد الإلكتروني',
   'login.password': 'كلمة المرور',
   'login.signIn': 'تسجيل الدخول',
+  'login.openWithEntrestate': 'ادخل بحساب Entrestate الخاص بك',
   'login.remember': 'إبقائي مسجلاً',
   'login.error': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
   'crm.leads': 'العملاء المحتملون',
@@ -2071,6 +2073,7 @@ const ru: Dict = {
   'login.email': 'Эл. почта',
   'login.password': 'Пароль',
   'login.signIn': 'Войти',
+  'login.openWithEntrestate': 'Войти через аккаунт Entrestate',
   'login.remember': 'Запомнить меня',
   'login.error': 'Неверная почта или пароль',
   'crm.leads': 'Лиды',

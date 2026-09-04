@@ -31,10 +31,17 @@
  *
  *   1. A Neon session is present on this request (the caller proves this by
  *      passing a TerminalUser it read from `getTerminalUser()`).
- *   2. The workspace exists and is not suspended.
- *   3. `saas_tenants.owner_email` equals that session's email, lowercased.
+ *   2. THE SESSION'S EMAIL IS VERIFIED. Added in review, and it is the one that
+ *      matters most: Neon Auth allows email+password sign-up, and a session can
+ *      exist before the address is proved. Without this check, anyone who typed
+ *      owner@brokerage.com at the Terminal's sign-up form would hold a session
+ *      whose email matches `owner_email`, and the door below would open the
+ *      brokerage's workspace as its CEO. The provider is configured to require
+ *      verification today; this code does not rely on that staying true.
+ *   3. The workspace exists and is not suspended.
+ *   4. `saas_tenants.owner_email` equals that session's email, lowercased.
  *
- * Condition 3 has a trap the schema documents and this module enforces:
+ * Condition 4 has a trap the schema documents and this module enforces:
  * `owner_email` is NULLABLE, and NULL means "we do not know who owns this",
  * never "anybody may". A tenant created before that column existed must not be
  * claimable by the first person to guess its subdomain, so a null owner is
@@ -72,6 +79,21 @@ import {
   type SaasTenant,
 } from './store'
 import { provisionTenantSchema } from './provision'
+
+/**
+ * The identity both doors accept, or null.
+ *
+ * One function so the two entry points cannot drift apart on what "proved"
+ * means. Returns the lowercased email only when the session says the address
+ * is verified; everything else — no email, no @, unverified — is null, and the
+ * caller treats null exactly as it treats a stranger.
+ */
+function provedEmail(user: { email: string | null; emailVerified: boolean }): string | null {
+  if (user.emailVerified !== true) return null
+  const email = (user.email ?? '').trim().toLowerCase()
+  if (!email || !email.includes('@')) return null
+  return email
+}
 
 /** What the account page shows for one workspace. Never carries a secret. */
 export type AccountWorkspace = {
@@ -121,7 +143,12 @@ const toWorkspace = (t: SaasTenant): AccountWorkspace => ({
  * which exists because an attacker can type any email into a sign-in box. Here
  * the identity was proved before we got here, so the list is safe to render.
  */
-export async function workspacesForAccount(email: string | null): Promise<AccountWorkspace[]> {
+export async function workspacesForAccount(
+  user: { email: string | null; emailVerified: boolean },
+): Promise<AccountWorkspace[]> {
+  // Listing discloses which brokerages an email owns. That is exactly the fact
+  // an unverified session must not be able to learn by typing an address.
+  const email = provedEmail(user)
   if (!email) return []
   const tenants = await tenantsOwnedByEmail(email).catch(() => [])
   return tenants.map(toWorkspace)
@@ -140,10 +167,11 @@ export type EnterResult =
  */
 export async function enterWorkspace(input: {
   subdomain: string
-  user: { email: string | null; name: string | null }
+  user: { email: string | null; name: string | null; emailVerified: boolean }
 }): Promise<EnterResult> {
-  const email = (input.user.email ?? '').trim().toLowerCase()
-  if (!email || !email.includes('@')) return { ok: false, reason: 'not_found' }
+  // An unverified session is a stranger here, and gets the stranger's answer.
+  const email = provedEmail(input.user)
+  if (!email) return { ok: false, reason: 'not_found' }
 
   const tenant = await getTenantBySubdomain(input.subdomain).catch(() => null)
   if (!tenant) return { ok: false, reason: 'not_found' }
@@ -174,7 +202,16 @@ export async function enterWorkspace(input: {
 
 export type CreateWorkspaceResult =
   | { ok: true; workspace: AccountWorkspace; claimUrl: string }
-  | { ok: false; reason: 'invalid_subdomain' | 'reserved' | 'taken' | 'company_required' | 'store_unreachable' }
+  | {
+      ok: false
+      reason:
+        | 'invalid_subdomain'
+        | 'reserved'
+        | 'taken'
+        | 'company_required'
+        | 'email_unverified'
+        | 'store_unreachable'
+    }
 
 /**
  * Create a workspace owned by the signed-in account — with no password.
@@ -194,10 +231,14 @@ export type CreateWorkspaceResult =
 export async function createWorkspaceForAccount(input: {
   subdomain: string
   company: string
-  user: { email: string | null; name: string | null }
+  user: { email: string | null; name: string | null; emailVerified: boolean }
 }): Promise<CreateWorkspaceResult> {
-  const email = (input.user.email ?? '').trim().toLowerCase()
-  if (!email || !email.includes('@')) return { ok: false, reason: 'store_unreachable' }
+  // Creating a workspace stamps this email as its owner for good, so an
+  // unproved address must not get that far. This reason is its own value —
+  // the first draft returned `store_unreachable` here, which told the person
+  // "something broke on our side" when the fix was in their inbox.
+  const email = provedEmail(input.user)
+  if (!email) return { ok: false, reason: 'email_unverified' }
 
   const company = input.company.trim()
   if (!company) return { ok: false, reason: 'company_required' }

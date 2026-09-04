@@ -7,6 +7,7 @@ import { login } from '@/lib/freehold/session'
 import type { Role } from '@/lib/freehold/session-types'
 import { ROLE_COLORS } from '@/lib/freehold/session-types'
 import { BRAND, brandName } from '@/lib/freehold/brand'
+import { SAAS_TENANCY, TENANT_BASE_DOMAIN, tenantSubdomainFromHost } from '@/lib/tenancy/config'
 import { I18nProvider, useT } from '@/lib/i18n/provider'
 
 type Profile = { email: string; name: string; initials: string; role: Role }
@@ -38,6 +39,14 @@ function ServerAuthInner() {
   const [remember, setRemember] = useState(true)
   const [show, setShow]         = useState(false)
   const [error, setError]       = useState(false)
+  // Resolved after mount: this is a client component and the host is only
+  // known in the browser. False until then, so the server render never shows
+  // the link on the apex, and false forever on a deployment without tenancy.
+  const [onTenantHost, setOnTenantHost] = useState(false)
+  useEffect(() => {
+    if (!SAAS_TENANCY) return
+    setOnTenantHost(tenantSubdomainFromHost(window.location.host) !== null)
+  }, [])
   const [loading, setLoading]   = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
   const [search, setSearch]     = useState('')
@@ -270,6 +279,33 @@ function ServerAuthInner() {
               {loading ? t('login.verifying') : t('login.signIn')}
             </button>
           </form>
+
+          {/*
+            THE PASSWORDLESS OWNER'S WAY OUT OF THIS SCREEN.
+
+            A workspace created from /business/account has an owner with NO
+            password — the Entrestate account is the only door. An owner who
+            bookmarks their subdomain lands here, on a form they can never
+            satisfy, and the only thing the form can say is "incorrect email or
+            password". This link is the way out.
+
+            It is a STATIC link to the apex account page: no email is read, no
+            lookup happens, nothing here can confirm whether an address owns a
+            workspace. It renders only on a tenant host of a tenancy-enabled
+            deployment, so the client's deployment (no
+            NEXT_PUBLIC_TENANT_BASE_DOMAIN) never shows it — the same dormancy
+            rule as the rest of lib/tenancy.
+          */}
+          {onTenantHost ? (
+            <p className="mt-4 text-center text-xs text-slate-600">
+              <a
+                href={`https://${TENANT_BASE_DOMAIN}/business/account`}
+                className="font-medium text-slate-800 underline-offset-2 hover:underline"
+              >
+                {t('login.openWithEntrestate')}
+              </a>
+            </p>
+          ) : null}
         </div>
 
         <p className="mt-4 text-center text-xs text-slate-700">

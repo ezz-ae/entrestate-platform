@@ -27,6 +27,12 @@
  *   6. Freehold's session is untouched. `fh_session` is a live client's
  *      cookie; this module reads a Neon session and mints a claim token, and
  *      it must never reach for the client's.
+ *   7. THE EMAIL MUST BE VERIFIED — found in review, after the first version
+ *      shipped. Neon Auth allows email+password sign-up and a session can
+ *      exist before the address is proved, so `owner_email === session.email`
+ *      was a comparison anyone could satisfy by typing the owner's address
+ *      into a sign-up form. Every entry point now refuses an unverified
+ *      session exactly as it refuses a stranger, through ONE shared guard.
  *
  * Pure — reads source. Runs in `pnpm guards`.
  */
@@ -65,7 +71,11 @@ console.log('\n── ownership is proved, and an unknown owner proves nothing �
   )
   check(
     'the owner is lowercased on both sides before comparing',
-    (mod.match(/\.trim\(\)\.toLowerCase\(\)/g) ?? []).length >= 3,
+    // The session side is normalised once, inside the shared guard; the tenant
+    // side at the comparison. Counting occurrences broke the moment the guard
+    // consolidated them, so this checks the two places by name instead.
+    /function provedEmail[\s\S]*?\.trim\(\)\.toLowerCase\(\)/.test(mod)
+      && /tenant\.ownerEmail[\s\S]{0,40}\.trim\(\)\.toLowerCase\(\)/.test(mod),
   )
   check('a suspended workspace does not open', /status\s*===\s*'suspended'/.test(mod))
   check(
@@ -164,6 +174,46 @@ console.log('\n── the client\'s session is not touched ──')
   )
 }
 
+console.log('\n── an unverified email is a stranger ──')
+{
+  const mod = stripComments(read(MODULE))
+  check(
+    'one shared guard decides what "proved" means',
+    /function provedEmail\(/.test(mod),
+    'no provedEmail() — two entry points with two definitions will drift',
+  )
+  check(
+    'the guard requires emailVerified === true, not merely truthy',
+    /emailVerified\s*!==\s*true/.test(mod),
+  )
+  const entryPoints = ['enterWorkspace', 'createWorkspaceForAccount', 'workspacesForAccount']
+  for (const fn of entryPoints) {
+    const body = mod.split(`export async function ${fn}(`)[1]?.split('\nexport ')[0] ?? ''
+    check(`${fn} reads the email through the guard`, body.includes('provedEmail('), `${fn} does not call provedEmail()`)
+    check(
+      `${fn} never lowercases the raw session email itself`,
+      !/input\.user\.email\s*\?\?[\s\S]{0,40}toLowerCase|user\.email\s*\?\?[\s\S]{0,40}toLowerCase/.test(body),
+      `${fn} reaches past the guard to the raw email`,
+    )
+  }
+  check(
+    'the session type carries the flag, so a caller cannot forget it exists',
+    /emailVerified:\s*boolean/.test(stripComments(read('lib/terminal-session.ts'))),
+  )
+  check(
+    'and the session reader is strict about it',
+    /emailVerified\s*===\s*true/.test(stripComments(read('lib/terminal-session.ts'))),
+    'the reader must map anything but literal true to false',
+  )
+  check(
+    'creation names the reason instead of blaming the store',
+    mod.includes("reason: 'email_unverified'") && !/provedEmail\(input\.user\)\s*\n\s*if \(!email\) return \{ ok: false, reason: 'store_unreachable' \}/.test(mod),
+  )
+  const page = read(PAGE)
+  check('the page passes the whole user, not a bare email, to the listing', /workspacesForAccount\(user\)/.test(page))
+  check('and tells an unverified person what to do rather than showing a form that bounces', page.includes('email_unverified') && /!user\.emailVerified/.test(page))
+}
+
 console.log('\n── the account page can actually reach it ──')
 {
   const page = read(PAGE)
@@ -176,6 +226,37 @@ console.log('\n── the account page can actually reach it ──')
     !/\bfree\b/i.test(page.replace(/freehold/gi, '')),
     'the included layer is NAMED, never sold as the banned word',
   )
+}
+
+console.log('\n── every other door into a second identity is closed ──')
+{
+  const signup = stripComments(read('app/signup/page.tsx'))
+  check('the public sign-up is a server component that reads the Neon session', signup.includes('getTerminalUser'))
+  check('and sends a signed-in person to the account page instead of the password form',
+    /if \(user\) redirect\('\/business\/account'\)/.test(signup))
+  check('the password form itself moved aside, unchanged, for strangers',
+    fs.existsSync(path.join(ROOT, 'app/signup/signup-client.tsx'))
+      && read('app/signup/signup-client.tsx').includes('type="password"'))
+  check('the redirect is dormant without tenancy, like the rest of the path',
+    /if \(SAAS_TENANCY\)[\s\S]{0,120}getTerminalUser/.test(signup))
+
+  const signin = read('app/server/page.tsx')
+  const signinCode = stripComments(signin)
+  check('the tenant sign-in screen offers the Entrestate-account door',
+    signinCode.includes("t('login.openWithEntrestate')"))
+  check('…as a static link to the apex, reading no email and making no lookup',
+    /href=\{`https:\/\/\$\{TENANT_BASE_DOMAIN\}\/business\/account`\}/.test(signinCode)
+      && !/openWithEntrestate[\s\S]{0,300}(fetch|tenantsOwnedByEmail|email)/.test(signinCode.split("openWithEntrestate")[0].slice(-300) + "openWithEntrestate"))
+  check('…only on a tenant host of a tenancy-enabled deployment',
+    signinCode.includes('if (!SAAS_TENANCY) return') && signinCode.includes('tenantSubdomainFromHost(window.location.host)'))
+  check('the link has all three languages',
+    ['en','ar','ru'].every(() => true) && (read('lib/i18n/dictionaries.ts').match(/'login\.openWithEntrestate'/g) ?? []).length === 3)
+
+  const summary = stripComments(read('app/api/account/summary/route.ts'))
+  check('the account summary hands the Terminal the workspaces and the door to each',
+    summary.includes('workspacesForAccount(user)') && summary.includes('enterUrl'))
+  check('and only says a workspace can be created when the identity could complete it',
+    /canCreateWorkspace:\s*SAAS_TENANCY && user\.emailVerified/.test(summary))
 }
 
 console.log('\n── the foundation doc records the phase ──')

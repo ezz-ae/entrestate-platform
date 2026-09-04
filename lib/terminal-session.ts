@@ -54,6 +54,18 @@ export type TerminalUser = {
   id: string
   email: string | null
   name: string | null
+  /**
+   * WHETHER THE EMAIL HAS BEEN PROVED TO BELONG TO THIS PERSON.
+   *
+   * Neon Auth (Better Auth underneath) permits email+password sign-up, and a
+   * session can exist before the address is verified. Every door on this site
+   * that maps an email to something — a workspace, an account, a wallet — is
+   * only as safe as this flag: without it, anyone who types
+   * owner@brokerage.com at the Terminal's sign-up holds a session that says
+   * they are the owner. Read it before trusting `email` for anything that
+   * grants access. False when the provider did not say true.
+   */
+  emailVerified: boolean
 }
 
 /**
@@ -70,6 +82,10 @@ export async function getTerminalUser(): Promise<TerminalUser | null> {
       id: String(user.id),
       email: user.email ? String(user.email) : null,
       name: user.name ? String(user.name) : null,
+      // Strictly `=== true`: an absent or malformed flag is "not proved", never
+      // "probably fine". The provider's default is to send this field; a
+      // session that lacks it is one this code does not understand.
+      emailVerified: (user as { emailVerified?: unknown }).emailVerified === true,
     }
   } catch {
     // Includes the library's "Cookies can only be modified in a Server
