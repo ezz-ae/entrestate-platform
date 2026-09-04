@@ -58,6 +58,8 @@ import { p_ads_google } from '../lib/i18n/dictionaries/p_ads_google'
 import { CALL_TYPES, CALL_BRANCHES, CALL_REFUSALS, CALL_KEY_PREFIX } from '../lib/freehold/call-templates'
 import { RAIL_REFUSALS } from '../lib/calling/gates'
 import { lm_calling } from '../lib/i18n/dictionaries/lm_calling'
+import { hub_starters } from '../lib/i18n/dictionaries/hub_starters'
+import { STARTER_DOORS, starterKeys } from '../lib/freehold/hub-starters'
 import { TRIAL_STATES } from '../lib/tenancy/trial'
 import { trial as trialDict } from '../lib/i18n/dictionaries/trial'
 import { RATE_REASONS, RATE_BANDS } from '../lib/freehold/lead-rate'
@@ -356,6 +358,15 @@ console.log('\n── lead rate reasons and bands ──')
   // without its words in every language.
   family('crm.rate.reason', 'crm.rate.reason.', RATE_REASONS, crmDict)
   family('crm.rate.band', 'crm.rate.band.', RATE_BANDS, crmDict)
+}
+
+console.log('\n── the seven doors on the home and their starters ──')
+{
+  // components/freehold/starter-row.tsx renders t(`hub.arch.${door.id}`) and
+  // t(`hub.arch.${door.id}.${n}.t` / `.s`) — a door cannot ship without its
+  // label and its three starters, title and sub, in every language.
+  const keys = STARTER_DOORS.flatMap((d) => starterKeys(d).map((k) => k.replace(/^hub\.arch\./, '')))
+  family('hub.arch (doors + starters)', 'hub.arch.', keys, hub_starters as typeof lm_ads)
 }
 
 if (failures > 0) {

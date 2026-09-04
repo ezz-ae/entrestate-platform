@@ -5,25 +5,28 @@ import { BRAND } from '@/lib/freehold/brand'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
-  AlertCircle, Activity, ArrowUpRight, X, Globe, Sparkles,
-  Users, Radio, Inbox, CalendarClock, Handshake, TrendingUp, ArrowRight,
-  Monitor, Wand2, Cloud, BookOpen, Bell,
+  AlertCircle, ArrowUpRight, X, Globe, Sparkles,
+  Users, Radio, TrendingUp, ArrowRight,
 } from 'lucide-react'
 import { type InventoryProperty } from '@/src/features/freehold-intelligence/inventory'
 import { useSession } from '@/lib/freehold/use-session'
 import { Panel, PanelHeader, buttonClass } from '@/components/freehold/ui'
 import { useI18n } from '@/lib/i18n/provider'
-import { openWhatsNew } from '@/components/freehold/whats-new'
 import { metaLeadCount } from '@/lib/meta/lead-count'
 import { AiPrompt } from '@/components/freehold/ai-prompt'
 import { sendToExpert } from '@/lib/freehold/expert-bus'
 import { NotificationsBell } from '@/components/freehold/notifications-bell'
+import { StarterRow } from '@/components/freehold/starter-row'
 
-// ─── The hub is a briefing, not a menu ───────────────────────────────────────
-// The nav spine already switches apps, and the Expert already answers
-// questions — so the home page does neither. It reads the live system and
-// says what's going on: what needs you (only when something does), and
-// deep widgets for ads, leads, team and the site. Empty boxes don't render.
+// ─── The hub is a question, then a briefing ──────────────────────────────────
+// The owner asked for the home to open the way an assistant does: one
+// question — "How can the Expert help you, {name}?" — a composer, and a row
+// of doors beneath it, each opening three creative starters the Expert can
+// run right now (components/freehold/starter-row.tsx). Under that, two
+// panels the person actually returns for: what NEEDS them, and what MOVED
+// since yesterday — each with an honest empty state, never a demo row.
+// The deep widgets for leads, ads, team and the site keep their place below
+// on desktop. The nav spine already switches apps; nothing here repeats it.
 
 type ActivityType = 'lead' | 'warning' | 'success' | 'info'
 type ActivityRow = { time: string; label: string; detail: string; type: ActivityType }
@@ -82,6 +85,7 @@ export default function DashboardClient({ inventoryData }: { inventoryData: Inve
 
   const { user } = useSession()
   const role = user?.role
+  const firstName = (user?.name ?? '').trim().split(/\s+/)[0] || ''
   const router = useRouter()
   const { t, locale } = useI18n()
   const localeTag = locale === 'ar' ? 'ar-AE' : locale === 'ru' ? 'ru-RU' : 'en-AE'
@@ -237,93 +241,105 @@ export default function DashboardClient({ inventoryData }: { inventoryData: Inve
     })),
   ]
 
-  // Deep entry points — not the nav again; each goes INSIDE an app.
-  const deepLinks: Array<{ key: string; Icon: typeof Users; label: string; href?: string; onClick?: () => void }> = [
-    { key: 'team', href: `${FI}/management/team`, Icon: Users, label: t('hub.go.team') },
-    { key: 'ads', href: `${FI}/ads-live`, Icon: Radio, label: t('hub.go.liveAds') },
-    { key: 'inbox', href: `${FI}/crm/inbox`, Icon: Inbox, label: t('hub.go.inbox') },
-    { key: 'followup', href: `${FI}/crm/follow-up`, Icon: CalendarClock, label: t('hub.go.followup') },
-    { key: 'deals', href: `${FI}/management/deals`, Icon: Handshake, label: t('hub.go.deals') },
-    { key: 'site', href: `${FI}/analytics/marketing`, Icon: TrendingUp, label: t('hub.go.site') },
-    // From Drive — the same rooms/nav entries, surfaced as one-tap shortcuts.
-    { key: 'webDesigner', href: `${FI}/drive/web`, Icon: Monitor, label: t('drive.room.web.title') },
-    { key: 'editor', href: `${FI}/drive/editor`, Icon: Wand2, label: t('drive.nav.editor') },
-    { key: 'studio', href: `${FI}/drive/create`, Icon: Sparkles, label: t('drive.room.studio.title') },
-    { key: 'cloud', href: `${FI}/cloud`, Icon: Cloud, label: t('drive.room.cloud.title') },
-    { key: 'whatsNew', onClick: openWhatsNew, Icon: Bell, label: t('whatsnew.menu') },
-    { key: 'guide', href: `${FI}/help`, Icon: BookOpen, label: t('hub.go.guide') },
-  ]
-
   return (
     <div className="mx-auto max-w-5xl px-5 pb-24 pt-8 sm:px-8 sm:pt-10">
 
-      {/* ── Greeting — slim, no box ──────────────────────────────────────────── */}
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-white">{greeting || t('hub.title')}</h1>
-          <div className="mt-0.5 text-sm text-slate-400">{dateStr}</div>
-        </div>
+      {/* ── The question — date and greeting as the eyebrow, the ask as the title ── */}
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
+        <div>{dateStr}{greeting ? <span className="text-slate-400"> · {greeting}</span> : null}</div>
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-slate-500 transition-colors hover:text-slate-300">
+          <Link href="/" className="flex items-center gap-1.5 transition-colors hover:text-slate-300">
             <Globe className="h-3.5 w-3.5" /> {BRAND.domain}
           </Link>
           <NotificationsBell />
         </div>
       </div>
+      <h1 className="mx-auto mb-6 mt-6 max-w-[22ch] text-balance text-center text-2xl font-semibold tracking-tight text-white sm:mt-10 sm:text-[2rem] sm:leading-tight">
+        {t('hub.arch.title', { expert: `${BRAND.company} Expert`, name: firstName })}
+      </h1>
 
-      {/* ── AI composer — home is the main AI of the day. Type here → the one
+      {/* ── The composer — home is the main AI of the day. Type here → the one
           docked Expert opens and runs the action loop, grounded in live data. ── */}
-      <div className="mb-6" data-coach="hub-ai">
-        <AiPrompt placeholder={t('hub.ai.placeholder')} suggestions={aiSuggestions} />
+      <div className="mb-5" data-coach="hub-ai">
+        <AiPrompt placeholder={t('hub.arch.placeholder')} suggestions={aiSuggestions} />
       </div>
 
-      {/* ── Needs your attention — exists ONLY when something does ──────────── */}
-      {signals.length > 0 && (
-        <section data-coach="hub-briefing" className="mb-6 overflow-hidden rounded-2xl border border-gold/20 bg-gradient-to-br from-gold/[0.08] via-gold/[0.02] to-transparent">
-          <div className="flex items-center gap-2.5 border-b border-line px-5 py-3.5">
-            <Sparkles className="h-4 w-4 text-gold" />
-            <span className="text-sm font-semibold text-white">{t('hub.attention')}</span>
-            <span className="ml-auto text-xs text-slate-500">{signals.length}</span>
-          </div>
-          <div className="divide-y divide-white/[0.05]">
-            {signals.map((s) => (
-              <div key={s.id} className="group flex items-center gap-3 px-5 py-3 transition hover:bg-white/[0.03]">
-                <span className={`h-2 w-2 shrink-0 rounded-full ${sevDot[s.sev]}`} />
-                <Link href={s.href} className="flex-1 text-sm text-slate-200 transition hover:text-white">{s.text}</Link>
-                {/* Ask AI — hand this signal to the Expert as a concrete task */}
-                <button
-                  type="button"
-                  onClick={() => sendToExpert(s.ai)}
-                  title={t('hub.askAi')}
-                  aria-label={t('hub.askAi')}
-                  className="shrink-0 rounded-full border border-gold/25 bg-gold/[0.06] p-1.5 text-gold/80 transition hover:bg-gold/15 hover:text-gold"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                </button>
-                <Link href={s.href} aria-label={t('hub.w.open')} className="shrink-0 text-slate-600 transition group-hover:text-gold">
-                  <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* ── Seven doors, three starters each ─────────────────────────────────── */}
+      <div className="mb-10">
+        <StarterRow />
+      </div>
 
-      {/* ── Deep entry points — a button group, not the nav again ───────────── */}
-      <div className="mb-8 flex flex-wrap gap-2">
-        {deepLinks.map((l, i) => {
-          // LITE: phones show the 4 essentials; the rest are desktop depth.
-          const cls = buttonClass('secondary', 'sm', `gap-2${i >= 4 ? ' max-sm:hidden' : ''}`)
-          return l.href ? (
-            <Link key={l.key} href={l.href} className={cls}>
-              <l.Icon className="h-3.5 w-3.5 text-gold" /> {l.label}
-            </Link>
+      {/* ── Needs you · Since yesterday — each honest when empty ─────────────── */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-2">
+        <section data-coach="hub-briefing" className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
+          <div className="flex items-start gap-3 px-5 pt-4 pb-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-white">{t('hub.arch.needsYou')}</div>
+              <div className="mt-0.5 text-xs text-slate-500">{t('hub.arch.needsYouSub')}</div>
+            </div>
+            <Link href={`${FI}/tasks`} className={buttonClass('secondary', 'sm')}>{t('hub.arch.viewAll')}</Link>
+          </div>
+          {signals.length > 0 ? (
+            <div className="divide-y divide-white/[0.05] border-t border-line">
+              {signals.map((s) => (
+                <div key={s.id} className="group flex items-center gap-3 px-5 py-3 transition hover:bg-white/[0.03]">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${sevDot[s.sev]}`} />
+                  <Link href={s.href} className="flex-1 text-sm text-slate-200 transition hover:text-white">{s.text}</Link>
+                  {/* Ask AI — hand this signal to the Expert as a concrete task */}
+                  <button
+                    type="button"
+                    onClick={() => sendToExpert(s.ai)}
+                    title={t('hub.askAi')}
+                    aria-label={t('hub.askAi')}
+                    className="shrink-0 rounded-full border border-gold/25 bg-gold/[0.06] p-1.5 text-gold/80 transition hover:bg-gold/15 hover:text-gold"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                  </button>
+                  <Link href={s.href} aria-label={t('hub.w.open')} className="shrink-0 text-slate-600 transition group-hover:text-gold">
+                    <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
+                  </Link>
+                </div>
+              ))}
+            </div>
           ) : (
-            <button key={l.key} type="button" onClick={l.onClick} className={cls}>
-              <l.Icon className="h-3.5 w-3.5 text-gold" /> {l.label}
-            </button>
-          )
-        })}
+            <div className="m-5 mt-1 rounded-xl border border-dashed border-line-strong px-5 py-8 text-center text-sm text-slate-500">
+              {t('hub.arch.needsYouEmpty')}
+            </div>
+          )}
+        </section>
+
+        <section className="flex flex-col overflow-hidden rounded-2xl border border-line bg-surface">
+          <div className="flex items-start gap-3 px-5 pt-4 pb-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-semibold text-white">{t('hub.arch.since')}</div>
+              <div className="mt-0.5 text-xs text-slate-500">{t('hub.arch.sinceSub')}</div>
+            </div>
+            <Link href={`${FI}/crm`} className={buttonClass('secondary', 'sm')}>{t('hub.arch.viewAll')}</Link>
+          </div>
+          {activity.length > 0 ? (
+            <div className="divide-y divide-white/[0.05] border-t border-line">
+              {activity.slice(0, 5).map((item, i) => (
+                <div key={i} className="flex items-center gap-3 px-5 py-3">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${
+                    item.type === 'lead' ? 'bg-gold' :
+                    item.type === 'warning' ? 'bg-amber-400' :
+                    item.type === 'success' ? 'bg-emerald-400' : 'bg-surface-3'
+                  }`} />
+                  <div className="min-w-0 flex-1 truncate">
+                    <span className="text-sm font-medium text-slate-200">{item.label}</span>
+                    <span className="mx-2 text-slate-600">·</span>
+                    <span className="text-sm text-slate-400">{item.detail}</span>
+                  </div>
+                  <span className="shrink-0 text-xs tabular-nums text-slate-500">{item.time}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="m-5 mt-1 rounded-xl border border-dashed border-line-strong px-5 py-8 text-center text-sm text-slate-500">
+              {t('hub.arch.sinceEmpty')}
+            </div>
+          )}
+        </section>
       </div>
 
       {/* ── Live widgets — desktop depth; phones keep only what needs you.
@@ -459,30 +475,6 @@ export default function DashboardClient({ inventoryData }: { inventoryData: Inve
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Panel>
-        )}
-
-        {/* Live activity — real events only, no demo fallback */}
-        {activity.length > 0 && (
-          <Panel>
-            <PanelHeader title={t('hub.liveActivity')} icon={<Activity className="h-4 w-4" />} />
-            <div className="divide-y divide-white/[0.06]">
-              {activity.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 px-5 py-3.5">
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${
-                    item.type === 'lead' ? 'bg-gold' :
-                    item.type === 'warning' ? 'bg-amber-400' :
-                    item.type === 'success' ? 'bg-emerald-400' : 'bg-surface-3'
-                  }`} />
-                  <div className="min-w-0 flex-1">
-                    <span className="text-sm font-medium text-slate-200">{item.label}</span>
-                    <span className="mx-2 text-slate-600">·</span>
-                    <span className="text-sm text-slate-400">{item.detail}</span>
-                  </div>
-                  <span className="shrink-0 text-xs tabular-nums text-slate-500">{item.time}</span>
                 </div>
               ))}
             </div>
