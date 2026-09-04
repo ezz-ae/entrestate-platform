@@ -186,3 +186,33 @@ Per-app economics, from the owner's model:
    their email in Neon Auth stops matching their workspace, and the fix is a
    `neon_user_id` column shipped with whatever first lets an email be edited.
    Guard `scripts/account-workspace-test.ts`.)*
+
+   *Hardened in review, 2026-09-04. The first version compared
+   `saas_tenants.owner_email` to the session's email and stopped there. Neon
+   Auth allows email+password sign-up, and a session can exist before the
+   address is verified — so anyone who typed the owner's address into the
+   Terminal's sign-up form held a session that satisfied the comparison, and
+   the door would have opened their brokerage as its CEO. `TerminalUser` now
+   carries `emailVerified` (strictly `=== true`), and every entry point —
+   listing, entering, creating — reads the email through one shared
+   `provedEmail()` guard that treats an unverified session exactly as a
+   stranger. The provider is configured to require verification today; the
+   code no longer relies on that staying true.*
+
+   *The remaining second-identity doors closed in the same change: the public
+   `/signup` is now a server component that sends a signed-in person to
+   `/business/account` instead of the password form (the form itself moved to
+   `signup-client.tsx`, unchanged, for strangers); the tenant sign-in screen
+   offers a static "Open with your Entrestate account" link on tenancy-enabled
+   tenant hosts only, so a passwordless owner who bookmarks their subdomain has
+   a way off a form they can never satisfy; and `/api/account/summary` hands
+   the Terminal the account's workspaces with an `enterUrl` each, so `/me`
+   offers the door rather than only describing what is behind it.*
+
+   *Still open, recorded rather than hidden: `/api/wl/claim` mints a
+   `freehold_site_users` row in the default schema for every claimant — the
+   platform identity the old sign-up path needed for its free surfaces. For a
+   Neon-originated person that row is redundant with `entrestate_accounts`, a
+   quiet second identity through the back door. Left alone because the claim
+   route cannot yet tell the two origins apart and the old path still depends
+   on it; the fix is a claim-token flag, and it is a separate change.*
