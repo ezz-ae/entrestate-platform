@@ -68,6 +68,7 @@
 import { randomUUID } from 'node:crypto'
 import { runWithSchema } from '@/lib/db'
 import { signSession } from '@/lib/freehold/auth-edge'
+import { memberSessionByEmail } from '@/lib/freehold/auth-db'
 import { upsertUserProfile } from '@/lib/data'
 import type { SessionUser } from '@/lib/freehold/session-types'
 import { ensureCreditAccount } from '@/lib/freehold/credits-db'
@@ -171,6 +172,26 @@ export async function workspacesForAccount(
   return tenants.map(toWorkspace)
 }
 
+/**
+ * How long a workspace session lives once a door has opened it. One number
+ * for the claim door and the recognise door — the cookie means the same
+ * thing whichever way it was minted.
+ */
+export const WORKSPACE_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * A `next` destination the recognise door will honour: a path on THIS host,
+ * with its query string, or null. No scheme, no host, no protocol-relative
+ * `//evil`, no backslash trick, no header-splitting characters. Null sends the
+ * person to their role's home, which is never wrong, only less specific.
+ */
+export function safeRelativePath(raw: string | null | undefined): string | null {
+  const v = (raw ?? '').trim()
+  if (!v.startsWith('/') || v.startsWith('//') || v.startsWith('/\\')) return null
+  if (/[\r\n]/.test(v)) return null
+  return v
+}
+
 export type EnterResult =
   | { ok: true; claimUrl: string }
   | { ok: false; reason: 'not_found' }
@@ -182,38 +203,74 @@ export type EnterResult =
  * returned URL is single-use in practice and expires in two minutes; it is a
  * credential, so it belongs in a redirect, never in a page body or a log.
  */
-export async function enterWorkspace(input: {
+/**
+ * WHO THIS PERSON IS INSIDE ONE WORKSPACE — decided from the Entrestate
+ * account alone. Null means "a stranger here", whatever else they are.
+ *
+ * This is the merge the owner asked for. The Terminal session (Neon) is the
+ * only account; a workspace is a place that account has standing in, and
+ * standing comes from exactly two records, checked in this order:
+ *
+ *   1. saas_tenants.owner_email — the founder. Session role 'ceo'.
+ *   2. the tenant's own roster, freehold_site_users — anyone the owner added
+ *      on the Team page. Their stored role and home, no password consulted:
+ *      a membership is a fact about the team, not a second credential.
+ *
+ * The email must be PROVED (verified on the Neon side) before either lookup
+ * runs; an unverified session is a stranger, same as before.
+ *
+ * Used by two callers with the same answer: /api/wl/recognise on the tenant
+ * host (the everyday door — the Neon cookie is readable there because it
+ * lives on .entrestate.com) and enterWorkspace() on the apex (the "Open the
+ * workspace" button, which still hands over through a claim token because
+ * that is where the redirect starts).
+ */
+export async function recogniseInWorkspace(input: {
   subdomain: string
   user: { email: string | null; name: string | null; emailVerified: boolean }
-}): Promise<EnterResult> {
-  // An unverified session is a stranger here, and gets the stranger's answer.
+}): Promise<SessionUser | null> {
   const email = provedEmail(input.user)
-  if (!email) return { ok: false, reason: 'not_found' }
+  if (!email) return null
 
   const tenant = await getTenantBySubdomain(input.subdomain).catch(() => null)
-  if (!tenant) return { ok: false, reason: 'not_found' }
-  if (tenant.status === 'suspended') return { ok: false, reason: 'not_found' }
+  if (!tenant) return null
+  if (tenant.status === 'suspended') return null
 
   // A null owner loses every comparison. Written as an explicit guard rather
   // than relying on `null !== email`, because the day someone "helpfully"
   // defaults ownerEmail to '' upstream, that expression starts handing out
   // workspaces and this line is what stops it.
   const owner = (tenant.ownerEmail ?? '').trim().toLowerCase()
-  if (!owner || owner !== email) return { ok: false, reason: 'not_found' }
-
-  const name = input.user.name?.trim() || tenant.company
-  const session: SessionUser = {
-    email,
-    name,
-    initials: initialsOf(name, email),
-    role: 'ceo',
-    home: '/freehold-intelligence',
-    tenant: tenant.subdomain,
+  if (owner && owner === email) {
+    const name = input.user.name?.trim() || tenant.company
+    return {
+      email,
+      name,
+      initials: initialsOf(name, email),
+      role: 'ceo',
+      home: '/freehold-intelligence',
+      tenant: tenant.subdomain,
+    }
   }
+
+  // Not the owner: the team. Scoped to the tenant's schema explicitly, so the
+  // answer is the same whether this runs on the tenant host (where that schema
+  // is already ambient) or on the apex (where it is not).
+  const member = await runWithSchema(tenant.schemaName, () => memberSessionByEmail(email)).catch(() => null)
+  if (!member) return null
+  return { ...member, tenant: tenant.subdomain }
+}
+
+export async function enterWorkspace(input: {
+  subdomain: string
+  user: { email: string | null; name: string | null; emailVerified: boolean }
+}): Promise<EnterResult> {
+  const session = await recogniseInWorkspace(input)
+  if (!session) return { ok: false, reason: 'not_found' }
   const token = await signSession(session, CLAIM_TOKEN_TTL_MS)
   return {
     ok: true,
-    claimUrl: `${workspaceUrl(tenant.subdomain)}/api/wl/claim?token=${encodeURIComponent(token)}`,
+    claimUrl: `${workspaceUrl(session.tenant ?? input.subdomain)}/api/wl/claim?token=${encodeURIComponent(token)}`,
   }
 }
 

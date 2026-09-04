@@ -55,31 +55,63 @@ const ROLE_HOME: Record<string, string> = {
   marketing: '/freehold-intelligence',
 }
 
-export async function authenticateFromDB(email: string, password: string): Promise<SessionUser | null> {
-  try {
-    const rows = await query<DbUser>(
-      `SELECT id, name, email, role, password_hash, ai_access,
+/**
+ * The ONE way a roster row becomes a session. authenticateFromDB (password)
+ * and memberSessionByEmail (Entrestate account) both end here, so role → home
+ * and the broker-id rule cannot drift between the two doors.
+ */
+function toSessionUser(u: DbUser): SessionUser {
+  const role = u.role as SessionUser['role']
+  return {
+    email: u.email,
+    name: u.name ?? u.email,
+    initials: (u.name ?? u.email).split(' ').map((p: string) => p[0]).slice(0,2).join('').toUpperCase(),
+    role,
+    home: ROLE_HOME[role] ?? '/freehold-intelligence',
+    // brokerId MUST equal the user id so leads' assigned_broker_id (set to the
+    // user id by inbox/assignment) matches the broker's session for filtering.
+    ...(role === 'broker' ? { brokerId: u.id } : {}),
+  }
+}
+
+const ROSTER_ROW = `SELECT id, name, email, role, password_hash, ai_access,
               COALESCE(suspended, false) AS suspended, COALESCE(banned, false) AS banned
        FROM freehold_site_users
-       WHERE email = $1 LIMIT 1`,
-      [email.trim().toLowerCase()]
-    )
+       WHERE email = $1 LIMIT 1`
+
+export async function authenticateFromDB(email: string, password: string): Promise<SessionUser | null> {
+  try {
+    const rows = await query<DbUser>(ROSTER_ROW, [email.trim().toLowerCase()])
     if (rows.length === 0) return null
     const u = rows[0]
     if (!verifyPassword(password, u.password_hash)) return null
     // Disabled or banned accounts cannot sign in.
     if (u.suspended || u.banned) return null
-    const role = u.role as SessionUser['role']
-    return {
-      email: u.email,
-      name: u.name ?? u.email,
-      initials: (u.name ?? u.email).split(' ').map((p: string) => p[0]).slice(0,2).join('').toUpperCase(),
-      role,
-      home: ROLE_HOME[role] ?? '/freehold-intelligence',
-      // brokerId MUST equal the user id so leads' assigned_broker_id (set to the
-      // user id by inbox/assignment) matches the broker's session for filtering.
-      ...(role === 'broker' ? { brokerId: u.id } : {}),
-    }
+    return toSessionUser(u)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * A roster member by email, WITHOUT a password — for the Entrestate-account
+ * door, where the person has already been identified by a verified Neon
+ * session and the only question is whether this workspace's team lists them.
+ *
+ * password_hash is deliberately not consulted: a member added through the
+ * Team page carries none (app/api/freehold/team creates the row with no
+ * password), and under the one-account rule that is the normal shape of a
+ * membership, not a broken one. Suspended and banned still refuse. Callers
+ * must run this inside the tenant's schema scope (runWithSchema) — the
+ * roster lives there.
+ */
+export async function memberSessionByEmail(email: string): Promise<SessionUser | null> {
+  try {
+    const rows = await query<DbUser>(ROSTER_ROW, [email.trim().toLowerCase()])
+    if (rows.length === 0) return null
+    const u = rows[0]
+    if (u.suspended || u.banned) return null
+    return toSessionUser(u)
   } catch {
     return null
   }

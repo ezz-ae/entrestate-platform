@@ -249,24 +249,46 @@ export async function proxy(request: NextRequest) {
   if (isInternalPage) {
     const token = request.cookies.get(SESSION_COOKIE)?.value
     const user = await verifySession(token)
+    const hostTenant = tenantSubdomainFromHost(hostname)
 
-    if (!user) {
-      const loginUrl = request.nextUrl.clone()
+    // WHERE A PERSON WITHOUT A WORKSPACE SESSION IS SENT.
+    //
+    // On a tenant host (SaaS), NOT to the sign-in screen: to the recognise
+    // door, /api/wl/recognise, which reads the Entrestate account (the Neon
+    // cookie on .entrestate.com, readable here) and mints the workspace
+    // session on the spot when this workspace lists that person. The owner
+    // and every team member who is signed in to Entrestate therefore never
+    // see a sign-in screen on their own workspace — one account, one door.
+    // Only a real stranger (no Neon session, or one this workspace does not
+    // list) ends up on /server, and the door says which.
+    //
+    // No cookie check at the edge on purpose: the Neon cookie's name is the
+    // auth library's business, and this middleware cannot verify it anyway.
+    // The door is one cheap redirect and it decides with the real session.
+    // Loop-safe: /server is not an internal page, so a refusal ends here.
+    //
+    // Elsewhere — the vendor's own hosts, a deployment without tenancy, the
+    // white-label demo — the previous rule stands.
+    const withoutSession = (): NextResponse => {
+      const url = request.nextUrl.clone()
+      if (hostTenant && !WHITE_LABEL) {
+        url.pathname = '/api/wl/recognise'
+        url.search = ''
+        url.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
+        return NextResponse.redirect(url)
+      }
       // White-label demo: unauthenticated visitors go to the activation gate,
       // not the Freehold team sign-in.
-      loginUrl.pathname = WHITE_LABEL ? '/activate' : '/server'
-      loginUrl.search = ''
-      return NextResponse.redirect(loginUrl)
+      url.pathname = WHITE_LABEL ? '/activate' : '/server'
+      url.search = ''
+      return NextResponse.redirect(url)
     }
+
+    if (!user) return withoutSession()
 
     // Tenant fencing for pages (SaaS): a session minted on another host must
     // re-authenticate here — same rule as the API wall above.
-    if ((user.tenant ?? null) !== tenantSubdomainFromHost(hostname)) {
-      const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = WHITE_LABEL ? '/activate' : '/server'
-      loginUrl.search = ''
-      return NextResponse.redirect(loginUrl)
-    }
+    if ((user.tenant ?? null) !== hostTenant) return withoutSession()
 
     // Management-only: company-wide reporting, money, ROI, system events.
     if (pathname.startsWith('/freehold-intelligence/management') && !MANAGEMENT_ROLES.includes(user.role)) {

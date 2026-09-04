@@ -236,3 +236,33 @@ Per-app economics, from the owner's model:
    workspace's own auth. That is membership, not account: one account, many
    memberships is the shape, and moving the roster onto Neon is a later
    decision, not a leftover.*
+
+   *One door, 2026-09-04, the same evening. The owner, after using it: "I
+   still see you struggle to merge both accounts, the server and the
+   terminal, but I know we can do it correctly." He was right: a workspace was
+   BORN from the one account, but LIVING in it still took a second session
+   that only a claim token minted on the apex could start — three hops for the
+   owner (Terminal → /me → "Open the workspace" → tenant) — and for a team
+   member there was no way in except a password on /server, which is the
+   second account by another name. The fact that fixes it was already in the
+   summary above: the Neon cookie lives on `.entrestate.com`, so it is
+   readable on every workspace host. `recogniseInWorkspace()` in
+   `lib/tenancy/account-workspace.ts` now decides standing from that session
+   alone — owner (`saas_tenants.owner_email`, role ceo) or team
+   (`freehold_site_users` through `memberSessionByEmail()`, NO password
+   consulted) — and `/api/wl/recognise` on the tenant host turns the answer
+   into the workspace session on the spot. `proxy.ts` sends every
+   unauthenticated internal-page request on a tenant host to that door before
+   any sign-in screen, so the owner and the team never see one on their own
+   workspace. `/server` on a tenant host lost its password form entirely: it
+   asks the door itself and, when refused, shows the door's verdict
+   (`signed_out` → "Continue with Entrestate", the Terminal sign-in and back
+   through the door; `stranger` → signed in but not on this team, ask the
+   owner; `slow_down`). The apex and the client's deployment keep their
+   password sign-in untouched. The roster question above is thereby answered
+   the way the shape implied: a member is added on the Team page by email and
+   signs in with the one account. `enterWorkspace()` is now a thin wrapper
+   over the same recognition, so the apex button and the host door cannot
+   disagree. Guard `scripts/one-door-test.ts`. Terminal side: the sign-in's
+   `next` accepts `https://*.entrestate.com` so a workspace can send a person
+   to the Terminal and get them back in one hop.*

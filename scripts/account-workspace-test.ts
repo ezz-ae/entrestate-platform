@@ -66,8 +66,11 @@ console.log('\n── ownership is proved, and an unknown owner proves nothing �
   )
   check(
     'an empty/unknown owner is refused explicitly, not by falling through a comparison',
-    /if\s*\(\s*!owner\s*\|\|/.test(mod),
-    'no `if (!owner || …)` guard — a null owner must lose on its own line',
+    // Since the recognise door: the owner branch OPENS only on `owner && owner
+    // === email`, so an empty owner never enters it and falls to the team
+    // lookup, where a stranger is still a stranger. Same guarantee, positive form.
+    /if\s*\(\s*owner\s*&&\s*owner\s*===\s*email\s*\)/.test(mod),
+    'no `if (owner && owner === email)` guard — a null owner must never match',
   )
   check(
     'the owner is lowercased on both sides before comparing',
@@ -91,7 +94,10 @@ console.log('\n── every refusal says the same thing ──')
   const enterReasons = reasons.filter((r) => r.includes('not_found'))
   check(
     'enterWorkspace returns only `not_found`',
-    enterReasons.length >= 3,
+    // One refusal now: enterWorkspace asks recogniseInWorkspace (null for every
+    // reason — unproved, missing, suspended, not owner, not on the team) and
+    // collapses null to the single flag. The variety lives in nulls, not names.
+    enterReasons.length >= 1 && !/reason:\s*'(?!not_found)[a-z_]+'[\s\S]{0,200}EnterResult/.test(mod),
     `refusal reasons found: ${reasons.join(', ') || 'none'}`,
   )
   check(
@@ -186,7 +192,9 @@ console.log('\n── an unverified email is a stranger ──')
     'the guard requires emailVerified === true, not merely truthy',
     /emailVerified\s*!==\s*true/.test(mod),
   )
-  const entryPoints = ['enterWorkspace', 'createWorkspaceForAccount', 'workspacesForAccount']
+  // enterWorkspace no longer reads the email itself: it asks
+  // recogniseInWorkspace, which is where the guard now runs for both doors.
+  const entryPoints = ['recogniseInWorkspace', 'createWorkspaceForAccount', 'workspacesForAccount']
   for (const fn of entryPoints) {
     const body = mod.split(`export async function ${fn}(`)[1]?.split('\nexport ')[0] ?? ''
     check(`${fn} reads the email through the guard`, body.includes('provedEmail('), `${fn} does not call provedEmail()`)
@@ -195,6 +203,11 @@ console.log('\n── an unverified email is a stranger ──')
       !/input\.user\.email\s*\?\?[\s\S]{0,40}toLowerCase|user\.email\s*\?\?[\s\S]{0,40}toLowerCase/.test(body),
       `${fn} reaches past the guard to the raw email`,
     )
+  }
+  {
+    const body = mod.split('export async function enterWorkspace(')[1]?.split('\nexport ')[0] ?? ''
+    check('enterWorkspace decides nothing itself — it asks recogniseInWorkspace',
+      body.includes('recogniseInWorkspace(input)') && !body.includes('ownerEmail') && !body.includes('.email'))
   }
   check(
     'the session type carries the flag, so a caller cannot forget it exists',
@@ -242,17 +255,20 @@ console.log('\n── every other door into a second identity is closed ──')
   check('the page is dormant without tenancy, like the rest of the path',
     /if \(!SAAS_TENANCY\) redirect/.test(signup))
 
+  // Superseded 2026-09-04, second time. The first door was a static link to
+  // the apex account page — the passwordless owner's way out of a password
+  // form they could never satisfy. Now the tenant host has NO password form:
+  // the screen IS the door (EntrestateDoor), and it asks /api/wl/recognise
+  // itself. The old link and its i18n key are gone. scripts/one-door-test.ts
+  // pins the door; here only the facts that still belong to this suite.
   const signin = read('app/server/page.tsx')
   const signinCode = stripComments(signin)
-  check('the tenant sign-in screen offers the Entrestate-account door',
-    signinCode.includes("t('login.openWithEntrestate')"))
-  check('…as a static link to the apex, reading no email and making no lookup',
-    /href=\{`https:\/\/\$\{TENANT_BASE_DOMAIN\}\/business\/account`\}/.test(signinCode)
-      && !/openWithEntrestate[\s\S]{0,300}(fetch|tenantsOwnedByEmail|email)/.test(signinCode.split("openWithEntrestate")[0].slice(-300) + "openWithEntrestate"))
-  check('…only on a tenant host of a tenancy-enabled deployment',
-    signinCode.includes('if (!SAAS_TENANCY) return') && signinCode.includes('tenantSubdomainFromHost(window.location.host)'))
-  check('the link has all three languages',
-    ['en','ar','ru'].every(() => true) && (read('lib/i18n/dictionaries.ts').match(/'login\.openWithEntrestate'/g) ?? []).length === 3)
+  check('the tenant sign-in screen is the Entrestate door, not a password form',
+    signinCode.includes('<EntrestateDoor door={door} />') && /host === 'tenant' \?/.test(signinCode))
+  check('…and the apex keeps the password form for the vendor\'s own staff',
+    /host === 'other' \?/.test(signinCode) && signinCode.includes('<form onSubmit={handleSubmit}'))
+  check('the old static link is gone with its key',
+    !signinCode.includes('login.openWithEntrestate') && !read('lib/i18n/dictionaries.ts').includes("'login.openWithEntrestate'"))
 
   const summary = stripComments(read('app/api/account/summary/route.ts'))
   check('the account summary hands the Terminal the workspaces and the door to each',
