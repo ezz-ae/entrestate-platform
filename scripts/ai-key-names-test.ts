@@ -137,6 +137,30 @@ console.log('\n── nobody keeps a private copy ──')
     !/GEMINI_API_KEY is not configured/.test(profile))
 }
 
+console.log('\n── the AI card tells the truth about one door ──')
+{
+  // Two doors to the same models are alternatives, not halves of one
+  // credential. A Gemini key alone once read as "partial" and put the card on
+  // the launch-blocker list while the Expert was answering; and "Live via
+  // Gemini API" was printed for two hours over a key Google refused. Now: one
+  // door = connected, and a probe asks Google and prints its answer.
+  const status = stripComments(read('lib/freehold/integration-status.ts'))
+  check('a Gemini key OR a Vertex credential is connected — never partial',
+    /let aiState: IntegrationState = geminiOk \|\| vertexOk \? 'connected' : 'disconnected'/.test(status))
+  check('the AI card has no partial state left', !/aiState === 'partial'/.test(status))
+  check('when probing, the key is put to Google with one ListModels read',
+    /async function probeGeminiKey\(key: string\)/.test(status)
+      && /generativelanguage\.googleapis\.com\/v1beta\/models\?pageSize=1/.test(status)
+      && /'x-goog-api-key': key/.test(status))
+  check('…bounded to five seconds', /setTimeout\(\(\) => ctrl\.abort\(\), 5_000\)/.test(status))
+  check('…only when asked (opts.probe) and only when a key exists', /if \(opts\.probe && geminiOk\)/.test(status))
+  check('a refused key is reported as error with Google\'s own HTTP status',
+    /aiState = vertexOk \? 'connected' : 'error'/.test(status) && /Google answered HTTP \$\{res\.status\}/.test(status))
+  check('…and the note says so in the card', /The key is saved, but Google refuses it\./.test(status))
+  check('the probe never generates — no generateContent, no prompt', !/generateContent|contents:/.test(status))
+  check('Vertex is not probed here (no token minting on a status page)', !/vertexGenerateContent|getAccessToken|oauth2/.test(status))
+}
+
 console.log('\n── the sign-up note sells without the banned word ──')
 {
   const banned = [/\bfree\b/i, /مجان/, /бесплат/i]

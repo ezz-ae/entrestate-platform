@@ -21,7 +21,7 @@ import { probeAdAccountAccess } from '@/lib/meta/client'
 import type { GoogleStoredCreds } from '@/lib/google/client'
 import type { HubspotStoredCreds } from '@/lib/hubspot/client'
 import { callingConnection } from '@/lib/calling/provider'
-import { GEMINI_KEY_NAMES } from '@/lib/gemini-rest'
+import { GEMINI_KEY_NAMES, geminiStudioKey } from '@/lib/gemini-rest'
 import { vertexConfigured } from '@/lib/google/vertex-auth'
 
 export type IntegrationState =
@@ -62,6 +62,31 @@ function evaluate(
     return { state: 'partial', missing }
   }
   return { state: 'disconnected', missing }
+}
+
+/**
+ * Ask Google whether it accepts this key: one ListModels read, no generation,
+ * five seconds. Returns Google's HTTP status in the message so the card can
+ * say "refused with 400" rather than "something is wrong".
+ */
+async function probeGeminiKey(key: string): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!key) return { ok: false, message: 'No key to test.' }
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 5_000)
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1', {
+      headers: { 'x-goog-api-key': key },
+      signal: ctrl.signal,
+      cache: 'no-store',
+    })
+    if (res.ok) return { ok: true }
+    return { ok: false, message: `Google answered HTTP ${res.status}. Check the key in Vercel → Environment Variables.` }
+  } catch (e) {
+    const timedOut = e instanceof Error && e.name === 'AbortError'
+    return { ok: false, message: timedOut ? 'Google did not answer within 5 seconds.' : 'Google could not be reached.' }
+  } finally {
+    clearTimeout(timer)
+  }
 }
 
 export async function getLiveIntegrationStatuses(
@@ -155,12 +180,36 @@ export async function getLiveIntegrationStatuses(
   // the thing it describes.
   const geminiOk = hasAny(...GEMINI_KEY_NAMES)
   const vertexOk = vertexConfigured()
-  const aiState: IntegrationState =
-    geminiOk && vertexOk ? 'connected' : geminiOk || vertexOk ? 'partial' : 'disconnected'
+  // ONE working door is a working AI. Gemini and Vertex are two doors to the
+  // same models, not two halves of one credential — so a Gemini key alone was
+  // never "partial", and calling it that put this card on the launch-blocker
+  // list ("1 thing is holding back the server") on a workspace whose Expert
+  // was answering. Vertex is the enterprise door; the note offers it, the
+  // state does not demand it.
+  let aiState: IntegrationState = geminiOk || vertexOk ? 'connected' : 'disconnected'
   const aiMissing = [
     ...(geminiOk ? [] : ['GEMINI_API_KEY']),
     ...(vertexOk ? [] : ['VERTEX_AI_SERVICE_ACCOUNT_JSON']),
   ]
+
+  // Presence proved nothing about acceptance. On 2026-09-04 this card said
+  // "Live via Gemini API" for two hours over a key Google rejected with 400
+  // on every model — the copy said LIVE while the Expert answered from its
+  // offline fallback. When asked to probe, make ONE cheap read against the
+  // key (ListModels, no generation, 5 s budget) and report Google's own
+  // answer. Vertex is not probed here: its credential is a service account
+  // whose exchange is the runtime's job, and a status page should not mint
+  // tokens; a Vertex-only deployment stays presence-based and the note says so.
+  let aiProbeError: string | null = null
+  if (opts.probe && geminiOk) {
+    const probe = await probeGeminiKey(geminiStudioKey())
+    if (!probe.ok) {
+      aiProbeError = probe.message
+      // Only downgrade what the probe actually tested. A Vertex door beside a
+      // rejected key still stands.
+      aiState = vertexOk ? 'connected' : 'error'
+    }
+  }
 
   // ── Neon DB ──────────────────────────────────────────────────────────────
   const db = evaluate(['NEON_DATABASE_URL'])
@@ -245,12 +294,14 @@ export async function getLiveIntegrationStatuses(
       requiredKeys: ['GEMINI_API_KEY', 'VERTEX_AI_SERVICE_ACCOUNT_JSON'],
       missingKeys: aiMissing,
       note:
-        aiState === 'connected'
-          ? 'Live — Gemini API and Vertex service account both configured.'
-          : aiState === 'partial'
-            ? geminiOk
-              ? 'Live via Gemini API. Add VERTEX_AI_SERVICE_ACCOUNT_JSON for Vertex models.'
-              : 'Live via Vertex. Add GEMINI_API_KEY for direct Gemini access.'
+        aiState === 'error'
+          ? `The key is saved, but Google refuses it. ${aiProbeError ?? ''}`.trim()
+          : aiState === 'connected'
+            ? geminiOk && vertexOk
+              ? 'Live — Gemini API and Vertex service account both configured.'
+              : geminiOk
+                ? `Live via Gemini API${opts.probe && !aiProbeError ? ' — Google accepted the key' : ''}.${vertexOk ? '' : ' Vertex is optional: add VERTEX_AI_SERVICE_ACCOUNT_JSON for the enterprise door.'}`
+                : 'Live via Vertex (presence only — the service account is exchanged at call time). Add GEMINI_API_KEY for direct Gemini access.'
             : 'No AI provider configured — chat will not generate responses.',
     },
     {
