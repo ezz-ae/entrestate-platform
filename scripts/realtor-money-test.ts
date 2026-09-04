@@ -303,7 +303,8 @@ console.log('\n── the monthly grant is a company entitlement ──')
   check('the rollover returns early for a pay-as-you-go account', /if \(!row\.monthly_grant\) return 0/.test(db))
   check('ensureCreditAccount can open one', /monthlyGrant\?: boolean/.test(db))
 
-  const onboard = readFileSync(new URL('../lib/tenancy/onboard.ts', import.meta.url), 'utf8')
+  // Moved with the rest of workspace creation when the password path was removed.
+  const onboard = readFileSync(new URL('../lib/tenancy/account-workspace.ts', import.meta.url), 'utf8')
   check('a realtor signup opens a pay-as-you-go account', /ensureCreditAccount\(email, \{ monthlyGrant: false \}\)/.test(onboard))
 
   // WHY: the signup seed is deliberately non-fatal, so the account can instead be

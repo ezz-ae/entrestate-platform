@@ -209,10 +209,30 @@ Per-app economics, from the owner's model:
    the Terminal the account's workspaces with an `enterUrl` each, so `/me`
    offers the door rather than only describing what is behind it.*
 
-   *Still open, recorded rather than hidden: `/api/wl/claim` mints a
-   `freehold_site_users` row in the default schema for every claimant — the
-   platform identity the old sign-up path needed for its free surfaces. For a
-   Neon-originated person that row is redundant with `entrestate_accounts`, a
-   quiet second identity through the back door. Left alone because the claim
-   route cannot yet tell the two origins apart and the old path still depends
-   on it; the fix is a claim-token flag, and it is a separate change.*
+   *One identity, 2026-09-04. The owner's ruling, verbatim: "مينفعش يكون في
+   حسابين هو حساب واحد ويترتب صح" — there cannot be two accounts; it is one
+   account, arranged properly. So the password sign-up path was REMOVED, not
+   gated: `signupTenant()` is gone from `lib/tenancy/onboard.ts` (the file
+   stays as a tombstone that says where everything went), and every workspace
+   is now born through `createWorkspaceForAccount()` from a verified Neon
+   session. `/api/wl/signup` — public, and until now willing to mint a
+   password-owned workspace for any email typed into it — takes its identity
+   from the session and reads no name, email or password from the body. The
+   branded `/signup` form lost its three identity inputs and shows the
+   signed-in owner instead; a stranger there is sent to the Terminal's sign-up,
+   the one place a person is created, and returns via /me. `WorkspaceBrand`
+   carries the product word, accent, logo and plan so nothing the old form
+   could do was lost — only the second password. The realtor credit-account
+   seed moved with it, unchanged.*
+
+   *And the back door closed: `/api/wl/claim` no longer mints a
+   `freehold_site_users` platform identity when the request carries a Neon
+   session — that person is already the apex identity through
+   `entrestate_accounts`. It still does for a pre-existing password owner with
+   no other identity, because for them it is still the only one. What remains
+   of the old model is exactly those pre-existing owners (two demo tenants on
+   example.com addresses today) and the workspace ROSTER — brokers and staff a
+   workspace adds to itself, who sign in at the tenant host with the
+   workspace's own auth. That is membership, not account: one account, many
+   memberships is the shape, and moving the roster onto Neon is a later
+   decision, not a leftover.*

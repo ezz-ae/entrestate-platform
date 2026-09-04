@@ -70,13 +70,15 @@ import { runWithSchema } from '@/lib/db'
 import { signSession } from '@/lib/freehold/auth-edge'
 import { upsertUserProfile } from '@/lib/data'
 import type { SessionUser } from '@/lib/freehold/session-types'
-import { CLAIM_TOKEN_TTL_MS } from './onboard'
+import { ensureCreditAccount } from '@/lib/freehold/credits-db'
 import { TENANT_BASE_DOMAIN } from './config'
 import {
   createTenant,
   getTenantBySubdomain,
   tenantsOwnedByEmail,
+  TENANT_LOGO_MAX_BYTES,
   type SaasTenant,
+  type TenantPlan,
 } from './store'
 import { provisionTenantSchema } from './provision'
 
@@ -95,6 +97,14 @@ function provedEmail(user: { email: string | null; emailVerified: boolean }): st
   return email
 }
 
+/**
+ * Claim tokens are single-purpose and near-immediate — keep them short.
+ *
+ * Moved here from lib/tenancy/onboard.ts when the password sign-up path was
+ * removed; this module is now the only thing that mints one.
+ */
+export const CLAIM_TOKEN_TTL_MS = 2 * 60 * 1000
+
 /** What the account page shows for one workspace. Never carries a secret. */
 export type AccountWorkspace = {
   subdomain: string
@@ -106,6 +116,13 @@ export type AccountWorkspace = {
   createdAt: string
   /** Absolute URL of the workspace itself, for display. */
   url: string
+}
+
+/** Decoded byte length of a base64 data: URL payload. */
+function dataUrlBytes(dataUrl: string): number {
+  const comma = dataUrl.indexOf(',')
+  if (comma < 0) return 0
+  return Math.floor(((dataUrl.length - comma - 1) * 3) / 4)
 }
 
 const initialsOf = (name: string, email: string): string =>
@@ -213,25 +230,45 @@ export type CreateWorkspaceResult =
         | 'store_unreachable'
     }
 
+/** A workspace's brand and plan, as the sign-up form collects them. All optional. */
+export type WorkspaceBrand = {
+  product?: string
+  accent?: string
+  logo?: string
+  plan?: TenantPlan
+}
+
 /**
  * Create a workspace owned by the signed-in account — with no password.
  *
- * This is `signupTenant()` minus the second identity. The owner row inside the
- * tenant schema is written WITHOUT a `password_hash`, deliberately: there is
- * one password on this account and it is Neon's. A null hash cannot be
- * verified by `verifyPassword`, so the tenant's own sign-in form can never let
- * anyone in as this owner — the only door is the claim token minted above,
- * which requires the Neon session first.
+ * THE ONLY WAY A WORKSPACE IS BORN. `signupTenant()` in lib/tenancy/onboard.ts
+ * used to be the other way: a name, an email and a PASSWORD typed into a form,
+ * hashed into the tenant schema as a second identity for the same human. It
+ * was removed rather than gated, because a path that exists is a path someone
+ * eventually re-opens. Every caller — /business/account's small form and
+ * /signup's branded one — now lands here, with the identity coming from a
+ * verified Neon session and never from a field.
+ *
+ * The owner row inside the tenant schema is written WITHOUT a `password_hash`,
+ * deliberately: there is one password on this account and it is Neon's. A
+ * null hash cannot be verified by `verifyPassword`, so the tenant's own
+ * sign-in form can never let anyone in as this owner — the only door is the
+ * claim token minted below, which requires the Neon session first.
  *
  * The consequence is worth stating: this owner CANNOT sign in at
  * {sub}.entrestate.com by typing a password, ever. That is the intended
- * shape, not an oversight, and it is why /business/account has to stay the
- * door people are pointed at.
+ * shape, not an oversight, and it is why the tenant sign-in screen carries a
+ * link back to the account page.
+ *
+ * `brand` carries what the sign-up form's live preview lets a person choose —
+ * product word, accent, logo, plan. Nothing the old path could do was lost;
+ * only the second password.
  */
 export async function createWorkspaceForAccount(input: {
   subdomain: string
   company: string
   user: { email: string | null; name: string | null; emailVerified: boolean }
+  brand?: WorkspaceBrand
 }): Promise<CreateWorkspaceResult> {
   // Creating a workspace stamps this email as its owner for good, so an
   // unproved address must not get that far. This reason is its own value —
@@ -243,12 +280,24 @@ export async function createWorkspaceForAccount(input: {
   const company = input.company.trim()
   if (!company) return { ok: false, reason: 'company_required' }
 
+  // The logo is bounded here as well as at the API edge: this function is the
+  // one place a workspace is born, so the cap belongs where it cannot be
+  // bypassed by a second caller.
+  const logo = (input.brand?.logo ?? '').startsWith('data:image/') && dataUrlBytes(input.brand?.logo ?? '') <= TENANT_LOGO_MAX_BYTES
+    ? input.brand!.logo!
+    : ''
+
   const created = await createTenant({
     subdomain: input.subdomain,
     company,
-    // 'account' is the plan the foundation already named for a workspace that
-    // hangs off one Entrestate account rather than a brokerage roster.
-    plan: 'account',
+    product: input.brand?.product,
+    accent: input.brand?.accent,
+    logo,
+    // 'account' is the plan the foundation named for a workspace that hangs off
+    // one Entrestate account. The branded sign-up may still choose 'company' or
+    // 'realtor' — those are SURFACE plans (what the workspace shows), and they
+    // no longer imply a separate identity.
+    plan: input.brand?.plan ?? 'account',
     ownerEmail: email,
   }).catch(() => null)
 
@@ -277,6 +326,24 @@ export async function createWorkspaceForAccount(input: {
       // No password. See the doc comment above — this is the whole point.
       password_hash: null,
     })
+    // A realtor workspace bills in tokens on the per-broker credit rails, so
+    // the owner gets their account at creation — opened at exactly 0, topped
+    // up only when a human confirms a payment. Keyed by EMAIL: every credit
+    // path resolves the account as `brokerId ?? email`, and the owner (role
+    // 'ceo') has no brokerId. Carried over from the removed password path
+    // unchanged: non-fatal and logged, because every credit path self-heals
+    // the row on first touch and a failed seed must never sink the creation.
+    if (tenant.plan === 'realtor') {
+      const seeded = await ensureCreditAccount(email, { monthlyGrant: false }).catch(
+        () => ({ ok: false as const, created: false }),
+      )
+      if (!seeded.ok) {
+        console.error(
+          '[account-workspace] token account seeding failed — owner has no credit account yet (self-heals on first credit touch)',
+          tenant.schemaName, email,
+        )
+      }
+    }
   })
 
   const session: SessionUser = {

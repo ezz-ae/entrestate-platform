@@ -47,7 +47,9 @@ const check = (m: string, cond: boolean, got = '') => (cond ? ok(m) : fail(m, go
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
 const login = read('app/api/server/login/route.ts')
 const store = read('lib/tenancy/store.ts')
-const onboard = read('lib/tenancy/onboard.ts')
+// The password sign-up path was removed on 2026-09-04; the owner is now
+// written by createWorkspaceForAccount() from a verified Neon session.
+const onboard = read('lib/tenancy/account-workspace.ts')
 const client = read('lib/freehold/session.ts')
 const page = read('app/server/page.tsx')
 
@@ -55,7 +57,7 @@ console.log('\n── the workspace an email opens is recorded at all ──')
 {
   check('saas_tenants carries an owner_email column',
     /owner_email\s+text/.test(store) && /ADD COLUMN IF NOT EXISTS owner_email/.test(store))
-  check('…and signup writes it', /ownerEmail: input\.adminEmail/.test(onboard))
+  check('…and workspace creation writes it, from the proved session email', /ownerEmail: email/.test(onboard) && /provedEmail\(input\.user\)/.test(onboard))
   check('…and it is selected back out', /SELECT_COLS = `[^`]*owner_email/.test(store))
   // Nullable on purpose: tenants created before the column existed have no
   // owner and no honest way to invent one.
