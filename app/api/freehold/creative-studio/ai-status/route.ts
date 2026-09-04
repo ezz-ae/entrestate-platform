@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { verifySession, SESSION_COOKIE } from "@/lib/freehold/auth-edge"
-import { geminiModelCandidates } from "@/lib/gemini-rest"
+import { GEMINI_KEY_NAMES, geminiKeyName, geminiModelCandidates } from "@/lib/gemini-rest"
 import { vertexConfigured } from "@/lib/google/vertex-auth"
 
 export const runtime = "nodejs"
@@ -10,14 +10,16 @@ export const dynamic = "force-dynamic"
 // Diagnostic: shows which Gemini key the LIVE deployment is using (masked) and
 // what a real test call returns — so a quota/billing/wrong-name issue is
 // obvious without ever exposing the key. Visit /api/freehold/creative-studio/ai-status
-const KEY_NAMES = ["GEMINI_API_KEY", "Gemini_API_KEY", "GOOGLE_API_KEY", "google_api_key", "GEMINI_KEY"] as const
+//
+// The names come from lib/gemini-rest.ts, not a copy kept here: a diagnostic
+// that checks a different list from the runtime diagnoses the wrong thing.
 
 export async function GET() {
   const user = await verifySession((await cookies()).get(SESSION_COOKIE)?.value)
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const setNames = KEY_NAMES.filter((n) => !!process.env[n])
-  const resolvedName = setNames[0] ?? null
+  const setNames = GEMINI_KEY_NAMES.filter((n) => !!(process.env[n] ?? "").trim())
+  const resolvedName = geminiKeyName()
   const key = resolvedName ? String(process.env[resolvedName]) : ""
   const mask = key ? `…${key.slice(-4)}` : null
 

@@ -1,7 +1,9 @@
 import { randomUUID } from 'node:crypto'
 import { query , ensureOnce } from '@/lib/db'
 import { ensureLeadsTable, ensureLeadActivityTable } from '@/lib/data'
-import { geminiGenerate, geminiText } from '@/lib/gemini-rest'
+import { geminiApiKey, geminiGenerate, geminiText } from '@/lib/gemini-rest'
+
+const NO_AI_NOTE = 'No AI provider is configured — the research agent cannot run.'
 
 /**
  * Smart profile completion — a research agent per lead.
@@ -165,8 +167,12 @@ export interface EnrichmentResult {
  * 2-minute staleness window means a crashed run never wedges the lead.
  */
 export async function enrichLeadProfile(leadId: string, byEmail: string): Promise<EnrichmentResult> {
-  if (!process.env.GEMINI_API_KEY?.trim()) {
-    return { ok: false, facts: await listProfileFacts(leadId).catch(() => []), found: 0, note: 'GEMINI_API_KEY is not configured — the research agent cannot run.' }
+  // geminiApiKey(), not process.env.GEMINI_API_KEY: this read one name of the
+  // six the runtime honours and never the Vertex service account, so the
+  // research agent said "not configured" on deployments where every other AI
+  // surface was live. geminiGenerate() below routes the Vertex sentinel itself.
+  if (!geminiApiKey()) {
+    return { ok: false, facts: await listProfileFacts(leadId).catch(() => []), found: 0, note: NO_AI_NOTE }
   }
   try {
     await ensureLeadsTable()
@@ -193,9 +199,9 @@ export async function enrichLeadProfile(leadId: string, byEmail: string): Promis
 }
 
 async function runEnrichment(leadId: string, byEmail: string): Promise<EnrichmentResult> {
-  const apiKey = process.env.GEMINI_API_KEY?.trim()
+  const apiKey = geminiApiKey()
   if (!apiKey) {
-    return { ok: false, facts: await listProfileFacts(leadId).catch(() => []), found: 0, note: 'GEMINI_API_KEY is not configured — the research agent cannot run.' }
+    return { ok: false, facts: await listProfileFacts(leadId).catch(() => []), found: 0, note: NO_AI_NOTE }
   }
 
   await ensureLeadsTable()

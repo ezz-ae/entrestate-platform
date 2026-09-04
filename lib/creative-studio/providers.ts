@@ -6,16 +6,15 @@
 // provider can serve a node, we return a clear, actionable message rather than
 // a fake result.
 
+import { geminiStudioKey } from "@/lib/gemini-rest"
+
 // Accept the common env-var name variants so a key set under any of them works.
 // Exported so every Google-AI route resolves the key the SAME way — a client
 // who set GOOGLE_API_KEY must not get image generation but broken text buttons.
-export const googleAiKey = () =>
-  process.env.GEMINI_API_KEY ||
-  process.env.Gemini_API_KEY ||
-  process.env.GOOGLE_API_KEY ||
-  process.env.google_api_key ||
-  process.env.GEMINI_KEY ||
-  ""
+// The list of names lives in lib/gemini-rest.ts (GEMINI_KEY_NAMES); this used
+// to be a second copy of it, which is how one name could work for chat and
+// not for images. Raw key only — the callers put it in a request themselves.
+export const googleAiKey = geminiStudioKey
 const GEMINI_KEY = googleAiKey
 const FAL_KEY = () => process.env.FAL_KEY || ""
 
