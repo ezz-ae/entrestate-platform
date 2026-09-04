@@ -4,11 +4,17 @@
  * Self-serve trial signup — the public door into the SaaS.
  *
  * One screen: brand (company, subdomain with live availability, product word,
- * accent, logo) + the owner account (name, email, password), with a live
- * brand preview. Submitting provisions the tenant and redirects straight into
- * {sub}.TENANT_BASE_DOMAIN via the claim endpoint — the broker lands inside
- * THEIR branded instance, already signed in. Only meaningful when
- * NEXT_PUBLIC_TENANT_BASE_DOMAIN is set.
+ * accent, logo) with a live brand preview. Submitting provisions the tenant
+ * and redirects straight into {sub}.TENANT_BASE_DOMAIN via the claim endpoint
+ * — the broker lands inside THEIR branded instance, already signed in. Only
+ * meaningful when NEXT_PUBLIC_TENANT_BASE_DOMAIN is set.
+ *
+ * THERE IS NO NAME, EMAIL OR PASSWORD ON THIS FORM ANY MORE. The owner is the
+ * Entrestate account already signed in — ./page.tsx reads it server-side and
+ * passes it down as `signedInAs`, and a stranger never reaches this component
+ * at all (they are sent to the Terminal's sign-up first). The old block asked
+ * for a second password and wrote it into the tenant schema as a second
+ * identity; that path was removed, not hidden. See lib/tenancy/onboard.ts.
  *
  * ?plan=realtor flips the same screen into the Meta for Realtors door: a
  * one-person desk on OUR off-plan inventory. Same rails, different story —
@@ -55,18 +61,20 @@ function downscaleToDataUrl(file: File): Promise<string> {
 
 type SubState = 'idle' | 'checking' | 'available' | 'taken' | 'reserved' | 'invalid'
 
-export default function SignupClient() {
+export type SignedInAs = { name: string | null; email: string }
+
+export default function SignupClient({ signedInAs }: { signedInAs: SignedInAs }) {
   return (
     <I18nProvider>
       {/* useSearchParams inside — Next wants a Suspense boundary above it. */}
       <Suspense fallback={null}>
-        <SignupForm />
+        <SignupForm signedInAs={signedInAs} />
       </Suspense>
     </I18nProvider>
   )
 }
 
-function SignupForm() {
+function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
   const t = useT()
   // The realtor door is the same form told a different story — see file header.
   const isRealtor = useSearchParams().get('plan') === 'realtor'
@@ -76,9 +84,6 @@ function SignupForm() {
   const [product, setProduct] = useState('Lead Machine')
   const [accent, setAccent] = useState(DEFAULT_ACCENT)
   const [logo, setLogo] = useState('')
-  const [adminName, setAdminName] = useState('')
-  const [adminEmail, setAdminEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [createdUrl, setCreatedUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -135,8 +140,6 @@ function SignupForm() {
     if (!subdomain.trim() || subState === 'invalid' || subState === 'reserved' || subState === 'taken') {
       return setError(t('wl.signup.errSubdomain'))
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail.trim())) return setError(t('wl.signup.errEmail'))
-    if (password.length < 8) return setError(t('wl.signup.errPassword'))
     setLoading(true)
     try {
       const res = await fetch('/api/wl/signup', {
@@ -150,9 +153,6 @@ function SignupForm() {
           plan: isRealtor ? 'realtor' : 'company',
           accent,
           logo,
-          adminName: adminName.trim(),
-          adminEmail: adminEmail.trim(),
-          password,
         }),
       })
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; redirect?: string; error?: string }
@@ -162,9 +162,11 @@ function SignupForm() {
           taken: 'wl.signup.taken',
           reserved: 'wl.signup.reserved',
           invalid_subdomain: 'wl.signup.invalid',
-          email_invalid: 'wl.signup.errEmail',
-          password_short: 'wl.signup.errPassword',
           rate_limited: 'wl.signup.errRate',
+          // The session expired or was never verified between page load and
+          // submit. Both point the person back to the Terminal.
+          signed_out: 'wl.signup.errSignedOut',
+          email_unverified: 'wl.signup.errUnverified',
         }[data.error ?? ''] ?? 'wl.signup.errGeneric'
         return setError(t(key))
       }
@@ -303,35 +305,18 @@ function SignupForm() {
             />
           </div>
 
+          {/*
+            Who owns this workspace. Read-only on purpose: the identity is the
+            Entrestate account that is signed in, proved by Neon, and the only
+            way to make it somebody else is to sign in as somebody else.
+          */}
           <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
             <div className="mb-3 text-xs font-medium uppercase tracking-widest text-white/40">
-              {t('wl.signup.adminTitle')}
+              {t('wl.signup.ownerTitle')}
             </div>
-            <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.adminName')}</label>
-            <input
-              value={adminName}
-              onChange={(e) => setAdminName(e.target.value)}
-              placeholder={t('wl.signup.adminNamePh')}
-              maxLength={60}
-              className="mb-3 w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
-            />
-            <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.adminEmail')}</label>
-            <input
-              type="email"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              dir="ltr"
-              className="mb-3 w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
-            />
-            <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.adminPassword')}</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              dir="ltr"
-              className="w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
-            />
-            <p className="mt-1 text-xs text-white/40">{t('wl.signup.adminPasswordHint')}</p>
+            <p className="text-sm text-white">{signedInAs.name || signedInAs.email}</p>
+            {signedInAs.name ? <p className="mt-0.5 text-xs text-white/50" dir="ltr">{signedInAs.email}</p> : null}
+            <p className="mt-2 text-xs text-white/40">{t('wl.signup.ownerHint')}</p>
           </div>
 
           {error ? <p className="mb-4 text-sm text-red-400">{error}</p> : null}

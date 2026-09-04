@@ -4,28 +4,38 @@ import { getTerminalUser } from '@/lib/terminal-session'
 import SignupClient from './signup-client'
 
 /**
- * THE PUBLIC SIGN-UP DOOR, WITH A CHECK FOR WHO IS ALREADY INSIDE.
+ * THE PUBLIC SIGN-UP DOOR — ONE IDENTITY, SO IT OPENS ONTO THE TERMINAL FIRST.
  *
- * The form in ./signup-client.tsx asks for a name, an email and a PASSWORD,
- * and creates the owner inside the new tenant's schema with that password.
- * That is the right door for a stranger. For someone who is already signed in
- * on the Terminal it is a second account: the same person, a second password,
- * a workspace whose `owner_email` may not even match the identity they sign in
- * with — which is the exact split /business/account was built to close.
+ * The owner's ruling: there cannot be two accounts. It is one account, arranged
+ * properly. So this page no longer has a way to create an identity of its own.
  *
- * So a signed-in person never sees this form. They are sent to the account
- * page, where the workspace is created against the identity they already hold
- * and no password is asked. Verified or not — the account page is the surface
- * that knows how to explain an unverified email; this one would only bounce.
+ *   · A stranger — no Neon session — is sent to the Terminal's sign-up. That is
+ *     where an Entrestate account is born, once. They land on /me afterwards,
+ *     and /me carries "Create the workspace" back to the account page.
+ *   · A signed-in person gets the branded form, with themselves shown as the
+ *     owner and nothing to type about who they are.
+ *
+ * The Terminal's `next` parameter accepts relative paths only (its open-
+ * redirect guard), which is why the return is /me rather than this page. One
+ * extra step for a stranger, and in exchange there is exactly one place a
+ * person can be created, and it is not here.
  *
  * Dormant without tenancy, like everything else on this path: on a deployment
- * with no NEXT_PUBLIC_TENANT_BASE_DOMAIN there is no Neon session to read and
- * the form renders exactly as before.
+ * with no NEXT_PUBLIC_TENANT_BASE_DOMAIN the client form never renders — there
+ * is no Terminal to send anyone to and no owner to show.
  */
+
+const TERMINAL_SIGNUP = 'https://terminal.entrestate.com/signup?next=%2Fme'
+
 export default async function SignupPage() {
-  if (SAAS_TENANCY) {
-    const user = await getTerminalUser()
-    if (user) redirect('/business/account')
-  }
-  return <SignupClient />
+  if (!SAAS_TENANCY) redirect('/')
+
+  const user = await getTerminalUser()
+  if (!user) redirect(TERMINAL_SIGNUP)
+
+  // The form needs an email to display and the API needs one to own the
+  // workspace. Verification is enforced by the API on submit — it returns
+  // `email_unverified` and the form says what to do — so an unverified person
+  // still sees the form rather than a wall, and learns the one step they owe.
+  return <SignupClient signedInAs={{ name: user.name, email: user.email ?? '' }} />
 }

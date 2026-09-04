@@ -14,6 +14,7 @@ import { signSession, verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-
 import { runWithDefaultSchema, query } from '@/lib/db'
 import { upsertUserProfile } from '@/lib/data'
 import { createSession, buildSessionCookie } from '@/lib/auth'
+import { getTerminalUser } from '@/lib/terminal-session'
 import { randomUUID } from 'crypto'
 
 export const runtime = 'nodejs'
@@ -68,6 +69,25 @@ export async function GET(req: NextRequest) {
   //
   // Best-effort by design. A failure here costs the free surfaces a name; it
   // must never cost the customer the workspace they just paid attention to.
+  //
+  // ── EXCEPT WHEN THE PERSON IS ALREADY KNOWN ─────────────────────────────
+  // The block below was written for the password sign-up path, where the
+  // workspace owner had no identity anywhere else and the apex needed one to
+  // say hello. That path is gone. Every workspace is now born from a Neon
+  // session, and a Neon session is ALREADY the apex identity — getTerminalUser()
+  // reads it on entrestate.com and maps it to entrestate_accounts. Minting a
+  // freehold_site_users row on top of that is a second record for the same
+  // human, which is the exact thing the owner ruled out: "مينفعش يكون في
+  // حسابين". So when the request carries a Neon session, this step is skipped.
+  //
+  // The Neon cookie lives on `.entrestate.com` and this route runs on a tenant
+  // host beneath it, so the read works here. Pre-existing tenants whose owner
+  // came through the old path and holds no Neon session keep the old
+  // behaviour: they still get the platform identity, because for them it is
+  // still the only one.
+  const alreadyKnown = await getTerminalUser().catch(() => null)
+  if (alreadyKnown) return res
+
   try {
     await runWithDefaultSchema(async () => {
       // NEVER overwrite an identity that already exists. upsertUserProfile's

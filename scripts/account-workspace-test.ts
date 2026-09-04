@@ -232,13 +232,15 @@ console.log('\n── every other door into a second identity is closed ──')
 {
   const signup = stripComments(read('app/signup/page.tsx'))
   check('the public sign-up is a server component that reads the Neon session', signup.includes('getTerminalUser'))
-  check('and sends a signed-in person to the account page instead of the password form',
-    /if \(user\) redirect\('\/business\/account'\)/.test(signup))
-  check('the password form itself moved aside, unchanged, for strangers',
-    fs.existsSync(path.join(ROOT, 'app/signup/signup-client.tsx'))
-      && read('app/signup/signup-client.tsx').includes('type="password"'))
-  check('the redirect is dormant without tenancy, like the rest of the path',
-    /if \(SAAS_TENANCY\)[\s\S]{0,120}getTerminalUser/.test(signup))
+  // Superseded 2026-09-04. The first hardening sent a signed-in person AWAY
+  // from this form to the account page, because the form still asked for a
+  // password. The form no longer does, so a signed-in person now gets it —
+  // branded, with themselves shown as owner — and it is the STRANGER who is
+  // sent away, to be created on the Terminal. Both facts are pinned below.
+  check('a signed-in person is handed the branded form with themselves as owner',
+    /return <SignupClient signedInAs=/.test(signup))
+  check('the page is dormant without tenancy, like the rest of the path',
+    /if \(!SAAS_TENANCY\) redirect/.test(signup))
 
   const signin = read('app/server/page.tsx')
   const signinCode = stripComments(signin)
@@ -257,6 +259,56 @@ console.log('\n── every other door into a second identity is closed ──')
     summary.includes('workspacesForAccount(user)') && summary.includes('enterUrl'))
   check('and only says a workspace can be created when the identity could complete it',
     /canCreateWorkspace:\s*SAAS_TENANCY && user\.emailVerified/.test(summary))
+}
+
+console.log('\n── there is exactly one way a workspace is born ──')
+{
+  // lib/tenancy/onboard.ts held signupTenant() — the password path — and was
+  // deleted outright on 2026-09-04. A tombstone was tried first and the
+  // orphan-module guard refused it, correctly: a file nothing imports is a
+  // file that will one day be imported. `git log -- lib/tenancy/onboard.ts`
+  // still finds the history.
+  check('signupTenant() — the password path — no longer exists anywhere',
+    !fs.existsSync(path.join(ROOT, 'lib/tenancy/onboard.ts'))
+      && !fs.readdirSync(path.join(ROOT, 'lib/tenancy')).some((f) => /signupTenant|hashPassword/.test(stripComments(read(`lib/tenancy/${f}`)))),
+    'a password sign-up function is back under lib/tenancy/')
+  check('and nothing in app/ or lib/ calls it',
+    !fs.readdirSync(path.join(ROOT, 'app/api/wl/signup')).some((f) => stripComments(read(`app/api/wl/signup/${f}`)).includes('signupTenant'))
+      && !stripComments(read(MODULE)).includes('signupTenant('))
+
+  const api = stripComments(read('app/api/wl/signup/route.ts'))
+  check('the public sign-up API takes its identity from the Neon session', api.includes('getTerminalUser()'))
+  check('…refuses a stranger before spending any rate-limit budget',
+    /getTerminalUser\(\)[\s\S]{0,200}status: 401[\s\S]*checkRateLimit/.test(api))
+  check('…refuses an unverified email', /emailVerified[\s\S]{0,80}email_unverified/.test(api))
+  check('…reads no name, email or password from the body',
+    // Any spelling: `body.adminEmail`, a cast, a destructure. The route has no
+    // legitimate reason to hold these identifiers in CODE at all.
+    !/\b(adminName|adminEmail|password)\b/.test(api))
+  check('…and creates through the same function the account page uses', api.includes('createWorkspaceForAccount('))
+
+  const client = stripComments(read('app/signup/signup-client.tsx'))
+  check('the branded form has no identity inputs', !/type="password"|adminEmail|adminName/.test(client))
+  check('…and shows the signed-in owner instead', client.includes('signedInAs.email') && client.includes("t('wl.signup.ownerTitle')"))
+  check('…and never posts a password', !/password/.test(client))
+
+  const page = stripComments(read('app/signup/page.tsx'))
+  check('a stranger on /signup is sent to the Terminal to be created, once',
+    /if \(!user\) redirect\(TERMINAL_SIGNUP\)/.test(page) && page.includes('terminal.entrestate.com/signup'))
+  check('…and the return lands on /me, a relative path the Terminal will honour', page.includes('next=%2Fme'))
+
+  const claim = stripComments(read('app/api/wl/claim/route.ts'))
+  check('the claim route does not mint a platform identity for a Neon person',
+    /const alreadyKnown = await getTerminalUser\(\)[\s\S]{0,60}if \(alreadyKnown\) return res/.test(claim))
+  check('…but still does for a pre-existing password owner with no other identity',
+    claim.includes('freehold_site_users') && claim.includes('createSession(profile.id)'))
+
+  check('the realtor credit seed survived the move',
+    /ensureCreditAccount\(email, \{ monthlyGrant: false \}\)/.test(stripComments(read(MODULE))))
+  check('the brand fields survived the move',
+    /product: input\.brand\?\.product/.test(stripComments(read(MODULE))) && /plan: input\.brand\?\.plan \?\? 'account'/.test(stripComments(read(MODULE))))
+  check('the four new form strings have all three languages',
+    ['ownerTitle','ownerHint','errSignedOut','errUnverified'].every((k) => (read('lib/i18n/dictionaries/wl_signup.ts').match(new RegExp(`'wl\\.signup\\.${k}'`, 'g')) ?? []).length === 3))
 }
 
 console.log('\n── the foundation doc records the phase ──')
