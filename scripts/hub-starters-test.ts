@@ -82,8 +82,12 @@ console.log('\n── the words ──')
 console.log('\n── the home renders the shape ──')
 {
   const hub = stripComments(read('app/freehold-intelligence/dashboard-client.tsx'))
-  check('the title is the question, with the workspace\'s Expert and the first name',
-    /t\('hub\.arch\.title', \{ expert: `\$\{BRAND\.company\} Expert`, name: firstName \}\)/.test(hub))
+  // The Expert is named the way the dock names it — t('expert.title'), whose
+  // {brand} is the TENANT's company — not BRAND.company, which is the
+  // vendor's. The first live render said "Entrestate Expert" on a workspace
+  // whose dock said "Experimental Expert": two names for one thing.
+  check('the title is the question, naming the Expert as the dock does, with the first name',
+    /t\('hub\.arch\.title', \{ expert: t\('expert\.title'\), name: firstName \}\)/.test(hub))
   check('the first name is the first word of the session name', /split\(\/\\s\+\/\)\[0\]/.test(hub))
   check('the composer sits under the question', /<AiPrompt placeholder=\{t\('hub\.arch\.placeholder'\)\}/.test(hub))
   check('the doors sit under the composer', /<StarterRow \/>/.test(hub))

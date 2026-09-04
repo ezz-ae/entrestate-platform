@@ -255,7 +255,7 @@ export default function DashboardClient({ inventoryData }: { inventoryData: Inve
         </div>
       </div>
       <h1 className="mx-auto mb-6 mt-6 max-w-[22ch] text-balance text-center text-2xl font-semibold tracking-tight text-white sm:mt-10 sm:text-[2rem] sm:leading-tight">
-        {t('hub.arch.title', { expert: `${BRAND.company} Expert`, name: firstName })}
+        {t('hub.arch.title', { expert: t('expert.title'), name: firstName })}
       </h1>
 
       {/* ── The composer — home is the main AI of the day. Type here → the one
