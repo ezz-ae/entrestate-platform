@@ -15,12 +15,12 @@ import { runWithDefaultSchema, query } from '@/lib/db'
 import { upsertUserProfile } from '@/lib/data'
 import { createSession, buildSessionCookie } from '@/lib/auth'
 import { getTerminalUser } from '@/lib/terminal-session'
+import { WORKSPACE_SESSION_TTL_MS as SESSION_TTL_MS } from '@/lib/tenancy/account-workspace'
 import { randomUUID } from 'crypto'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 export async function GET(req: NextRequest) {
   if (!SAAS_TENANCY) return new NextResponse(null, { status: 404 })

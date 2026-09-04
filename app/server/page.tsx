@@ -40,12 +40,19 @@ function ServerAuthInner() {
   const [show, setShow]         = useState(false)
   const [error, setError]       = useState(false)
   // Resolved after mount: this is a client component and the host is only
-  // known in the browser. False until then, so the server render never shows
-  // the link on the apex, and false forever on a deployment without tenancy.
-  const [onTenantHost, setOnTenantHost] = useState(false)
+  // known in the browser. 'unknown' until then, so the server render shows
+  // neither door — a tenant host must never flash the password form, and the
+  // apex must never flash the Entrestate door. 'other' forever on a
+  // deployment without tenancy.
+  const [host, setHost] = useState<'unknown' | 'tenant' | 'other'>('unknown')
+  // The recognise door's verdict, when this screen was sent here by it:
+  // signed_out · stranger · slow_down. Absent means nobody has asked the door
+  // yet — and on a tenant host the screen asks it before showing anything.
+  const [door, setDoor] = useState<string | null>(null)
   useEffect(() => {
-    if (!SAAS_TENANCY) return
-    setOnTenantHost(tenantSubdomainFromHost(window.location.host) !== null)
+    const tenant = SAAS_TENANCY && tenantSubdomainFromHost(window.location.host) !== null
+    setDoor(new URLSearchParams(window.location.search).get('door'))
+    setHost(tenant ? 'tenant' : 'other')
   }, [])
   const [loading, setLoading]   = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
@@ -111,6 +118,10 @@ function ServerAuthInner() {
 
       <div className="relative w-full max-w-[460px]">
 
+        {host === 'tenant' ? (
+          <EntrestateDoor door={door} />
+        ) : host === 'other' ? (
+          <>
         {/* Header */}
         <div className="mb-7 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">
@@ -280,38 +291,87 @@ function ServerAuthInner() {
             </button>
           </form>
 
-          {/*
-            THE PASSWORDLESS OWNER'S WAY OUT OF THIS SCREEN.
-
-            A workspace created from /business/account has an owner with NO
-            password — the Entrestate account is the only door. An owner who
-            bookmarks their subdomain lands here, on a form they can never
-            satisfy, and the only thing the form can say is "incorrect email or
-            password". This link is the way out.
-
-            It is a STATIC link to the apex account page: no email is read, no
-            lookup happens, nothing here can confirm whether an address owns a
-            workspace. It renders only on a tenant host of a tenancy-enabled
-            deployment, so the client's deployment (no
-            NEXT_PUBLIC_TENANT_BASE_DOMAIN) never shows it — the same dormancy
-            rule as the rest of lib/tenancy.
-          */}
-          {onTenantHost ? (
-            <p className="mt-4 text-center text-xs text-slate-600">
-              <a
-                href={`https://${TENANT_BASE_DOMAIN}/business/account`}
-                className="font-medium text-slate-800 underline-offset-2 hover:underline"
-              >
-                {t('login.openWithEntrestate')}
-              </a>
-            </p>
-          ) : null}
         </div>
+
+          </>
+        ) : null}
 
         <p className="mt-4 text-center text-xs text-slate-700">
           {brandName} Platform &middot; {BRAND.tagline}
         </p>
       </div>
+    </div>
+  )
+}
+
+/**
+ * THE ONE DOOR, on a workspace host.
+ *
+ * There is no password here because there is no second account: the
+ * Entrestate account (the Terminal's Neon session, on .entrestate.com) is the
+ * identity, and /api/wl/recognise turns it into a workspace session when this
+ * workspace lists the person as owner or on its team.
+ *
+ * With no verdict yet, the screen asks the door itself — so an owner or team
+ * member who is already signed in to Entrestate is inside before this screen
+ * finishes painting. The verdicts are the door's own words:
+ *   signed_out  → "Continue with Entrestate" (the Terminal sign-in, then back
+ *                 through the door)
+ *   stranger    → signed in, not on this team; ask the owner
+ *   slow_down   → too many attempts
+ *
+ * Only ever rendered on a tenant host of a tenancy-enabled deployment, so the
+ * client's deployment (no NEXT_PUBLIC_TENANT_BASE_DOMAIN) never sees it —
+ * their password sign-in is untouched.
+ */
+function EntrestateDoor({ door }: { door: string | null }) {
+  const t = useT()
+  const [checking, setChecking] = useState(door === null)
+  useEffect(() => {
+    if (door !== null) return
+    setChecking(true)
+    window.location.replace('/api/wl/recognise')
+  }, [door])
+
+  const back = typeof window === 'undefined' ? '' : `${window.location.origin}/api/wl/recognise`
+  const terminalSignIn = `https://terminal.${TENANT_BASE_DOMAIN}/login?next=${encodeURIComponent(back)}`
+  const stranger = door === 'stranger'
+
+  return (
+    <div className="rounded-2xl border border-line bg-surface p-7 text-center shadow-[0_24px_70px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">
+        <Shield className="h-7 w-7 text-gold" />
+      </div>
+      <h1 className="text-xl font-semibold tracking-tight text-white">{BRAND.company}</h1>
+
+      {checking ? (
+        <p className="mt-4 text-sm text-slate-400">{t('login.doorChecking')}</p>
+      ) : (
+        <>
+          <p className="mt-3 text-base font-medium text-slate-200">
+            {stranger ? t('login.strangerTitle') : t('login.doorTitle')}
+          </p>
+          <p className="mx-auto mt-2 max-w-[36ch] text-sm leading-relaxed text-slate-500">
+            {stranger ? t('login.strangerBody') : door === 'slow_down' ? t('login.slowDown') : t('login.doorBody')}
+          </p>
+          <div className="mt-6 flex flex-col gap-2.5">
+            {stranger ? (
+              <>
+                <a href="/api/wl/recognise" className="w-full rounded-xl bg-gold py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90">
+                  {t('login.tryAgain')}
+                </a>
+                <a href={terminalSignIn} className="w-full rounded-xl border border-line-strong bg-surface-2 py-2.5 text-sm font-medium text-slate-300 transition-colors hover:text-white">
+                  {t('login.useAnotherAccount')}
+                </a>
+              </>
+            ) : (
+              <a href={terminalSignIn} className="w-full rounded-xl bg-gold py-2.5 text-sm font-semibold text-ink transition-opacity hover:opacity-90">
+                {t('login.continueWithEntrestate')}
+              </a>
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }
