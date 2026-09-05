@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
-import { Sparkles, ChevronDown, LogOut, Home } from 'lucide-react'
-import { spineApps } from '@/lib/freehold/apps'
+import { Sparkles, ChevronDown, LogOut, BookOpen } from 'lucide-react'
+import { DepartmentSwitcher } from '@/components/freehold/department-switcher'
 import { useBrand } from '@/components/whitelabel/brand-provider'
 import { useSession } from '@/lib/freehold/use-session'
 import { clearSession } from '@/lib/freehold/session'
@@ -21,15 +21,6 @@ import { CommandNav } from '@/components/freehold/command-nav'
 import { Monogram } from '@/components/freehold/monogram'
 
 const HOME_HREF = '/freehold-intelligence'
-
-// Map an app id to its nav translation key; falls back to the app's own label.
-const NAV_KEYS: Record<string, string> = {
-  crm: 'nav.crm', ads: 'nav.ads', inventory: 'nav.inventory', finance: 'nav.finance',
-  'ai-manager': 'nav.ai-manager', analytics: 'nav.analytics', notebook: 'nav.notebook',
-  drive: 'nav.drive', team: 'nav.team',
-  integrations: 'nav.integrations', settings: 'nav.settings', management: 'nav.management',
-  agent: 'nav.agent', calendar: 'nav.calendar',
-}
 
 export function SpacesNav() {
   // What the agent is waiting to say, if anything. Read from the browser
@@ -72,11 +63,6 @@ export function SpacesNav() {
 
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  // App tabs are role-aware and read from the single app registry. The plan
-  // rides the host-resolved brand payload: on a realtor tenant the spine
-  // shrinks to the solo ad-running workspace, whatever the role says.
-  const apps = spineApps(role, brand.plan)
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -122,71 +108,44 @@ export function SpacesNav() {
           and third permanent nav rail. */}
       <CommandNav />
 
-      {/* Mobile spacer — keeps brand left, account right while the spine is hidden */}
-      <div className="flex-1 md:hidden" />
+      {/* The department switcher — where you are, and the other three doors.
+          It replaced the app spine: fourteen tabs taught nobody the shape of
+          the product; four departments and a rail do. */}
+      <DepartmentSwitcher />
 
-      {/* App spine — role-aware, single source of truth. Hidden on phones:
-          the bottom tab bar takes over there, so the top stays calm. */}
-      <nav data-coach="nav-spine" className="hidden h-full flex-1 overflow-x-auto md:flex" style={{ scrollbarWidth: 'none' }}>
-        <div className="flex h-full min-w-max">
-          {/* Home — hidden for brokers (they use My Workspace tab) and for
-              realtor plans (their home IS the campaign desk; the hub would
-              only bounce them straight back there). */}
-          {role !== 'broker' && brand.plan !== 'realtor' && (
-            <Link
-              href={HOME_HREF}
-              data-coach="nav-home"
-              className={[
-                'flex h-full items-center gap-1.5 border-b-2 px-4 text-sm font-medium whitespace-nowrap transition-colors',
-                isActive(HOME_HREF, true)
-                  ? 'border-gold text-white'
-                  : 'border-transparent text-slate-400 hover:text-white hover:border-white/[0.2]',
-              ].join(' ')}
-            >
-              <Home className="h-3.5 w-3.5" />
-              {t('nav.home')}
-            </Link>
-          )}
+      {/* The chat's own entry — the Notebook — stays in the header so the
+          agent's signal is visible from every screen. WE NEVER OPEN THE CHAT
+          ON SOMEONE'S BEHALF — a window that opens by itself reads as
+          something going wrong, even when the news is good. */}
+      {(() => {
+        const active = isActive(`${HOME_HREF}/notebook`)
+        const lit = !!waiting && !active
+        return (
+          <Link
+            href={`${HOME_HREF}/notebook`}
+            data-coach="nav-notebook"
+            title={lit ? waiting?.line : t('nav.notebook')}
+            aria-label={t('nav.notebook')}
+            className={[
+              'relative flex h-full shrink-0 items-center border-e border-white/[0.07] px-3 transition-colors',
+              active ? 'text-white' : lit ? 'text-slate-300 hover:text-white' : 'text-slate-400 hover:text-white',
+            ].join(' ')}
+          >
+            <BookOpen className="h-4 w-4" />
+            {lit && (
+              // Two soft flashes, then it simply stays lit. The flash is
+              // missable — someone is looking elsewhere, or is not at the
+              // desk — so the steady light is what actually carries it.
+              <span
+                aria-hidden
+                className={`absolute end-2 top-3.5 h-1.5 w-1.5 rounded-full bg-emerald-400 ${flashNow ? 'agent-flash' : 'opacity-70'}`}
+              />
+            )}
+          </Link>
+        )
+      })()}
 
-          {apps.map((app) => {
-            // `match` prefixes let a tab stay lit across relocated routes
-            // (e.g. Drive while inside Notebook).
-            const active = app.match ? app.match.some((p) => isActive(p)) : isActive(app.href)
-            const key = NAV_KEYS[app.id]
-            // The chat's own entry carries the signal. WE NEVER OPEN THE CHAT
-            // ON SOMEONE'S BEHALF — a window that opens by itself reads as
-            // something going wrong, even when the news is good.
-            const lit = app.id === 'notebook' && !!waiting && !active
-            return (
-              <Link
-                key={app.id}
-                href={app.href}
-                data-coach={`nav-${app.id}`}
-                title={lit ? waiting?.line : undefined}
-                className={[
-                  'relative flex h-full items-center border-b-2 px-4 text-sm font-medium whitespace-nowrap transition-colors',
-                  active
-                    ? 'border-gold text-white'
-                    : lit
-                      ? 'border-transparent text-slate-300 hover:text-white'
-                      : 'border-transparent text-slate-400 hover:text-white hover:border-white/[0.2]',
-                ].join(' ')}
-              >
-                {key ? t(key) : app.label}
-                {lit && (
-                  // Two soft flashes, then it simply stays lit. The flash is
-                  // missable — someone is looking elsewhere, or is not at the
-                  // desk — so the steady light is what actually carries it.
-                  <span
-                    aria-hidden
-                    className={`ms-2 h-1.5 w-1.5 rounded-full bg-emerald-400 ${flashNow ? 'agent-flash' : 'opacity-70'}`}
-                  />
-                )}
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
+      <div className="flex-1" />
 
       {/* User menu — identity, role, sign-out */}
       <div ref={menuRef} className="relative flex h-full shrink-0 items-center border-l border-white/[0.07] px-3">

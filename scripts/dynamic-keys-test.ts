@@ -59,6 +59,9 @@ import { CALL_TYPES, CALL_BRANCHES, CALL_REFUSALS, CALL_KEY_PREFIX } from '../li
 import { RAIL_REFUSALS } from '../lib/calling/gates'
 import { lm_calling } from '../lib/i18n/dictionaries/lm_calling'
 import { hub_starters } from '../lib/i18n/dictionaries/hub_starters'
+import { departments as departmentsDict } from '../lib/i18n/dictionaries/departments'
+import { DEPARTMENT_IDS, COMPANY_RAIL } from '../lib/freehold/departments'
+import { DICTIONARIES } from '../lib/i18n/dictionaries'
 import { STARTER_DOORS, starterKeys } from '../lib/freehold/hub-starters'
 import { TRIAL_STATES } from '../lib/tenancy/trial'
 import { trial as trialDict } from '../lib/i18n/dictionaries/trial'
@@ -367,6 +370,19 @@ console.log('\n── the seven doors on the home and their starters ──')
   // label and its three starters, title and sub, in every language.
   const keys = STARTER_DOORS.flatMap((d) => starterKeys(d).map((k) => k.replace(/^hub\.arch\./, '')))
   family('hub.arch (doors + starters)', 'hub.arch.', keys, hub_starters as typeof lm_ads)
+}
+
+console.log('\n── the four departments and the company doors on the rail ──')
+{
+  // components/freehold/department-switcher.tsx and side-rail.tsx render
+  // t(`dept.${id}`) and t(`dept.${id}.blurb`) — a department cannot ship
+  // without its name and its one line in every language.
+  family('dept (names)', 'dept.', DEPARTMENT_IDS, departmentsDict as typeof lm_ads)
+  family('dept (blurbs)', 'dept.', DEPARTMENT_IDS.map((id) => `${id}.blurb`), departmentsDict as typeof lm_ads)
+  // The company doors read t(APP_NAV_KEY[app.id]) — nav.<id> — from the
+  // merged dictionaries (nav.* lives in the main file; fund and store were
+  // added with the rail).
+  family('nav (company rail)', 'nav.', COMPANY_RAIL, DICTIONARIES as unknown as typeof lm_ads)
 }
 
 if (failures > 0) {

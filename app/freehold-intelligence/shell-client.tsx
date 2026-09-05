@@ -5,6 +5,7 @@ import { usePathname, redirect } from 'next/navigation'
 import { useBrand } from '@/components/whitelabel/brand-provider'
 import { realtorAllowsPath, REALTOR_HOME, accountAllowsPath, ACCOUNT_HOME } from '@/lib/freehold/apps'
 import { SpacesNav } from '@/components/freehold/spaces-nav'
+import { SideRail } from '@/components/freehold/side-rail'
 import { TrialBanner } from '@/components/freehold/trial-banner'
 import type { TrialState } from '@/lib/tenancy/trial'
 import { MobileTabBar } from '@/components/freehold/mobile-tab-bar'
@@ -64,6 +65,9 @@ function FreeholdShell({ children, trial }: { children: React.ReactNode; trial: 
         <SpacesNav />
         {trial && <TrialBanner state={trial} />}
         <div className="flex min-h-0 flex-1">
+          {/* The department's rail — icons that open to labels; the phone's
+              rail is the bottom tab bar, so this one hides there. */}
+          <SideRail />
           {/* overflow-x-hidden is the page-level guard: no matter what a child
               renders, the app never scrolls sideways on a phone. Intentional
               wide tables keep their OWN overflow-x-auto scroll region inside. */}
