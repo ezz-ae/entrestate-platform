@@ -22,6 +22,9 @@
  * (app/signup/signup-client.tsx, TRIAL_DAYS) and provisioning grants.
  */
 
+/** The welcome credit, in AED — the number the landing page says. lib/business/offers.ts carries the offer itself. */
+export const WELCOME_CREDIT_AED = 500
+
 export const FULL_SYSTEM = {
   /** The subscription, per workspace. */
   monthlyAed: 999,
@@ -46,7 +49,11 @@ export const FULL_SYSTEM_PRICE_SHORT = `${aed(FULL_SYSTEM.monthlyAed)}/month`
 export const FULL_SYSTEM_CTA = 'Start with your own address'
 
 /**
- * The line under every start button. Benefit first, and never the banned
- * word: the days cost nothing, but the page does not say "free".
+ * The line under every start button. The owner's school: no trial, no
+ * discount, no gift — "take these, spend them on me." So the line is the
+ * welcome credit (lib/business/offers.ts, WELCOME): an amount in AED that
+ * comes off the account's bills, said the way money is said, and never with
+ * the banned word. `trialDays` above is a provisioning fact (the grace
+ * before the subscription is due) and no selling surface prints it.
  */
-export const FULL_SYSTEM_TRIAL_NOTE = `${FULL_SYSTEM.trialDays} days to try it, no card. Your own address and your own database from the first screen.`
+export const FULL_SYSTEM_START_NOTE = `AED ${WELCOME_CREDIT_AED} on your account when you start — it comes off your bills. Your own address and your own database from the first screen.`

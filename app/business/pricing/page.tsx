@@ -3,7 +3,7 @@ import { Section, Eyebrow, Display, Lede, H3, ButtonLink, TextLink } from '@/com
 import { PunchGrid, StatBand, GlowBand, NextStep } from '@/components/business/visuals'
 import { DownloadCard, Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { TOKEN_PRICE_AED } from '@/lib/freehold/credits-shared'
-import { FULL_SYSTEM, FULL_SYSTEM_PRICE_LINE } from '@/lib/business/full-system'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE } from '@/lib/business/full-system'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -57,9 +57,9 @@ const PLANS: Plan[] = [
       'Roles for agents, managers, marketing, directors',
       'English, العربية, Русский',
       'Spend caps and the decision log',
-      '14-day trial, no card',
+      'AED 500 on your account when you start',
     ],
-    cta: { label: 'Start a 14-day trial', href: '/signup' },
+    cta: { label: FULL_SYSTEM_CTA, href: FULL_SYSTEM.startHref },
     featured: true,
   },
   {
@@ -173,8 +173,8 @@ export default function PricingPage() {
                 body: 'Paid direct to Meta and Google. We take no cut.',
               },
               {
-                title: 'The trial just stops.',
-                body: '14 days, no card taken. When it ends, nothing is charged.',
+                title: 'Credit, not discounts.',
+                body: 'AED 500 on your account when you start; more with a longer plan. It comes off your bills, bill by bill.'
               },
               {
                 title: 'Leave with your records.',
@@ -205,9 +205,8 @@ export default function PricingPage() {
 
       <StatBand
         items={[
-          // "Trial period", never "Free trial" — the word ban (بلاش نستخدم فري)
-          // applies to every selling surface, including a stat label.
-          { value: '14 days', label: 'Trial period', note: 'No card taken.' },
+          // Credit, said as money — never the banned word, never "points".
+          { value: 'AED 500', label: 'On your account when you start', note: 'It comes off your bills.' },
           { value: '0%', label: 'of your ad spend', note: 'We take no percentage.' },
           { value: '3', label: 'languages in every plan', note: 'English, العربية, Русский' },
         ]}

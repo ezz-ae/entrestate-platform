@@ -18,6 +18,7 @@ import { Holder, Keyword, KeywordSub, LearnMore, type HolderTone } from '@/compo
 import { nextInTour } from '@/lib/business/nav'
 import { LoopSection } from '@/components/business/loop'
 import { LeadCardCrop } from '@/components/business/crops'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 export const metadata: Metadata = {
   title: 'How it works',
@@ -119,7 +120,7 @@ export default function HowItWorksPage() {
           <Lede>The whole path, in order. No step skipped, no step hidden.</Lede>
         </div>
         <div className="mt-9 flex flex-wrap gap-3">
-          <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+          <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
           <ButtonLink href="/business/platform/inventory" variant="ghost">
             See the platform
           </ButtonLink>

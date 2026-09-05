@@ -7,6 +7,7 @@ import {
 import { Holder, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { SALES_TEAM, totalRate, READINESS_THRESHOLD } from '@/lib/freehold/visual-sales-team'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 /**
  * Leadformer — the product page for the conversational lead form.
@@ -26,7 +27,7 @@ import { SALES_TEAM, totalRate, READINESS_THRESHOLD } from '@/lib/freehold/visua
 export const metadata: Metadata = {
   title: 'Leadformer',
   description:
-    'A lead form that talks back. Your Visual Sales Team greets every enquiry by name, qualifies it in conversation, and turns the good ones into calls. 14-day trial, no card.',
+    'A lead form that talks back. Your Visual Sales Team greets every enquiry by name, qualifies it in conversation, and turns the good ones into calls. AED 500 on your account when you start.',
   alternates: { canonical: '/business/leadformer' },
 }
 
@@ -64,7 +65,7 @@ export default function LeadformerPage() {
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
               <ButtonLink href="/business/pricing" variant="ghost">See pricing</ButtonLink>
             </div>
           </div>

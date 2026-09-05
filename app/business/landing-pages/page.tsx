@@ -6,6 +6,7 @@ import {
 import { SceneChatBuilds } from '@/components/business/scenes'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 export const metadata: Metadata = {
   title: 'Landing Pages',
@@ -74,13 +75,13 @@ export default function LandingPagesPage() {
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
               <ButtonLink href="#templates" variant="ghost">
                 See the templates
               </ButtonLink>
             </div>
             {/* Access model: this ships inside Lead Machine, which is the
-                self-serve product — so the CTA is the trial, not a request
+                self-serve product — so the CTA is the start, not a request
                 for setup. Keep it in step with /business/pricing. */}
             <p className="mt-7 text-[0.8125rem] leading-[1.6] text-ink-faint">
               Included with Lead Machine. Pages run on your own domain.
@@ -296,7 +297,7 @@ export default function LandingPagesPage() {
           />
         </div>
         <div className="mt-12 flex flex-wrap gap-3">
-          <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+          <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
           <ButtonLink href="/business/contact" variant="ghost">
             Talk to a human
           </ButtonLink>

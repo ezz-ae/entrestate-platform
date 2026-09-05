@@ -26,12 +26,12 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { I18nProvider, useT } from '@/lib/i18n/provider'
 import { BusinessHeader, BusinessFooter } from '@/components/business/shell'
+import { WELCOME_CREDIT_AED } from '@/lib/business/full-system'
 import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from '@/lib/tenancy/config'
 import { SUBDOMAIN_RE, RESERVED_SUBDOMAINS } from '@/lib/tenancy/reserved'
 
 const MAX_LOGO_DIM = 256 // px — downscale before upload so the row stays small
 const DEFAULT_ACCENT = 'var(--brand)'
-const TRIAL_DAYS = 14
 
 /** Downscale an uploaded image to a small PNG data URL via canvas. */
 function downscaleToDataUrl(file: File): Promise<string> {
@@ -330,7 +330,7 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
             {loading ? t('wl.signup.submitting') : t('wl.signup.submit')}
           </button>
           <p className="mt-3 text-center text-xs text-ink/40">
-            {isRealtor ? t('wl.signup.realtorNote') : t('wl.signup.trialNote', { days: TRIAL_DAYS })}
+            {isRealtor ? t('wl.signup.realtorNote') : t('wl.signup.trialNote', { credit: WELCOME_CREDIT_AED })}
           </p>
         </form>
         )}

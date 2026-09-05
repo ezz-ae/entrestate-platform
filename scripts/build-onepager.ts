@@ -18,7 +18,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib'
 import QRCode from 'qrcode'
-import { FULL_SYSTEM, FULL_SYSTEM_PRICE_SHORT } from '../lib/business/full-system'
+import { FULL_SYSTEM_PRICE_SHORT, WELCOME_CREDIT_AED } from '../lib/business/full-system'
 
 const OUT = join(process.cwd(), 'public', 'business', 'entrestate-one-pager.pdf')
 const LINK = 'https://entrestate.com/business'
@@ -151,7 +151,7 @@ async function main(): Promise<void> {
       name: 'Lead Machine',
       line: 'Inventory, a landing page per project, ads, CRM and the month-end report — one system, your brand.',
       who: 'Brokerages and developers’ sales teams.',
-      billed: `${FULL_SYSTEM_PRICE_SHORT}. ${FULL_SYSTEM.trialDays}-day trial, no card.`,
+      billed: `${FULL_SYSTEM_PRICE_SHORT}. AED ${WELCOME_CREDIT_AED} on your account when you start.`,
     },
     {
       name: 'Mega Brokerage Platform',
@@ -232,7 +232,7 @@ async function main(): Promise<void> {
   // ── Footer: the way back to us ───────────────────────────────────────────
   page.drawLine({ start: { x: M, y: 140 }, end: { x: W - M, y: 140 }, thickness: 1.5, color: GOLD })
   page.drawText('entrestate.com/business', { x: M, y: 108, size: 12.5, font: bold, color: INK })
-  page.drawText('Start a 14-day trial · No card.', { x: M, y: 91, size: 8.5, font: helv, color: MUTED })
+  page.drawText(`Start with your own address · AED ${WELCOME_CREDIT_AED} on your account when you start.`, { x: M, y: 91, size: 8.5, font: helv, color: MUTED })
   page.drawText('Scan the code for the full tour.', { x: M, y: 76, size: 7.5, font: helv, color: MUTED })
   const qrData = await QRCode.toDataURL(LINK, {
     errorCorrectionLevel: 'M',

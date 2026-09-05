@@ -6,7 +6,8 @@ import { ensureBusinessAccount, listAccountApps } from "@/lib/terminal-account"
 import { readAccountWallet, recentAccountPostings, TOPUP_MIN_AED, TOPUP_MAX_AED } from "@/lib/account-wallet"
 import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from "@/lib/tenancy/config"
 import { workspacesForAccount } from "@/lib/tenancy/account-workspace"
-import { submitTopUp, createWorkspace } from "./actions"
+import { submitTopUp, createWorkspace, redeemOffer, humanFromHeaders } from "./actions"
+import { issueOfferCode, readAccountCredit } from "@/lib/account-credit"
 
 /**
  * THE ACCOUNT PAGE — phase 3's surface. One identity (the Terminal's
@@ -28,6 +29,18 @@ export const metadata = {
 
 const TERMINAL_URL = "https://terminal.entrestate.com"
 
+/** What each redemption outcome says, in words, on the page. */
+const CREDIT_MESSAGE: Record<string, string> = {
+  landed: "It is on your account. It comes off your next bills.",
+  already: "That code already landed on this account.",
+  already_claimed: "This one has already been used — once per person, and it has been.",
+  not_yours: "That code was issued to another account.",
+  unknown_code: "That code is not one of ours. Check the letters and try again.",
+  not_eligible: "That code needs a plan this account is not on yet.",
+  slow_down: "That is a lot of attempts in a row. Give it a few minutes.",
+  failed: "That did not save on our side. Nothing was lost — try once more in a minute.",
+}
+
 /** What each workspace outcome says, in words, on the page. */
 const WORKSPACE_MESSAGE: Record<string, string> = {
   taken: "That address is already in use — pick another and the rest carries over.",
@@ -43,9 +56,9 @@ const WORKSPACE_MESSAGE: Record<string, string> = {
 export default async function BusinessAccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ topup?: string; workspace?: string }>
+  searchParams: Promise<{ topup?: string; workspace?: string; credit?: string }>
 }) {
-  const { topup, workspace } = await searchParams
+  const { topup, workspace, credit: creditFlag } = await searchParams
   const user = await getTerminalUser()
 
   if (!user) {
@@ -64,6 +77,10 @@ export default async function BusinessAccountPage({
   }
 
   const account = await ensureBusinessAccount(user)
+  // The welcome code is minted the first time the account is seen here —
+  // once per human (device, network, email); the ledger refuses a second.
+  if (account) await issueOfferCode(account, 'welcome', await humanFromHeaders())
+  const credit = account ? await readAccountCredit(account) : null
   const wallet = account ? await readAccountWallet(account) : null
   const postings = account ? await recentAccountPostings(account, 8) : []
   const apps = account ? await listAccountApps(account.id) : new Map<string, string>()
@@ -82,10 +99,75 @@ export default async function BusinessAccountPage({
         lede="Everything you add — apps, coin, the workspace — lands here, on the one account."
         meta={[
           { k: "Signed in as", v: account?.email ?? "Terminal account" },
-          { k: "Wallet", v: wallet ? `AED ${wallet.balanceAed}` : "—" },
+          { k: "On your account", v: credit ? `AED ${credit.balanceAed}` : "—" },
+          { k: "Ads wallet", v: wallet ? `AED ${wallet.balanceAed}` : "—" },
           { k: "Apps on the account", v: String(appRows.length) },
         ]}
       />
+
+      {/*
+        THE BALANCE. The owner: "this must FEEL like money — if he feels it is
+        points, or any such talk, it will not work." So it is shown the way a
+        bank shows it: an amount in AED, a statement beneath, and the code
+        that puts money on it. No points, no coins, no percentages.
+      */}
+      {account && credit ? (
+        <Section className="pb-10">
+          <article className="rounded-2xl border border-line bg-surface p-8 shadow-(--shadow-card)">
+            <Eyebrow className="mb-4">On your account</Eyebrow>
+            <div className="flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <span className="text-[2.4rem] font-semibold leading-none tabular-nums text-ink">AED {credit.balanceAed}</span>
+                <P className="mt-3 max-w-[44ch]">
+                  Pays your bills here — the subscription, apps, pages. Each bill takes its share; what is left waits for the next one.
+                </P>
+              </div>
+              {credit.waiting.length > 0 ? (
+                <form action={redeemOffer} className="flex flex-col gap-2">
+                  {credit.waiting.map((w) => (
+                    <div key={w.code} className="flex flex-wrap items-center gap-3">
+                      <span className="text-[0.8125rem] text-ink-muted">{w.headline}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <input
+                      name="code"
+                      defaultValue={credit.waiting[0].code}
+                      readOnly
+                      aria-label="Your code"
+                      className="w-48 rounded-2xl border border-line bg-surface-2 px-3 py-2.5 font-mono text-[0.9375rem] tracking-[0.08em] text-ink"
+                    />
+                    <button type="submit" className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-brand-ink">
+                      Redeem
+                    </button>
+                  </div>
+                </form>
+              ) : null}
+            </div>
+
+            {creditFlag ? (
+              <p className={`mt-5 rounded-xl border px-4 py-3 text-[0.875rem] ${
+                creditFlag === "landed" ? "border-positive/40 bg-positive/10 text-ink" : "border-caution/40 bg-caution/10 text-ink"
+              }`}>
+                {CREDIT_MESSAGE[creditFlag] ?? CREDIT_MESSAGE.failed}
+              </p>
+            ) : null}
+
+            {credit.recent.length > 0 ? (
+              <ul className="mt-6 divide-y divide-line border-t border-line">
+                {credit.recent.map((r, i) => (
+                  <li key={i} className="flex items-center justify-between gap-4 py-3 text-[0.875rem]">
+                    <span className="min-w-0 truncate text-ink-muted">{r.memo}</span>
+                    <span className={`shrink-0 font-mono tabular-nums ${r.kind === "grant" ? "text-positive-bright" : "text-ink"}`} dir="ltr">
+                      {r.kind === "grant" ? "+" : "−"} AED {r.amountAed}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </article>
+        </Section>
+      ) : null}
 
       {/*
         THE WORKSPACE. This block exists because the account could be seen and
