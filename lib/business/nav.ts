@@ -133,7 +133,7 @@ export const COMPANY: NavItem[] = [
   {
     href: '/business/getting-started',
     label: 'Getting started',
-    blurb: 'What the first thirty days look like, week by week.',
+    blurb: 'Your first ad in five minutes — steps, not weeks.',
   },
   {
     href: '/business/contact',
@@ -242,7 +242,7 @@ export const GUIDES: GuideItem[] = [
   {
     href: '/business/docs/get-set-up',
     label: 'From signup to first lead',
-    blurb: 'The first thirty days, week by week, as you would actually run them.',
+    blurb: 'From your address to your first ad, step by step.',
     category: 'Getting set up',
   },
 ]

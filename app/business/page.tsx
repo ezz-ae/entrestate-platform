@@ -266,7 +266,7 @@ export default function BusinessHome() {
           <div>
             <H2>Start with your own address.</H2>
             <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
-              {FULL_SYSTEM.trialDays} days, no card. Live spend stays off until you connect an ad account.
+              Your first ad in five minutes. Spend runs in your own ad account, inside a cap you wrote.
             </p>
           </div>
           <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>

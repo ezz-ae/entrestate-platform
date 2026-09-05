@@ -69,7 +69,11 @@ console.log('\n── /business sells one thing ──')
   check('the price is rendered from the constant, never retyped',
     /\{FULL_SYSTEM_PRICE_LINE\}/.test(home) && !/999|9,588/.test(home))
   check('the trial length is rendered from the constant, never retyped',
-    /FULL_SYSTEM_TRIAL_NOTE/.test(home) && /FULL_SYSTEM\.trialDays/.test(home) && !/14-day|14 days/.test(home))
+    /FULL_SYSTEM_TRIAL_NOTE/.test(home) && !/14-day|14 days/.test(home))
+  // The owner: "we cannot tell them a month to learn — make an ad in five
+  // minutes." The home's closing note says so, and never "stays off".
+  check('the closing note promises the first ad in five minutes, not a wait',
+    /first ad in five minutes/.test(home) && !/stays off/.test(home))
   check('the parts come from the site\'s own map', /PLATFORM\.map\(\(p\)/.test(home))
   check('every platform part has a page to open', PLATFORM.every((p) => p.href.startsWith('/business/platform/')))
   check('the three product doors are gone from the home — one thing at a time', !/PRODUCTS\[/.test(home))

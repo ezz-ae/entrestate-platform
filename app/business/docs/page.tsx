@@ -17,7 +17,7 @@ const CATEGORY_LINES: Record<DocsCategory, string> = {
   'Lead machine': 'Campaigns, audiences, and the rules that govern spend.',
   'Creative studio': 'The ads, made from the listing you already have.',
   Finance: 'Commission against expenses, and what everything cost.',
-  'Getting set up': 'From signup to the first lead, week by week.',
+  'Getting set up': 'From signup to the first ad and the first lead, step by step.',
 }
 
 export default function DocsHubPage() {
