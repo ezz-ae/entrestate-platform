@@ -1,7 +1,9 @@
 /**
  * THE EVERYDAY DOOR INTO A WORKSPACE — the Entrestate account, and nothing else.
  *
- * Runs on the tenant host (mahmoud.entrestate.com/api/wl/recognise). The Neon
+ * Runs on the tenant host (mahmoud.entrestate.com/api/wl/recognise) — and on
+ * the vendor's own host, where it asks the vendor's list instead (see
+ * recogniseAtVendor: the finance screen and /ctrl had no way in). The Neon
  * session cookie lives on `.entrestate.com`, so it is readable here, and that
  * is the whole trick: a person who is signed in to Entrestate anywhere is
  * already identified on every workspace host. This route asks one question —
@@ -31,7 +33,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SAAS_TENANCY, tenantSubdomainFromHost } from '@/lib/tenancy/config'
 import { signSession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
-import { recogniseInWorkspace, safeRelativePath, WORKSPACE_SESSION_TTL_MS } from '@/lib/tenancy/account-workspace'
+import { recogniseInWorkspace, recogniseAtVendor, safeRelativePath, WORKSPACE_SESSION_TTL_MS } from '@/lib/tenancy/account-workspace'
 import { getTerminalUser } from '@/lib/terminal-session'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
 
@@ -45,8 +47,9 @@ export async function GET(req: NextRequest) {
   signIn.pathname = '/server'
   signIn.search = ''
 
+  // A tenant host asks its workspace; any other host under tenancy is the
+  // vendor's own, and asks the vendor's list (recogniseAtVendor).
   const hostTenant = tenantSubdomainFromHost(req.headers.get('host'))
-  if (!hostTenant) return NextResponse.redirect(signIn)
 
   const refuse = (door: 'signed_out' | 'stranger' | 'slow_down') => {
     signIn.searchParams.set('door', door)
@@ -59,7 +62,9 @@ export async function GET(req: NextRequest) {
   const limit = await checkRateLimit(`ws-recognise:${user.id}`, { limit: 60, windowSec: 300 })
   if (!limit.ok) return refuse('slow_down')
 
-  const session = await recogniseInWorkspace({ subdomain: hostTenant, user }).catch(() => null)
+  const session = hostTenant
+    ? await recogniseInWorkspace({ subdomain: hostTenant, user }).catch(() => null)
+    : await recogniseAtVendor(user).catch(() => null)
   if (!session) return refuse('stranger')
 
   // Where they were going, on this host — or their role's home.

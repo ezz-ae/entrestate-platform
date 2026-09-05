@@ -66,7 +66,7 @@
  */
 
 import { randomUUID } from 'node:crypto'
-import { runWithSchema } from '@/lib/db'
+import { runWithSchema, runWithDefaultSchema } from '@/lib/db'
 import { signSession } from '@/lib/freehold/auth-edge'
 import { memberSessionByEmail } from '@/lib/freehold/auth-db'
 import { upsertUserProfile } from '@/lib/data'
@@ -259,6 +259,54 @@ export async function recogniseInWorkspace(input: {
   const member = await runWithSchema(tenant.schemaName, () => memberSessionByEmail(email)).catch(() => null)
   if (!member) return null
   return { ...member, tenant: tenant.subdomain }
+}
+
+/**
+ * THE VENDOR'S OWN DOOR — the same door, on the apex.
+ *
+ * The vendor's workspace (entrestate.com/freehold-intelligence, the finance
+ * screen, /ctrl) is a workspace like any other, and it was the only one with
+ * no everyday way in: its roster was empty, so /server offered a password
+ * nobody had, and the desk that approves ad credit and mints coupons could
+ * not be opened by anyone. The same rule as a tenant applies — a person who
+ * is signed in to Entrestate is already identified — and the vendor lists
+ * its people in two places:
+ *
+ *   VENDOR_STAFF_EMAILS  a comma-separated allowlist in the environment,
+ *                        set on the vendor deployment only. Owner-level
+ *                        (role 'ceo'). Emails are not secrets; the Neon
+ *                        session proves the address before it is compared.
+ *   freehold_site_users  the vendor's own roster, in the default schema —
+ *                        anyone added there from Team, with their role.
+ *
+ * The session has NO `tenant`, so the proxy fences it to non-tenant hosts,
+ * exactly as it fences a tenant's session to theirs.
+ */
+export function vendorStaffEmails(env: string | undefined = process.env.VENDOR_STAFF_EMAILS): Set<string> {
+  return new Set(
+    (env ?? '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e.includes('@')),
+  )
+}
+
+export async function recogniseAtVendor(user: {
+  email: string | null; name: string | null; emailVerified: boolean
+}): Promise<SessionUser | null> {
+  const email = provedEmail(user)
+  if (!email) return null
+  if (vendorStaffEmails().has(email)) {
+    const name = user.name?.trim() || email
+    return {
+      email,
+      name,
+      initials: initialsOf(name, email),
+      role: 'ceo',
+      home: '/freehold-intelligence',
+    }
+  }
+  return runWithDefaultSchema(() => memberSessionByEmail(email)).catch(() => null)
 }
 
 export async function enterWorkspace(input: {
