@@ -9,6 +9,7 @@ import {
   RelatedRow,
 } from '@/components/business/docs'
 import { Phone, Chat } from '@/components/business/visuals'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'From signup to first lead',
@@ -93,18 +94,16 @@ export default function GetSetUpGuide() {
         <Step n={6} id="first-lead" title="The first lead">
           <p>
             Somewhere in week three or four, it happens without you: an enquiry lands, is
-            recorded first, answered fast, tagged by language, and handed to one agent with a
-            clock running. That path — the four doors in, the duplicate check, the owner — is its
+            recorded first, tagged by language, and handed to one agent with a clock running
+            until they answer. That path — the four doors in, the duplicate check, the owner — is its
             own guide, and it is the part of the system your team will live in daily.
           </p>
           <figure className="mt-5">
-            <div className="flex justify-center">
-              <Phone className="w-[250px] sm:w-[270px]">
-                <Chat />
-              </Phone>
+            <div className="mx-auto max-w-[34rem]">
+              <LeadCardCrop />
             </div>
             <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-ink-faint">
-              The first one arrives — answered, tagged by language, owned by an agent.
+              The first one arrives — tagged by language, owned by an agent, on the clock.
             </figcaption>
           </figure>
         </Step>
