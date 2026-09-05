@@ -34,6 +34,7 @@ import { useBrand } from '@/components/whitelabel/brand-provider'
 import { useT } from '@/lib/i18n/provider'
 import { realtorAllowsPath } from '@/lib/freehold/apps'
 import { TOOLS, TOOL_GROUPS, visibleTools, toolById, toolMatches, type ToolDef } from '@/lib/freehold/tools'
+import { ALL_TOOLS_EVENT } from '@/lib/freehold/departments'
 
 /** Sections the API can return, in the order they are most useful on screen. */
 const DATA_SECTIONS = ['leads', 'inventory', 'campaigns', 'landings', 'people', 'drive'] as const
@@ -68,6 +69,8 @@ export function CommandNav() {
   const t = useT()
 
   // ⌘K / Ctrl-K from anywhere; Escape closes (the panel handles that itself).
+  // The side rail's "All tools" button asks through a window event rather
+  // than owning a second copy of the panel — one implementation, two doors.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -75,8 +78,10 @@ export function CommandNav() {
         setOpen((o) => !o)
       }
     }
+    const onAsk = () => setOpen(true)
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener(ALL_TOOLS_EVENT, onAsk)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener(ALL_TOOLS_EVENT, onAsk) }
   }, [])
 
   return (
