@@ -25,7 +25,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_PRICE_SHORT, FULL_SYSTEM_TRIAL_NOTE } from '../lib/business/full-system'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_PRICE_SHORT, FULL_SYSTEM_START_NOTE, WELCOME_CREDIT_AED } from '../lib/business/full-system'
 import { PLATFORM } from '../lib/business/nav'
 
 let failures = 0
@@ -48,15 +48,19 @@ console.log('\n── the facts, typed once ──')
     FULL_SYSTEM.yearlyAed < FULL_SYSTEM.monthlyAed * 12 && FULL_SYSTEM.yearlyAed > FULL_SYSTEM.monthlyAed * 9)
   check('the door is /signup, which provisions plan company', FULL_SYSTEM.startHref === '/signup')
   const signup = stripComments(read('app/signup/signup-client.tsx'))
-  const promised = Number(/const TRIAL_DAYS = (\d+)/.exec(signup)?.[1])
-  check('the trial length is the one the sign-up screen promises',
-    promised === FULL_SYSTEM.trialDays, `${promised} vs ${FULL_SYSTEM.trialDays}`)
+  // The owner: "forget free — free never sells again. Take these, spend them
+  // on me." The sign-up screen promises the welcome credit, from the one
+  // constant, and no longer a number of days.
+  check('the sign-up screen promises the welcome credit from the one constant',
+    /t\('wl\.signup\.trialNote', \{ credit: WELCOME_CREDIT_AED \}\)/.test(signup) && !/TRIAL_DAYS/.test(signup))
   check('…and sign-up provisions plan company by default', /plan: isRealtor \? 'realtor' : 'company'/.test(signup))
   check('the full system\'s address is where /me on the Terminal points',
     FULL_SYSTEM.url === 'https://entrestate.com/business', FULL_SYSTEM.url)
   check('the call to action is a benefit, not a term', FULL_SYSTEM_CTA === 'Start with your own address', FULL_SYSTEM_CTA)
-  check('the trial note names the days and never the banned word',
-    FULL_SYSTEM_TRIAL_NOTE.includes(`${FULL_SYSTEM.trialDays} days`) && !saysBanned(FULL_SYSTEM_TRIAL_NOTE), FULL_SYSTEM_TRIAL_NOTE)
+  check('the start note is the welcome credit, said as money, never the banned word and never a trial',
+    FULL_SYSTEM_START_NOTE.includes(`AED ${WELCOME_CREDIT_AED} on your account`) && /comes off your bills/.test(FULL_SYSTEM_START_NOTE)
+      && !saysBanned(FULL_SYSTEM_START_NOTE) && !/trial|days/i.test(FULL_SYSTEM_START_NOTE), FULL_SYSTEM_START_NOTE)
+  check('the welcome credit is AED 500 — the owner\'s number', WELCOME_CREDIT_AED === 500)
 }
 
 console.log('\n── /business sells one thing ──')
@@ -68,8 +72,8 @@ console.log('\n── /business sells one thing ──')
   check('…and says the one thing on it', (home.match(/\{FULL_SYSTEM_CTA\}/g) ?? []).length >= 2)
   check('the price is rendered from the constant, never retyped',
     /\{FULL_SYSTEM_PRICE_LINE\}/.test(home) && !/999|9,588/.test(home))
-  check('the trial length is rendered from the constant, never retyped',
-    /FULL_SYSTEM_TRIAL_NOTE/.test(home) && !/14-day|14 days/.test(home))
+  check('the start note is rendered from the constant; no trial, no days, anywhere on the home',
+    /FULL_SYSTEM_START_NOTE/.test(home) && !/14-day|14 days|trial/i.test(home))
   // The owner: "we cannot tell them a month to learn — make an ad in five
   // minutes." The home's closing note says so, and never "stays off".
   check('the closing note promises the first ad in five minutes, not a wait',

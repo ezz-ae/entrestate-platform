@@ -167,7 +167,7 @@ console.log('\n── the sign-up note sells without the banned word ──')
   for (const [lang, dict] of Object.entries(DICTIONARIES)) {
     const note = String((dict as Record<string, string>)['wl.signup.trialNote'] ?? '')
     check(`${lang}: wl.signup.trialNote exists`, note.length > 0)
-    check(`${lang}: …keeps the {days} placeholder`, note.includes('{days}'), note)
+    check(`${lang}: …keeps the {credit} placeholder — the welcome credit, not a number of days`, note.includes('{credit}') && !note.includes('{days}'), note)
     check(`${lang}: …and never says the word`, !banned.some((re) => re.test(note)), note)
     const realtor = String((dict as Record<string, string>)['wl.signup.realtorNote'] ?? '')
     check(`${lang}: wl.signup.realtorNote never says it either`, !banned.some((re) => re.test(realtor)), realtor)

@@ -2,7 +2,7 @@
 type Dict = Record<string, string>
 
 const en: Dict = {
-  'wl.signup.eyebrow': 'Start your trial',
+  'wl.signup.eyebrow': 'Start with your own address',
   'wl.signup.title': 'Launch your own platform',
   'wl.signup.subtitle': 'Your brand, your team, your data — a complete real-estate operating system on your own address, live in under a minute.',
   'wl.signup.realtorEyebrow': 'Meta for Realtors',
@@ -32,7 +32,7 @@ const en: Dict = {
   'wl.signup.adminEmail': 'Work email',
   'wl.signup.adminPassword': 'Password',
   'wl.signup.adminPasswordHint': 'At least 8 characters.',
-  'wl.signup.trialNote': 'Your first {days} days cost nothing. No card required.',
+  'wl.signup.trialNote': 'AED {credit} on your account when you start — it comes off your bills.',
   'wl.signup.realtorNote': 'Tokens as you run ads. No monthly fee, no card.',
   'wl.signup.createdEyebrow': 'Workspace created',
   'wl.signup.createdTitle': 'Your address is ready.',
@@ -60,7 +60,7 @@ const en: Dict = {
 }
 
 const ar: Dict = {
-  'wl.signup.eyebrow': 'ابدأ تجربتك',
+  'wl.signup.eyebrow': 'ابدأ بعنوانك الخاص',
   'wl.signup.title': 'أطلق منصتك الخاصة',
   'wl.signup.subtitle': 'علامتك، فريقك، بياناتك — نظام تشغيل عقاري متكامل على عنوانك الخاص، جاهز في أقل من دقيقة.',
   'wl.signup.realtorEyebrow': 'Meta for Realtors',
@@ -90,7 +90,7 @@ const ar: Dict = {
   'wl.signup.adminEmail': 'البريد الإلكتروني للعمل',
   'wl.signup.adminPassword': 'كلمة المرور',
   'wl.signup.adminPasswordHint': '8 أحرف على الأقل.',
-  'wl.signup.trialNote': 'أول {days} يومًا بلا أي تكلفة. بدون بطاقة.',
+  'wl.signup.trialNote': '{credit} درهم على حسابك عند البدء — تُخصم من فواتيرك.',
   'wl.signup.realtorNote': 'رموز أثناء تشغيل إعلاناتك. بلا رسوم شهرية وبلا بطاقة.',
   'wl.signup.createdEyebrow': 'تم إنشاء مساحة العمل',
   'wl.signup.createdTitle': 'عنوانك جاهز.',
@@ -118,7 +118,7 @@ const ar: Dict = {
 }
 
 const ru: Dict = {
-  'wl.signup.eyebrow': 'Начните пробный период',
+  'wl.signup.eyebrow': 'Начните со своего адреса',
   'wl.signup.title': 'Запустите собственную платформу',
   'wl.signup.subtitle': 'Ваш бренд, ваша команда, ваши данные — полноценная операционная система недвижимости на вашем собственном адресе, запуск меньше чем за минуту.',
   'wl.signup.realtorEyebrow': 'Meta for Realtors',
@@ -148,7 +148,7 @@ const ru: Dict = {
   'wl.signup.adminEmail': 'Рабочая почта',
   'wl.signup.adminPassword': 'Пароль',
   'wl.signup.adminPasswordHint': 'Не менее 8 символов.',
-  'wl.signup.trialNote': 'Первые {days} дней ничего не стоят. Без карты.',
+  'wl.signup.trialNote': 'AED {credit} на вашем счёте с самого начала — они идут в счёт ваших платежей.',
   'wl.signup.realtorNote': 'Токены, пока идут объявления. Без ежемесячной платы и без карты.',
   'wl.signup.createdEyebrow': 'Рабочее пространство создано',
   'wl.signup.createdTitle': 'Ваш адрес готов.',

@@ -7,11 +7,12 @@ import {
 } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 export const metadata: Metadata = {
   title: 'Lead Machine',
   description:
-    'Your brokerage, on rails. Inventory, pages, ads, CRM and the month-end report — one system, your brand, your address. 14-day trial, no card.',
+    'Your brokerage, on rails. Inventory, pages, ads, CRM and the month-end report — one system, your brand, your address. AED 500 on your account when you start.',
   alternates: { canonical: '/business/lead-machine' },
 }
 
@@ -43,7 +44,7 @@ export default function LeadMachinePage() {
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
               <ButtonLink href="/business/pricing" variant="ghost">See pricing</ButtonLink>
             </div>
           </div>
@@ -136,7 +137,7 @@ export default function LeadMachinePage() {
       {/* ── Facts ───────────────────────────────────────────────────────── */}
       <StatBand
         items={[
-          { value: '14 days', label: 'Trial, no card', note: 'The workspace exists within a minute.' },
+          { value: 'AED 500', label: 'On your account when you start', note: 'It comes off your bills. The workspace exists within a minute.' },
           { value: 'Yours', label: 'Own database', note: 'No other company can reach your records.' },
           { value: '3', label: 'Languages', note: 'English · العربية · Русский' },
           { value: 'OFF', label: 'Live spend, by default', note: 'Nothing spends until you connect your own ad account.' },

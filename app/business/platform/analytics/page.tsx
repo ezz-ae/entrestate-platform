@@ -3,6 +3,7 @@ import { Section, Display, Lede, ButtonLink } from '@/components/business/ui'
 import { Browser, MiniReport, Ledger, Chapter, NextStep } from '@/components/business/visuals'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
+import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 export const metadata: Metadata = {
   title: 'Analytics & finance',
@@ -50,7 +51,7 @@ export default function AnalyticsPage() {
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
               <ButtonLink href="/business/pricing" variant="ghost">
                 See plans
               </ButtonLink>

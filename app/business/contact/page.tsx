@@ -53,7 +53,7 @@ export default function ContactPage() {
             </Holder>
 
             <Holder tone="gold">
-              <H3>Start the trial instead</H3>
+              <H3>Or just start</H3>
               <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
                 The workspace exists within a minute. Open the desk, click around, come back with
                 questions. <TextLink href="/signup">Start one</TextLink>.
@@ -98,7 +98,7 @@ export default function ContactPage() {
         />
       </Section>
 
-      <NextStep href={next.href} label="Or just start the trial" note={next.blurb} />
+      <NextStep href={next.href} label="Or just start" note={next.blurb} />
     </>
   )
 }

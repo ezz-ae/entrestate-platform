@@ -11,7 +11,7 @@ import {
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { PLATFORM, nextInTour } from '@/lib/business/nav'
 import {
-  FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_TRIAL_NOTE,
+  FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_START_NOTE,
 } from '@/lib/business/full-system'
 import { ExplorerSection } from '@/components/business/explorer'
 import { LoopSection } from '@/components/business/loop'
@@ -76,7 +76,7 @@ export default function BusinessHome() {
                 See what it costs
               </ButtonLink>
             </div>
-            <p className="mt-5 text-[0.8125rem] text-ink-faint">{FULL_SYSTEM_TRIAL_NOTE}</p>
+            <p className="mt-5 text-[0.8125rem] text-ink-faint">{FULL_SYSTEM_START_NOTE}</p>
           </div>
           {/* The reel: the product's strong options, one at a time, cut large
               enough to read — never a whole screen in a small frame, never a
@@ -179,7 +179,7 @@ export default function BusinessHome() {
             <div className="flex flex-col items-start gap-4 lg:items-end">
               <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
               <p className="max-w-[34ch] text-[0.8125rem] leading-[1.6] text-ink-faint lg:text-right">
-                {FULL_SYSTEM_TRIAL_NOTE}
+                {FULL_SYSTEM_START_NOTE}
               </p>
               <TextLink href="/business/pricing">Every plan, line by line</TextLink>
             </div>

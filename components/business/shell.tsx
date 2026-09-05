@@ -153,7 +153,7 @@ export function BusinessHeader() {
             href="/signup"
             className="rounded-lg bg-brand px-4 py-2 text-[0.8125rem] font-semibold text-brand-ink transition hover:bg-brand-bright"
           >
-            Start a trial
+            Start
           </Link>
           <button
             type="button"

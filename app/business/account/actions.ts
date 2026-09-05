@@ -8,6 +8,36 @@ import { getLeadershipLeadRecipients, sendSystemEmail } from '@/lib/transactiona
 import { SAAS_TENANCY } from '@/lib/tenancy/config'
 import { createWorkspaceForAccount } from '@/lib/tenancy/account-workspace'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
+import { headers } from 'next/headers'
+import { redeemCode, type Human } from '@/lib/account-credit'
+
+/** The device and the network behind this request — for the once-per-human rule. */
+export async function humanFromHeaders(): Promise<Human> {
+  const h = await headers()
+  const forwarded = h.get('x-forwarded-for') ?? ''
+  const address = (forwarded.split(',')[0] || h.get('x-real-ip') || 'unknown').trim()
+  return { userAgent: h.get('user-agent') ?? '', address }
+}
+
+/**
+ * Redeem a code. The code was minted for this account (the page issues it);
+ * the ledger refuses a second landing for the same account, device+network
+ * or address. Rate-limited so a code cannot be guessed. The outcome travels
+ * back as a query flag the page renders in words.
+ */
+export async function redeemOffer(formData: FormData): Promise<void> {
+  const user = await getTerminalUser()
+  if (!user) redirect('/business/account')
+  const account = await ensureBusinessAccount(user)
+  if (!account) redirect('/business/account?credit=failed')
+  const human = await humanFromHeaders()
+  const limit = await checkRateLimit(`redeem:${account.id}`, { limit: 10, windowSec: 300 })
+  if (!limit.ok) redirect('/business/account?credit=slow_down')
+  const code = String(formData.get('code') ?? '')
+  const out = await redeemCode(account, code, human)
+  if (out.ok) redirect(`/business/account?credit=${out.already ? 'already' : 'landed'}`)
+  redirect(`/business/account?credit=${out.reason}`)
+}
 
 /**
  * The top-up form's server half. Session-gated (the shared .entrestate.com

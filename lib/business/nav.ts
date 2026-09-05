@@ -292,7 +292,7 @@ export function nextInTour(href: string): NavItem | null {
   const at = TOUR.indexOf(href)
   if (at === -1) return null
   const next = TOUR[at + 1]
-  if (!next) return { href: '/signup', label: 'Start a trial', blurb: '14 days. No card.' }
+  if (!next) return { href: '/signup', label: 'Start', blurb: 'AED 500 on your account when you start.' }
   const all = [...PRODUCTS, ...PLATFORM, ...COMPANY]
   return all.find((i) => i.href === next) ?? null
 }
