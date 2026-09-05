@@ -47,8 +47,6 @@ export function CropReel({ frames, className = '' }: { frames: ReelFrame[]; clas
     return () => clearInterval(t)
   }, [held, still, frames.length])
 
-  const current = frames[i] ?? frames[0]
-
   return (
     <div
       ref={rootRef}
@@ -65,7 +63,8 @@ export function CropReel({ frames, className = '' }: { frames: ReelFrame[]; clas
         className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 rounded-[40px] bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--brand)_10%,transparent),transparent_65%)]"
       />
       {/* Every frame sits in the same grid cell, so the reel is as tall as
-          its tallest frame and the caption never jumps when it turns. */}
+          its tallest frame. A frame carries its own caption, so a short frame
+          reads as card + line, never as a card with an empty half. */}
       <div className="grid">
         {frames.map((f, n) => (
           <div
@@ -74,27 +73,25 @@ export function CropReel({ frames, className = '' }: { frames: ReelFrame[]; clas
             aria-roledescription="slide"
             aria-label={`${n + 1} of ${frames.length}: ${f.caption}`}
             aria-hidden={n !== i}
-            className={`col-start-1 row-start-1 [&>div]:h-full ${n === i ? 'opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-500 motion-reduce:transition-none`}
+            className={`col-start-1 row-start-1 self-start ${n === i ? 'opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-500 motion-reduce:transition-none`}
           >
             {f.node}
+            <p className="mt-4 text-[0.875rem] leading-snug text-ink-muted" aria-live={n === i ? 'polite' : undefined}>{f.caption}</p>
           </div>
         ))}
       </div>
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <p className="min-w-0 text-[0.875rem] leading-snug text-ink-muted" aria-live="polite">{current?.caption}</p>
-        <div className="flex shrink-0 items-center gap-1.5" role="tablist" aria-label="Frames">
-          {frames.map((f, n) => (
-            <button
-              key={f.key}
-              type="button"
-              role="tab"
-              aria-selected={n === i}
-              aria-label={f.caption}
-              onClick={() => setI(n)}
-              className={`h-1.5 rounded-full transition-all ${n === i ? 'w-6 bg-brand' : 'w-1.5 bg-line-strong hover:bg-ink-faint'}`}
-            />
-          ))}
-        </div>
+      <div className="mt-3 flex items-center justify-end gap-1.5" role="tablist" aria-label="Frames">
+        {frames.map((f, n) => (
+          <button
+            key={f.key}
+            type="button"
+            role="tab"
+            aria-selected={n === i}
+            aria-label={f.caption}
+            onClick={() => setI(n)}
+            className={`h-1.5 rounded-full transition-all ${n === i ? 'w-6 bg-brand' : 'w-1.5 bg-line-strong hover:bg-ink-faint'}`}
+          />
+        ))}
       </div>
     </div>
   )
