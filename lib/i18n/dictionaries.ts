@@ -657,6 +657,7 @@ const en: Dict = {
   'login.tryAgain': 'Try again',
   'login.useAnotherAccount': 'Use another account',
   'login.slowDown': 'Too many attempts in a row. Give it a minute, then continue.',
+  'login.orPassword': 'Or sign in with a password below.',
   'login.remember': 'Keep me signed in',
   'login.error': 'Incorrect email or password',
   // crm
@@ -1382,6 +1383,7 @@ const ar: Dict = {
   'login.tryAgain': 'حاول مرة أخرى',
   'login.useAnotherAccount': 'استخدم حسابًا آخر',
   'login.slowDown': 'محاولات كثيرة متتالية. انتظر دقيقة ثم تابع.',
+  'login.orPassword': 'أو ادخل بكلمة المرور أدناه.',
   'login.remember': 'إبقائي مسجلاً',
   'login.error': 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
   'crm.leads': 'العملاء المحتملون',
@@ -2100,6 +2102,7 @@ const ru: Dict = {
   'login.tryAgain': 'Попробовать снова',
   'login.useAnotherAccount': 'Использовать другой аккаунт',
   'login.slowDown': 'Слишком много попыток подряд. Подождите минуту и продолжите.',
+  'login.orPassword': 'Или войдите с паролем ниже.',
   'login.remember': 'Запомнить меня',
   'login.error': 'Неверная почта или пароль',
   'crm.leads': 'Лиды',

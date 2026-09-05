@@ -92,7 +92,9 @@ console.log('\n── the door on the host ──')
 {
   const door = stripComments(read(DOOR))
   check('dormant without tenancy', /if \(!SAAS_TENANCY\) return new NextResponse\(null, \{ status: 404 \}\)/.test(door))
-  check('only on a tenant host', /tenantSubdomainFromHost\(req\.headers\.get\('host'\)\)/.test(door) && /if \(!hostTenant\)/.test(door))
+  check('a tenant host asks its workspace; the vendor\'s own host asks the vendor\'s list',
+    /tenantSubdomainFromHost\(req\.headers\.get\('host'\)\)/.test(door)
+      && /hostTenant\s*\?\s*await recogniseInWorkspace\(\{ subdomain: hostTenant, user \}\)[\s\S]{0,80}: await recogniseAtVendor\(user\)/.test(door))
   check('identity comes from the Neon session and nowhere else',
     /getTerminalUser\(\)/.test(door) && !/password|searchParams\.get\('email'\)|body/.test(door))
   check('standing is decided by recogniseInWorkspace', /recogniseInWorkspace\(\{ subdomain: hostTenant, user \}\)/.test(door))
@@ -125,7 +127,7 @@ console.log('\n── the wall sends people to the door, not to a form ──')
   check('the page gate resolves the tenant host once', /const hostTenant = tenantSubdomainFromHost\(hostname\)/.test(gate))
   check('without a session on a tenant host → /api/wl/recognise, carrying where they were going',
     /url\.pathname = '\/api\/wl\/recognise'/.test(gate) && /searchParams\.set\('next', `\$\{pathname\}\$\{request\.nextUrl\.search\}`\)/.test(gate))
-  check('…never for the white-label demo, which keeps its activation gate', /if \(hostTenant && !WHITE_LABEL\)/.test(gate))
+  check('…on every host under tenancy, never for the white-label demo, which keeps its activation gate', /if \(SAAS_TENANCY && !WHITE_LABEL\)/.test(gate))
   check('elsewhere the previous rule stands (/activate or /server)', /WHITE_LABEL \? '\/activate' : '\/server'/.test(gate))
   check('a session fenced to another tenant takes the same road', /!== hostTenant\) return withoutSession\(\)/.test(gate))
   check('the API wall is untouched: no session is still a 401, never a redirect',

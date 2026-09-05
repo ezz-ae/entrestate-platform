@@ -122,6 +122,17 @@ function ServerAuthInner() {
           <EntrestateDoor door={door} />
         ) : host === 'other' ? (
           <>
+        {/* The vendor's own host: when the Entrestate door has spoken
+            (signed_out · stranger · slow_down) it is shown first — the
+            vendor's people are recognised from their Entrestate account
+            like a tenant's — and the password roster stays beneath for a
+            row that has one. With no verdict, the roster alone, as before. */}
+        {SAAS_TENANCY && door !== null ? (
+          <div className="mb-6">
+            <EntrestateDoor door={door} />
+            <p className="mt-4 text-center text-xs text-slate-500">{t('login.orPassword')}</p>
+          </div>
+        ) : null}
         {/* Header */}
         <div className="mb-7 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">

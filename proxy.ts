@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server"
 import { verifySession, SESSION_COOKIE } from '@/lib/freehold/auth-edge'
 import { MANAGEMENT_ROLES, LEADERSHIP_ROLES } from '@/lib/freehold/session-types'
 import { WHITE_LABEL } from '@/lib/whitelabel/config'
-import { tenantSubdomainFromHost } from '@/lib/tenancy/config'
+import { tenantSubdomainFromHost, SAAS_TENANCY } from '@/lib/tenancy/config'
 import { vendorHostAction } from '@/lib/tenancy/vendor-host'
 
 // Internal command surfaces — pages that must never render for anonymous visitors.
@@ -267,11 +267,16 @@ export async function proxy(request: NextRequest) {
     // The door is one cheap redirect and it decides with the real session.
     // Loop-safe: /server is not an internal page, so a refusal ends here.
     //
-    // Elsewhere — the vendor's own hosts, a deployment without tenancy, the
-    // white-label demo — the previous rule stands.
+    // The vendor's own hosts go through the same door under tenancy (the
+    // vendor's list is asked instead — recogniseAtVendor). Elsewhere — a
+    // deployment without tenancy, the white-label demo — the previous rule
+    // stands.
     const withoutSession = (): NextResponse => {
       const url = request.nextUrl.clone()
-      if (hostTenant && !WHITE_LABEL) {
+      // The vendor's own host goes through the same door under tenancy: its
+      // people are recognised from the Entrestate account (recogniseAtVendor)
+      // — the roster was empty and the finance screen had no way in.
+      if (SAAS_TENANCY && !WHITE_LABEL) {
         url.pathname = '/api/wl/recognise'
         url.search = ''
         url.searchParams.set('next', `${pathname}${request.nextUrl.search}`)
