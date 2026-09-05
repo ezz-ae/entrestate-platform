@@ -23,7 +23,7 @@ export default async function CtrlProjectsPage() {
 
   return (
     <main>
-      <p><Link href="/ctrl">← Partners</Link></p>
+      <p><Link href="/ctrl/partners">← Lead marketplace</Link></p>
       <h1>Projects</h1>
       <p className="dim">
         What clients shop for, lead by lead. Attach forms to a project on each partner's

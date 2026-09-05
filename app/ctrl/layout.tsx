@@ -1,14 +1,19 @@
 import { redirect } from 'next/navigation'
 import { getSessionUser, isAdminRole } from '@/lib/auth'
 import { onTenantHost } from '@/lib/ctrl/vendor-gate'
+import { AdminNav } from '@/components/ctrl/admin-nav'
 import './ctrl.css'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * The control plane's staff gate. /ctrl is where Entrestate runs the lead
- * marketplace — mints partners, prices leads, maps our Meta objects to them,
- * moves wallet money. It is management-only, server-checked (not merely the
+ * THE ADMIN — every vendor desk under one roof, behind one staff gate.
+ * /ctrl began as the lead marketplace (partners, prices, Meta mappings,
+ * partner wallets); it is now the company's admin: overview, workspaces,
+ * marketing (coupons), finance (credit and requests), partners, access.
+ * The sidebar (components/ctrl/admin-nav.tsx) is the map.
+ *
+ * It is management-only, server-checked (not merely the
  * client guard the CRM uses): a request that is not a signed-in manager never
  * renders a control page. The public storefront lives elsewhere (/portal/[slug],
  * capability URL, no login) — deliberately NOT under this gate.
@@ -28,5 +33,12 @@ export default async function CtrlLayout({ children }: { children: React.ReactNo
   // the coupon desk. A tenant is sent home; nothing here is theirs. The
   // why, in full: lib/ctrl/vendor-gate.ts.
   if (await onTenantHost()) redirect('/')
-  return <div className="ctrl-shell">{children}</div>
+  return (
+    <div className="ctrl-shell">
+      <div className="ctrl-layout">
+        <AdminNav email={user.email ?? null} />
+        <div>{children}</div>
+      </div>
+    </div>
+  )
 }
