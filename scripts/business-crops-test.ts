@@ -124,7 +124,7 @@ console.log('\n── the reel is a reel ──')
   check('it turns by itself', /setInterval\(/.test(reel) && /TURN_MS/.test(reel))
   check('a hand on it stops it', /onMouseEnter=\{\(\) => setHeld\(true\)\}/.test(reel))
   check('reduced motion stops it', /prefers-reduced-motion: reduce/.test(reel) && /held \|\| still/.test(reel))
-  check('every frame is announced with its caption', /aria-roledescription="slide"/.test(reel) && /aria-live="polite"/.test(reel))
+  check('every frame carries its own caption and is announced', /aria-roledescription="slide"/.test(reel) && /aria-live=\{n === i \? 'polite' : undefined\}/.test(reel) && /\{f\.node\}\s*<p/.test(reel))
   const home = stripComments(read('app/business/page.tsx'))
   const frames = (home.match(/\{ key: '[a-z]+', caption: '[^']+', node: </g) ?? []).length
   check('the hero is the reel, with at least six frames', /<CropReel/.test(home) && frames >= 6, String(frames))
