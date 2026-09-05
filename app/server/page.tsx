@@ -49,6 +49,10 @@ function ServerAuthInner() {
   // signed_out · stranger · slow_down. Absent means nobody has asked the door
   // yet — and on a tenant host the screen asks it before showing anything.
   const [door, setDoor] = useState<string | null>(null)
+  // The vendor's own host, once the door has spoken: the door alone, and a
+  // password screen only for the person who asks for it — an empty roster
+  // and a second header under the door was a wall, not a way in.
+  const [passwordDoor, setPasswordDoor] = useState(false)
   useEffect(() => {
     const tenant = SAAS_TENANCY && tenantSubdomainFromHost(window.location.host) !== null
     setDoor(new URLSearchParams(window.location.search).get('door'))
@@ -120,19 +124,26 @@ function ServerAuthInner() {
 
         {host === 'tenant' ? (
           <EntrestateDoor door={door} />
+        ) : host === 'other' && SAAS_TENANCY && door !== null && !passwordDoor ? (
+          <>
+            {/* The vendor's own host, once the Entrestate door has spoken
+                (signed_out · stranger · slow_down): the door, and nothing
+                else — the vendor's people are recognised from their
+                Entrestate account like a tenant's. One quiet line opens the
+                password screen for a row that has one. */}
+            <EntrestateDoor door={door} vendor />
+            {/* This screen is staff-only — a customer who wanders here needs
+                the way back to the public site more than a password form. */}
+            <div className="mt-5 flex items-center justify-center gap-4 text-xs text-slate-500">
+              <a href="/business" className="transition-colors hover:text-slate-300">{t('login.backHome')}</a>
+              <span aria-hidden>·</span>
+              <button type="button" onClick={() => setPasswordDoor(true)} className="transition-colors hover:text-slate-300">
+                {t('login.orPassword')}
+              </button>
+            </div>
+          </>
         ) : host === 'other' ? (
           <>
-        {/* The vendor's own host: when the Entrestate door has spoken
-            (signed_out · stranger · slow_down) it is shown first — the
-            vendor's people are recognised from their Entrestate account
-            like a tenant's — and the password roster stays beneath for a
-            row that has one. With no verdict, the roster alone, as before. */}
-        {SAAS_TENANCY && door !== null ? (
-          <div className="mb-6">
-            <EntrestateDoor door={door} />
-            <p className="mt-4 text-center text-xs text-slate-500">{t('login.orPassword')}</p>
-          </div>
-        ) : null}
         {/* Header */}
         <div className="mb-7 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-gold/10">
@@ -142,7 +153,10 @@ function ServerAuthInner() {
           <p className="mt-1 text-sm text-slate-500">{t('login.subtitle')}</p>
         </div>
 
-        {/* Role selector panel */}
+        {/* Role selector panel — only when there is a team to pick from. An
+            empty roster ("No results" under four zero tabs) says nothing a
+            person can act on; the form below is the whole screen then. */}
+        {profiles.length > 0 ? (
         <div className="mb-4 rounded-2xl border border-line bg-surface shadow-[0_24px_70px_rgba(0,0,0,0.5)] backdrop-blur-xl overflow-hidden">
 
           {/* Tab row + search */}
@@ -226,6 +240,7 @@ function ServerAuthInner() {
             )}
           </div>
         </div>
+        ) : null}
 
         {/* Auth form */}
         <div className="rounded-2xl border border-line bg-surface p-6 shadow-[0_24px_70px_rgba(0,0,0,0.5)] backdrop-blur-xl">
@@ -335,7 +350,7 @@ function ServerAuthInner() {
  * client's deployment (no NEXT_PUBLIC_TENANT_BASE_DOMAIN) never sees it —
  * their password sign-in is untouched.
  */
-function EntrestateDoor({ door }: { door: string | null }) {
+function EntrestateDoor({ door, vendor = false }: { door: string | null; vendor?: boolean }) {
   const t = useT()
   const [checking, setChecking] = useState(door === null)
   useEffect(() => {
@@ -363,7 +378,7 @@ function EntrestateDoor({ door }: { door: string | null }) {
             {stranger ? t('login.strangerTitle') : t('login.doorTitle')}
           </p>
           <p className="mx-auto mt-2 max-w-[36ch] text-sm leading-relaxed text-slate-500">
-            {stranger ? t('login.strangerBody') : door === 'slow_down' ? t('login.slowDown') : t('login.doorBody')}
+            {stranger ? (vendor ? t('login.vendorStrangerBody') : t('login.strangerBody')) : door === 'slow_down' ? t('login.slowDown') : t('login.doorBody')}
           </p>
           <div className="mt-6 flex flex-col gap-2.5">
             {stranger ? (

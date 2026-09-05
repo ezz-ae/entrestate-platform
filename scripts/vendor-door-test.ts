@@ -17,8 +17,9 @@
  *   · /api/wl/recognise asks the vendor's list on a non-tenant host;
  *   · the proxy sends an unauthenticated vendor-host page through the door;
  *   · /ctrl sends a stranger through the door, never to a password form;
- *   · /server on the vendor host shows the door when it has spoken, and
- *     keeps the password roster beneath for a row that has one;
+ *   · /server on the vendor host shows the door ALONE when it has spoken;
+ *     the password screen is one quiet line away, and an empty roster is
+ *     never shown;
  *   · the allowlist is documented; no password is generated anywhere.
  *
  * Pure — no network. Runs in `pnpm guards`.
@@ -71,9 +72,14 @@ console.log('\n── the wall, the desk, the sign-in screen ──')
   check('/ctrl sends a stranger through the door, carrying /ctrl', /if \(!user\) redirect\('\/api\/wl\/recognise\?next=%2Fctrl'\)/.test(ctrl))
   check('…and still refuses a broker and a tenant host', /if \(!isAdminRole\(user\.role\)\) redirect\('\/server'\)/.test(ctrl) && /if \(await onTenantHost\(\)\) redirect\('\/'\)/.test(ctrl))
   const page = stripComments(read('app/server/page.tsx'))
-  check('/server on the vendor host shows the door once it has spoken, and keeps the roster', /SAAS_TENANCY && door !== null \?/.test(page) && /<form onSubmit=\{handleSubmit\}/.test(page))
+  check('/server on the vendor host shows the door ALONE once it has spoken; the password screen is one quiet line away',
+    /host === 'other' && SAAS_TENANCY && door !== null && !passwordDoor \?/.test(page) && /setPasswordDoor\(true\)/.test(page) && /<form onSubmit=\{handleSubmit\}/.test(page))
+  check('an empty roster is not shown — the form is the screen then', /\{profiles\.length > 0 \? \(/.test(page))
+  check('a stranger at the vendor\'s door is told whose list it is', /<EntrestateDoor door=\{door\} vendor \/>/.test(page) && /vendor \? t\('login\.vendorStrangerBody'\)/.test(page))
   const dict = read('lib/i18n/dictionaries.ts')
-  check('the bridge line exists in all three languages', (dict.match(/'login\.orPassword'/g) ?? []).length === 3)
+  check('the bridge line, the way back, and the vendor stranger line exist in all three languages',
+    ['orPassword', 'backHome', 'vendorStrangerBody'].every((k) => (dict.match(new RegExp(`'login\\.${k}'`, 'g')) ?? []).length === 3))
+  check('a wanderer has the way back to the public site', /href="\/business"[^>]*>\{t\('login\.backHome'\)\}/.test(page))
   const env = read('.env.example')
   check('the allowlist is documented, and documented as emails, not secrets', /VENDOR_STAFF_EMAILS=/.test(env) && /Emails, not secrets/.test(env))
 }
