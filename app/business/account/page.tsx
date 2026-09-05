@@ -32,11 +32,17 @@ const TERMINAL_URL = "https://terminal.entrestate.com"
 /** What each redemption outcome says, in words, on the page. */
 const CREDIT_MESSAGE: Record<string, string> = {
   landed: "It is on your account. It comes off your next bills.",
+  landed_ads: "Ad credit is on its way — the team confirms it and it shows in your ads wallet.",
   already: "That code already landed on this account.",
   already_claimed: "This one has already been used — once per person, and it has been.",
   not_yours: "That code was issued to another account.",
   unknown_code: "That code is not one of ours. Check the letters and try again.",
   not_eligible: "That code needs a plan this account is not on yet.",
+  used_up: "That code has been claimed as many times as it could be.",
+  expired: "That code has run its course — it is past its date.",
+  not_yet: "That code is not open yet. Try again on its date.",
+  paused: "That code is on hold for the moment. Try again later.",
+  ended: "That code has been closed.",
   slow_down: "That is a lot of attempts in a row. Give it a few minutes.",
   failed: "That did not save on our side. Nothing was lost — try once more in a minute.",
 }
@@ -118,36 +124,62 @@ export default async function BusinessAccountPage({
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <span className="text-[2.4rem] font-semibold leading-none tabular-nums text-ink">AED {credit.balanceAed}</span>
+                {credit.pockets.length > 0 ? (
+                  <p className="mt-2 text-[0.8125rem] text-ink-muted">
+                    Of it, {credit.pockets.map((k, i) => (
+                      <span key={k.scope}>{i > 0 ? " · " : ""}<span className="tabular-nums text-ink">AED {k.amountAed}</span> on {k.label}</span>
+                    ))}.
+                  </p>
+                ) : null}
                 <P className="mt-3 max-w-[44ch]">
                   Pays your bills here — the subscription, apps, pages. Each bill takes its share; what is left waits for the next one.
                 </P>
               </div>
-              {credit.waiting.length > 0 ? (
-                <form action={redeemOffer} className="flex flex-col gap-2">
-                  {credit.waiting.map((w) => (
-                    <div key={w.code} className="flex flex-wrap items-center gap-3">
-                      <span className="text-[0.8125rem] text-ink-muted">{w.headline}</span>
+              <div className="flex flex-col gap-4">
+                {credit.waiting.length > 0 ? (
+                  <form action={redeemOffer} className="flex flex-col gap-2">
+                    {credit.waiting.map((w) => (
+                      <div key={w.code} className="flex flex-wrap items-center gap-3">
+                        <span className="text-[0.8125rem] text-ink-muted">{w.headline}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center gap-2">
+                      <input
+                        name="code"
+                        defaultValue={credit.waiting[0].code}
+                        readOnly
+                        aria-label="Your code"
+                        className="w-48 rounded-2xl border border-line bg-surface-2 px-3 py-2.5 font-mono text-[0.9375rem] tracking-[0.08em] text-ink"
+                      />
+                      <button type="submit" className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-brand-ink">
+                        Redeem
+                      </button>
                     </div>
-                  ))}
+                  </form>
+                ) : null}
+                {/* A coupon from a coupon site, or a voucher somebody bought — typed here, same button. */}
+                <form action={redeemOffer} className="flex flex-col gap-2">
+                  <label htmlFor="coupon" className="text-[0.8125rem] text-ink-muted">Have a coupon or a voucher?</label>
                   <div className="flex items-center gap-2">
                     <input
+                      id="coupon"
                       name="code"
-                      defaultValue={credit.waiting[0].code}
-                      readOnly
-                      aria-label="Your code"
-                      className="w-48 rounded-2xl border border-line bg-surface-2 px-3 py-2.5 font-mono text-[0.9375rem] tracking-[0.08em] text-ink"
+                      placeholder="V500-K7PM-Q2XD"
+                      autoComplete="off"
+                      spellCheck={false}
+                      className="w-48 rounded-2xl border border-line bg-surface-2 px-3 py-2.5 font-mono text-[0.9375rem] tracking-[0.08em] text-ink placeholder:text-ink-faint focus:outline-brand/60"
                     />
-                    <button type="submit" className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-brand-ink">
-                      Redeem
+                    <button type="submit" className="rounded-xl border border-line-strong bg-surface-2 px-5 py-2.5 text-[0.875rem] font-semibold text-ink">
+                      Add it
                     </button>
                   </div>
                 </form>
-              ) : null}
+              </div>
             </div>
 
             {creditFlag ? (
               <p className={`mt-5 rounded-xl border px-4 py-3 text-[0.875rem] ${
-                creditFlag === "landed" ? "border-positive/40 bg-positive/10 text-ink" : "border-caution/40 bg-caution/10 text-ink"
+                creditFlag === "landed" || creditFlag === "landed_ads" ? "border-positive/40 bg-positive/10 text-ink" : "border-caution/40 bg-caution/10 text-ink"
               }`}>
                 {CREDIT_MESSAGE[creditFlag] ?? CREDIT_MESSAGE.failed}
               </p>
@@ -210,7 +242,7 @@ export default async function BusinessAccountPage({
                     </div>
                     <div className="flex items-center gap-4">
                       <span className={`font-mono text-[10px] uppercase tracking-[0.14em] ${w.status === "active" ? "text-emerald-400" : "text-ink-muted"}`}>
-                        {w.status === "trial" ? "Trial" : w.status === "active" ? "Active" : "Paused"}
+                        {w.status === "trial" ? "Starting" : w.status === "active" ? "Active" : "Paused"}
                       </span>
                       <a
                         href={`/api/account/workspace/enter?sub=${encodeURIComponent(w.subdomain)}`}
