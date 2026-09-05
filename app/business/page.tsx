@@ -1,26 +1,54 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Section, Band, Eyebrow, Display, H2, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
+import { Section, Band, Eyebrow, Display, H2, Lede, ButtonLink, SectionHeading, TextLink } from '@/components/business/ui'
 import {
-  Browser, Phone, Chat, MiniCampaigns, MiniCRM, MiniReport, HeroVisual,
-  FeatureTile, TileGrid, PunchGrid, StatBand, NextStep,
+  Browser, Phone, Chat, MiniCampaigns, MiniReport, HeroVisual,
+  FeatureTile, TileGrid, PunchGrid, StatBand, NextStep, type GlyphName,
 } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
-import { PRODUCTS, nextInTour } from '@/lib/business/nav'
+import { PLATFORM, nextInTour } from '@/lib/business/nav'
+import {
+  FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_TRIAL_NOTE,
+} from '@/lib/business/full-system'
 import { ExplorerSection } from '@/components/business/explorer'
 import { LoopSection } from '@/components/business/loop'
 
 export const metadata: Metadata = {
   // Absolute: this page names the whole site, so it must not inherit the
   // product site's suffix from the root layout.
-  title: { absolute: 'Entrestate for Business — Listings go in. Deals come out.' },
+  title: { absolute: 'Entrestate — Listings go in. Deals come out.' },
   description:
-    'Pages, ads, leads and follow-up under your name — one system from listing to closed deal, with numbers you can defend.',
+    `The full system a real-estate company runs on — pages, ads, leads, follow-up and the team — under your name, on your own address. AED ${FULL_SYSTEM.monthlyAed.toLocaleString('en-US')} a month.`,
   alternates: { canonical: '/business' },
 }
 
-/* The five product branches (the Learn taxonomy) as group labels over the
-   seven tour chapters — the strip teaches the platform's shape at a glance. */
+/**
+ * THE FULL SYSTEM'S ONE PAGE.
+ *
+ * /business sells one thing: the complete operation, installed under the
+ * company's own name. It used to open three doors at once (the whole system,
+ * the public-site add-on, the one-agent ads app) and a reader who had never
+ * heard of Entrestate had to route themselves before they knew what any of
+ * it was. The owner's arrangement is simpler — the apps live on the account,
+ * the system is what a company buys — so this page says the one thing, shows
+ * every part of it, names the price, and opens the one door: /signup.
+ *
+ * The parts are read from PLATFORM (lib/business/nav) so the page cannot
+ * list a part the site has no page for, plus the team — one account, no
+ * password to hand out — which is the shape the one-door work made true.
+ */
+
+/** A glyph for each platform part, keyed by its route so nav stays the source. */
+const PART_GLYPH: Record<string, GlyphName> = {
+  '/business/platform/inventory': 'inventory',
+  '/business/platform/advertising': 'gauge',
+  '/business/platform/landing-pages': 'page',
+  '/business/platform/creative': 'ads',
+  '/business/platform/crm': 'chat',
+  '/business/platform/intelligence': 'target',
+  '/business/platform/analytics': 'spend',
+}
+
 export default function BusinessHome() {
   const next = nextInTour('/business')!
   return (
@@ -29,58 +57,50 @@ export default function BusinessHome() {
       <Section className="pb-20 pt-16 lg:pb-28 lg:pt-24">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16">
           <div>
-            <Eyebrow>Entrestate for Business</Eyebrow>
+            <Eyebrow>The full system for a real-estate company</Eyebrow>
             <div className="mt-5 max-w-[44rem]">
               <Display>Listings go in. Deals come out.</Display>
             </div>
             <div className="mt-6 max-w-[46ch]">
               <Lede>
-                Entrestate runs everything in between — pages, ads, leads, follow-up — under your
-                name, on your own address.
+                Everything in between — pages, ads, leads, follow-up, the team — runs on one
+                system, under your name, on your own address.
               </Lede>
             </div>
             <div className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
-              <ButtonLink href="/business/how-it-works" variant="ghost">
-                See how it works
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
+              <ButtonLink href="/business/pricing" variant="ghost">
+                See what it costs
               </ButtonLink>
             </div>
-            <p className="mt-5 text-[0.8125rem] text-ink-faint">
-              No card. Your own address and your own database from the first screen.
-            </p>
+            <p className="mt-5 text-[0.8125rem] text-ink-faint">{FULL_SYSTEM_TRIAL_NOTE}</p>
           </div>
           <HeroVisual variant="home" />
         </div>
       </Section>
 
-      {/* ── What you get ────────────────────────────────────────────────── */}
+      {/* ── What you get — every part, from the site's own map ──────────── */}
       <Section className="pb-20 lg:pb-28">
-        <TileGrid>
-          <FeatureTile
-            icon="inventory"
-            title="Inventory that's fit to sell"
-            body="Every listing scored. Weak stock is flagged before it carries budget."
-            href="/business/platform/inventory"
-          />
-          <FeatureTile
-            icon="gauge"
-            title="Ads with brakes"
-            body="Spend caps per day and per move. No rule, no spend."
-            href="/business/platform/advertising"
-          />
-          <FeatureTile
-            icon="chat"
-            title="Leads answered fast"
-            body="Answer, language, owner — inside the first minute, day or night."
-            href="/business/platform/crm"
-          />
-          <FeatureTile
-            icon="report"
-            title="Numbers you can defend"
-            body="Spend, leads, deals — one report that adds up."
-            href="/business/platform/analytics"
-          />
-        </TileGrid>
+        <SectionHeading eyebrow="What you get" title="The whole operation, part by part." />
+        <div className="mt-12">
+          <TileGrid>
+            {PLATFORM.map((p) => (
+              <FeatureTile
+                key={p.href}
+                icon={PART_GLYPH[p.href] ?? 'flow'}
+                title={p.label}
+                body={p.blurb}
+                href={p.href}
+              />
+            ))}
+            <FeatureTile
+              icon="team"
+              title="Team & roles"
+              body="Seven roles, enforced on every screen. A person is added by email and signs in with their own Entrestate account."
+              href="/business/docs/team-roles"
+            />
+          </TileGrid>
+        </div>
       </Section>
 
       {/* ── The pitch, in three holders — the Keywords alone carry it ───── */}
@@ -132,37 +152,25 @@ export default function BusinessHome() {
         </div>
       </Section>
 
-      {/* ── Products — one taught first, then the two smaller doors.
-             A name alone teaches nothing ("Lead Machine" reads as jargon on
-             first contact), so every product introduces ITSELF: name, then a
-             plain what-it-does line, then who it is for — in that order. ── */}
+      {/* ── One price, one door ─────────────────────────────────────────── */}
       <Section className="pb-20 lg:pb-28">
-        <SectionHeading eyebrow="Products" title="Start with the one that fits." />
-
-        {/* The main product, alone — one important thing at a time. */}
-        <Link
-          href={PRODUCTS[0].href}
-          className="group mt-12 block bg-surface p-8 outline outline-1 outline-[#3B82F6]/25 transition hover:bg-[#131926] lg:p-12"
-        >
+        <div className="bg-surface p-8 outline outline-1 outline-[#3B82F6]/25 lg:p-12">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
             <div>
-              <Eyebrow>For real-estate companies</Eyebrow>
-              <div className="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <span className="font-sans font-semibold text-[2rem] leading-tight text-white lg:text-[2.5rem]">
-                  {PRODUCTS[0].label}
-                </span>
-                <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">→</span>
-              </div>
+              <Eyebrow>One price</Eyebrow>
+              <p className="mt-4 font-sans text-[2rem] font-semibold leading-tight text-white lg:text-[2.5rem]">
+                {FULL_SYSTEM_PRICE_LINE}
+              </p>
               <p className="mt-2 text-[1.125rem] leading-snug text-[#3B82F6]">
-                Makes leads from your listings. Works them to the deal.
+                The whole system, per workspace. Nothing sold in pieces.
               </p>
               <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-[1.7] text-ink-muted">
-                Not a tool you bolt on — the operation itself, installed under your name. Your
-                listings become pages, pages carry ads, ads bring leads, and the CRM works every
-                one of them.
+                Every part above, every role, three languages, your own address and your own
+                database. Ad spend stays in your own Meta and Google accounts — it is never
+                billed through us.
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
-                {['Inventory', 'Pages', 'Ads', 'CRM', 'Reports'].map((c) => (
+                {['Inventory', 'Pages', 'Ads', 'Creative', 'CRM', 'Finance', 'Team'].map((c) => (
                   <span
                     key={c}
                     className="rounded-full bg-white/[0.05] px-3 py-1 text-[0.75rem] text-ink-muted ring-1 ring-white/[0.07]"
@@ -171,57 +179,50 @@ export default function BusinessHome() {
                   </span>
                 ))}
               </div>
-              <div className="mt-8 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                Self-serve · 14-day trial · no card
-              </div>
             </div>
-            <div className="hidden lg:block">
-              <Browser title="app.yourbrokerage.ae/crm">
-                <MiniCRM />
-              </Browser>
+            <div className="flex flex-col items-start gap-4 lg:items-end">
+              <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
+              <p className="max-w-[34ch] text-[0.8125rem] leading-[1.6] text-ink-faint lg:text-right">
+                {FULL_SYSTEM_TRIAL_NOTE}
+              </p>
+              <TextLink href="/business/pricing">Every plan, line by line</TextLink>
             </div>
           </div>
-        </Link>
-
-        {/* The two narrower doors — each opens with who it is for, so the
-            reader routes themselves in one glance. */}
-        <p className="mt-10 text-[0.875rem] text-ink-faint">Only need part of it?</p>
-        <div className="mt-4 grid grid-cols-1 gap-px lg:grid-cols-2">
-          {[
-            {
-              ...PRODUCTS[1],
-              what: 'Your public website, run properly.',
-              who: 'For companies whose first problem is their public face',
-              body: 'A site and a landing page for every listing — enquiries land in the CRM, owned.',
-              how: 'Set up with you, on request',
-            },
-            {
-              ...PRODUCTS[2],
-              what: 'Professional Meta lead ads, few clicks.',
-              who: 'For one agent selling off-plan',
-              body: 'A full system: pick a project from our off-plan inventory, set a budget — it builds and runs the campaign.',
-              how: 'Tokens · pay as you run ads',
-            },
-          ].map((p) => (
-            <Link
-              key={p.href}
-              href={p.href}
-              className="group flex flex-col bg-surface p-8 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
-            >
-              <Eyebrow>{p.who}</Eyebrow>
-              <div className="mt-4 flex items-baseline justify-between gap-3">
-                <div className="text-[1.25rem] font-semibold leading-snug text-white">{p.label}</div>
-                <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">→</span>
-              </div>
-              <p className="mt-1 text-[0.9375rem] leading-snug text-[#3B82F6]">{p.what}</p>
-              <p className="mt-3 flex-1 text-[0.9375rem] leading-[1.7] text-ink-muted">{p.body}</p>
-              <div className="mt-6 border-t border-white/[0.07] pt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                {p.how}
-              </div>
-            </Link>
-          ))}
         </div>
+        <p className="mt-6 text-[0.875rem] leading-[1.7] text-ink-faint">
+          Only need one app — ads for a single agent, a lead form that talks back? Those run on
+          your account, with no workspace to set up.{' '}
+          <Link href="/business/account" className="text-[#3B82F6] underline-offset-4 hover:underline">
+            See your account
+          </Link>
+          .
+        </p>
       </Section>
+
+      {/* ── The team: one account, no password to hand out ──────────────── */}
+      <Band className="bg-[#0A0E14]">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
+          <div>
+            <Eyebrow>Your team</Eyebrow>
+            <div className="mt-4">
+              <H2>Add a person by email. That is the whole procedure.</H2>
+            </div>
+          </div>
+          <div className="space-y-4 text-[0.9375rem] leading-[1.7] text-ink-muted">
+            <p>
+              A member signs in with their own Entrestate account — the same email you added.
+              There is no password to hand out, none to reset, and nothing for them to install.
+            </p>
+            <p>
+              Their role decides what they see, on every screen and every data request. Remove
+              them and the door closes the same minute.
+            </p>
+            <p className="text-ink-faint">
+              <TextLink href="/business/docs/team-roles">Seven roles, who sees what</TextLink>
+            </p>
+          </div>
+        </div>
+      </Band>
 
       {/* ── The product, part by part — real screens, one tab each ──────── */}
       <ExplorerSection />
@@ -269,10 +270,10 @@ export default function BusinessHome() {
           <div>
             <H2>Start with your own address.</H2>
             <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
-              14 days, no card. Live spend stays off until you connect an ad account.
+              {FULL_SYSTEM.trialDays} days, no card. Live spend stays off until you connect an ad account.
             </p>
           </div>
-          <ButtonLink href="/signup">Start a 14-day trial</ButtonLink>
+          <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>
         </div>
       </Section>
 

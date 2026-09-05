@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useI18n } from '@/lib/i18n/provider'
 import { fieldClass } from '@/components/freehold/ui'
+import { SAAS_TENANCY } from '@/lib/tenancy/config'
 
 type Role = 'ceo' | 'director' | 'admin' | 'sales_manager' | 'marketing' | 'broker'
 type Status = 'active' | 'suspended' | 'banned'
@@ -284,7 +285,7 @@ function CreateMemberModal({ onClose, onCreated }: { onClose: () => void; onCrea
         <input className={inputCls} placeholder={t('mgmt.team.admin.phoneOptional')} value={phone} onChange={(e) => setPhone(e.target.value)} />
         <input className={inputCls} placeholder={t('mgmt.team.admin.commissionPct')} type="number" value={commission} onChange={(e) => setCommission(e.target.value)} />
       </div>
-      <p className="text-xs text-slate-500">{t('mgmt.team.admin.passwordHint')}</p>
+      <p className="text-xs text-slate-500">{t(SAAS_TENANCY ? 'mgmt.team.admin.signInHint' : 'mgmt.team.admin.passwordHint')}</p>
       <button onClick={create} disabled={saving}
         className="flex items-center justify-center gap-1.5 rounded-full bg-gold px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-gold-bright disabled:opacity-50">
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />} {t('mgmt.team.admin.createMember')}
