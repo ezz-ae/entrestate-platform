@@ -38,7 +38,7 @@ export default async function CtrlTenantPage({ params }: { params: Promise<{ id:
 
   return (
     <main>
-      <p><Link href="/ctrl">← Partners</Link></p>
+      <p><Link href="/ctrl/partners">← Lead marketplace</Link></p>
       <h1>{tenant.name}</h1>
       <p className="dim">{tenant.id}</p>
 

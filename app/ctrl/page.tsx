@@ -1,86 +1,71 @@
 import Link from 'next/link'
-import { cookies } from 'next/headers'
-import { ctrlQuery, ensureCtrlSchema } from '@/lib/ctrl/db'
-import { listTenants } from '@/lib/ctrl/tenants'
-import { filsToAed } from '@/lib/ctrl/pricing'
-import { createTenantAction } from './actions'
+import { readAdminOverview } from '@/lib/ctrl/admin-figures'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * The roster: every partner, its balance, and what is waiting on money.
- * `held` is the number this screen exists to surface — leads we have bought
- * and priced that the partner cannot see yet because the wallet is short.
+ * THE OVERVIEW — the company on one screen, every figure a door.
+ *
+ * Six numbers derived at read time (lib/ctrl/admin-figures.ts), each one
+ * linking to the desk that owns it. A figure the database could not answer
+ * says so ("—") rather than showing a confident zero.
  */
-export default async function CtrlHome() {
-  await ensureCtrlSchema()
-  const tenants = await listTenants()
+const n = (f: { n: number; unknown?: boolean }) => (f.unknown ? '—' : f.n.toLocaleString('en-US'))
 
-  const stats = await ctrlQuery(
-    `SELECT tenant_id,
-            COUNT(*) FILTER (WHERE state = 'held')::text AS held,
-            COUNT(*) FILTER (WHERE state = 'delivered')::text AS delivered
-       FROM ctrl_leads GROUP BY tenant_id`,
-  )
-  const byTenant = new Map(stats.rows.map((r) => [r.tenant_id, r]))
-  // Partners with no leads yet still need their balance shown.
-  const balances = await ctrlQuery(
-    `SELECT tenant_id, SUM(CASE WHEN kind = 'credit' THEN amount_fils ELSE -amount_fils END)::text AS balance
-       FROM ctrl_wallet_entries GROUP BY tenant_id`,
-  )
-  const balanceOf = new Map(balances.rows.map((r) => [r.tenant_id, Number(r.balance) || 0]))
-
-  const jar = await cookies()
-  const flash = jar.get('ctrl_flash_token')?.value ?? null
-  const [flashName, flashToken] = flash ? flash.split('::') : [null, null]
-
+export default async function AdminOverview() {
+  const o = await readAdminOverview()
+  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
   return (
     <main>
-      <h1>Partners</h1>
-      <p className="dim">
-        Each partner is one client system buying leads at your prices ·{' '}
-        <Link href="/ctrl/projects">Projects catalog →</Link> ·{' '}
-        <Link href="/ctrl/coupons">Coupons and vouchers →</Link>
-      </p>
+      <p className="eyebrow">{today}</p>
+      <h1>Entrestate, today</h1>
+      <p className="dim">Every figure opens its desk. Numbers are read from the rows that carry them, never stored.</p>
 
-      {flashToken && (
-        <div className="card" style={{ borderColor: 'var(--accent)' }}>
-          <b>Token for {flashName}</b> — copy it NOW; it is never shown again.
-          Put it in the client system as <code>PARTNER_PLANE_TOKEN</code>.
-          <div className="token" style={{ marginTop: 8 }}>{flashToken}</div>
-        </div>
-      )}
-
-      <div className="card">
-        <table>
-          <thead>
-            <tr><th>Name</th><th>Balance</th><th>Delivered</th><th>Held (unpaid)</th><th></th></tr>
-          </thead>
-          <tbody>
-            {tenants.map((t) => {
-              const s = byTenant.get(t.id)
-              const held = Number(s?.held) || 0
-              return (
-                <tr key={t.id}>
-                  <td><Link href={`/ctrl/tenant/${t.id}`}>{t.name}</Link></td>
-                  <td className="amount">AED {filsToAed(balanceOf.get(t.id) ?? 0)}</td>
-                  <td className="amount">{Number(s?.delivered) || 0}</td>
-                  <td>{held > 0 ? <span className="pill bad">{held}</span> : <span className="pill">0</span>}</td>
-                  <td className="dim">{t.id}</td>
-                </tr>
-              )
-            })}
-            {tenants.length === 0 && <tr><td colSpan={5} className="dim">No partners yet.</td></tr>}
-          </tbody>
-        </table>
+      <div className="figures">
+        <Link href="/ctrl/workspaces" className={`figure${o.workspaces.chase > 0 ? ' attention' : ''}`}>
+          <p className="eyebrow">Workspaces</p>
+          <p className="n">{n(o.workspaces)}</p>
+          <p className="sub">{o.workspaces.active} paying · {o.workspaces.starting} starting{o.workspaces.chase > 0 ? ` · ${o.workspaces.chase} owed a call` : ''}</p>
+        </Link>
+        <Link href="/ctrl/finance" className="figure">
+          <p className="eyebrow">Accounts</p>
+          <p className="n">{n(o.accounts)}</p>
+          <p className="sub">Entrestate accounts seen on the business site</p>
+        </Link>
+        <Link href="/ctrl/finance" className="figure">
+          <p className="eyebrow">Credit on accounts</p>
+          <p className="n">{o.credit.unknown ? '—' : <>AED {o.credit.onAccountsAed}</>}</p>
+          <p className="sub">AED {o.credit.landedAed} landed so far, off the bills as they come</p>
+        </Link>
+        <Link href="/ctrl/finance" className={`figure${o.requests.n > 0 ? ' attention' : ''}`}>
+          <p className="eyebrow">Waiting for you</p>
+          <p className="n">{n(o.requests)}</p>
+          <p className="sub">Ads Coin requests pending a person</p>
+        </Link>
+        <Link href="/ctrl/coupons" className="figure">
+          <p className="eyebrow">Coupons</p>
+          <p className="n">{n(o.coupons)}<small>{o.coupons.unknown ? '' : `${o.coupons.live} live`}</small></p>
+          <p className="sub">Campaigns minted — coupon sites, gift sites, bait</p>
+        </Link>
+        <Link href="/ctrl/partners" className={`figure${o.partners.held > 0 ? ' attention' : ''}`}>
+          <p className="eyebrow">Partners</p>
+          <p className="n">{n(o.partners)}</p>
+          <p className="sub">{o.partners.held > 0 ? `${o.partners.held} leads held, unpaid` : 'Nothing held'}</p>
+        </Link>
       </div>
 
-      <h2>New partner</h2>
+      <h2>Desks</h2>
       <div className="card">
-        <form action={createTenantAction} className="row">
-          <input name="name" placeholder="Client name (e.g. Freehold Properties)" style={{ flex: 1 }} />
-          <button type="submit">Create + mint token</button>
-        </form>
+        <table>
+          <tbody>
+            <tr><td><Link href="/ctrl/workspaces">Workspaces</Link></td><td className="dim">Every customer instance — company, address, owner, plan, where its starting period stands.</td></tr>
+            <tr><td><Link href="/ctrl/coupons">Coupons &amp; vouchers</Link></td><td className="dim">Mint the marketing system: shared codes for coupon sites, single-use vouchers for gift sites, ad credit as bait.</td></tr>
+            <tr><td><Link href="/ctrl/finance">Credit &amp; requests</Link></td><td className="dim">Who holds credit, what landed and what was applied; the Ads Coin requests waiting for a person.</td></tr>
+            <tr><td><Link href="/freehold-intelligence/finance/wallets">Ads Coin bank ↗</Link></td><td className="dim">The ledger itself — issue, transfer, approve. The one place money moves.</td></tr>
+            <tr><td><Link href="/ctrl/partners">Lead marketplace</Link></td><td className="dim">Partners buying leads at your prices; balances, held leads, mappings.</td></tr>
+            <tr><td><Link href="/wl-admin">Access keys ↗</Link></td><td className="dim">White-label access keys — mint, review, revoke.</td></tr>
+          </tbody>
+        </table>
       </div>
     </main>
   )

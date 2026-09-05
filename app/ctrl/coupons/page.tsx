@@ -36,10 +36,10 @@ export default async function CouponDesk({ searchParams }: { searchParams: Promi
 
   return (
     <main>
+      <p className="eyebrow">Marketing</p>
       <h1>Coupons and vouchers</h1>
       <p className="dim">
-        Every code is credit with a scope — it lands on the account and comes off the bills it was aimed at ·{' '}
-        <Link href="/ctrl">Partners →</Link>
+        Every code is credit with a scope — it lands on the account and comes off the bills it was aimed at.
       </p>
 
       {note && <div className="card" style={{ borderColor: 'var(--bad)' }}>{note}</div>}

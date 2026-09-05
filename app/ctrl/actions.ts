@@ -12,11 +12,11 @@ import { ingestTenantLeads } from '@/lib/ctrl/sync'
  *  cleared on render — never a query string, never stored. */
 export async function createTenantAction(formData: FormData) {
   const name = String(formData.get('name') ?? '').trim()
-  if (!name) redirect('/ctrl')
+  if (!name) redirect('/ctrl/partners')
   const { tenant, token } = await createTenant(name)
   const jar = await cookies()
   jar.set('ctrl_flash_token', `${tenant.name}::${token}`, { httpOnly: true, maxAge: 60, path: '/ctrl' })
-  redirect('/ctrl')
+  redirect('/ctrl/partners')
 }
 
 export async function setPricingAction(formData: FormData) {
