@@ -72,14 +72,54 @@ function warnOnAmbiguousConnectionSource(): void {
   }
 }
 
+/**
+ * SESSION MODE ONLY — this pool must never speak to a transaction-mode pooler.
+ *
+ * Every query here runs on a connection whose search_path was set ONCE per
+ * checkout (acquireClient, below) and then trusted: "re-points search_path
+ * only on mismatch". That is a session-level contract. Neon's `-pooler` host
+ * is PgBouncer in transaction mode, where a session-level SET lives only as
+ * long as the statement's transaction — the next statement from the same
+ * client may land on a backend last used by ANOTHER request, carrying THAT
+ * request's search_path.
+ *
+ * It happened. 2026-09-05 05:55: a tenant claim (/api/account/workspace/enter)
+ * pinned a backend to "t_mahmoud, entrestate_app"; 05:56:24, a request on
+ * entrestate.com — schema pinned to the default by runWithDefaultSchema — ran
+ * CREATE TABLE IF NOT EXISTS entrestate_accounts and INSERTed the account on
+ * that backend, and both landed in t_mahmoud. The vendor's tables appeared
+ * inside a customer's schema, and the mirror of that — a customer's query
+ * reading the shared schema, or another tenant's — is the same bug with the
+ * roles swapped. Schema isolation cannot rest on a pooler that forgets.
+ *
+ * So the pooled hostname is rewritten to the direct one, whatever the env
+ * says: the same endpoint, the same credentials, session semantics. The pool
+ * is kept small (POOL_MAX) because direct connections are counted against
+ * the compute's max_connections and every warm function instance holds its
+ * own pool. scripts/db-session-pool-test.ts holds both.
+ */
+export function sessionModeConnectionString(raw: string): string {
+  return raw.replace(/-pooler(\.[a-z0-9.-]*neon\.tech)/i, "$1")
+}
+
+/**
+ * Connections per function instance. Neon's smallest compute allows ~112
+ * direct connections; ten warm instances at five each leave room. Idle
+ * connections are released after thirty seconds so a quiet instance does
+ * not sit on five of them.
+ */
+export const POOL_MAX = 5
+const POOL_IDLE_MS = 30_000
+
 const getConnectionString = () => {
   warnOnAmbiguousConnectionSource()
   if (!rawConnectionString) {
     throw new Error("Missing NEON_DATABASE_URL or DATABASE_URL environment variable")
   }
-  return rawConnectionString.includes("sslmode=")
-    ? rawConnectionString.replace(/sslmode=[^&]+/, "sslmode=verify-full")
-    : `${rawConnectionString}${rawConnectionString.includes("?") ? "&" : "?"}sslmode=verify-full`
+  const direct = sessionModeConnectionString(rawConnectionString)
+  return direct.includes("sslmode=")
+    ? direct.replace(/sslmode=[^&]+/, "sslmode=verify-full")
+    : `${direct}${direct.includes("?") ? "&" : "?"}sslmode=verify-full`
 }
 
 const globalForPool = globalThis as unknown as { pgPool?: Pool }
@@ -95,7 +135,9 @@ function getPool(): Pool {
   if (globalForPool.pgPool) return globalForPool.pgPool
 
   const pool = new Pool({
-    connectionString: getConnectionString()
+    connectionString: getConnectionString(),
+    max: POOL_MAX,
+    idleTimeoutMillis: POOL_IDLE_MS,
   })
 
   pool.on('connect', (client) => {
