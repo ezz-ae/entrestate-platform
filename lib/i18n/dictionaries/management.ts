@@ -242,7 +242,13 @@ export const management: Record<Locale, Dict> = {
     'mgmt.team.admin.emailAddress': 'Email address',
     'mgmt.team.admin.phoneOptional': 'Phone (optional)',
     'mgmt.team.admin.commissionPct': 'Commission %',
-    'mgmt.team.admin.passwordHint': 'A default password is set on creation; the member can reset it. Disabled/banned members cannot sign in.',
+    // Two doors, two truths. On a workspace (tenancy) a member is recognised
+    // by their own Entrestate account — no password exists to hand out. On a
+    // standalone deployment no password is set either; the member makes one
+    // through "Forgot password". The old line promised a default password
+    // that nothing ever set.
+    'mgmt.team.admin.signInHint': 'They sign in with their own Entrestate account — the same email. No password to hand out. Disabled or banned members cannot sign in.',
+    'mgmt.team.admin.passwordHint': 'No password is set here — the member creates one with “Forgot password” on the sign-in screen. Disabled or banned members cannot sign in.',
     'mgmt.team.admin.createMember': 'Create member',
     'mgmt.team.admin.failedSave': 'Failed to save',
     'mgmt.team.admin.memberUpdated': 'Member updated',
@@ -662,7 +668,8 @@ export const management: Record<Locale, Dict> = {
     'mgmt.team.admin.emailAddress': 'عنوان البريد الإلكتروني',
     'mgmt.team.admin.phoneOptional': 'الهاتف (اختياري)',
     'mgmt.team.admin.commissionPct': 'العمولة %',
-    'mgmt.team.admin.passwordHint': 'يتم تعيين كلمة مرور افتراضية عند الإنشاء؛ يمكن للعضو إعادة تعيينها. لا يمكن للأعضاء المعطّلين/المحظورين تسجيل الدخول.',
+    'mgmt.team.admin.signInHint': 'يدخل بحساب Entrestate الخاص به — نفس البريد. لا كلمة مرور تُسلَّم. الأعضاء المعطّلون أو المحظورون لا يمكنهم الدخول.',
+    'mgmt.team.admin.passwordHint': 'لا تُعيَّن كلمة مرور هنا — ينشئ العضو كلمته من «نسيت كلمة المرور» في شاشة الدخول. الأعضاء المعطّلون أو المحظورون لا يمكنهم الدخول.',
     'mgmt.team.admin.createMember': 'إنشاء عضو',
     'mgmt.team.admin.failedSave': 'فشل الحفظ',
     'mgmt.team.admin.memberUpdated': 'تم تحديث العضو',
@@ -1074,7 +1081,8 @@ export const management: Record<Locale, Dict> = {
     'mgmt.team.admin.emailAddress': 'Адрес эл. почты',
     'mgmt.team.admin.phoneOptional': 'Телефон (необязательно)',
     'mgmt.team.admin.commissionPct': 'Комиссия %',
-    'mgmt.team.admin.passwordHint': 'При создании задаётся пароль по умолчанию; участник может его сбросить. Отключённые/заблокированные участники не могут войти.',
+    'mgmt.team.admin.signInHint': 'Участник входит со своим аккаунтом Entrestate — по тому же email. Пароль выдавать не нужно. Отключённые или заблокированные участники войти не могут.',
+    'mgmt.team.admin.passwordHint': 'Пароль здесь не задаётся — участник создаёт его через «Забыли пароль?» на экране входа. Отключённые или заблокированные участники войти не могут.',
     'mgmt.team.admin.createMember': 'Создать участника',
     'mgmt.team.admin.failedSave': 'Не удалось сохранить',
     'mgmt.team.admin.memberUpdated': 'Участник обновлён',

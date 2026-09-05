@@ -18,6 +18,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage, type RGB } from 'pdf-lib'
 import QRCode from 'qrcode'
+import { FULL_SYSTEM, FULL_SYSTEM_PRICE_SHORT } from '../lib/business/full-system'
 
 const OUT = join(process.cwd(), 'public', 'business', 'entrestate-one-pager.pdf')
 const LINK = 'https://entrestate.com/business'
@@ -150,7 +151,7 @@ async function main(): Promise<void> {
       name: 'Lead Machine',
       line: 'Inventory, a landing page per project, ads, CRM and the month-end report — one system, your brand.',
       who: 'Brokerages and developers’ sales teams.',
-      billed: 'AED 999/month. 14-day trial, no card.',
+      billed: `${FULL_SYSTEM_PRICE_SHORT}. ${FULL_SYSTEM.trialDays}-day trial, no card.`,
     },
     {
       name: 'Mega Brokerage Platform',

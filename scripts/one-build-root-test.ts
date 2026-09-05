@@ -38,6 +38,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { FULL_SYSTEM_PRICE_LINE } from '../lib/business/full-system'
 
 const cwd = process.cwd()
 let failures = 0
@@ -111,18 +112,20 @@ console.log('\n── the price this product quotes still names where it is deci
   // The AED 999 on /business/pricing is the Terminal's Team tier, and that
   // literal lives in ezz-ae/Entrestate_os — a boundary no guard here can cross.
   // The least this repository can do is keep the pointer accurate, so the next
-  // person changes the deciding file rather than this one.
-  const page = readFileSync(join(cwd, 'app/business/pricing/page.tsx'), 'utf8')
-  check('the pricing page still quotes the agreed monthly figure',
-    page.includes('AED 999 / month'), 'AED 999 not found')
-  check('…and the annual figure beside it', page.includes('AED 9,588 / year'), '9,588 missing')
-  check('and it names the repository where that number is decided',
-    page.includes('Entrestate_os') && page.includes('lib/pricing/plans.ts'),
+  // person changes the deciding file rather than this one. Since the full
+  // system got its one page, the number is typed once here, in
+  // lib/business/full-system.ts, and the pricing page and the one-pager READ
+  // it — scripts/full-system-page-test.ts holds them to that.
+  check('the agreed monthly and annual figures are typed once, in lib/business/full-system.ts',
+    FULL_SYSTEM_PRICE_LINE === 'AED 999 / month · AED 9,588 / year', FULL_SYSTEM_PRICE_LINE)
+  const constants = readFileSync(join(cwd, 'lib/business/full-system.ts'), 'utf8')
+  check('and that module names the repository where the number is decided',
+    constants.includes('Entrestate_os') && constants.includes('lib/pricing/plans.ts'),
     'the comment no longer says where to change the price first')
-
-  const onepager = readFileSync(join(cwd, 'scripts/build-onepager.ts'), 'utf8')
-  check('the one-pager quotes the same monthly figure',
-    onepager.includes('AED 999/month'), 'AED 999 not in build-onepager.ts')
+  const page = readFileSync(join(cwd, 'app/business/pricing/page.tsx'), 'utf8')
+  check('the pricing page still points at that module',
+    page.includes('Entrestate_os') && page.includes('lib/business/full-system.ts'),
+    'the comment no longer says where to change the price first')
 }
 
 if (failures > 0) {

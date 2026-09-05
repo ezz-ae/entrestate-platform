@@ -3,12 +3,13 @@ import { Section, Eyebrow, Display, Lede, H3, ButtonLink, TextLink } from '@/com
 import { PunchGrid, StatBand, GlowBand, NextStep } from '@/components/business/visuals'
 import { DownloadCard, Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { TOKEN_PRICE_AED } from '@/lib/freehold/credits-shared'
+import { FULL_SYSTEM, FULL_SYSTEM_PRICE_LINE } from '@/lib/business/full-system'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
   title: 'Plans',
   description:
-    'Lead Machine at AED 999 a month, Meta for Realtors at AED 5 per token as you run ads, and the Mega Brokerage Platform set up on request.',
+    `Lead Machine at AED ${FULL_SYSTEM.monthlyAed} a month, Meta for Realtors at AED ${TOKEN_PRICE_AED} per token as you run ads, and the Mega Brokerage Platform set up on request.`,
   alternates: { canonical: '/business/pricing' },
 }
 
@@ -45,8 +46,9 @@ const PLANS: Plan[] = [
     // defect, /checkout?tier=realtor quoting this AED 999 for the one-agent
     // product. No guard here can reach across the repository boundary, so the
     // rule is written instead: change the price in Entrestate_os FIRST, then
-    // here and in scripts/build-onepager.ts, in one sitting.
-    price: 'AED 999 / month · AED 9,588 / year',
+    // in lib/business/full-system.ts — the one place it is typed here; this
+    // page, /business and the printed one-pager all read that line.
+    price: FULL_SYSTEM_PRICE_LINE,
     line: 'Makes leads from your listings, then works them to the deal.',
     includes: [
       'Inventory, pages, ads, CRM, reports',
