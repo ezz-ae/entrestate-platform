@@ -118,6 +118,11 @@ export interface Invoice {
   kind: InvoiceKind
   /** In fils (AED × 100), always positive. */
   totalFils: number
+  /**
+   * For an app invoice, the store id it bills (lib/freehold/app-store.ts) —
+   * so credit scoped to that app (lib/business/coupons.ts) can pay it.
+   */
+  product?: string
 }
 
 export interface CreditApplication {

@@ -39,7 +39,8 @@ export default async function CtrlHome() {
       <h1>Partners</h1>
       <p className="dim">
         Each partner is one client system buying leads at your prices ·{' '}
-        <Link href="/ctrl/projects">Projects catalog →</Link>
+        <Link href="/ctrl/projects">Projects catalog →</Link> ·{' '}
+        <Link href="/ctrl/coupons">Coupons and vouchers →</Link>
       </p>
 
       {flashToken && (

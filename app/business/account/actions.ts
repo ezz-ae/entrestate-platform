@@ -10,6 +10,8 @@ import { createWorkspaceForAccount } from '@/lib/tenancy/account-workspace'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
 import { headers } from 'next/headers'
 import { redeemCode, type Human } from '@/lib/account-credit'
+import { redeemCampaignCode } from '@/lib/coupon-campaigns'
+import { offerOfCode } from '@/lib/business/offers'
 
 /** The device and the network behind this request — for the once-per-human rule. */
 export async function humanFromHeaders(): Promise<Human> {
@@ -20,10 +22,14 @@ export async function humanFromHeaders(): Promise<Human> {
 }
 
 /**
- * Redeem a code. The code was minted for this account (the page issues it);
- * the ledger refuses a second landing for the same account, device+network
- * or address. Rate-limited so a code cannot be guessed. The outcome travels
- * back as a query flag the page renders in words.
+ * Redeem a code — one form, two ledgers behind it. A code whose family is
+ * a house offer (WELCOME500…) was minted for this account by the page, and
+ * lib/account-credit.ts refuses a second landing for the same account,
+ * device+network or address. Any other code is a coupon or a voucher
+ * (lib/coupon-campaigns.ts): a coupon site's shared code, once per account
+ * and once per human, or a bought voucher, once per code. Rate-limited so a
+ * code cannot be guessed. The outcome travels back as a query flag the page
+ * renders in words.
  */
 export async function redeemOffer(formData: FormData): Promise<void> {
   const user = await getTerminalUser()
@@ -34,9 +40,14 @@ export async function redeemOffer(formData: FormData): Promise<void> {
   const limit = await checkRateLimit(`redeem:${account.id}`, { limit: 10, windowSec: 300 })
   if (!limit.ok) redirect('/business/account?credit=slow_down')
   const code = String(formData.get('code') ?? '')
-  const out = await redeemCode(account, code, human)
-  if (out.ok) redirect(`/business/account?credit=${out.already ? 'already' : 'landed'}`)
-  redirect(`/business/account?credit=${out.reason}`)
+  if (offerOfCode(code)) {
+    const out = await redeemCode(account, code, human)
+    if (out.ok) redirect(`/business/account?credit=${out.already ? 'already' : 'landed'}`)
+    redirect(`/business/account?credit=${out.reason}`)
+  }
+  const out = await redeemCampaignCode(account, code, human)
+  if (out.ok) redirect(`/business/account?credit=${out.already ? 'already' : out.scope === 'ads' ? 'landed_ads' : 'landed'}`)
+  redirect(`/business/account?credit=${out.reason === 'human_already' ? 'already_claimed' : out.reason}`)
 }
 
 /**

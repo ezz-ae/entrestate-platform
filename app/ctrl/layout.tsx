@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getSessionUser, isAdminRole } from '@/lib/auth'
+import { onTenantHost } from '@/lib/ctrl/vendor-gate'
 import './ctrl.css'
 
 export const dynamic = 'force-dynamic'
@@ -17,5 +18,12 @@ export default async function CtrlLayout({ children }: { children: React.ReactNo
   // Not signed in, or a broker (isAdminRole is the same management line the
   // landing-page editor and every other staff surface use) → bounce to login.
   if (!user || !isAdminRole(user.role)) redirect('/server')
+  // THE CONTROL PLANE IS THE VENDOR'S. Every workspace runs this same code,
+  // and a customer's owner is an admin of their own workspace — so on a
+  // tenant host ({sub}.entrestate.com) this must never render a screen that
+  // writes the SHARED schema: the partner wallets, the lead pool, and now
+  // the coupon desk. A tenant is sent home; nothing here is theirs. The
+  // why, in full: lib/ctrl/vendor-gate.ts.
+  if (await onTenantHost()) redirect('/')
   return <div className="ctrl-shell">{children}</div>
 }

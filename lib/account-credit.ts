@@ -31,7 +31,14 @@
  * imports postTransfer or decideRequest; the guard holds it to that.
  *
  * IDEMPOTENT BY REFERENCE. A grant carries `claim:<id>`, an application
- * `invoice:<id>`; a retried request posts nothing twice.
+ * `invoice:<id>:<scope>`; a retried request posts nothing twice.
+ *
+ * POCKETS. Every posting carries a SCOPE (lib/business/coupons.ts): 'bills'
+ * is the general credit — the house offers land here — and a campaign may
+ * aim its credit at one pocket: 'pages' for the landing builder, 'app:<id>'
+ * for one app. An invoice draws on its own pocket first, then the general
+ * one (scopesForInvoice), so bait is spent where it was aimed. The balance a
+ * screen shows is the sum of the pockets; the pockets are said beneath it.
  */
 import { createHash, randomUUID } from 'node:crypto'
 import { query, runWithDefaultSchema, withTransaction, ensureOnce } from '@/lib/db'
@@ -43,6 +50,7 @@ import {
   OFFERS, annualCashback, applyCredit, mintCode, offerOfCode,
   type Invoice, type Offer, type OfferId,
 } from '@/lib/business/offers'
+import { scopesForInvoice, splitAcrossScopes, scopeLabel, isCreditScope, type CreditScope } from '@/lib/business/coupons'
 import { FULL_SYSTEM } from '@/lib/business/full-system'
 
 const ensureTables = () =>
@@ -85,8 +93,14 @@ const ensureTables = () =>
         )
       `)
       await query(`CREATE INDEX IF NOT EXISTS entrestate_credit_postings_account ON entrestate_credit_postings (account_id, created_at DESC)`)
+      // The pocket a posting belongs to. Added after the ledger shipped, so
+      // it is an ALTER with a default: every earlier posting is general credit.
+      await query(`ALTER TABLE entrestate_credit_postings ADD COLUMN IF NOT EXISTS scope text NOT NULL DEFAULT 'bills'`)
     }),
   )
+
+/** The ledger's tables, once per process — for lib/coupon-campaigns.ts, which posts grants here. */
+export const ensureCreditTables = ensureTables
 
 /** Who is at the keyboard, as far as a server can tell: the device and the network. */
 export interface Human {
@@ -219,8 +233,8 @@ export async function redeemCode(account: BusinessAccount, raw: string, human: H
           [id, account.id, offer.id, code, fp, human.address.trim()])
         if (systemAed > 0) {
           await tx(
-            `INSERT INTO entrestate_credit_postings (id, account_id, kind, amount, reference, memo)
-             VALUES ($1, $2, 'grant', $3, $4, $5)
+            `INSERT INTO entrestate_credit_postings (id, account_id, kind, amount, reference, memo, scope)
+             VALUES ($1, $2, 'grant', $3, $4, $5, 'bills')
              ON CONFLICT (reference) DO NOTHING`,
             [`cp_${randomUUID()}`, account.id, aedToFils(systemAed), `claim:${id}`, `${offer.code} — ${offer.headline}`])
         }
@@ -260,23 +274,38 @@ export async function redeemCode(account: BusinessAccount, raw: string, human: H
 
 /* ── reading ────────────────────────────────────────────────────────────── */
 
-/** The credit on the account now, in fils — grants minus applications. */
-export async function creditBalanceFils(account: BusinessAccount): Promise<number> {
+/** The credit on the account now, per pocket, in fils — grants minus applications, never below zero. */
+export async function creditPockets(account: BusinessAccount): Promise<Partial<Record<CreditScope, number>>> {
   try {
     await ensureTables()
     const rows = await runWithDefaultSchema(() =>
-      query<{ balance: string }>(
-        `SELECT COALESCE(SUM(CASE WHEN kind = 'grant' THEN amount ELSE -amount END), 0)::text AS balance
-           FROM entrestate_credit_postings WHERE account_id = $1`,
+      query<{ scope: string; balance: string }>(
+        `SELECT scope, COALESCE(SUM(CASE WHEN kind = 'grant' THEN amount ELSE -amount END), 0)::text AS balance
+           FROM entrestate_credit_postings WHERE account_id = $1 GROUP BY scope`,
         [account.id]))
-    return Math.max(0, Number(rows[0]?.balance ?? 0))
+    const pockets: Partial<Record<CreditScope, number>> = {}
+    for (const r of rows) {
+      if (!isCreditScope(r.scope)) continue
+      pockets[r.scope] = Math.max(0, Number(r.balance ?? 0))
+    }
+    return pockets
   } catch {
-    return 0
+    return {}
   }
 }
 
+/** The credit on the account now, in fils — the pockets summed. */
+export async function creditBalanceFils(account: BusinessAccount): Promise<number> {
+  return sumPockets(await creditPockets(account))
+}
+
+const sumPockets = (pockets: Partial<Record<CreditScope, number>>): number =>
+  (Object.values(pockets) as Array<number | undefined>).reduce<number>((sum, n) => sum + Math.max(0, Number(n ?? 0)), 0)
+
 export interface CreditSummary {
   balanceAed: string
+  /** The aimed pockets with something in them — "of it, AED 60 on Landing Pages". General credit is not listed; it is the rest. */
+  pockets: Array<{ scope: CreditScope; label: string; amountAed: string }>
   /** The account's minted codes that are still unredeemed — the ones to show. */
   waiting: Array<{ offer: OfferId; code: string; headline: string }>
   claimed: OfferId[]
@@ -285,11 +314,11 @@ export interface CreditSummary {
 
 /** What the account page shows: the balance, the codes waiting, which landed, the last movements. */
 export async function readAccountCredit(account: BusinessAccount): Promise<CreditSummary> {
-  const empty: CreditSummary = { balanceAed: '0.00', waiting: [], claimed: [], recent: [] }
+  const empty: CreditSummary = { balanceAed: '0.00', pockets: [], waiting: [], claimed: [], recent: [] }
   try {
     await ensureTables()
-    const [balance, codes, claims, recent] = await Promise.all([
-      creditBalanceFils(account),
+    const [pockets, codes, claims, recent] = await Promise.all([
+      creditPockets(account),
       runWithDefaultSchema(() => query<{ code: string; offer_id: OfferId }>(`SELECT code, offer_id FROM entrestate_offer_codes WHERE account_id = $1`, [account.id])),
       runWithDefaultSchema(() => query<{ offer_id: OfferId }>(`SELECT offer_id FROM entrestate_offer_claims WHERE account_id = $1`, [account.id])),
       runWithDefaultSchema(() =>
@@ -299,8 +328,12 @@ export async function readAccountCredit(account: BusinessAccount): Promise<Credi
           [account.id])),
     ])
     const claimed = new Set(claims.map((c) => c.offer_id))
+    const balance = sumPockets(pockets)
     return {
       balanceAed: filsToAed(balance),
+      pockets: (Object.entries(pockets) as Array<[CreditScope, number]>)
+        .filter(([scope, fils]) => scope !== 'bills' && fils > 0)
+        .map(([scope, fils]) => ({ scope, label: scopeLabel(scope), amountAed: filsToAed(fils) })),
       waiting: codes
         .filter((c) => !claimed.has(c.offer_id))
         .map((c) => ({ offer: c.offer_id, code: c.code, headline: OFFERS.find((o) => o.id === c.offer_id)?.headline ?? '' })),
@@ -315,27 +348,54 @@ export async function readAccountCredit(account: BusinessAccount): Promise<Credi
 /* ── applying ───────────────────────────────────────────────────────────── */
 
 /**
- * Take the credit's share off an invoice and write it down. Idempotent by
- * `invoice:<id>`: billing may call this on every attempt and the credit is
- * taken once. Returns what the invoice still owes.
+ * Take the credit's share off an invoice and write it down. The share is
+ * applyCredit's (the house cap); WHICH pocket pays is scopesForInvoice's —
+ * the invoice's own pocket first, the general credit last. Idempotent by
+ * invoice: billing may call this on every attempt, and an invoice that has
+ * postings already is answered from them, never applied twice. Returns what
+ * the invoice still owes.
  */
 export async function applyCreditToInvoice(account: BusinessAccount, invoice: Invoice): Promise<{ appliedAed: string; dueAed: string; remainingAed: string }> {
   await ensureTables()
-  const balance = await creditBalanceFils(account)
-  const app = applyCredit(balance, invoice)
+  const total = Math.max(0, Math.floor(invoice.totalFils))
+  try {
+    const done = await runWithDefaultSchema(() =>
+      query<{ applied: string }>(
+        `SELECT COALESCE(SUM(amount), 0)::text AS applied FROM entrestate_credit_postings
+          WHERE account_id = $1 AND kind = 'apply' AND reference LIKE $2`,
+        [account.id, `invoice:${invoice.id}:%`]))
+    const already = Number(done[0]?.applied ?? 0)
+    if (already > 0) {
+      return { appliedAed: filsToAed(already), dueAed: filsToAed(Math.max(0, total - already)), remainingAed: filsToAed(await creditBalanceFils(account)) }
+    }
+  } catch (err) {
+    console.error('[account-credit] apply lookup failed', err)
+    return { appliedAed: '0.00', dueAed: filsToAed(total), remainingAed: '0.00' }
+  }
+
+  const pockets = await creditPockets(account)
+  const scopes = scopesForInvoice(invoice)
+  const usable = scopes.reduce((sum, scope) => sum + (pockets[scope] ?? 0), 0)
+  const app = applyCredit(usable, invoice)
   if (app.appliedFils > 0) {
+    const parts = splitAcrossScopes(app.appliedFils, pockets, scopes)
     try {
       await runWithDefaultSchema(() =>
-        query(
-          `INSERT INTO entrestate_credit_postings (id, account_id, kind, amount, reference, memo)
-           VALUES ($1, $2, 'apply', $3, $4, $5)
-           ON CONFLICT (reference) DO NOTHING`,
-          [`cp_${randomUUID()}`, account.id, app.appliedFils, `invoice:${invoice.id}`, `Applied to ${invoice.kind} invoice ${invoice.id}`]))
+        withTransaction(async (tx) => {
+          for (const part of parts) {
+            await tx(
+              `INSERT INTO entrestate_credit_postings (id, account_id, kind, amount, reference, memo, scope)
+               VALUES ($1, $2, 'apply', $3, $4, $5, $6)
+               ON CONFLICT (reference) DO NOTHING`,
+              [`cp_${randomUUID()}`, account.id, part.fils, `invoice:${invoice.id}:${part.scope}`, `Applied to ${invoice.kind} invoice ${invoice.id}`, part.scope])
+          }
+        }))
     } catch (err) {
       console.error('[account-credit] apply failed', err)
       // The invoice is still owed in full if the application did not write.
-      return { appliedAed: '0.00', dueAed: filsToAed(invoice.totalFils), remainingAed: filsToAed(balance) }
+      return { appliedAed: '0.00', dueAed: filsToAed(total), remainingAed: filsToAed(usable) }
     }
   }
-  return { appliedAed: filsToAed(app.appliedFils), dueAed: filsToAed(app.dueFils), remainingAed: filsToAed(app.remainingFils) }
+  const remaining = sumPockets(pockets) - app.appliedFils
+  return { appliedAed: filsToAed(app.appliedFils), dueAed: filsToAed(app.dueFils), remainingAed: filsToAed(Math.max(0, remaining)) }
 }
