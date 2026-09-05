@@ -6,7 +6,7 @@ import {
 } from '@/components/business/visuals'
 import { CropReel } from '@/components/business/crop-reel'
 import {
-  RocketAdCrop, VerdictCrop, ReachCrop, AudienceCrop, LandingRowsCrop, AiEditCrop, LeadformCrop, MicrositeCrop, SpendRuleCrop,
+  RocketAdCrop, VerdictCrop, ReachCrop, AudienceCrop, LandingRowsCrop, AiEditCrop, LeadformCrop, MicrositeCrop, SpendRuleCrop, CompanyCrop,
 } from '@/components/business/crops'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { PLATFORM, nextInTour } from '@/lib/business/nav'
@@ -88,9 +88,9 @@ export default function BusinessHome() {
               { key: 'landing', caption: 'Landing pages — one per property, gated on ad readiness.', node: <LandingRowsCrop /> },
               { key: 'reach', caption: 'Who this reaches — the live targeting, read back from Meta.', node: <ReachCrop /> },
               { key: 'audience', caption: 'Rated leads become the audience next month’s ads chase.', node: <AudienceCrop /> },
-              { key: 'leadform', caption: 'Leadformer — a lead form with no fields. It talks.', node: <LeadformCrop /> },
               { key: 'aiedit', caption: 'Edit any page from the Expert chat. Reversible.', node: <AiEditCrop /> },
               { key: 'microsite', caption: 'A whole project website, generated in one click.', node: <MicrositeCrop /> },
+              { key: 'company', caption: 'Company-wide leads, deals and commission — the report you send upstairs.', node: <CompanyCrop /> },
             ]}
           />
         </div>
@@ -125,19 +125,19 @@ export default function BusinessHome() {
              what that screen does. ── */}
       <Section className="pb-20 lg:pb-28">
         <div className="space-y-5">
-          <Holder tone="gold" visual={<SpendRuleCrop />}>
+          <Holder tone="gold" label="Ads Machine · rules" visual={<SpendRuleCrop flush />}>
             <Keyword>Budgets with brakes.</Keyword>
             <KeywordSub>The machine spends like it&rsquo;s your money — inside rules you wrote. Every move written down, with its reason.</KeywordSub>
             <LearnMore href="/business/docs/spend-rules" />
           </Holder>
 
-          <Holder tone="green" visual={<LeadformCrop />}>
+          <Holder tone="green" label="Leadformer" visual={<LeadformCrop flush />}>
             <Keyword>A form that talks back.</Keyword>
             <KeywordSub>No fields. It greets by name, asks what a good salesperson asks, and hands you a lead that already told you everything.</KeywordSub>
             <LearnMore href="/business/leadformer" />
           </Holder>
 
-          <Holder tone="blue" visual={<AudienceCrop />}>
+          <Holder tone="blue" label="Audiences" visual={<AudienceCrop flush />}>
             <Keyword>Deals teach targeting.</Keyword>
             <KeywordSub>
               Every rating teaches the machine what to buy. Rated leads become the audience next

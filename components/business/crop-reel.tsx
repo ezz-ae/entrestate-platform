@@ -74,7 +74,7 @@ export function CropReel({ frames, className = '' }: { frames: ReelFrame[]; clas
             aria-roledescription="slide"
             aria-label={`${n + 1} of ${frames.length}: ${f.caption}`}
             aria-hidden={n !== i}
-            className={`col-start-1 row-start-1 self-start ${n === i ? 'opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-500 motion-reduce:transition-none`}
+            className={`col-start-1 row-start-1 [&>div]:h-full ${n === i ? 'opacity-100' : 'pointer-events-none opacity-0'} transition-opacity duration-500 motion-reduce:transition-none`}
           >
             {f.node}
           </div>

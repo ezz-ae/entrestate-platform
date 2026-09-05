@@ -77,7 +77,11 @@ console.log('\n── every crop says what the product says ──')
   }
   const micro = en(p_aim3 as never, 'paim.micro.subtitle').split(' — ')[0]
   check('the microsite crop opens with the Web Studio\'s own sentence', micro.length > 20 && CROPS.includes(micro), micro)
-  check('the leadform crop is the form that talks back — its first line', /I’m the form\. What should I call you\?/.test(CROPS))
+  // The owner: "'Hi, I'm the form' is weird — this wants the feed, the ad,
+  // and the pop-up as a GIF: he sees what was asked and what happened."
+  check('the leadform crop is the feed, the ad, and the pop-up moving through its moments',
+    /Sponsored/.test(CROPS) && /@keyframes lf-stage/.test(CROPS) && /prefers-reduced-motion: reduce/.test(CROPS) && !/I’m the form/.test(CROPS))
+  check('…greeted by a real member of the Visual Sales Team, and ended by a person', /Sara/.test(CROPS) && /Call with/.test(CROPS) && /Omar K\./.test(CROPS))
 }
 
 console.log('\n── nothing the product does not do ──')
@@ -125,7 +129,11 @@ console.log('\n── the reel is a reel ──')
   const frames = (home.match(/\{ key: '[a-z]+', caption: '[^']+', node: </g) ?? []).length
   check('the hero is the reel, with at least six frames', /<CropReel/.test(home) && frames >= 6, String(frames))
   check('the old collage is gone from the home', !/HeroVisual/.test(home))
-  check('the holders are crops', /<Holder tone="gold" visual=\{<SpendRuleCrop \/>\}/.test(home) && /<Holder tone="green" visual=\{<LeadformCrop \/>\}/.test(home) && /<Holder tone="blue" visual=\{<AudienceCrop \/>\}/.test(home))
+  check('the holders are flush crops — the holder is the frame, no square on a square',
+    /<Holder tone="gold" label="[^"]+" visual=\{<SpendRuleCrop flush \/>\}/.test(home) && /<Holder tone="green" label="[^"]+" visual=\{<LeadformCrop flush \/>\}/.test(home) && /<Holder tone="blue" label="[^"]+" visual=\{<AudienceCrop flush \/>\}/.test(home))
+  const holders = stripComments(read('components/business/holders.tsx'))
+  check('the three tones are three colours — amber, green, blue — not one blue', /caution/.test(holders) && /positive/.test(holders) && /var\(--brand\)/.test(holders))
+  check('a flush crop draws no second border', /flush \? '' : 'overflow-hidden rounded-2xl border/.test(CROPS))
   check('"Leads answered fast" is gone; the form that talks back is here', !/Leads answered fast/.test(home) && /A form that talks back\./.test(home) && /href="\/business\/leadformer"/.test(home))
   check('the banned word appears on no crop and no caption', !/\bfree\b/i.test(CROPS) && !/\bfree\b/i.test(home))
 }

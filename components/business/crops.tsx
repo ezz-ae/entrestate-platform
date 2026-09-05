@@ -33,16 +33,21 @@ export function CropFrame({
   sub,
   children,
   className = '',
+  flush = false,
 }: {
   kicker?: string
   title?: ReactNode
   sub?: ReactNode
   children: ReactNode
   className?: string
+  /** Inside a Holder the holder IS the frame — no second border, no second
+   *  surface. "Squares on top of each other" was the owner's note. */
+  flush?: boolean
 }) {
   return (
-    <div className={`overflow-hidden rounded-2xl border border-line bg-surface p-5 text-ink shadow-(--shadow-card) sm:p-6 ${className}`}>
-      {(kicker || title) && (
+    <div className={`${flush ? '' : 'overflow-hidden rounded-2xl border border-line bg-surface p-5 shadow-(--shadow-card) sm:p-6'} text-ink ${className}`}>
+      {/* Flush inside a holder, the holder's Keyword and label already say it. */}
+      {(kicker || title) && !flush && (
         <div className="mb-4">
           {kicker ? <div className={LABEL}>{kicker}</div> : null}
           {title ? <div className="mt-1 text-[1.0625rem] font-semibold leading-snug">{title}</div> : null}
@@ -79,10 +84,10 @@ function Btn({ primary = false, children }: { primary?: boolean; children: React
 
 /* ── 1. Rocket Ad — one source, one budget, an ad that starts paused ────── */
 
-export function RocketAdCrop() {
+export function RocketAdCrop({ flush = false }: { flush?: boolean } = {}) {
   const sources = ['Brochure', 'Landing', 'Image', 'Video', 'Text', 'Link']
   return (
-    <CropFrame
+    <CropFrame flush={flush}
       kicker="Ads · Rocket Ad"
       title="Rocket Ad"
       sub="Give it a source and a budget. It reads the source, writes the ad, and sets the rest — you confirm and it runs."
@@ -118,7 +123,7 @@ export function RocketAdCrop() {
 
 /* ── 2. Who this reaches — the live targeting, read back from Meta ─────── */
 
-export function ReachCrop() {
+export function ReachCrop({ flush = false }: { flush?: boolean } = {}) {
   const rows: Array<[string, ReactNode]> = [
     ['Where', 'Dubai'],
     ['Who counts', 'Residents + visitors'],
@@ -129,7 +134,7 @@ export function ReachCrop() {
     ['Runs on', 'Feed · Reels · Stories'],
   ]
   return (
-    <CropFrame
+    <CropFrame flush={flush}
       kicker="Ads · live campaign"
       title="Who this reaches"
       sub="The live targeting, read back from Meta — what the money is actually pointed at right now."
@@ -148,9 +153,9 @@ export function ReachCrop() {
 
 /* ── 3. Rated leads become the next audience ───────────────────────────── */
 
-export function AudienceCrop() {
+export function AudienceCrop({ flush = false }: { flush?: boolean } = {}) {
   return (
-    <CropFrame
+    <CropFrame flush={flush}
       kicker="Lead forms · audience builder"
       title="Form portfolio value"
       sub="Every rating teaches the machine what to buy and what to stop buying — and rated 6+ leads become sellable audiences."
@@ -199,14 +204,14 @@ export function AudienceCrop() {
 
 /* ── 4. A page per property, and the gate that reads it ───────────────── */
 
-export function LandingRowsCrop() {
+export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
   const rows = [
     { name: 'Marina Vista — 2BR', where: 'Dubai Marina · AED 1.9M', status: 'Live', ready: 97 },
     { name: 'Creekside One', where: 'Dubai Creek Harbour · AED 2.4M', status: 'Live', ready: 96 },
     { name: 'Palm Crescent Penthouse', where: 'Palm Jumeirah · AED 6.2M', status: 'Live', ready: 95 },
   ]
   return (
-    <CropFrame kicker="Landing pages" title="Each property has a dedicated ad landing page">
+    <CropFrame flush={flush} kicker="Landing pages" title="Each property has a dedicated ad landing page">
       <div className="grid grid-cols-3 gap-2">
         {[['Live', '1,633', 'active pages'], ['Draft', '367', 'unpublished'], ['Ad-ready', '94%', 'across the catalogue']].map(([l, v, s]) => (
           <div key={l} className="rounded-xl border border-line bg-surface-2 px-3 py-2.5">
@@ -245,11 +250,11 @@ export function LandingRowsCrop() {
 
 /* ── 5. Edit the page from the chat; the layout is a list you can reorder ── */
 
-export function AiEditCrop() {
+export function AiEditCrop({ flush = false }: { flush?: boolean } = {}) {
   const chips = ['Make the headline punchier', 'Rewrite for Arabic investors', 'Improve SEO title & description', 'Move the lead form higher']
   const sections = ['Hero', 'Key facts', 'Description', 'Market intelligence', 'ROI', 'Golden Visa', 'AI Concierge', 'FAQ', 'Lead form']
   return (
-    <CropFrame
+    <CropFrame flush={flush}
       kicker="Landing page · AI edit"
       title="AI edit"
       sub="Edit this page from the Expert chat — describe the change and it applies live, reversible from the chat."
@@ -279,7 +284,7 @@ export function AiEditCrop() {
 
 /* ── 6. One verdict per listing, one next action ───────────────────────── */
 
-export function VerdictCrop() {
+export function VerdictCrop({ flush = false }: { flush?: boolean } = {}) {
   const rows: Array<{ name: string; score: number; verdict: 'Scale' | 'Launch' | 'Fix first' | 'Hold'; next: string }> = [
     { name: 'Marina Vista — 2BR', score: 92, verdict: 'Scale', next: 'Already running and ready — increase budget' },
     { name: 'Creekside One', score: 88, verdict: 'Scale', next: '51 leads in 30 days — momentum already there' },
@@ -288,7 +293,7 @@ export function VerdictCrop() {
   ]
   const tone = { Scale: 'positive', Launch: 'brand', 'Fix first': 'caution', Hold: 'neutral' } as const
   return (
-    <CropFrame kicker="Inventory" title="Which properties should we advertise, and why?" sub="Ad readiness out of 100. Ad-ready starts at 70.">
+    <CropFrame flush={flush} kicker="Inventory" title="Which properties should we advertise, and why?" sub="Ad readiness out of 100. Ad-ready starts at 70.">
       <div className="divide-y divide-line overflow-hidden rounded-xl border border-line">
         {rows.map((r) => (
           <div key={r.name} className="flex items-center gap-3 bg-surface-2/60 px-3.5 py-3">
@@ -307,37 +312,75 @@ export function VerdictCrop() {
   )
 }
 
-/* ── 7. The form that talks back ───────────────────────────────────────── */
+/* ── 7. The form that talks back — seen where it happens ──────────────── */
 
-export function LeadformCrop() {
-  const thread: Array<{ from: 'form' | 'lead' | 'system'; text: string }> = [
-    { from: 'form', text: 'Hi — I’m the form. What should I call you?' },
-    { from: 'lead', text: 'Mohamed' },
-    { from: 'form', text: 'Nice to meet you, Mohamed. Buying to live in, or to invest?' },
-    { from: 'lead', text: 'Investment — something with good yield' },
-    { from: 'system', text: 'Intent: investor · yield-led — handed to the desk' },
-    { from: 'form', text: 'Then Marina Vista is the one to see — shall I put you on a call now?' },
+/**
+ * The owner: "'Hi, I'm the form' is weird, and the chat way is not clear.
+ * This wants a screenshot from Instagram with a pop-up over it — the form
+ * as a GIF: he sees what was asked and what happened. A chat as a picture
+ * pulls nobody any more." So: a phone showing a feed with OUR ad in it, and
+ * over it the form's pop-up moving through its four moments on its own —
+ * greeting, the one question, the answer, and the result: a call booked
+ * and the lead handed to a person. The mover is CSS; a reader who asked for
+ * reduced motion sees the result frame, still.
+ *
+ * The greeter is Sara, the Visual Sales Team's warm opener
+ * (lib/freehold/visual-sales-team.ts) — a real member, not a bot voice.
+ */
+export function LeadformCrop({ flush = false }: { flush?: boolean } = {}) {
+  const stages: Array<{ who: string; line: ReactNode; reply?: string; done?: boolean }> = [
+    { who: 'Sara · Marina Vista', line: 'Welcome — before I show you the plans, what should I call you?', reply: 'Mohamed' },
+    { who: 'Sara', line: 'Nice to meet you, Mohamed. Buying to live in, or to invest?', reply: 'To invest — good yield' },
+    { who: 'Sara', line: 'Then Marina Vista is the one to see. Thursday 4 PM or Saturday 11 AM for a call?', reply: 'Thursday' },
+    { who: 'Booked', line: <>Call with <b className="font-semibold">Omar K.</b> · Thursday 4 PM. The desk has everything Mohamed said.</>, done: true },
   ]
   return (
-    <CropFrame kicker="Leadformer" title="A lead form with no fields" sub="It greets by name, asks what a good salesperson would ask, and hands you a lead that already told you everything.">
-      <div className="space-y-2">
-        {thread.map((m, i) =>
-          m.from === 'system' ? (
-            <div key={i} className="flex justify-center">
-              <span className="rounded-full border border-line bg-surface-2 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">{m.text}</span>
+    <CropFrame flush={flush} kicker="Leadformer" title="The form that talks back" sub="An ad in the feed. A tap. No fields — a conversation that ends with a booked call and a lead that already told you everything.">
+      <style>{`
+        @keyframes lf-stage { 0%, 4% { opacity: 0; transform: translateY(6px) } 8%, 24% { opacity: 1; transform: none } 28%, 100% { opacity: 0; transform: translateY(-4px) } }
+        .lf-stage { animation: lf-stage 14s linear infinite; opacity: 0 }
+        .lf-stage:nth-child(1) { animation-delay: 0s } .lf-stage:nth-child(2) { animation-delay: 3.5s }
+        .lf-stage:nth-child(3) { animation-delay: 7s } .lf-stage:nth-child(4) { animation-delay: 10.5s }
+        @media (prefers-reduced-motion: reduce) { .lf-stage { animation: none } .lf-stage:nth-child(4) { opacity: 1 } }
+      `}</style>
+      <div className="mx-auto w-full max-w-[19rem] overflow-hidden rounded-[2rem] border border-line-strong bg-surface-2 shadow-(--shadow-card)">
+        {/* the feed */}
+        <div className="border-b border-line px-4 py-3 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">Feed</div>
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5">
+          <span aria-hidden className="h-7 w-7 rounded-full bg-[linear-gradient(135deg,#d9a042,#d46b47)]" />
+          <div className="min-w-0 leading-tight">
+            <div className="text-[12px] font-semibold text-ink">yourbrokerage</div>
+            <div className="text-[10px] text-ink-faint">Sponsored</div>
+          </div>
+        </div>
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[linear-gradient(160deg,#d9a042_0%,#d46b47_45%,#3a3140_100%)]">
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-x-4 bottom-3 text-white">
+            <div className="text-[15px] font-semibold leading-tight">Marina Vista — 2BR from AED 1.9M</div>
+            <div className="mt-0.5 text-[11px] opacity-85">Ready · 6.8% projected yield · payment plan</div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between px-3.5 py-2.5 text-[12px] text-ink-muted">
+          <span>♡ ○ ➤</span>
+          <span className="rounded-md bg-brand px-3 py-1 text-[11px] font-semibold text-brand-ink">Learn more</span>
+        </div>
+        {/* the pop-up, moving through its four moments */}
+        <div className="relative border-t border-line bg-surface p-3.5" style={{ minHeight: '9.5rem' }}>
+          {stages.map((st, i) => (
+            <div key={i} className="lf-stage absolute inset-3.5" aria-hidden={i !== stages.length - 1}>
+              <div className="flex items-center gap-2">
+                <span aria-hidden className={`grid h-6 w-6 place-items-center rounded-full text-[11px] font-semibold ${st.done ? 'bg-positive text-white' : 'bg-brand text-brand-ink'}`}>{st.done ? '✓' : 'S'}</span>
+                <span className="text-[11px] font-medium text-ink-faint">{st.who}</span>
+              </div>
+              <div className="mt-2 rounded-2xl rounded-tl-sm border border-line bg-surface-2 px-3 py-2 text-[13px] leading-snug text-ink">{st.line}</div>
+              {st.reply ? (
+                <div className="mt-2 flex justify-end">
+                  <span className="rounded-2xl rounded-br-sm bg-brand px-3 py-1.5 text-[13px] text-brand-ink">{st.reply}</span>
+                </div>
+              ) : null}
             </div>
-          ) : (
-            <div key={i} className={`flex ${m.from === 'lead' ? 'justify-end' : 'justify-start'}`}>
-              <span
-                className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-[13px] leading-snug ${
-                  m.from === 'lead' ? 'rounded-br-sm bg-brand text-brand-ink' : 'rounded-bl-sm border border-line bg-surface-2 text-ink'
-                }`}
-              >
-                {m.text}
-              </span>
-            </div>
-          ),
-        )}
+          ))}
+        </div>
       </div>
     </CropFrame>
   )
@@ -345,9 +388,9 @@ export function LeadformCrop() {
 
 /* ── 8. A lead lands owned, tagged, and on a clock ─────────────────────── */
 
-export function LeadCardCrop() {
+export function LeadCardCrop({ flush = false }: { flush?: boolean } = {}) {
   return (
-    <CropFrame kicker="CRM · new lead" title="Landed 2:47 AM — owned by 2:48">
+    <CropFrame flush={flush} kicker="CRM · new lead" title="Landed 2:47 AM — owned by 2:48">
       <div className="rounded-xl border border-line bg-surface-2/60 p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -377,9 +420,9 @@ export function LeadCardCrop() {
 
 /* ── 9. A whole site, generated ────────────────────────────────────────── */
 
-export function MicrositeCrop() {
+export function MicrositeCrop({ flush = false }: { flush?: boolean } = {}) {
   return (
-    <CropFrame kicker="Web Studio · project microsites" title="Generate a full multi-section website for any project" sub="Its own address, from the record you already have.">
+    <CropFrame flush={flush} kicker="Web Studio · project microsites" title="Generate a full multi-section website for any project" sub="Its own address, from the record you already have.">
       <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
         <div className="min-w-0">
           <div className="truncate text-[13px] font-semibold text-ink">Creekside One</div>
@@ -402,7 +445,7 @@ export function MicrositeCrop() {
 
 /* ── 10. Every design tool in one place ────────────────────────────────── */
 
-export function CreativeSuiteCrop() {
+export function CreativeSuiteCrop({ flush = false }: { flush?: boolean } = {}) {
   const tools = [
     ['Ad Designer', 'A ready Meta ad set from a listing or image.'],
     ['Photo Reel', 'Listing photos become a real video ad, any placement.'],
@@ -412,7 +455,7 @@ export function CreativeSuiteCrop() {
     ['Video', 'Trim, caption and end-card — no re-encode.'],
   ]
   return (
-    <CropFrame kicker="Creative Studio" title="Every design tool in one place">
+    <CropFrame flush={flush} kicker="Creative Studio" title="Every design tool in one place">
       <div className="grid grid-cols-2 gap-2">
         {tools.map(([n, s]) => (
           <div key={n} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5">
@@ -427,7 +470,7 @@ export function CreativeSuiteCrop() {
 
 /* ── 11. The report you send upstairs ──────────────────────────────────── */
 
-export function CompanyCrop() {
+export function CompanyCrop({ flush = false }: { flush?: boolean } = {}) {
   const tiles = [
     ['Total leads', '892', 'All time'],
     ['New leads', '362', 'Last 30 days'],
@@ -435,7 +478,7 @@ export function CompanyCrop() {
     ['Commission', 'AED 100K', 'Approved + closed'],
   ]
   return (
-    <CropFrame kicker="Management · company" title="Company-wide leads, conversions and revenue">
+    <CropFrame flush={flush} kicker="Management · company" title="Company-wide leads, conversions and revenue">
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {tiles.map(([l, v, s]) => (
           <div key={l} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5">
@@ -462,9 +505,9 @@ export function CompanyCrop() {
 
 /* ── 12. A rule, and the brake it pulls ────────────────────────────────── */
 
-export function SpendRuleCrop() {
+export function SpendRuleCrop({ flush = false }: { flush?: boolean } = {}) {
   return (
-    <CropFrame kicker="Ads Machine · rules" title="No rule, no spend" sub="Money moves only inside limits a person wrote. Every automatic move is written down with its reason.">
+    <CropFrame flush={flush} kicker="Ads Machine · rules" title="No rule, no spend" sub="Money moves only inside limits a person wrote. Every automatic move is written down with its reason.">
       <div className="space-y-2">
         <div className="rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
           <div className="flex items-center justify-between gap-3">

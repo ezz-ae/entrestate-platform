@@ -18,13 +18,14 @@ export type HolderSize = 'xl' | 'lg'
    without a hard fill, so the minis inside keep their own contrast. The
    holder is the one content vessel the whole family shares: the Terminal's
    rounded white card with a hairline border and a soft throw. */
-const TONE_WASH: Record<HolderTone, string> = {
-  gold: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(59,130,246,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(59,130,246,0.04),transparent_60%)]',
-  green:
-    'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(29,168,90,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(29,168,90,0.04),transparent_60%)]',
-  blue: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(96,148,224,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(96,148,224,0.04),transparent_60%)]',
-  plain:
-    'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(255,255,255,0.05),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(255,255,255,0.03),transparent_60%)]',
+/* The Terminal's tinted card — "you can use colours like this": a flat tint
+   on the surface, a border in the same hue, and a small label in it. Amber
+   for money, green for leads, blue for the machine; plain for the rest. */
+const TONE: Record<HolderTone, { card: string; label: string }> = {
+  gold:  { card: 'border-caution/30 bg-[color-mix(in_srgb,var(--color-caution)_7%,var(--color-surface))]',   label: 'text-caution-bright' },
+  green: { card: 'border-positive/30 bg-[color-mix(in_srgb,var(--color-positive)_7%,var(--color-surface))]', label: 'text-positive-bright' },
+  blue:  { card: 'border-brand/35 bg-[color-mix(in_srgb,var(--brand)_9%,var(--color-surface))]',            label: 'text-brand-bright' },
+  plain: { card: 'border-line bg-surface', label: 'text-ink-faint' },
 }
 
 const SIZE_PAD: Record<HolderSize, string> = {
@@ -35,32 +36,34 @@ const SIZE_PAD: Record<HolderSize, string> = {
 export function Holder({
   tone = 'plain',
   size = 'lg',
+  label,
   visual,
   children,
   className = '',
 }: {
   tone?: HolderTone
   size?: HolderSize
-  /** A mini from visuals.tsx (usually inside Browser/Phone); renders beside the copy on lg, below it on mobile. */
+  /** The small label in the tone's colour above the Keyword — "VALUE YIELD" on the Terminal. */
+  label?: string
+  /** A crop from crops.tsx (flush — the holder is its frame); renders beside the copy on lg, below it on mobile. */
   visual?: ReactNode
   children: ReactNode
   className?: string
 }) {
+  const t = TONE[tone]
   return (
     <section
-      className={`relative overflow-hidden rounded-[28px] border border-line bg-surface shadow-(--shadow-card) ${SIZE_PAD[size]} ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border shadow-(--shadow-card) ${t.card} ${SIZE_PAD[size]} ${className}`}
     >
-      <div aria-hidden className={`pointer-events-none absolute inset-0 ${TONE_WASH[tone]}`} />
-      <div className="relative">
-        {visual ? (
-          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
-            <div className="min-w-0">{children}</div>
-            <div className="min-w-0">{visual}</div>
-          </div>
-        ) : (
-          children
-        )}
-      </div>
+      {label ? <div className={`mb-4 font-mono text-[11px] uppercase tracking-[0.18em] ${t.label}`}>{label}</div> : null}
+      {visual ? (
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="min-w-0">{children}</div>
+          <div className="min-w-0">{visual}</div>
+        </div>
+      ) : (
+        children
+      )}
     </section>
   )
 }
@@ -85,7 +88,7 @@ export function Keyword({
       ? 'text-[2.4rem] leading-[1.03] sm:text-[3rem] lg:text-[3.5rem]'
       : 'text-[2rem] leading-[1.05] sm:text-[2.4rem] lg:text-[2.75rem]'
   return (
-    <Tag className={`font-semibold tracking-[-0.02em] text-ink ${type} ${className}`}>{children}</Tag>
+    <Tag className={`font-(family-name:--font-display) font-medium tracking-[-0.015em] text-ink ${type} ${className}`}>{children}</Tag>
   )
 }
 
@@ -161,9 +164,8 @@ export function DownloadCard({
 }) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[28px] border border-line bg-surface p-8 shadow-(--shadow-card) lg:p-12 ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border p-8 shadow-(--shadow-card) lg:p-12 ${TONE.gold.card} ${className}`}
     >
-      <div aria-hidden className={`pointer-events-none absolute inset-0 ${TONE_WASH.gold}`} />
       <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="font-sans font-semibold text-[1.55rem] leading-[1.2] tracking-[-0.015em] text-ink sm:text-[1.9rem]">
