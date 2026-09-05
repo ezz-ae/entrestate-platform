@@ -55,7 +55,7 @@ export default function TeamRolesGuide() {
           <ul className="space-y-2.5">
             {ROLES.map((r) => (
               <li key={r.name}>
-                <span className="font-medium text-white">{r.name}</span>
+                <span className="font-medium text-ink">{r.name}</span>
                 <span aria-hidden> — </span>
                 {r.line}
               </li>
@@ -129,7 +129,7 @@ export default function TeamRolesGuide() {
         answers for the company.
       </DocNote>
 
-      <h2 id="faq" className="scroll-mt-24 text-[1.0625rem] font-semibold leading-snug text-white">
+      <h2 id="faq" className="scroll-mt-24 text-[1.0625rem] font-semibold leading-snug text-ink">
         Common questions
       </h2>
       <div className="mt-4">

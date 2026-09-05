@@ -139,7 +139,7 @@ export default function HowItWorksPage() {
           {STOPS.map((s, i) => (
             <li key={s.title}>
               <Holder tone={s.tone} visual={s.visual}>
-                <div className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
+                <div className="font-mono text-[0.8125rem] tabular-nums text-brand" dir="ltr">
                   {String(i + 1).padStart(2, '0')}
                 </div>
                 <Keyword className="mt-4">{s.title}</Keyword>

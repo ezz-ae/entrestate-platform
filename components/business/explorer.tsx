@@ -488,7 +488,7 @@ export function ProductExplorer() {
     '-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
 
   return (
-    <div className="rounded-2xl bg-[#0A0E14] p-4 ring-1 ring-white/[0.06] sm:p-6 lg:p-8">
+    <div className="rounded-2xl bg-surface-2 p-4 ring-1 ring-line sm:p-6 lg:p-8">
       {/* Level one — the product's own grouping. */}
       <div
         role="tablist"
@@ -510,8 +510,8 @@ export function ProductExplorer() {
               onClick={() => selectGroup(group)}
               className={`shrink-0 rounded-full px-4 py-2 text-[0.8125rem] font-medium transition ${
                 isActive
-                  ? 'bg-white/[0.08] text-white ring-1 ring-[#3B82F6]/40'
-                  : 'text-ink-muted hover:text-white'
+                  ? 'bg-surface-2 text-ink ring-1 ring-brand/40'
+                  : 'text-ink-muted hover:text-ink'
               }`}
             >
               {group.label}
@@ -533,7 +533,7 @@ export function ProductExplorer() {
               aria-pressed={isActive}
               onClick={() => setActiveToolId(tool.id)}
               className={`shrink-0 rounded-full px-3.5 py-1.5 text-[0.8125rem] transition ${
-                isActive ? 'bg-white/[0.06] text-white' : 'text-ink-faint hover:text-white'
+                isActive ? 'bg-surface-2 text-ink' : 'text-ink-faint hover:text-ink'
               }`}
             >
               {tool.label}
@@ -569,7 +569,7 @@ export function ProductExplorer() {
           </Browser>
 
           <div className="min-w-0">
-            <h3 className="text-[1.75rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white sm:text-[2.1rem]">
+            <h3 className="text-[1.75rem] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[2.1rem]">
               {activeTool.keyword}
             </h3>
             <p className="mt-3 max-w-[38ch] text-[1rem] leading-[1.55] text-ink-muted">
@@ -581,8 +581,8 @@ export function ProductExplorer() {
 
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {activeTool.cards.map((card) => (
-            <div key={card.title} className="rounded-xl bg-surface p-4 ring-1 ring-white/[0.06]">
-              <div className="text-[0.875rem] font-semibold tracking-[-0.01em] text-white">{card.title}</div>
+            <div key={card.title} className="rounded-xl bg-surface p-4 ring-1 ring-line">
+              <div className="text-[0.875rem] font-semibold tracking-[-0.01em] text-ink">{card.title}</div>
               <p className="mt-1.5 text-[0.8125rem] leading-[1.5] text-ink-muted">{card.body}</p>
             </div>
           ))}

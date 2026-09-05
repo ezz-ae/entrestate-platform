@@ -39,7 +39,7 @@ export default function MetaForRealtorsPage() {
                 How it runs
               </ButtonLink>
             </div>
-            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-[#7C838B]">
+            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-ink-faint">
               Pay with tokens as you run ads. No monthly fee. Ad spend stays in your own Meta
               account.
             </p>

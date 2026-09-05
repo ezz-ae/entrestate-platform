@@ -47,46 +47,46 @@ export default function CreativeStudioGuide() {
         <Step n={2} id="tools" title="The nine apps">
           <ul className="list-disc space-y-2 pl-5">
             <li>
-              <span className="font-medium text-white">Ad Designer</span> — pick a listing and
+              <span className="font-medium text-ink">Ad Designer</span> — pick a listing and
               get a grid of finished designs built from its own price and payment plan; choose
               one, add the permit, write the caption, download or launch.
             </li>
             <li>
-              <span className="font-medium text-white">Photo Reel</span> — listing photos become
+              <span className="font-medium text-ink">Photo Reel</span> — listing photos become
               a real video: a slow push across each photo, an opening title, a closing offer
               card.
             </li>
             <li>
-              <span className="font-medium text-white">Image editor</span> — crop, reframe and
+              <span className="font-medium text-ink">Image editor</span> — crop, reframe and
               touch up the photos in your library before they carry a design.
             </li>
             <li>
-              <span className="font-medium text-white">Video</span> — trim a clip, add a caption
+              <span className="font-medium text-ink">Video</span> — trim a clip, add a caption
               and a closing card, pick the cover frame; oversized phone clips shrink without
               leaving the app.
             </li>
             <li>
-              <span className="font-medium text-white">Presenters</span> — three ready on-camera
+              <span className="font-medium text-ink">Presenters</span> — three ready on-camera
               personas, each with one saved face for your whole company, so it is the same person
               in every creative.
             </li>
             <li>
-              <span className="font-medium text-white">Brochure &rarr; Ad Set</span> — drop a
+              <span className="font-medium text-ink">Brochure &rarr; Ad Set</span> — drop a
               developer&rsquo;s PDF; the studio reads the facts, creates the listing and its
               page, and designs ads from the same numbers.
             </li>
             <li>
-              <span className="font-medium text-white">Node canvas</span> — an open canvas for
+              <span className="font-medium text-ink">Node canvas</span> — an open canvas for
               the layout no template covers; compose the design block by block and keep full
               control of every element.
             </li>
             <li>
-              <span className="font-medium text-white">Templates &amp; starters</span> — ready
+              <span className="font-medium text-ink">Templates &amp; starters</span> — ready
               designs in English, Arabic and Russian, previewed live with your own photos rather
               than stock screenshots.
             </li>
             <li>
-              <span className="font-medium text-white">Library</span> — everything any tool makes
+              <span className="font-medium text-ink">Library</span> — everything any tool makes
               lands in one place, ready for the next campaign.
             </li>
           </ul>
@@ -133,7 +133,7 @@ export default function CreativeStudioGuide() {
         or your library. Designs are composed over your own photographs; the studio does not
         generate pictures of property that was never built.
       </DocNote>
-      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-white">
+      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-ink">
         Common questions
       </h2>
       <div className="mt-4">

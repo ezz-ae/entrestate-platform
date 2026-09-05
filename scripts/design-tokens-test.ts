@@ -87,6 +87,64 @@ console.log('\n── the colours a migration is allowed to converge on ──')
   }
 }
 
+console.log('\n── the semantic ramp reaches the utilities without forking ──')
+{
+  // WHY: `border-caution/40` only exists if @theme names --color-caution, and
+  // a :root variable cannot be referenced from @theme by its own name. So
+  // globals.css restates the ten semantic hexes — and this is the check that
+  // keeps them the same ten hexes as design/tokens.css.
+  const tok = readFileSync(join(ROOT, 'design/tokens.css'), 'utf8')
+  const glob = readFileSync(join(ROOT, 'app/globals.css'), 'utf8')
+  const theme = glob.slice(glob.indexOf('\n@theme {'), glob.indexOf('\n@theme inline {'))
+  const roles = ['positive', 'positive-bright', 'caution', 'caution-bright', 'warning', 'warning-bright', 'danger', 'danger-bright', 'neutral', 'neutral-bright']
+  const drift: string[] = []
+  for (const r of roles) {
+    const a = tok.match(new RegExp(`--color-${r}:\\s*(#[0-9A-Fa-f]{6})`))?.[1]
+    const b = theme.match(new RegExp(`--color-${r}:\\s*(#[0-9A-Fa-f]{6})`))?.[1]
+    if (!a || !b || a.toUpperCase() !== b.toUpperCase()) drift.push(`${r}: tokens ${a ?? '—'} vs @theme ${b ?? '—'}`)
+  }
+  check(`the ten semantic roles are utilities, and match design/tokens.css`, drift.length === 0, drift.join('; '))
+  check('the family accent is a utility (bg-brand / text-brand / text-brand-ink)',
+    /--color-brand:\s*var\(--brand\)/.test(theme) && /--color-brand-ink:\s*var\(--brand-ink\)/.test(theme))
+}
+
+console.log('\n── the light ramp IS the Terminal\'s palette ──')
+{
+  // WHY: the owner's ruling — "the Terminal's colours are soft and beautiful;
+  // the business site feels hard; everything has to be one." The light theme
+  // is therefore not a light version of this product's ramp; it is the
+  // Terminal's :root, value for value (ezz-ae/Entrestate_os app/globals.css).
+  const glob = readFileSync(join(ROOT, 'app/globals.css'), 'utf8')
+  const light = glob.slice(glob.indexOf('.theme-light {'), glob.indexOf('.theme-light body'))
+  for (const [role, hex] of [
+    ['--color-app', '#f5f7fa'], ['--color-surface', '#ffffff'], ['--color-ink', '#0f151d'],
+    ['--color-ink-muted', '#4a5563'], ['--color-line', '#d5dde7'], ['--brand', '#2f5aa6'],
+  ] as const) {
+    check(`${role} is the Terminal's ${hex}`, new RegExp(`${role}:\\s*${hex}`, 'i').test(light))
+  }
+}
+
+console.log('\n── the vendor\'s surfaces wear the Terminal\'s dark room ──')
+{
+  // WHY: shown a white business site the owner said "the black is good; the
+  // idea is the softness of the other design — the edges and the gradations";
+  // shown a near-black one, "much more pro than a blue-on-black wall — the
+  // colours are well picked", pointing at the Terminal's `.dark`. So the
+  // business site is dark, and its dark is that slate room, value for value.
+  const glob = readFileSync(join(ROOT, 'app/globals.css'), 'utf8')
+  const dark = glob.slice(glob.indexOf('.theme-terminal {'), glob.indexOf('.theme-light {'))
+  for (const [role, hex] of [
+    ['--color-app', '#11161d'], ['--color-surface', '#1a232e'], ['--color-surface-2', '#202b36'],
+    ['--color-ink', '#e6ecf3'], ['--color-ink-muted', '#b2bdca'], ['--color-line', '#2f3a46'], ['--brand', '#3a6fb8'],
+  ] as const) {
+    check(`${role} is the Terminal's ${hex}`, new RegExp(`${role}:\\s*${hex}`, 'i').test(dark))
+  }
+  const biz = readFileSync(join(ROOT, 'app/business/layout.tsx'), 'utf8')
+  check('the business site wears it by class, whatever the workspace theme', /className="theme-terminal /.test(biz))
+  const signup = readFileSync(join(ROOT, 'app/signup/signup-client.tsx'), 'utf8')
+  check('…and so does the sign-up screen', /className="theme-terminal /.test(signup))
+}
+
 console.log('\n── one token source, generated into both build roots ──')
 {
   // WHY: two apps, two package.json files, two Vercel roots and no pnpm

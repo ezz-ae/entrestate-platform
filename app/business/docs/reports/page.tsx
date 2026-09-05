@@ -103,7 +103,7 @@ export default function ReportsGuide() {
         times before anyone has responded, no return before spend is logged, no viewing rate
         before a viewing is held. When a figure appears, something real happened behind it.
       </DocNote>
-      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-white">
+      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-ink">
         Common questions
       </h2>
       <div className="mt-4">

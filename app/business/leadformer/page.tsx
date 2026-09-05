@@ -176,17 +176,17 @@ export default function LeadformerPage() {
 /** The roster, rendered from the real catalog — hiring cards, not copy. */
 function TeamRoster({ team }: { team: typeof SALES_TEAM }) {
   return (
-    <div className="overflow-hidden rounded-lg bg-chrome ring-1 ring-white/[0.07]" dir="ltr">
-      <div className="flex items-center justify-between border-b border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
-        <span className="text-[10.5px] font-medium text-white">Visual Sales Team</span>
+    <div className="overflow-hidden rounded-lg bg-chrome ring-1 ring-line" dir="ltr">
+      <div className="flex items-center justify-between border-b border-line bg-surface-2 px-3.5 py-2.5">
+        <span className="text-[10.5px] font-medium text-ink">Visual Sales Team</span>
         <span className="font-mono text-[8.5px] text-ink-faint">{team.length} available</span>
       </div>
-      <div className="divide-y divide-white/[0.05]">
+      <div className="divide-y divide-line">
         {team.map((m) => (
           <div key={m.id} className="flex items-center gap-3 px-3.5 py-2.5">
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
-                <span className="truncate text-[11px] font-medium text-white">{m.name}</span>
+                <span className="truncate text-[11px] font-medium text-ink">{m.name}</span>
                 <span className="truncate font-mono text-[8.5px] text-ink-faint">
                   {m.title} · {m.yearsExperience}y
                 </span>
@@ -195,13 +195,13 @@ function TeamRoster({ team }: { team: typeof SALES_TEAM }) {
                 {m.topSkills.map((s) => `${s.skill} ${s.rate}`).join('  ·  ')}
               </div>
             </div>
-            <span className="shrink-0 rounded-full bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-[9px] tabular-nums text-[#3B82F6] ring-1 ring-[#3B82F6]/25">
+            <span className="shrink-0 rounded-full bg-brand/10 px-2 py-0.5 font-mono text-[9px] tabular-nums text-brand ring-1 ring-brand/25">
               {totalRate(m)}
             </span>
           </div>
         ))}
       </div>
-      <div className="border-t border-white/[0.06] px-3.5 py-2">
+      <div className="border-t border-line px-3.5 py-2">
         <Mono className="text-[8.5px] text-ink-faint">search: total ≥ 88 · skill ≥ 80 · speaks fr</Mono>
       </div>
     </div>

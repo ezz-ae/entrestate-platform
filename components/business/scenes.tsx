@@ -109,7 +109,7 @@ function Scene({
         onClick={() => setPaused((p) => !p)}
         aria-pressed={paused}
         aria-label={paused ? 'Play animation' : 'Pause animation'}
-        className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/[0.08] transition-colors hover:bg-black/80"
+        className="absolute bottom-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-ink ring-1 ring-line transition-colors hover:bg-black/80"
       >
         {paused ? (
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden>
@@ -137,15 +137,15 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
       <div className="relative mx-auto w-full max-w-[340px]">
         {/* beat 4: the lead lands — drops in like a notification */}
         <div className="absolute -top-2 right-0 w-[180px]">
-          <div className="bscene-drop rounded-2xl rounded-tr-sm bg-[#0E3B2E] px-3 py-2 ring-1 ring-white/[0.08] shadow-[0_18px_50px_-18px_rgba(0,0,0,0.8)]">
-            <p dir="rtl" className="text-[11px] leading-snug text-white">
+          <div className="bscene-drop rounded-2xl rounded-tr-sm bg-[#0E3B2E] px-3 py-2 ring-1 ring-line shadow-[0_18px_50px_-18px_rgba(0,0,0,0.8)]">
+            <p dir="rtl" className="text-[11px] leading-snug text-ink">
               مرحباً، مهتم بالمشروع
             </p>
-            <p className={`mt-0.5 text-right ${MONO} text-white/40`}>2:47 AM</p>
+            <p className={`mt-0.5 text-right ${MONO} text-ink/40`}>2:47 AM</p>
           </div>
           <div className="bscene-in-e mt-1.5 flex justify-end">
             <span
-              className={`rounded-full bg-[#3B82F6]/15 px-2 py-0.5 ${MONO} text-[#60A5FA] ring-1 ring-[#3B82F6]/25`}
+              className={`rounded-full bg-brand/15 px-2 py-0.5 ${MONO} text-brand-bright ring-1 ring-brand/25`}
             >
               answered in 54s
             </span>
@@ -154,16 +154,16 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
 
         <div className="pt-16">
           {/* beat 1: the project card */}
-          <div className="bscene-in-a w-[232px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+          <div className="bscene-in-a w-[232px] rounded-xl bg-surface p-3 ring-1 ring-line shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
             <div className="h-20 rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220]" />
             <div className="mt-2 flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="truncate text-[11px] font-semibold tracking-tight text-white">
+                <p className="truncate text-[11px] font-semibold tracking-tight text-ink">
                   Narenj Villas · Masaar 2
                 </p>
                 <p className="mt-0.5 font-mono text-[10px] tabular-nums text-ink-muted">AED 540K</p>
               </div>
-              <span className="shrink-0 rounded-md bg-[#3B82F6]/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-[#60A5FA] ring-1 ring-[#3B82F6]/25">
+              <span className="shrink-0 rounded-md bg-brand/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-brand-bright ring-1 ring-brand/25">
                 85
               </span>
             </div>
@@ -171,23 +171,23 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
 
           {/* beat 2: the cap goes on before anything spends */}
           <div
-            className={`bscene-in-b mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/[0.05] px-3 py-1.5 ${MONO} text-ink-muted ring-1 ring-white/[0.06]`}
+            className={`bscene-in-b mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 ${MONO} text-ink-muted ring-1 ring-line`}
           >
             AED 300/day · cap
           </div>
 
           {/* beat 3: the campaign row goes ON, spend fills in */}
-          <div className="bscene-in-c mt-3 w-full max-w-[264px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06]">
+          <div className="bscene-in-c mt-3 w-full max-w-[264px] rounded-xl bg-surface p-3 ring-1 ring-line">
             <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[10px] font-semibold tracking-tight text-white">
+              <p className="truncate text-[10px] font-semibold tracking-tight text-ink">
                 Narenj Villas — Leads
               </p>
               <span className={`shrink-0 rounded-full bg-[#34D399]/15 px-1.5 py-px ${MONO} text-[8px] text-[#34D399] ring-1 ring-[#34D399]/25`}>
                 On
               </span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-              <div className="bscene-bar h-full w-[78%] rounded-full bg-[#3B82F6]" />
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div className="bscene-bar h-full w-[78%] rounded-full bg-brand" />
             </div>
             <p className="mt-1.5 font-mono text-[9px] tabular-nums text-ink-faint">
               AED 212 spent · 4 leads · AED 53/lead
@@ -212,8 +212,8 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
       <div className="mx-auto w-full max-w-[320px]">
         {/* beat 1: the ask, typed word by word */}
         <div className="flex justify-end">
-          <div className="bscene-in-a max-w-[260px] rounded-2xl rounded-br-sm bg-[#1B2F55] px-3 py-2 ring-1 ring-[#3B82F6]/20">
-            <p className="text-[11px] leading-snug text-white">
+          <div className="bscene-in-a max-w-[260px] rounded-2xl rounded-br-sm bg-[#1B2F55] px-3 py-2 ring-1 ring-brand/20">
+            <p className="text-[11px] leading-snug text-ink">
               {CHAT_WORDS.map((w, i) => (
                 <span key={i} className={`bscene-word-${i}`}>
                   {w}
@@ -225,7 +225,7 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
         </div>
 
         {/* beat 2: thinking — transient, absent from the final frame */}
-        <div className="bscene-dots mt-2 inline-flex items-center gap-1 rounded-2xl rounded-bl-sm bg-surface px-3 py-2.5 opacity-0 ring-1 ring-white/[0.06]">
+        <div className="bscene-dots mt-2 inline-flex items-center gap-1 rounded-2xl rounded-bl-sm bg-surface px-3 py-2.5 opacity-0 ring-1 ring-line">
           {[0, 1, 2].map((i) => (
             <span
               key={i}
@@ -236,22 +236,22 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
         </div>
 
         {/* beat 3: the page skeleton fills in */}
-        <div className="bscene-frame relative mt-4 rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+        <div className="bscene-frame relative mt-4 rounded-xl bg-surface p-3 ring-1 ring-line shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
           <div className="bscene-p1 flex h-14 items-end rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220] p-2">
-            <span className="h-2 w-1/2 rounded-full bg-white/[0.14]" />
+            <span className="h-2 w-1/2 rounded-full bg-surface-3" />
           </div>
           <div className="bscene-p2 mt-2 flex items-center justify-between">
-            <span className="h-2 w-16 rounded-full bg-white/[0.08]" />
+            <span className="h-2 w-16 rounded-full bg-surface-2" />
             <span className="font-mono text-[9px] tabular-nums text-ink-muted">AED 540K</span>
           </div>
           <div className="bscene-p3 mt-2 grid grid-cols-3 gap-2">
-            <span className="h-10 rounded-md bg-white/[0.05]" />
-            <span className="h-10 rounded-md bg-white/[0.05]" />
-            <span className="h-10 rounded-md bg-white/[0.05]" />
+            <span className="h-10 rounded-md bg-surface-2" />
+            <span className="h-10 rounded-md bg-surface-2" />
+            <span className="h-10 rounded-md bg-surface-2" />
           </div>
           <div className="bscene-p4 mt-2 space-y-1.5">
-            <span className="block h-6 rounded-md bg-white/[0.04] ring-1 ring-white/[0.06]" />
-            <span className="block h-6 rounded-md bg-white/[0.04] ring-1 ring-white/[0.06]" />
+            <span className="block h-6 rounded-md bg-surface-2 ring-1 ring-line" />
+            <span className="block h-6 rounded-md bg-surface-2 ring-1 ring-line" />
             <span className="flex h-7 items-center justify-center gap-1.5 rounded-md bg-[#34D399]/20 text-[9px] font-semibold text-[#34D399]">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
                 <path d="M21 11.5a8.5 8.5 0 01-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1121 11.5z" />
@@ -281,29 +281,29 @@ export function SceneOneClickStory({ className = '' }: { className?: string }) {
     >
       <div className="flex items-center justify-center gap-4 sm:gap-6">
         {/* beat 1: the inventory card */}
-        <div className="bscene-in-a w-[176px] rounded-xl bg-surface p-3 ring-1 ring-white/[0.06] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] sm:w-[216px]">
+        <div className="bscene-in-a w-[176px] rounded-xl bg-surface p-3 ring-1 ring-line shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)] sm:w-[216px]">
           <div className="h-20 rounded-lg bg-gradient-to-br from-[#1E3A5F] via-[#16283F] to-[#0B1220] sm:h-24" />
           <div className="mt-2 flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="truncate text-[11px] font-semibold tracking-tight text-white">
+              <p className="truncate text-[11px] font-semibold tracking-tight text-ink">
                 Narenj Villas
               </p>
               <p className="mt-0.5 font-mono text-[10px] tabular-nums text-ink-muted">AED 540K</p>
             </div>
-            <span className="shrink-0 rounded-md bg-[#3B82F6]/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-[#60A5FA] ring-1 ring-[#3B82F6]/25">
+            <span className="shrink-0 rounded-md bg-brand/15 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-brand-bright ring-1 ring-brand/25">
               85
             </span>
           </div>
-          <div className="mt-2.5 flex items-center justify-between border-t border-white/[0.06] pt-2">
+          <div className="mt-2.5 flex items-center justify-between border-t border-line pt-2">
             <span className={`${MONO} text-ink-faint`}>Inventory</span>
             <span className="relative inline-flex">
               {/* beats 2: cursor glides in, presses, ripples */}
-              <span className="bscene-press inline-flex rounded-md bg-[#3B82F6] px-2.5 py-1 text-[10px] font-semibold tracking-tight text-white">
+              <span className="bscene-press inline-flex rounded-md bg-brand px-2.5 py-1 text-[10px] font-semibold tracking-tight text-ink">
                 Story
               </span>
               <span
                 aria-hidden
-                className="bscene-ripple absolute left-1/2 top-1/2 -ml-3 -mt-3 h-6 w-6 rounded-full bg-white/40 opacity-0"
+                className="bscene-ripple absolute left-1/2 top-1/2 -ml-3 -mt-3 h-6 w-6 rounded-full bg-ink/ opacity-0"
               />
               <span
                 aria-hidden
@@ -315,16 +315,16 @@ export function SceneOneClickStory({ className = '' }: { className?: string }) {
 
         {/* beat 3: the 9:16 story pops out */}
         <div className="w-[96px] sm:w-[120px]">
-          <div className="bscene-story relative aspect-[9/16] overflow-hidden rounded-xl ring-1 ring-white/[0.08] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
+          <div className="bscene-story relative aspect-[9/16] overflow-hidden rounded-xl ring-1 ring-line shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
             <div className="absolute inset-0 bg-gradient-to-b from-[#2A4A73] via-[#16283F] to-[#0A0E14]" />
-            <span className={`absolute left-2 top-2 rounded bg-black/40 px-1 py-px ${MONO} text-[8px] text-white/60`}>
+            <span className={`absolute left-2 top-2 rounded bg-black/40 px-1 py-px ${MONO} text-[8px] text-ink/60`}>
               9:16
             </span>
             <div className="absolute inset-x-0 bottom-0 p-2">
-              <p className="text-[9px] font-semibold tracking-tight text-white">Narenj Villas</p>
-              <p className="font-mono text-[8px] tabular-nums text-white/60">AED 540K</p>
+              <p className="text-[9px] font-semibold tracking-tight text-ink">Narenj Villas</p>
+              <p className="font-mono text-[8px] tabular-nums text-ink/60">AED 540K</p>
               <div className="mt-1.5 flex justify-center">
-                <span className="rounded-full bg-white/15 px-2 py-0.5 text-[8px] text-white">
+                <span className="rounded-full bg-surface-3 px-2 py-0.5 text-[8px] text-ink">
                   ↑ Swipe up
                 </span>
               </div>

@@ -23,15 +23,15 @@ export function Browser({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-xl bg-surface ring-1 ring-white/[0.08] shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ${className}`}
+      className={`overflow-hidden rounded-xl bg-surface ring-1 ring-line shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ${className}`}
     >
-      <div className="flex items-center gap-3 border-b border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
+      <div className="flex items-center gap-3 border-b border-line bg-surface-2 px-3.5 py-2.5">
         <div className="flex shrink-0 gap-1.5" aria-hidden>
           <span className="h-2 w-2 rounded-full bg-[#FF5F57]/70" />
           <span className="h-2 w-2 rounded-full bg-[#FEBC2E]/70" />
           <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
         </div>
-        <div className="mx-auto flex min-w-0 max-w-[280px] flex-1 items-center justify-center gap-1.5 rounded-md bg-white/[0.05] px-3 py-1 ring-1 ring-white/[0.05]">
+        <div className="mx-auto flex min-w-0 max-w-[280px] flex-1 items-center justify-center gap-1.5 rounded-md bg-surface-2 px-3 py-1 ring-1 ring-line">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" aria-hidden>
             <rect x="5" y="11" width="14" height="9" rx="2" />
             <path d="M8 11V8a4 4 0 018 0v3" />
@@ -65,12 +65,12 @@ export function Phone({
   return (
     <div
       dir={dir}
-      className={`w-full max-w-[300px] rounded-[2.1rem] bg-[#101318] p-1.5 shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ring-1 ring-white/[0.09] ${className}`}
+      className={`w-full max-w-[300px] rounded-[2.1rem] bg-[#101318] p-1.5 shadow-[0_32px_90px_-30px_rgba(0,0,0,0.85)] ring-1 ring-line ${className}`}
     >
-      <div className="relative overflow-hidden rounded-[1.7rem] bg-app ring-1 ring-white/[0.06]">
+      <div className="relative overflow-hidden rounded-[1.7rem] bg-app ring-1 ring-line">
         <div
           aria-hidden
-          className="absolute left-1/2 top-1.5 z-20 h-[18px] w-24 -translate-x-1/2 rounded-full bg-black ring-1 ring-white/[0.07]"
+          className="absolute left-1/2 top-1.5 z-20 h-[18px] w-24 -translate-x-1/2 rounded-full bg-black ring-1 ring-line"
         />
         <div className="pt-7">{children}</div>
       </div>
@@ -109,17 +109,17 @@ export function Chat({
 }) {
   return (
     <div className="relative bg-chrome">
-      <div className="flex items-center gap-2.5 border-b border-white/[0.06] bg-white/[0.03] px-3.5 py-2.5">
+      <div className="flex items-center gap-2.5 border-b border-line bg-surface-2 px-3.5 py-2.5">
         <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#1DA85A]/20 font-mono text-[9px] text-[#3FD07F]">
           MV
         </div>
         <div className="min-w-0">
-          <div className="truncate text-[10.5px] font-medium text-white">{title}</div>
+          <div className="truncate text-[10.5px] font-medium text-ink">{title}</div>
           <div className="text-[8.5px] text-[#3FD07F]">online</div>
         </div>
       </div>
       {chip ? (
-        <div className="absolute right-2.5 top-12 z-10 rounded-full bg-[#3B82F6]/10 px-2 py-0.5 font-mono text-[8.5px] text-[#3B82F6] ring-1 ring-[#3B82F6]/25">
+        <div className="absolute right-2.5 top-12 z-10 rounded-full bg-brand/10 px-2 py-0.5 font-mono text-[8.5px] text-brand ring-1 ring-brand/25">
           {chip}
         </div>
       ) : null}
@@ -128,7 +128,7 @@ export function Chat({
           if (m.from === 'system')
             return (
               <div key={i} className="flex justify-center py-0.5">
-                <span className="rounded-full bg-white/[0.05] px-2.5 py-0.5 font-mono text-[8.5px] text-ink-faint ring-1 ring-white/[0.06]">
+                <span className="rounded-full bg-surface-2 px-2.5 py-0.5 font-mono text-[8.5px] text-ink-faint ring-1 ring-line">
                   {m.text}
                 </span>
               </div>
@@ -141,12 +141,12 @@ export function Chat({
                 className={`max-w-[82%] rounded-xl px-2.5 py-1.5 text-[10.5px] leading-[1.5] ring-1 ${
                   outbound
                     ? 'rounded-br-sm bg-[#123D2C] text-[#D9E5DE] ring-[#1DA85A]/20'
-                    : 'rounded-bl-sm bg-white/[0.06] text-ink ring-white/[0.06]'
+                    : 'rounded-bl-sm bg-surface-2 text-ink ring-line'
                 }`}
               >
                 {m.text}
                 {m.time ? (
-                  <span className="mx-1.5 inline-block align-baseline font-mono text-[8px] tabular-nums text-white/35" dir="ltr">
+                  <span className="mx-1.5 inline-block align-baseline font-mono text-[8px] tabular-nums text-ink/35" dir="ltr">
                     {m.time}
                   </span>
                 ) : null}
@@ -167,7 +167,7 @@ const faint = 'text-ink-faint'
 
 function MiniHeader({ label, right }: { label: string; right?: string }) {
   return (
-    <div className="flex items-baseline justify-between border-b border-white/[0.06] px-3 py-2">
+    <div className="flex items-baseline justify-between border-b border-line px-3 py-2">
       <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">{label}</span>
       {right ? (
         <span className="font-mono text-[9px] tabular-nums text-ink-faint" dir="ltr">
@@ -225,15 +225,15 @@ export function MiniCRM() {
             </div>
             <div className="space-y-1.5">
               {c.leads.map((l) => (
-                <div key={l.who} className="rounded-md bg-white/[0.04] p-1.5 ring-1 ring-white/[0.06]">
+                <div key={l.who} className="rounded-md bg-surface-2 p-1.5 ring-1 ring-line">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="truncate text-[9.5px] font-medium text-white">{l.who}</span>
+                    <span className="truncate text-[9.5px] font-medium text-ink">{l.who}</span>
                     {l.heat ? (
                       <span
                         className={`shrink-0 rounded-sm px-1 font-mono text-[7px] uppercase ${
                           l.heat === 'hot'
-                            ? 'bg-[#3B82F6]/15 text-[#3B82F6]'
-                            : 'bg-white/[0.06] text-ink-faint'
+                            ? 'bg-brand/15 text-brand'
+                            : 'bg-surface-2 text-ink-faint'
                         }`}
                       >
                         {l.heat}
@@ -267,7 +267,7 @@ export function MiniCampaigns() {
   return (
     <div className="bg-chrome">
       <MiniHeader label="Campaigns" right="today · AED 9,220" />
-      <div className="divide-y divide-white/[0.05]">
+      <div className="divide-y divide-line">
         <div className="grid grid-cols-[minmax(0,1fr)_30px_74px_28px_50px] items-center gap-2 px-3 py-1.5">
           {['Campaign', 'St.', 'Spend', 'Leads', 'AED/lead'].map((h) => (
             <span key={h} className="truncate font-mono text-[7.5px] uppercase tracking-[0.1em] text-[#565C64]">
@@ -283,18 +283,18 @@ export function MiniCampaigns() {
                 className={`justify-self-start rounded-full px-1.5 py-px font-mono text-[7px] uppercase ring-1 ${
                   r.on
                     ? 'bg-[#28C840]/10 text-[#3FD07F] ring-[#28C840]/25'
-                    : 'bg-white/[0.05] text-ink-faint ring-white/[0.08]'
+                    : 'bg-surface-2 text-ink-faint ring-line'
                 }`}
               >
                 {r.on ? 'On' : 'Off'}
               </span>
               <span className="min-w-0" dir="ltr">
                 <span className="block truncate font-mono text-[9px] tabular-nums text-ink">{r.spend}</span>
-                <span className="mt-1 block h-1 overflow-hidden rounded-full bg-white/[0.07]">
-                  <span className={`block h-full rounded-full bg-[#3B82F6]/70 ${r.bar}`} />
+                <span className="mt-1 block h-1 overflow-hidden rounded-full bg-surface-2">
+                  <span className={`block h-full rounded-full bg-brand/70 ${r.bar}`} />
                 </span>
               </span>
-              <span className="font-mono text-[9.5px] tabular-nums text-white" dir="ltr">
+              <span className="font-mono text-[9.5px] tabular-nums text-ink" dir="ltr">
                 {r.leads}
               </span>
               <span className="truncate font-mono text-[9px] tabular-nums text-ink-faint" dir="ltr">
@@ -303,8 +303,8 @@ export function MiniCampaigns() {
             </div>
             {r.name === 'Creekside One launch' ? (
               <div className="flex items-center gap-1.5 px-3 pb-2">
-                <span aria-hidden className="h-1 w-1 rounded-full bg-[#3B82F6]" />
-                <span className="truncate font-mono text-[8.5px] text-[#3B82F6]" dir="ltr">
+                <span aria-hidden className="h-1 w-1 rounded-full bg-brand" />
+                <span className="truncate font-mono text-[8.5px] text-brand" dir="ltr">
                   budget moved +AED 120 → Creekside ad — rule: cost/lead &lt; AED 90
                 </span>
               </div>
@@ -332,19 +332,19 @@ export function MiniInventory() {
         {units.map((u) => (
           <div
             key={u.name}
-            className={`relative min-w-0 overflow-hidden rounded-md bg-white/[0.04] ring-1 ring-white/[0.06] ${u.dead ? 'opacity-50' : ''}`}
+            className={`relative min-w-0 overflow-hidden rounded-md bg-surface-2 ring-1 ring-line ${u.dead ? 'opacity-50' : ''}`}
           >
             <div className={`h-9 w-full bg-gradient-to-br ${u.tint} to-[#0B0E12]`} aria-hidden />
             <span
               className={`absolute right-1 top-1 rounded-sm px-1 font-mono text-[7.5px] tabular-nums ${
-                u.dead ? 'bg-black/50 text-ink-faint' : 'bg-black/50 text-[#3B82F6]'
+                u.dead ? 'bg-black/50 text-ink-faint' : 'bg-black/50 text-brand'
               }`}
               dir="ltr"
             >
               {u.score}
             </span>
             <div className="p-1.5">
-              <div className="truncate text-[9px] font-medium text-white">{u.name}</div>
+              <div className="truncate text-[9px] font-medium text-ink">{u.name}</div>
               <div className={`${cell} ${faint} mt-0.5 text-[8px]`}>{u.where}</div>
               <div className="mt-1 flex items-baseline justify-between gap-1">
                 <span className="truncate font-mono text-[8.5px] tabular-nums text-ink" dir="ltr">
@@ -372,9 +372,9 @@ export function MiniPage() {
       </span>
       <div className="h-20 w-full bg-gradient-to-br from-[#20303F] via-[#141B22] to-[#0B0E12]" aria-hidden />
       <div className="px-3.5 py-3">
-        <div className="text-[12px] font-semibold text-white">Marina Vista — 2 Bedroom</div>
+        <div className="text-[12px] font-semibold text-ink">Marina Vista — 2 Bedroom</div>
         <div className="mt-1 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
-          <span className="font-mono text-[11px] tabular-nums text-[#3B82F6]" dir="ltr">
+          <span className="font-mono text-[11px] tabular-nums text-brand" dir="ltr">
             AED 1.9M
           </span>
           <span className={`${faint} font-mono text-[8.5px] tabular-nums`} dir="ltr">
@@ -383,7 +383,7 @@ export function MiniPage() {
         </div>
         <div className="mt-3 space-y-1.5">
           {['Your name', 'WhatsApp number'].map((ph) => (
-            <div key={ph} className="rounded-md bg-white/[0.04] px-2.5 py-1.5 text-[9.5px] text-ink-faint ring-1 ring-white/[0.07]">
+            <div key={ph} className="rounded-md bg-surface-2 px-2.5 py-1.5 text-[9.5px] text-ink-faint ring-1 ring-line">
               {ph}
             </div>
           ))}
@@ -419,7 +419,7 @@ export function MiniReport() {
       <MiniHeader label="Month report" right="May" />
       <div className="grid grid-cols-[auto_1fr] items-end gap-x-5 px-3.5 pt-3">
         <div>
-          <div className="font-sans font-semibold text-[1.5rem] leading-none tabular-nums text-white" dir="ltr">
+          <div className="font-sans font-semibold text-[1.5rem] leading-none tabular-nums text-ink" dir="ltr">
             AED 38,400
           </div>
           <div className="mt-1 font-mono text-[8.5px] uppercase tracking-[0.12em] text-ink-faint" dir="ltr">
@@ -430,8 +430,8 @@ export function MiniReport() {
           {funnel.map((f) => (
             <div key={f.label} className="grid grid-cols-[38px_1fr_auto] items-center gap-2">
               <span className="font-mono text-[7.5px] uppercase text-[#565C64]">{f.label}</span>
-              <span className="block h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
-                <span className={`block h-full rounded-full bg-[#3B82F6]/70 ${f.bar}`} />
+              <span className="block h-1.5 overflow-hidden rounded-full bg-surface-2">
+                <span className={`block h-full rounded-full bg-brand/70 ${f.bar}`} />
               </span>
               <span className="font-mono text-[8.5px] tabular-nums text-ink" dir="ltr">
                 {f.value}
@@ -440,7 +440,7 @@ export function MiniReport() {
           ))}
         </div>
       </div>
-      <div className="mt-3 divide-y divide-white/[0.05] border-t border-white/[0.06]">
+      <div className="mt-3 divide-y divide-line border-t border-line">
         {items.map((it) => (
           <div key={it.name} className="grid grid-cols-[minmax(0,1fr)_72px_36px_34px] items-baseline gap-2 px-3.5 py-1.5">
             <span className="truncate text-[9.5px] text-ink">{it.name}</span>
@@ -450,7 +450,7 @@ export function MiniReport() {
             <span className="font-mono text-[8.5px] tabular-nums text-ink-faint" dir="ltr">
               {it.leads} ld
             </span>
-            <span className={`font-mono text-[8.5px] tabular-nums ${it.deals > 0 ? 'text-[#3B82F6]' : 'text-[#565C64]'}`} dir="ltr">
+            <span className={`font-mono text-[8.5px] tabular-nums ${it.deals > 0 ? 'text-brand' : 'text-[#565C64]'}`} dir="ltr">
               {it.deals} dl
             </span>
           </div>
@@ -470,15 +470,15 @@ export interface LedgerRow {
 
 export function Ledger({ rows, className = '' }: { rows: LedgerRow[]; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-lg bg-chrome ring-1 ring-white/[0.07] ${className}`}>
+    <div className={`overflow-hidden rounded-lg bg-chrome ring-1 ring-line ${className}`}>
       <MiniHeader label="Decision log" right="written before spend" />
-      <div className="divide-y divide-white/[0.05]" dir="ltr">
+      <div className="divide-y divide-line" dir="ltr">
         {rows.map((r, i) => (
           <div key={i} className="flex items-baseline gap-3 px-3.5 py-2 font-mono">
             <span className="shrink-0 text-[9px] tabular-nums text-[#565C64]">{r.time}</span>
             <span className="min-w-0 flex-1 truncate text-[10px] text-ink-muted">{r.event}</span>
             {r.amount ? (
-              <span className="shrink-0 text-[10px] tabular-nums text-[#3B82F6]">{r.amount}</span>
+              <span className="shrink-0 text-[10px] tabular-nums text-brand">{r.amount}</span>
             ) : null}
           </div>
         ))}
@@ -497,15 +497,15 @@ export function StatBand({
   const cols =
     items.length === 4 ? 'lg:grid-cols-4' : items.length === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'
   return (
-    <div className="w-full border-y border-white/[0.07]">
-      <div className={`mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-px bg-white/[0.07] sm:grid-cols-2 ${cols}`}>
+    <div className="w-full border-y border-line">
+      <div className={`mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-4 bg-surface-2 sm:grid-cols-2 ${cols}`}>
         {items.map((s) => (
           <div key={s.label} className="bg-app px-6 py-10 lg:px-10 lg:py-14">
-            <div className="font-sans font-semibold text-[2.6rem] leading-none tracking-[-0.02em] text-white sm:text-[3.2rem]" dir="ltr">
+            <div className="font-sans font-semibold text-[2.6rem] leading-none tracking-[-0.02em] text-ink sm:text-[3.2rem]" dir="ltr">
               {s.value}
             </div>
             <div className="mt-3.5 text-[0.875rem] font-medium text-ink">{s.label}</div>
-            {s.note ? <div className="mt-1 text-[0.8125rem] text-[#7C838B]">{s.note}</div> : null}
+            {s.note ? <div className="mt-1 text-[0.8125rem] text-ink-faint">{s.note}</div> : null}
           </div>
         ))}
       </div>
@@ -525,13 +525,13 @@ export function StepRail({
         ? 'sm:grid-cols-2'
         : 'sm:grid-cols-3'
   return (
-    <ol className={`grid grid-cols-1 gap-px bg-white/[0.07] ${cols}`}>
+    <ol className={`grid grid-cols-1 gap-4 bg-surface-2 ${cols}`}>
       {steps.map((s, i) => (
         <li key={s.title} className="bg-surface p-7">
-          <div className="font-mono text-[0.9375rem] tabular-nums text-[#3B82F6]" dir="ltr">
+          <div className="font-mono text-[0.9375rem] tabular-nums text-brand" dir="ltr">
             {String(s.n ?? i + 1).padStart(2, '0')}
           </div>
-          <div className="mt-4 text-[0.9375rem] font-semibold text-white">{s.title}</div>
+          <div className="mt-4 text-[0.9375rem] font-semibold text-ink">{s.title}</div>
           <p className="mt-2 text-[0.875rem] leading-[1.6] text-ink-muted">{s.body}</p>
         </li>
       ))}
@@ -541,10 +541,10 @@ export function StepRail({
 
 export function PunchCard({ title, body }: { title: string; body?: string }) {
   return (
-    <div className="bg-surface p-7 outline outline-1 outline-white/[0.07]">
-      <span aria-hidden className="block h-0.5 w-6 bg-[#3B82F6]" />
-      <div className="mt-5 font-sans font-semibold text-[1.35rem] leading-[1.25] tracking-[-0.01em] text-white">{title}</div>
-      {body ? <p className="mt-2.5 text-[0.8125rem] leading-[1.6] text-[#7C838B]">{body}</p> : null}
+    <div className="bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card)">
+      <span aria-hidden className="block h-0.5 w-6 bg-brand" />
+      <div className="mt-5 font-sans font-semibold text-[1.35rem] leading-[1.25] tracking-[-0.01em] text-ink">{title}</div>
+      {body ? <p className="mt-2.5 text-[0.8125rem] leading-[1.6] text-ink-faint">{body}</p> : null}
     </div>
   )
 }
@@ -558,7 +558,7 @@ export function PunchGrid({
 }) {
   const map = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' }
   return (
-    <div className={`grid grid-cols-1 gap-px ${map[cols]}`}>
+    <div className={`grid grid-cols-1 gap-4 ${map[cols]}`}>
       {items.map((p) => (
         <PunchCard key={p.title} title={p.title} body={p.body} />
       ))}
@@ -728,10 +728,10 @@ export function FeatureTile({
 }) {
   const inner = (
     <>
-      <span className="text-[#3B82F6]">
+      <span className="text-brand">
         <Glyph name={icon} />
       </span>
-      <div className="mt-5 text-[0.9375rem] font-semibold text-white">{title}</div>
+      <div className="mt-5 text-[0.9375rem] font-semibold text-ink">{title}</div>
       <p className="mt-2 text-[0.875rem] leading-[1.6] text-ink-muted">{body}</p>
     </>
   )
@@ -739,20 +739,20 @@ export function FeatureTile({
     return (
       <Link
         href={href}
-        className="group block bg-surface p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
+        className="group block bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card) transition hover:bg-surface-2"
       >
         {inner}
-        <span className="mt-3 inline-block text-[#3B82F6] opacity-0 transition group-hover:opacity-100" aria-hidden>
+        <span className="mt-3 inline-block text-brand opacity-0 transition group-hover:opacity-100" aria-hidden>
           →
         </span>
       </Link>
     )
-  return <div className="bg-surface p-7 outline outline-1 outline-white/[0.07]">{inner}</div>
+  return <div className="bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card)">{inner}</div>
 }
 
 export function TileGrid({ children, cols = 4 }: { children: ReactNode; cols?: 2 | 3 | 4 }) {
   const map = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' }
-  return <div className={`grid grid-cols-1 gap-px ${map[cols]}`}>{children}</div>
+  return <div className={`grid grid-cols-1 gap-4 ${map[cols]}`}>{children}</div>
 }
 
 /* ── Reading path ───────────────────────────────────────────────────────── */
@@ -760,10 +760,10 @@ export function TileGrid({ children, cols = 4 }: { children: ReactNode; cols?: 2
 export function Chapter({ n, total, label }: { n: number; total: number; label: string }) {
   return (
     <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em]">
-      <span className="tabular-nums text-[#3B82F6]" dir="ltr">
+      <span className="tabular-nums text-brand" dir="ltr">
         {String(n).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </span>
-      <span aria-hidden className="h-px w-8 bg-white/[0.15]" />
+      <span aria-hidden className="h-px w-8 bg-surface-3" />
       <span className="text-ink-faint">{label}</span>
     </div>
   )
@@ -786,20 +786,20 @@ export function NextStep({
     <section className="mx-auto w-full max-w-[1180px] px-6 pb-20 pt-6 lg:px-10 lg:pb-28">
       <Link
         href={href}
-        className="group flex items-center justify-between gap-6 bg-surface px-7 py-9 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926] sm:px-10 sm:py-11"
+        className="group flex items-center justify-between gap-6 bg-surface px-7 py-9 rounded-2xl border border-line shadow-(--shadow-card) transition hover:bg-surface-2 sm:px-10 sm:py-11"
       >
         <div className="min-w-0">
           <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">
             {progress ? `Next · ${progress}` : 'Next'}
           </div>
-          <div className="mt-2.5 font-sans font-semibold text-[1.55rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2rem]">
+          <div className="mt-2.5 font-sans font-semibold text-[1.55rem] leading-[1.15] tracking-[-0.015em] text-ink sm:text-[2rem]">
             {label}
           </div>
           <p className="mt-2 text-[0.875rem] leading-[1.6] text-ink-muted">{note}</p>
         </div>
         <span
           aria-hidden
-          className="shrink-0 text-[2rem] leading-none text-[#3B82F6] transition-transform duration-200 group-hover:translate-x-2 sm:text-[2.6rem]"
+          className="shrink-0 text-[2rem] leading-none text-brand transition-transform duration-200 group-hover:translate-x-2 sm:text-[2.6rem]"
         >
           →
         </span>
@@ -855,7 +855,7 @@ export function HeroVisual({ variant }: { variant: 'home' | 'machine' | 'listing
 /** Full-bleed section wrapper: hairline top/bottom, faint gold radial glow. */
 export function GlowBand({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`relative w-full border-y border-white/[0.07] ${className}`}>
+    <div className={`relative w-full border-y border-line ${className}`}>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_60%_at_50%_0%,rgba(59,130,246,0.06),transparent_70%)]"

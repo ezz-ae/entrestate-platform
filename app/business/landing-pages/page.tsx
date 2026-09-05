@@ -82,7 +82,7 @@ export default function LandingPagesPage() {
             {/* Access model: this ships inside Lead Machine, which is the
                 self-serve product — so the CTA is the trial, not a request
                 for setup. Keep it in step with /business/pricing. */}
-            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-[#7C838B]">
+            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-ink-faint">
               Included with Lead Machine. Pages run on your own domain.
             </p>
           </div>

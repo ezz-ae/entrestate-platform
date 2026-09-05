@@ -71,10 +71,10 @@ export default async function EntrestateStorePage() {
 
       {terminalUser ? (
         <Section className="pb-10">
-          <div className="flex items-center gap-3 bg-surface px-5 py-3.5 outline outline-1 outline-[#3B82F6]/25">
-            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#3B82F6]" />
+          <div className="flex items-center gap-3 bg-surface px-5 py-3.5 rounded-2xl border border-brand/25 shadow-(--shadow-card)">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-brand" />
             <p className="text-[0.875rem] text-ink-muted">
-              Signed in as <span className="text-white">{terminalUser.name ?? terminalUser.email ?? "your Terminal account"}</span>
+              Signed in as <span className="text-ink">{terminalUser.name ?? terminalUser.email ?? "your Terminal account"}</span>
               {" — apps you add here land on this same account."}
             </p>
           </div>
@@ -88,11 +88,11 @@ export default async function EntrestateStorePage() {
             <article
               key={product.id}
               id={product.id}
-              className="group flex flex-col bg-surface p-8 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
+              className="group flex flex-col bg-surface p-8 rounded-2xl border border-line shadow-(--shadow-card) transition hover:bg-surface-2"
             >
               <div className="flex items-start justify-between gap-3">
                 <H3>{product.name}</H3>
-                <span className="mt-0.5 shrink-0 rounded-full bg-white/[0.05] px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted ring-1 ring-white/[0.07]">
+                <span className="mt-0.5 shrink-0 rounded-full bg-surface-2 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted ring-1 ring-line">
                   {product.tier === "lite" ? "Lite" : "Full"}
                 </span>
               </div>
@@ -121,7 +121,7 @@ export default async function EntrestateStorePage() {
               ) : (
                 <Link
                   href={`/business/store/start?app=${product.id}`}
-                  className="mt-6 inline-flex items-baseline gap-1.5 text-[0.875rem] font-medium text-[#3B82F6]"
+                  className="mt-6 inline-flex items-baseline gap-1.5 text-[0.875rem] font-medium text-brand"
                 >
                   Start with this app
                   <span aria-hidden className="opacity-0 transition group-hover:opacity-100">
@@ -142,7 +142,7 @@ export default async function EntrestateStorePage() {
               <article
                 key={product.id}
                 id={product.id}
-                className="border border-dashed border-white/[0.12] p-8"
+                className="border border-dashed border-line p-8"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-[1.0625rem] font-semibold leading-snug text-ink-muted">{product.name}</h3>

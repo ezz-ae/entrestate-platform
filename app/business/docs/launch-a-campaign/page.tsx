@@ -117,7 +117,7 @@ export default function LaunchACampaignGuide() {
         lapses, and warns you five days ahead so you can renew without interrupting the
         campaign.
       </DocNote>
-      <h2 className="mt-12 text-[1.0625rem] font-semibold text-white">Common questions</h2>
+      <h2 className="mt-12 text-[1.0625rem] font-semibold text-ink">Common questions</h2>
       <div className="mt-4">
         <FAQItem q="Does anything spend while I build?">
           No. Building, previewing and saving cost nothing. A campaign only spends after you have

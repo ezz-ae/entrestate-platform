@@ -87,10 +87,10 @@ function Connector() {
       className="mr-5 flex items-center justify-center py-1.5 lg:mr-0 lg:w-5 lg:shrink-0 lg:py-0"
     >
       <svg className="h-5 w-3 lg:hidden" viewBox="0 0 12 20" fill="none">
-        <path d="M6 0v12" stroke="#3B82F6" strokeOpacity="0.4" strokeWidth="1.5" />
+        <path d="M6 0v12" stroke="var(--brand)" strokeOpacity="0.4" strokeWidth="1.5" />
         <path
           d="M2 12l4 6 4-6"
-          stroke="#3B82F6"
+          stroke="var(--brand)"
           strokeOpacity="0.4"
           strokeWidth="1.5"
           strokeLinecap="round"
@@ -98,10 +98,10 @@ function Connector() {
         />
       </svg>
       <svg className="hidden h-3 w-5 lg:block" viewBox="0 0 20 12" fill="none">
-        <path d="M0 6h12" stroke="#3B82F6" strokeOpacity="0.4" strokeWidth="1.5" />
+        <path d="M0 6h12" stroke="var(--brand)" strokeOpacity="0.4" strokeWidth="1.5" />
         <path
           d="M12 2l6 4-6 4"
-          stroke="#3B82F6"
+          stroke="var(--brand)"
           strokeOpacity="0.4"
           strokeWidth="1.5"
           strokeLinecap="round"
@@ -121,8 +121,8 @@ export function PlatformLoop() {
             <Fragment key={s.n}>
               {i > 0 ? <Connector /> : null}
               {/* mr-5 opens a right gutter on mobile for the green return rail. */}
-              <article className="mr-5 min-w-0 bg-surface outline outline-1 outline-white/[0.07] lg:mr-0 lg:flex-1">
-                <div className="relative aspect-[16/11] overflow-hidden border-b border-white/[0.06] bg-app">
+              <article className="mr-5 min-w-0 bg-surface rounded-2xl border border-line shadow-(--shadow-card) lg:mr-0 lg:flex-1">
+                <div className="relative aspect-[16/11] overflow-hidden border-b border-line bg-app">
                   {/* A readable SLAB of the screen, not the whole app
                      miniaturized: each stage zooms into its own working
                      region (stat tiles, the table, the cards) so the thumb
@@ -137,10 +137,10 @@ export function PlatformLoop() {
                 </div>
                 <div className="p-4">
                   <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[0.75rem] tabular-nums text-[#3B82F6]" dir="ltr">
+                    <span className="font-mono text-[0.75rem] tabular-nums text-brand" dir="ltr">
                       {s.n}
                     </span>
-                    <h3 className="text-[0.9375rem] font-semibold leading-snug text-white">
+                    <h3 className="text-[0.9375rem] font-semibold leading-snug text-ink">
                       {s.name}
                     </h3>
                   </div>

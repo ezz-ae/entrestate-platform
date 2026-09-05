@@ -110,7 +110,7 @@ export default function AudiencesGuide() {
         check whether it already knows the same person. Raw phone numbers and emails never leave
         your system, and nothing is uploaded until you confirm it.
       </DocNote>
-      <h2 className="mt-12 text-[1.0625rem] font-semibold text-white">Common questions</h2>
+      <h2 className="mt-12 text-[1.0625rem] font-semibold text-ink">Common questions</h2>
       <div className="mt-4">
         <FAQItem q="Why can't I build a lookalike yet?">
           Not enough rated leads. A lookalike needs at least 100 matched people behind it, and

@@ -114,7 +114,7 @@ export default function GetSetUpGuide() {
         campaign — before a dirham moves. Money only moves after you connect an ad account, write
         a spend rule, and switch a campaign on yourself.
       </DocNote>
-      <h2 className="mt-12 text-[1.0625rem] font-semibold text-white">Common questions</h2>
+      <h2 className="mt-12 text-[1.0625rem] font-semibold text-ink">Common questions</h2>
       <div className="mt-4">
         <FAQItem q="Do I need a card for the trial?">
           No. Fourteen days, the full platform, no card. Load real stock and real leads — if you

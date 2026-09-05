@@ -64,7 +64,7 @@ export function MegaBrokerageProductPage() {
                 operators, so a self-serve button would promise a door that
                 does not open. See the pricing page and the Terminal’s apps
                 page, which say the same thing in the same words. */}
-            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-[#7C838B]">
+            <p className="mt-7 text-[0.8125rem] leading-[1.6] text-ink-faint">
               Setup on request, with our team. Built for large-scale operators — your domain, your
               database, your stock.
             </p>

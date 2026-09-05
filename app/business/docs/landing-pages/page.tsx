@@ -55,10 +55,10 @@ export default function LandingPagesGuide() {
         </Step>
         <Step n={2} id="layouts" title="Three layouts, one honesty rule">
           <p>
-            <span className="font-medium text-white">Classic</span> is the full brochure, for warm
-            buyers who want depth. <span className="font-medium text-white">Campaign</span> puts
+            <span className="font-medium text-ink">Classic</span> is the full brochure, for warm
+            buyers who want depth. <span className="font-medium text-ink">Campaign</span> puts
             the lead form directly under the hero — it is the one to point paid ads at.{' '}
-            <span className="font-medium text-white">Signature</span> leads with visuals, for
+            <span className="font-medium text-ink">Signature</span> leads with visuals, for
             premium launches.
           </p>
           <p>
@@ -123,7 +123,7 @@ export default function LandingPagesGuide() {
         money sections or lingered on the gallery. Your agent opens the lead already knowing
         which kind of buyer is on the line.
       </DocNote>
-      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-white">
+      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-ink">
         Common questions
       </h2>
       <div className="mt-4">

@@ -111,17 +111,17 @@ export default function InventoryGuide() {
           <p>Three things stand between a listing and a live campaign:</p>
           <ul className="list-disc space-y-2 pl-5">
             <li>
-              <span className="font-medium text-white">The advertising permit.</span> A Dubai
+              <span className="font-medium text-ink">The advertising permit.</span> A Dubai
               listing with no valid permit cannot launch, and a running campaign stops on the day
               its permit lapses. You are warned five days ahead so renewal never interrupts a
               campaign.
             </li>
             <li>
-              <span className="font-medium text-white">The page.</span> If the listing has no
+              <span className="font-medium text-ink">The page.</span> If the listing has no
               live page for a paid click to land on, the launch refuses and says so.
             </li>
             <li>
-              <span className="font-medium text-white">The record itself.</span> A listing marked
+              <span className="font-medium text-ink">The record itself.</span> A listing marked
               Fix first is telling you an ad built from it would have a gap where a fact belongs.
               Fill the fact and the block clears.
             </li>
@@ -133,7 +133,7 @@ export default function InventoryGuide() {
         line is left out entirely. Nothing is defaulted, rounded into existence, or borrowed from
         a similar listing. When you see a figure, it was recorded.
       </DocNote>
-      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-white">
+      <h2 id="faq" className="scroll-mt-24 mt-12 text-[1.0625rem] font-semibold text-ink">
         Common questions
       </h2>
       <div className="mt-4">

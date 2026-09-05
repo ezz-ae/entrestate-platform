@@ -127,6 +127,31 @@ html {
   --color-gold: #D4AF37;
   /* Hover/highlight step of the brand colour — white-label overrides both. */
   --color-gold-bright: #F8E7AE;
+
+  /* THE FAMILY'S OWN ACCENT as utilities — `bg-brand`, `text-brand`,
+   * `outline-brand/25`, `text-brand-ink`. --brand is Entrestate's blue
+   * (design/tokens.css); the vendor's site and the apex wear it, a tenant's
+   * workspace wears --color-gold. The business site used to type #3B82F6
+   * ninety-nine times instead of saying `brand` once. */
+  --color-brand:        var(--brand);
+  --color-brand-bright: var(--brand-bright);
+  --color-brand-ink:    var(--brand-ink);
+
+  /* The semantic ramp as utilities — `border-caution/40`, `bg-positive/10`,
+   * `text-danger` — meaning, never decoration. A :root variable alone
+   * generates no utility, so the values are restated here; the values are
+   * design/tokens.css's, byte for byte, and scripts/design-tokens-test.ts
+   * fails when they drift. */
+  --color-positive:                #10B981;
+  --color-positive-bright:         #34D399;
+  --color-caution:                 #F59E0B;
+  --color-caution-bright:          #FBBF24;
+  --color-warning:                 #F97316;
+  --color-warning-bright:          #FB923C;
+  --color-danger:                  #EF4444;
+  --color-danger-bright:           #F87171;
+  --color-neutral:                 #64748B;
+  --color-neutral-bright:          #94A3B8;
 }
 
 @theme inline {
@@ -190,15 +215,59 @@ html {
  * flip automatically; the override block remaps the hardcoded text-white /
  * text-slate-* utilities the app was built with dark-first.
  * ─────────────────────────────────────────────────────────────────────────── */
+/* ───────────────────────────────────────────────────────────────────────────
+ * THE TERMINAL'S DARK ROOM — the family's own look, value for value
+ * (ezz-ae/Entrestate_os app/globals.css, `.dark` — the theme the owner
+ * actually sees on terminal.entrestate.com). Shown a white version of the
+ * business site he ruled: "the black is good — the idea is the SOFTNESS of
+ * the other design: the edges and the gradations of colour." Shown a
+ * near-black one: "this is much more pro than a blue-on-black wall — the
+ * colours are well picked." So this is neither black nor a warmer ramp: it
+ * is the Terminal's slate room — a deep blue-grey ground, a card one clear
+ * step above it, a second step for wells and inputs, a third for chips, a
+ * solid visible hairline, soft ink, and the family's deeper blue. Worn by
+ * the vendor's own surfaces (the business site, the apex) by class; a
+ * tenant's workspace keeps its brand and degree.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.theme-terminal {
+  --color-app:          #11161d;                 /* --background */
+  --color-chrome:       #0f141b;                 /* --sidebar: nav / headers */
+  --color-surface:      #1a232e;                 /* --card */
+  --color-surface-2:    #202b36;                 /* --secondary / --input: wells, hovers */
+  --color-surface-3:    #2a3542;                 /* --muted: chips, tracks */
+  --color-ink:          #e6ecf3;                 /* --foreground */
+  --color-ink-muted:    #b2bdca;                 /* --muted-foreground */
+  --color-ink-faint:    #8a97a6;                 /* captions, one step quieter */
+  --color-line:         #2f3a46;                 /* --border — solid, visible */
+  --color-line-strong:  #3d4957;
+  --brand:              #3a6fb8;                 /* --primary */
+  --brand-bright:       #4f83c9;
+  --shadow-card:        0 1px 2px 0 rgb(0 0 0 / 0.35), 0 12px 32px -20px rgb(0 0 0 / 0.55);
+  --shadow-glow:        0 24px 80px -48px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
 .theme-light {
-  --color-app:          #ecf0f6;                 /* cool gray ground (behind the body gradient) */
+  /* THE TERMINAL'S PALETTE, value for value (ezz-ae/Entrestate_os
+   * app/globals.css :root). The owner's ruling on the family's look: "the
+   * Terminal's colours are soft and beautiful; the business site feels hard —
+   * everything has to be one." So the light ramp is not a light version of
+   * this product's dark ramp; it IS the Terminal's: its ground, its white
+   * card, its hairline, its ink, and its deeper blue for the accent on white.
+   * Change one of these and the two halves of the family stop matching. */
+  --color-app:          #f5f7fa;                 /* the Terminal's --background */
   --color-chrome:       #ffffff;                 /* nav / headers */
-  --color-surface:      #ffffff;                 /* cards & panels */
-  --color-ink:          #0f172a;                 /* headings / deepest ink */
-  --color-surface-2:    #eef2f8;                 /* inputs / raised */
-  --color-surface-3:    #dfe6ef;                 /* hover / tracks / chips */
-  --color-line:         #d9e0e9;                 /* hairline dividers */
+  --color-surface:      #ffffff;                 /* --card */
+  --color-ink:          #0f151d;                 /* --foreground */
+  --color-ink-muted:    #4a5563;                 /* --muted-foreground */
+  --color-ink-faint:    #6b7686;                 /* captions, one step lighter */
+  --color-surface-2:    #eef1f5;                 /* --secondary: inputs / raised */
+  --color-surface-3:    #e2e8f0;                 /* --muted: hover / tracks / chips */
+  --color-line:         #d5dde7;                 /* --border */
   --color-line-strong:  #b9c4d2;                 /* control borders */
+  --brand:              #2f5aa6;                 /* --primary on white */
+  --brand-bright:       #3b82f6;
+  --shadow-card:        0 1px 2px 0 rgb(15 21 29 / 0.06), 0 1px 3px 0 rgb(15 21 29 / 0.04);
+  --shadow-glow:        0 24px 80px -48px color-mix(in srgb, var(--brand) 35%, transparent);
 }
 /* A cool gray wash that never resolves to pure white, so white cards keep a
    visible edge everywhere on the page instead of melting into the ground.

@@ -56,7 +56,7 @@ export default async function BusinessAccountPage({
           title="One account carries all of it."
           lede="Market discovery comes with the Terminal account; the wallet, the apps and the workspace attach to that same account. Sign in on the Terminal and this page fills itself in."
         />
-        <a href={`${TERMINAL_URL}/login`} className="bg-[#3B82F6] px-6 py-3 text-[0.9375rem] font-semibold text-white">
+        <a href={`${TERMINAL_URL}/login`} className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink">
           Sign in on the Terminal
         </a>
       </Section>
@@ -96,11 +96,11 @@ export default async function BusinessAccountPage({
       */}
       {SAAS_TENANCY ? (
         <Section className="pb-10">
-          <article className="bg-surface p-8 outline outline-1 outline-white/[0.07]">
+          <article className="bg-surface p-8 rounded-2xl border border-line shadow-(--shadow-card)">
             <Eyebrow className="mb-4">Your workspace</Eyebrow>
 
             {workspaceNote ? (
-              <p className="mb-5 bg-surface px-4 py-3 text-[0.875rem] text-amber-300 outline outline-1 outline-amber-400/25">
+              <p className="mb-5 rounded-xl border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] text-ink">
                 {workspaceNote}
               </p>
             ) : null}
@@ -112,16 +112,16 @@ export default async function BusinessAccountPage({
                   The workspace is tied to your email, so the email has to be confirmed first. Open the verification
                   message from the Terminal, then come back — the form is waiting here.
                 </P>
-                <a href={`${TERMINAL_URL}/account`} className="mt-6 inline-block text-[0.875rem] font-medium text-[#3B82F6]">
+                <a href={`${TERMINAL_URL}/account`} className="mt-6 inline-block text-[0.875rem] font-medium text-brand">
                   Confirm it on the Terminal →
                 </a>
               </>
             ) : workspaces.length > 0 ? (
-              <ul className="divide-y divide-white/[0.06]">
+              <ul className="divide-y divide-line">
                 {workspaces.map((w) => (
                   <li key={w.subdomain} className="flex flex-wrap items-center justify-between gap-4 py-4 first:pt-0">
                     <div>
-                      <p className="text-[0.9375rem] font-medium text-white">{w.company}</p>
+                      <p className="text-[0.9375rem] font-medium text-ink">{w.company}</p>
                       <p className="mt-0.5 font-mono text-[11px] tracking-[0.06em] text-ink-faint">
                         {w.subdomain}.{TENANT_BASE_DOMAIN}
                       </p>
@@ -132,7 +132,7 @@ export default async function BusinessAccountPage({
                       </span>
                       <a
                         href={`/api/account/workspace/enter?sub=${encodeURIComponent(w.subdomain)}`}
-                        className="bg-[#3B82F6] px-5 py-2.5 text-[0.875rem] font-semibold text-white"
+                        className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-ink"
                       >
                         Open the workspace
                       </a>
@@ -153,7 +153,7 @@ export default async function BusinessAccountPage({
                     <input
                       name="company"
                       placeholder="Marina Realty"
-                      className="w-56 bg-[#0B0F17] px-3 py-2.5 text-[0.9375rem] text-white outline outline-1 outline-white/[0.12] placeholder:text-ink-faint focus:outline-[#3B82F6]/60"
+                      className="w-56 bg-surface-2 px-3 py-2.5 text-[0.9375rem] text-ink rounded-2xl border border-line shadow-(--shadow-card) placeholder:text-ink-faint focus:outline-brand/60"
                     />
                   </label>
                   <label className="flex flex-col gap-1.5">
@@ -162,12 +162,12 @@ export default async function BusinessAccountPage({
                       <input
                         name="subdomain"
                         placeholder="marina"
-                        className="w-40 bg-[#0B0F17] px-3 py-2.5 text-[0.9375rem] text-white outline outline-1 outline-white/[0.12] placeholder:text-ink-faint focus:outline-[#3B82F6]/60"
+                        className="w-40 bg-surface-2 px-3 py-2.5 text-[0.9375rem] text-ink rounded-2xl border border-line shadow-(--shadow-card) placeholder:text-ink-faint focus:outline-brand/60"
                       />
                       <span className="ml-2 font-mono text-[12px] text-ink-faint">.{TENANT_BASE_DOMAIN}</span>
                     </span>
                   </label>
-                  <button type="submit" className="bg-[#3B82F6] px-5 py-2.5 text-[0.875rem] font-semibold text-white">
+                  <button type="submit" className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-ink">
                     Create the workspace
                   </button>
                 </form>
@@ -180,12 +180,12 @@ export default async function BusinessAccountPage({
       <Section className="pb-16">
         <Grid cols={2}>
           {/* ── The wallet ── */}
-          <article className="bg-surface p-8 outline outline-1 outline-white/[0.07]">
+          <article className="bg-surface p-8 rounded-2xl border border-line shadow-(--shadow-card)">
             <Eyebrow className="mb-4">Ads Coin wallet</Eyebrow>
             {wallet ? (
               <>
                 <div className="flex items-end gap-3">
-                  <span className="text-[2rem] font-semibold leading-none text-white tabular-nums">AED {wallet.balanceAed}</span>
+                  <span className="text-[2rem] font-semibold leading-none text-ink tabular-nums">AED {wallet.balanceAed}</span>
                   {Number(wallet.heldAed.replace(/,/g, "")) > 0 ? (
                     <span className="mb-1 text-[0.8125rem] text-ink-muted">+ AED {wallet.heldAed} held in running work</span>
                   ) : null}
@@ -197,15 +197,15 @@ export default async function BusinessAccountPage({
                 </P>
 
                 {topup === "requested" ? (
-                  <p className="mt-5 bg-[#3B82F6]/10 px-4 py-3 text-[0.875rem] text-[#93C5FD] outline outline-1 outline-[#3B82F6]/25">
+                  <p className="mt-5 rounded-xl border border-brand/25 bg-brand/10 px-4 py-3 text-[0.875rem] text-brand">
                     Top-up recorded — the team confirms it and the balance updates right here.
                   </p>
                 ) : topup === "bounds" ? (
-                  <p className="mt-5 bg-surface px-4 py-3 text-[0.875rem] text-amber-300 outline outline-1 outline-amber-400/25">
+                  <p className="mt-5 rounded-xl border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] text-ink">
                     Amounts between AED {TOPUP_MIN_AED.toLocaleString()} and AED {TOPUP_MAX_AED.toLocaleString()} — try again inside that range.
                   </p>
                 ) : topup === "failed" ? (
-                  <p className="mt-5 bg-surface px-4 py-3 text-[0.875rem] text-amber-300 outline outline-1 outline-amber-400/25">
+                  <p className="mt-5 rounded-xl border border-caution/40 bg-caution/10 px-4 py-3 text-[0.875rem] text-ink">
                     That did not save — nothing was lost, try once more in a minute.
                   </p>
                 ) : null}
@@ -227,9 +227,9 @@ export default async function BusinessAccountPage({
                     name="amount"
                     inputMode="numeric"
                     placeholder={`AED ${TOPUP_MIN_AED}+`}
-                    className="w-36 bg-[#0B0F17] px-3 py-2.5 text-[0.9375rem] text-white outline outline-1 outline-white/[0.12] placeholder:text-ink-faint focus:outline-[#3B82F6]/60"
+                    className="w-36 bg-surface-2 px-3 py-2.5 text-[0.9375rem] text-ink rounded-2xl border border-line shadow-(--shadow-card) placeholder:text-ink-faint focus:outline-brand/60"
                   />
-                  <button type="submit" className="bg-[#3B82F6] px-5 py-2.5 text-[0.875rem] font-semibold text-white">
+                  <button type="submit" className="rounded-xl bg-brand px-5 py-2.5 text-[0.875rem] font-semibold text-ink">
                     Request the top-up
                   </button>
                 </form>
@@ -240,7 +240,7 @@ export default async function BusinessAccountPage({
           </article>
 
           {/* ── The apps ── */}
-          <article className="bg-surface p-8 outline outline-1 outline-white/[0.07]">
+          <article className="bg-surface p-8 rounded-2xl border border-line shadow-(--shadow-card)">
             <Eyebrow className="mb-4">Apps on this account</Eyebrow>
             {appRows.length === 0 ? (
               <>
@@ -255,7 +255,7 @@ export default async function BusinessAccountPage({
                 {appRows.map((p) => (
                   <li key={p.id} className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-[0.9375rem] font-medium text-white">{p.name}</p>
+                      <p className="text-[0.9375rem] font-medium text-ink">{p.name}</p>
                       <p className="mt-0.5 text-[0.8125rem] text-ink-muted">{p.tagline}</p>
                     </div>
                     <span className={`mt-0.5 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] ${apps.get(p.id) === "active" ? "text-emerald-400" : "text-ink-muted"}`}>
@@ -265,7 +265,7 @@ export default async function BusinessAccountPage({
                 ))}
               </ul>
             )}
-            <Link href="/business/store" className="mt-6 inline-block text-[0.875rem] font-medium text-[#3B82F6]">
+            <Link href="/business/store" className="mt-6 inline-block text-[0.875rem] font-medium text-brand">
               Open the App Store →
             </Link>
           </article>
@@ -275,7 +275,7 @@ export default async function BusinessAccountPage({
       {postings.length > 0 ? (
         <Section className="pb-24">
           <Eyebrow className="mb-4">Last movements</Eyebrow>
-          <div className="divide-y divide-white/[0.06] bg-surface outline outline-1 outline-white/[0.07]">
+          <div className="divide-y divide-line bg-surface rounded-2xl border border-line shadow-(--shadow-card)">
             {postings.map((p, i) => (
               <div key={i} className="flex items-center justify-between px-5 py-3 text-[0.875rem]">
                 <span className="text-ink-muted">{p.kind}</span>

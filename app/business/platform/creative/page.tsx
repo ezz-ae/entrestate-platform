@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 function MiniStudio() {
   return (
     <div className="bg-chrome">
-      <div className="flex items-baseline justify-between border-b border-white/[0.06] px-3 py-2">
+      <div className="flex items-baseline justify-between border-b border-line px-3 py-2">
         <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">Ad Designer</span>
         <span className="font-mono text-[9px] tabular-nums text-ink-faint" dir="ltr">
           payment plan · feed 4:5
@@ -28,27 +28,27 @@ function MiniStudio() {
       </div>
       <div className="flex gap-3 p-3">
         {/* The composed ad: finance hook first, total price largest — the Dubai pattern. */}
-        <div className="relative aspect-[4/5] min-w-0 flex-1 overflow-hidden rounded-md ring-1 ring-white/[0.08]">
+        <div className="relative aspect-[4/5] min-w-0 flex-1 overflow-hidden rounded-md ring-1 ring-line">
           <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-[#273B4E] via-[#16202A] to-[#0B1014]" />
           <div className="absolute inset-x-0 top-0 p-2.5">
-            <div className="font-mono text-[6.5px] uppercase tracking-[0.16em] text-[#3B82F6]" dir="ltr">
+            <div className="font-mono text-[6.5px] uppercase tracking-[0.16em] text-brand" dir="ltr">
               Creek Harbour · Qamar Group
             </div>
-            <div className="mt-1 text-[11px] font-semibold leading-tight text-white">Waterfront 2 Bedroom</div>
+            <div className="mt-1 text-[11px] font-semibold leading-tight text-ink">Waterfront 2 Bedroom</div>
           </div>
           <div className="absolute inset-x-0 bottom-0 space-y-1 p-2.5">
-            <div className="rounded-[2px] bg-[#3B82F6] px-1.5 py-[3px] text-[7.5px] font-bold tracking-wide text-app" dir="ltr">
+            <div className="rounded-[2px] bg-brand px-1.5 py-[3px] text-[7.5px] font-bold tracking-wide text-app" dir="ltr">
               20% DOWN PAYMENT
             </div>
-            <div className="rounded-[2px] bg-black/50 px-1.5 py-[3px] font-mono text-[6.5px] text-[#D7DBDF] ring-1 ring-white/[0.08]" dir="ltr">
+            <div className="rounded-[2px] bg-black/50 px-1.5 py-[3px] font-mono text-[6.5px] text-[#D7DBDF] ring-1 ring-line" dir="ltr">
               80% on handover · Q4 2027
             </div>
             <div className="flex items-end justify-between pt-0.5">
               <div>
-                <div className="font-mono text-[6px] uppercase tracking-[0.14em] text-white/50" dir="ltr">
+                <div className="font-mono text-[6px] uppercase tracking-[0.14em] text-ink/50" dir="ltr">
                   from
                 </div>
-                <div className="font-sans font-semibold text-[17px] leading-none text-white" dir="ltr">
+                <div className="font-sans font-semibold text-[17px] leading-none text-ink" dir="ltr">
                   AED 1.9M
                 </div>
               </div>
@@ -63,7 +63,7 @@ function MiniStudio() {
                     </g>
                   </svg>
                 </div>
-                <div className="mt-0.5 text-center font-mono text-[5px] uppercase text-white/45">permit</div>
+                <div className="mt-0.5 text-center font-mono text-[5px] uppercase text-ink/45">permit</div>
               </div>
             </div>
           </div>
@@ -71,32 +71,32 @@ function MiniStudio() {
         {/* Variant rail: same listing, different layout and palette — one is Arabic. */}
         <div className="flex w-[96px] shrink-0 flex-col gap-1.5">
           <div className="font-mono text-[7px] uppercase tracking-[0.14em] text-ink-faint">variants</div>
-          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#273B4E] to-[#10161C] ring-1 ring-[#3B82F6]/60">
-            <div className="absolute inset-x-0 bottom-0 bg-[#3B82F6] px-1 py-[2px] text-[5.5px] font-bold text-app" dir="ltr">
+          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#273B4E] to-[#10161C] ring-1 ring-brand/60">
+            <div className="absolute inset-x-0 bottom-0 bg-brand px-1 py-[2px] text-[5.5px] font-bold text-app" dir="ltr">
               20% DOWN
             </div>
           </div>
-          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#40342A] to-[#14100C] ring-1 ring-white/[0.08]">
+          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#40342A] to-[#14100C] ring-1 ring-line">
             <div className="absolute inset-x-0 bottom-0 bg-white/90 px-1 py-[2px] text-[5.5px] font-bold text-[#0B0E12]" dir="rtl">
               دفعة أولى ٢٠٪
             </div>
           </div>
-          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#2E3B33] to-[#0F1512] ring-1 ring-white/[0.08]">
-            <div className="absolute inset-x-0 bottom-0 bg-black/55 px-1 py-[2px] font-mono text-[5px] text-white/75" dir="ltr">
+          <div className="relative h-[54px] overflow-hidden rounded-[3px] bg-gradient-to-b from-[#2E3B33] to-[#0F1512] ring-1 ring-line">
+            <div className="absolute inset-x-0 bottom-0 bg-black/55 px-1 py-[2px] font-mono text-[5px] text-ink/75" dir="ltr">
               AED 1.9M
             </div>
           </div>
-          <div className="mt-auto space-y-0.5 border-t border-white/[0.06] pt-1.5 font-mono text-[6.5px] leading-snug text-ink-faint">
+          <div className="mt-auto space-y-0.5 border-t border-line pt-1.5 font-mono text-[6.5px] leading-snug text-ink-faint">
             <div dir="ltr">8 layouts · 8 palettes</div>
-            <div className="text-[#3B82F6]" dir="ltr">Arabic → flips RTL</div>
+            <div className="text-brand" dir="ltr">Arabic → flips RTL</div>
           </div>
         </div>
       </div>
-      <div className="flex items-baseline justify-between border-t border-white/[0.06] px-3 py-2 font-mono text-[7.5px]">
+      <div className="flex items-baseline justify-between border-t border-line px-3 py-2 font-mono text-[7.5px]">
         <span className="truncate text-ink-faint" dir="ltr">
           feed · square · story
         </span>
-        <span className="shrink-0 pl-2 text-[#3B82F6]" dir="ltr">
+        <span className="shrink-0 pl-2 text-brand" dir="ltr">
           one ZIP · captions in
         </span>
       </div>
