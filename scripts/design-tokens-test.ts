@@ -127,14 +127,15 @@ console.log('\n── the light ramp IS the Terminal\'s palette ──')
 console.log('\n── the vendor\'s surfaces wear the Terminal\'s dark room ──')
 {
   // WHY: shown a white business site the owner said "the black is good; the
-  // idea is the softness of the other design — the edges and the gradations".
-  // So the business site is dark, and its dark is the Terminal's .llm-theme,
-  // value for value: a card one clear step above the ground, a solid border.
+  // idea is the softness of the other design — the edges and the gradations";
+  // shown a near-black one, "much more pro than a blue-on-black wall — the
+  // colours are well picked", pointing at the Terminal's `.dark`. So the
+  // business site is dark, and its dark is that slate room, value for value.
   const glob = readFileSync(join(ROOT, 'app/globals.css'), 'utf8')
   const dark = glob.slice(glob.indexOf('.theme-terminal {'), glob.indexOf('.theme-light {'))
   for (const [role, hex] of [
-    ['--color-app', '#07090d'], ['--color-surface', '#0f131a'], ['--color-surface-2', '#141a26'],
-    ['--color-ink', '#f8fafc'], ['--color-ink-muted', '#94a3b8'], ['--color-line', '#1f2937'], ['--brand', '#3b82f6'],
+    ['--color-app', '#11161d'], ['--color-surface', '#1a232e'], ['--color-surface-2', '#202b36'],
+    ['--color-ink', '#e6ecf3'], ['--color-ink-muted', '#b2bdca'], ['--color-line', '#2f3a46'], ['--brand', '#3a6fb8'],
   ] as const) {
     check(`${role} is the Terminal's ${hex}`, new RegExp(`${role}:\\s*${hex}`, 'i').test(dark))
   }
