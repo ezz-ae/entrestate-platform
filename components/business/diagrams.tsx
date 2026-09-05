@@ -13,7 +13,7 @@ const INK = '#0F131A'
 const LINE = 'rgba(255,255,255,0.14)'
 const TXT = '#E8EAED'
 const DIM = '#7C8B9D'
-const GOLD = '#3B82F6'
+const GOLD = 'var(--brand)'
 
 function Arrow({ id }: { id: string }) {
   return (

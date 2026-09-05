@@ -39,7 +39,7 @@ function Bar({ w, dim = false }: { w: string; dim?: boolean }) {
   return (
     <span
       aria-hidden
-      className={`block h-[6px] ${dim ? 'bg-white/[0.08]' : 'bg-white/20'}`}
+      className={`block h-[6px] ${dim ? 'bg-surface-2' : 'bg-surface-3'}`}
       style={{ width: w }}
     />
   )
@@ -49,7 +49,7 @@ function Chip({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <span
       className={`inline-flex items-center px-2 py-[3px] font-mono text-[9px] uppercase tracking-[0.12em] ${
-        accent ? 'bg-[#3B82F6]/15 text-[#93C5FD]' : 'bg-white/[0.06] text-ink-faint'
+        accent ? 'bg-brand/15 text-brand' : 'bg-surface-2 text-ink-faint'
       }`}
     >
       {children}
@@ -59,7 +59,7 @@ function Chip({ children, accent = false }: { children: React.ReactNode; accent?
 
 function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full border border-white/[0.07] bg-white/[0.02] p-4">{children}</div>
+    <div className="w-full border border-line bg-surface-2 p-4">{children}</div>
   )
 }
 
@@ -76,20 +76,20 @@ function LeadMachine() {
       <Tag>Inbox → owner → stage</Tag>
       <div className="mt-3 flex gap-2">
         {stages.map((s, si) => (
-          <div key={s.name} className="flex-1 border border-white/[0.06] bg-app/40 p-2">
+          <div key={s.name} className="flex-1 border border-line bg-app/40 p-2">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-[10px] text-ink-muted">{s.name}</span>
-              <span aria-hidden className="h-[5px] w-[5px] rounded-full bg-white/20" />
+              <span aria-hidden className="h-[5px] w-[5px] rounded-full bg-surface-3" />
             </div>
             <div className="space-y-1.5">
               {Array.from({ length: s.rows }).map((_, i) => (
-                <div key={i} className="border border-white/[0.05] bg-white/[0.03] p-1.5">
+                <div key={i} className="border border-line bg-surface-2 p-1.5">
                   <Bar w={`${70 - i * 12}%`} />
                   <div className="mt-1.5 flex items-center gap-1">
                     <span
                       aria-hidden
                       className={`h-[10px] w-[10px] rounded-full ${
-                        si === 0 && i === 0 ? 'bg-[#3B82F6]' : 'bg-white/15'
+                        si === 0 && i === 0 ? 'bg-brand' : 'bg-surface-3'
                       }`}
                     />
                     <Bar w="40%" dim />
@@ -115,9 +115,9 @@ function MegaBrokerage() {
   return (
     <Frame>
       <Tag>One catalogue, two faces</Tag>
-      <div className="mt-3 border border-white/[0.06] bg-app/40">
-        <div className="flex items-center gap-2 border-b border-white/[0.06] px-2.5 py-2">
-          <span aria-hidden className="h-[6px] w-[6px] rounded-[2px] bg-[#3B82F6]" />
+      <div className="mt-3 border border-line bg-app/40">
+        <div className="flex items-center gap-2 border-b border-line px-2.5 py-2">
+          <span aria-hidden className="h-[6px] w-[6px] rounded-[2px] bg-brand" />
           <Bar w="52px" />
           <div className="ml-auto flex gap-2">
             <Bar w="26px" dim />
@@ -127,8 +127,8 @@ function MegaBrokerage() {
         </div>
         <div className="grid grid-cols-3 gap-2 p-2.5">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="border border-white/[0.05]">
-              <div aria-hidden className="h-9 bg-white/[0.05]" />
+            <div key={i} className="border border-line">
+              <div aria-hidden className="h-9 bg-surface-2" />
               <div className="space-y-1 p-1.5">
                 <Bar w="80%" />
                 <Bar w="55%" dim />
@@ -153,18 +153,18 @@ function LandingPages() {
     <Frame>
       <Tag>Page, form, launch gate</Tag>
       <div className="mt-3 flex gap-2.5">
-        <div className="flex-1 border border-white/[0.06] bg-app/40 p-2.5">
-          <div aria-hidden className="h-10 bg-white/[0.05]" />
+        <div className="flex-1 border border-line bg-app/40 p-2.5">
+          <div aria-hidden className="h-10 bg-surface-2" />
           <div className="mt-2 space-y-1.5">
             <Bar w="85%" />
             <Bar w="65%" dim />
             <Bar w="72%" dim />
           </div>
-          <div className="mt-2.5 border border-[#3B82F6]/30 bg-[#3B82F6]/[0.07] p-2">
+          <div className="mt-2.5 border border-brand/30 bg-brand/[0.07] p-2">
             <div className="space-y-1.5">
-              <div className="h-[9px] bg-white/[0.09]" />
-              <div className="h-[9px] bg-white/[0.09]" />
-              <div className="h-[9px] w-1/2 bg-[#3B82F6]/50" />
+              <div className="h-[9px] bg-surface-2" />
+              <div className="h-[9px] bg-surface-2" />
+              <div className="h-[9px] w-1/2 bg-brand/50" />
             </div>
           </div>
         </div>
@@ -176,11 +176,11 @@ function LandingPages() {
           ].map(([label, ok]) => (
             <div
               key={String(label)}
-              className="flex items-center gap-1.5 border border-white/[0.06] bg-app/40 px-2 py-1.5"
+              className="flex items-center gap-1.5 border border-line bg-app/40 px-2 py-1.5"
             >
               <span
                 aria-hidden
-                className={`h-[6px] w-[6px] rounded-full ${ok ? 'bg-[#3B82F6]' : 'bg-white/20'}`}
+                className={`h-[6px] w-[6px] rounded-full ${ok ? 'bg-brand' : 'bg-surface-3'}`}
               />
               <span className="text-[10px] text-ink-faint">{label}</span>
             </div>
@@ -201,7 +201,7 @@ function MetaForRealtors() {
   return (
     <Frame>
       <Tag>Campaign, before it spends</Tag>
-      <div className="mt-3 border border-white/[0.06] bg-app/40 p-3">
+      <div className="mt-3 border border-line bg-app/40 p-3">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1.5">
             <Bar w="120px" />
@@ -213,9 +213,9 @@ function MetaForRealtors() {
           {placements.map((p, i) => (
             <div key={p} className="flex items-center gap-2">
               <span className="w-12 text-[10px] text-ink-faint">{p}</span>
-              <span aria-hidden className="h-[5px] flex-1 bg-white/[0.06]">
+              <span aria-hidden className="h-[5px] flex-1 bg-surface-2">
                 <span
-                  className={`block h-full ${i === 0 ? 'bg-[#3B82F6]' : 'bg-white/20'}`}
+                  className={`block h-full ${i === 0 ? 'bg-brand' : 'bg-surface-3'}`}
                   style={{ width: ['62%', '44%', '30%', '18%'][i] }}
                 />
               </span>
@@ -251,8 +251,8 @@ function Leadformer() {
             <span
               className={`max-w-[78%] px-3 py-2 text-[11.5px] leading-snug ${
                 t.from === 'lead'
-                  ? 'bg-[#3B82F6]/15 text-[#BFDBFE]'
-                  : 'bg-white/[0.05] text-ink-muted'
+                  ? 'bg-brand/15 text-[#BFDBFE]'
+                  : 'bg-surface-2 text-ink-muted'
               }`}
             >
               {t.text}
@@ -260,7 +260,7 @@ function Leadformer() {
           </div>
         ))}
       </div>
-      <div className="mt-3 border-t border-white/[0.06] pt-2.5">
+      <div className="mt-3 border-t border-line pt-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <Chip accent>Intent: investor · yield-led</Chip>
           <Chip>Saeed takes over</Chip>

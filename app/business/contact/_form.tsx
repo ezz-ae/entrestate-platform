@@ -20,7 +20,7 @@ const INTERESTS = [
 ]
 
 const field =
-  'w-full rounded-none border border-white/[0.12] bg-surface px-4 py-3 text-[0.9375rem] text-white outline-none transition placeholder:text-[#5C636B] focus:border-[#3B82F6]/60'
+  'w-full rounded-none border border-line bg-surface px-4 py-3 text-[0.9375rem] text-ink outline-none transition placeholder:text-ink-faint focus:border-brand/60'
 
 export function ContactForm() {
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle')
@@ -68,9 +68,9 @@ export function ContactForm() {
 
   if (state === 'sent') {
     return (
-      <div className="border border-[#3B82F6]/40 bg-app p-8">
-        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#3B82F6]">Received</div>
-        <p className="mt-4 text-[1.0625rem] leading-[1.65] text-white">
+      <div className="border border-brand/40 bg-app p-8">
+        <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand">Received</div>
+        <p className="mt-4 text-[1.0625rem] leading-[1.65] text-ink">
           Thank you — that has reached us.
         </p>
         <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
@@ -144,7 +144,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={state === 'sending'}
-        className="inline-flex items-center gap-2 bg-[#3B82F6] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#60A5FA] disabled:opacity-60"
+        className="inline-flex items-center gap-2 rounded-xl bg-brand px-6 py-3 text-[0.875rem] font-semibold text-brand-ink transition hover:bg-brand-bright disabled:opacity-60"
       >
         {state === 'sending' ? 'Sending…' : 'Send'}
         <span aria-hidden>→</span>

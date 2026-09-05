@@ -48,7 +48,7 @@ export default async function StoreStartPage({
           title="That app isn't in the catalog."
           lede="Pick an app from the store and its card brings you here with the right one."
         />
-        <Link href="/business/store" className="text-[0.9375rem] font-medium text-[#3B82F6]">
+        <Link href="/business/store" className="text-[0.9375rem] font-medium text-brand">
           Back to the App Store →
         </Link>
       </Section>
@@ -68,7 +68,7 @@ export default async function StoreStartPage({
         <div className="flex flex-wrap items-center gap-6">
           <a
             href={`${TERMINAL_URL}/login`}
-            className="bg-[#3B82F6] px-6 py-3 text-[0.9375rem] font-semibold text-white"
+            className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink"
           >
             Open your account on the Terminal
           </a>
@@ -129,7 +129,7 @@ export default async function StoreStartPage({
         }
       />
       <div className="flex flex-wrap items-center gap-6">
-        <a href={`${TERMINAL_URL}/me`} className="bg-[#3B82F6] px-6 py-3 text-[0.9375rem] font-semibold text-white">
+        <a href={`${TERMINAL_URL}/me`} className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink">
           Open your account
         </a>
         <Link href="/business/store" className="text-[0.9375rem] text-ink-muted">

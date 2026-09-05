@@ -154,14 +154,14 @@ export default function BusinessHome() {
 
       {/* ── One price, one door ─────────────────────────────────────────── */}
       <Section className="pb-20 lg:pb-28">
-        <div className="bg-surface p-8 outline outline-1 outline-[#3B82F6]/25 lg:p-12">
+        <div className="bg-surface p-8 rounded-2xl border border-brand/25 shadow-(--shadow-card) lg:p-12">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
             <div>
               <Eyebrow>One price</Eyebrow>
-              <p className="mt-4 font-sans text-[2rem] font-semibold leading-tight text-white lg:text-[2.5rem]">
+              <p className="mt-4 font-sans text-[2rem] font-semibold leading-tight text-ink lg:text-[2.5rem]">
                 {FULL_SYSTEM_PRICE_LINE}
               </p>
-              <p className="mt-2 text-[1.125rem] leading-snug text-[#3B82F6]">
+              <p className="mt-2 text-[1.125rem] leading-snug text-brand">
                 The whole system, per workspace. Nothing sold in pieces.
               </p>
               <p className="mt-5 max-w-[52ch] text-[0.9375rem] leading-[1.7] text-ink-muted">
@@ -173,7 +173,7 @@ export default function BusinessHome() {
                 {['Inventory', 'Pages', 'Ads', 'Creative', 'CRM', 'Finance', 'Team'].map((c) => (
                   <span
                     key={c}
-                    className="rounded-full bg-white/[0.05] px-3 py-1 text-[0.75rem] text-ink-muted ring-1 ring-white/[0.07]"
+                    className="rounded-full bg-surface-2 px-3 py-1 text-[0.75rem] text-ink-muted ring-1 ring-line"
                   >
                     {c}
                   </span>
@@ -192,7 +192,7 @@ export default function BusinessHome() {
         <p className="mt-6 text-[0.875rem] leading-[1.7] text-ink-faint">
           Only need one app — ads for a single agent, a lead form that talks back? Those run on
           your account, with no workspace to set up.{' '}
-          <Link href="/business/account" className="text-[#3B82F6] underline-offset-4 hover:underline">
+          <Link href="/business/account" className="text-brand underline-offset-4 hover:underline">
             See your account
           </Link>
           .
@@ -200,7 +200,7 @@ export default function BusinessHome() {
       </Section>
 
       {/* ── The team: one account, no password to hand out ──────────────── */}
-      <Band className="bg-[#0A0E14]">
+      <Band className="bg-surface-2">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start">
           <div>
             <Eyebrow>Your team</Eyebrow>
@@ -231,7 +231,7 @@ export default function BusinessHome() {
       <LoopSection />
 
       {/* ── The rules ───────────────────────────────────────────────────── */}
-      <Band className="bg-[#0A0E14]">
+      <Band className="bg-surface-2">
         <SectionHeading eyebrow="How it behaves" title="What it refuses to do" />
         <div className="mt-10">
           <PunchGrid

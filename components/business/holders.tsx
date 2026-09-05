@@ -14,8 +14,10 @@ import type { ReactNode } from 'react'
 export type HolderTone = 'gold' | 'green' | 'blue' | 'plain'
 export type HolderSize = 'xl' | 'lg'
 
-/* Layered tinted washes at 4–7% opacity over #0B0E12 — the card feeling
-   without a hard fill, so the minis inside keep their own contrast. */
+/* Layered tinted washes at 4–7% opacity over the surface — the card feeling
+   without a hard fill, so the minis inside keep their own contrast. The
+   holder is the one content vessel the whole family shares: the Terminal's
+   rounded white card with a hairline border and a soft throw. */
 const TONE_WASH: Record<HolderTone, string> = {
   gold: 'bg-[radial-gradient(ellipse_90%_70%_at_18%_0%,rgba(59,130,246,0.07),transparent_62%),radial-gradient(ellipse_70%_60%_at_100%_100%,rgba(59,130,246,0.04),transparent_60%)]',
   green:
@@ -46,7 +48,7 @@ export function Holder({
 }) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[28px] bg-[#0B0E12] ring-1 ring-white/[0.06] ${SIZE_PAD[size]} ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border border-line bg-surface shadow-(--shadow-card) ${SIZE_PAD[size]} ${className}`}
     >
       <div aria-hidden className={`pointer-events-none absolute inset-0 ${TONE_WASH[tone]}`} />
       <div className="relative">
@@ -83,7 +85,7 @@ export function Keyword({
       ? 'text-[2.4rem] leading-[1.03] sm:text-[3rem] lg:text-[3.5rem]'
       : 'text-[2rem] leading-[1.05] sm:text-[2.4rem] lg:text-[2.75rem]'
   return (
-    <Tag className={`font-semibold tracking-[-0.02em] text-white ${type} ${className}`}>{children}</Tag>
+    <Tag className={`font-semibold tracking-[-0.02em] text-ink ${type} ${className}`}>{children}</Tag>
   )
 }
 
@@ -126,10 +128,10 @@ export function LearnMore({
   return (
     <Link
       href={href}
-      className={`group mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[0.875rem] font-medium text-white ring-1 ring-white/[0.14] transition hover:bg-white/[0.04] hover:ring-white/[0.3] ${className}`}
+      className={`group mt-7 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[0.875rem] font-medium text-ink ring-1 ring-line transition hover:bg-surface-2 hover:ring-line ${className}`}
     >
       {label}
-      <span aria-hidden className="text-[#3B82F6] transition-transform duration-200 group-hover:translate-x-1">
+      <span aria-hidden className="text-brand transition-transform duration-200 group-hover:translate-x-1">
         →
       </span>
     </Link>
@@ -159,18 +161,18 @@ export function DownloadCard({
 }) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[28px] bg-[#0B0E12] p-8 ring-1 ring-white/[0.06] lg:p-12 ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border border-line bg-surface p-8 shadow-(--shadow-card) lg:p-12 ${className}`}
     >
       <div aria-hidden className={`pointer-events-none absolute inset-0 ${TONE_WASH.gold}`} />
       <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="font-sans font-semibold text-[1.55rem] leading-[1.2] tracking-[-0.015em] text-white sm:text-[1.9rem]">
+          <div className="font-sans font-semibold text-[1.55rem] leading-[1.2] tracking-[-0.015em] text-ink sm:text-[1.9rem]">
             {title}
           </div>
           <ul className="mt-4 space-y-1.5">
             {lines.map((line) => (
               <li key={line} className="flex gap-3 text-[0.9375rem] leading-[1.6] text-ink-muted">
-                <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#3B82F6]/60" />
+                <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-brand/60" />
                 <span>{line}</span>
               </li>
             ))}
@@ -180,7 +182,7 @@ export function DownloadCard({
           <a
             href={href}
             download
-            className="inline-flex items-center gap-2 rounded-full bg-[#3B82F6] px-6 py-3 text-[0.875rem] font-semibold text-black transition hover:bg-[#60A5FA]"
+            className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[0.875rem] font-semibold text-brand-ink transition hover:bg-brand-bright"
           >
             Download
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -192,7 +194,7 @@ export function DownloadCard({
             href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[0.875rem] font-semibold text-white ring-1 ring-white/20 transition hover:ring-white/40"
+            className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[0.875rem] font-semibold text-ink ring-1 ring-line transition hover:ring-line"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3FD07F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M12 3a9 9 0 00-7.8 13.5L3 21l4.7-1.2A9 9 0 1012 3z" />

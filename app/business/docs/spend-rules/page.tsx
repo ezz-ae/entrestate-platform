@@ -48,17 +48,17 @@ export default function SpendRulesGuide() {
           <p>Three ready postures cover most companies. Each is a ceiling plus conditions:</p>
           <ul className="list-disc space-y-2 pl-5">
             <li>
-              <span className="font-medium text-white">Conservative</span> (recommended) — up to
+              <span className="font-medium text-ink">Conservative</span> (recommended) — up to
               AED 300 a day, raises of at most AED 50 at a time, and only while a lead costs
               under AED 120, lead quality holds at 70 or better, and at least 10 leads back the
               numbers.
             </li>
             <li>
-              <span className="font-medium text-white">Standard</span> — up to AED 750 a day,
+              <span className="font-medium text-ink">Standard</span> — up to AED 750 a day,
               AED 150 per move, a lead under AED 200, quality at 55 or better, at least 5 leads.
             </li>
             <li>
-              <span className="font-medium text-white">Aggressive</span> — up to AED 1,500 a
+              <span className="font-medium text-ink">Aggressive</span> — up to AED 1,500 a
               day, AED 400 per move, a lead under AED 350, quality at 40 or better, at least 3
               leads.
             </li>
@@ -133,7 +133,7 @@ export default function SpendRulesGuide() {
         cannot spend autonomously until you add one.&rdquo; That sentence is the default, not an
         error.
       </DocNote>
-      <h2 className="mt-12 text-[1.0625rem] font-semibold text-white">Common questions</h2>
+      <h2 className="mt-12 text-[1.0625rem] font-semibold text-ink">Common questions</h2>
       <div className="mt-4">
         <FAQItem q="Can it empty my ad account?">
           No. The daily ceiling is absolute, each raise is capped, and a raise needs real

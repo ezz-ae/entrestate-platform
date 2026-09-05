@@ -30,8 +30,10 @@ export default async function BusinessLayout({ children }: { children: React.Rea
   // Inside a tenant's instance this site does not exist.
   if (tenantSubdomainFromHost(host)) notFound()
 
+  // theme-terminal: the Terminal's dark room, applied by class so this site
+  // wears the family's look whatever the reader's workspace theme is.
   return (
-    <div className="min-h-screen bg-app font-sans antialiased [color-scheme:dark] selection:bg-[#3B82F6]/25">
+    <div className="theme-terminal min-h-screen bg-app font-sans text-ink antialiased [color-scheme:dark] selection:bg-brand/25">
       <BusinessHeader />
       <main>{children}</main>
       <BusinessFooter />

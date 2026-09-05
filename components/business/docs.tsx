@@ -40,7 +40,7 @@ export function DocsShell({
   return (
     <div className="mx-auto w-full max-w-[1180px] px-6 pb-20 pt-10 lg:px-10 lg:pb-28 lg:pt-14">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-ink-muted">
-        <Link href={DOCS_HOME} className="transition hover:text-white">
+        <Link href={DOCS_HOME} className="transition hover:text-ink">
           Learn
         </Link>
         {guide ? (
@@ -48,7 +48,7 @@ export function DocsShell({
             <span aria-hidden className="text-[#4A5058]">
               /
             </span>
-            <Link href={`${DOCS_HOME}#${docsCategoryId(guide.category)}`} className="transition hover:text-white">
+            <Link href={`${DOCS_HOME}#${docsCategoryId(guide.category)}`} className="transition hover:text-ink">
               {guide.category}
             </Link>
             <span aria-hidden className="text-[#4A5058]">
@@ -79,8 +79,8 @@ export function DocsShell({
                             aria-current={current ? 'page' : undefined}
                             className={`block border-l py-1.5 pl-4 text-[0.875rem] leading-snug transition ${
                               current
-                                ? 'border-[#3B82F6] text-white'
-                                : 'border-white/[0.08] text-ink-muted hover:border-white/[0.2] hover:text-white'
+                                ? 'border-brand text-ink'
+                                : 'border-line text-ink-muted hover:border-line hover:text-ink'
                             }`}
                           >
                             {g.label}
@@ -95,7 +95,7 @@ export function DocsShell({
           </nav>
         </aside>
         <article className="mt-2 min-w-0 max-w-[46rem] lg:mt-0">
-          <h1 className="font-sans font-semibold text-[2rem] leading-[1.12] tracking-[-0.015em] text-white sm:text-[2.5rem]">
+          <h1 className="font-sans font-semibold text-[2rem] leading-[1.12] tracking-[-0.015em] text-ink sm:text-[2.5rem]">
             {heading}
           </h1>
           {children}
@@ -112,7 +112,7 @@ export function ArticleMeta({ category, read }: { category: string; read: string
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
       <span className="text-ink-faint">{category}</span>
-      <span aria-hidden className="h-px w-4 bg-white/[0.15]" />
+      <span aria-hidden className="h-px w-4 bg-surface-3" />
       <span>{read}</span>
     </div>
   )
@@ -123,7 +123,7 @@ export function OnPage({ items }: { items: Array<{ id: string; label: string }> 
   return (
     <nav
       aria-label="On this page"
-      className="mt-8 rounded-xl bg-white/[0.02] px-6 py-5 ring-1 ring-white/[0.07]"
+      className="mt-8 rounded-xl bg-surface-2 px-6 py-5 ring-1 ring-line"
     >
       <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">On this page</div>
       <ul className="mt-3 space-y-1.5">
@@ -131,7 +131,7 @@ export function OnPage({ items }: { items: Array<{ id: string; label: string }> 
           <li key={i.id}>
             <a
               href={`#${i.id}`}
-              className="text-[0.875rem] leading-snug text-ink-muted transition hover:text-white"
+              className="text-[0.875rem] leading-snug text-ink-muted transition hover:text-ink"
             >
               {i.label}
             </a>
@@ -157,13 +157,13 @@ export function Step({
   return (
     <section
       id={id}
-      className="grid scroll-mt-24 grid-cols-[2.5rem_1fr] gap-x-4 border-t border-white/[0.06] py-7 first:border-t-0 sm:gap-x-6"
+      className="grid scroll-mt-24 grid-cols-[2.5rem_1fr] gap-x-4 border-t border-line py-7 first:border-t-0 sm:gap-x-6"
     >
-      <div className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
+      <div className="font-mono text-[0.8125rem] tabular-nums text-brand" dir="ltr">
         {String(n).padStart(2, '0')}
       </div>
       <div className="min-w-0">
-        <h2 className="text-[1.0625rem] font-semibold leading-snug text-white">{title}</h2>
+        <h2 className="text-[1.0625rem] font-semibold leading-snug text-ink">{title}</h2>
         <div className="mt-2.5 space-y-3 text-[0.9375rem] leading-[1.75] text-ink-muted">{children}</div>
       </div>
     </section>
@@ -173,8 +173,8 @@ export function Step({
 /** A calm callout for the one thing the reader should not miss. */
 export function DocNote({ title = 'Note', children }: { title?: string; children: ReactNode }) {
   return (
-    <aside className="my-8 rounded-xl bg-white/[0.03] px-6 py-5 ring-1 ring-white/[0.07]">
-      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#3B82F6]">{title}</div>
+    <aside className="my-8 rounded-xl bg-surface-2 px-6 py-5 ring-1 ring-line">
+      <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-brand">{title}</div>
       <div className="mt-2 text-[0.9375rem] leading-[1.7] text-ink-muted">{children}</div>
     </aside>
   )
@@ -183,12 +183,12 @@ export function DocNote({ title = 'Note', children }: { title?: string; children
 /** Question + short answer. Native details/summary — no script, no state. */
 export function FAQItem({ q, children }: { q: string; children: ReactNode }) {
   return (
-    <details className="group border-t border-white/[0.06] py-4 last:border-b">
-      <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 text-[0.9375rem] font-medium text-white [&::-webkit-details-marker]:hidden">
+    <details className="group border-t border-line py-4 last:border-b">
+      <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 text-[0.9375rem] font-medium text-ink [&::-webkit-details-marker]:hidden">
         {q}
         <span
           aria-hidden
-          className="shrink-0 text-[#3B82F6] transition-transform duration-200 group-open:rotate-45"
+          className="shrink-0 text-brand transition-transform duration-200 group-open:rotate-45"
         >
           +
         </span>
@@ -212,7 +212,7 @@ export function GuideCard({
   return (
     <Link
       href={guide.href}
-      className={`group block rounded-2xl bg-white/[0.02] p-6 ring-1 ring-white/[0.07] transition hover:bg-white/[0.04] hover:ring-white/[0.12] ${className}`}
+      className={`group block rounded-2xl bg-surface-2 p-6 ring-1 ring-line transition hover:bg-surface-2 hover:ring-line ${className}`}
     >
       {showCategory ? (
         <div className="mb-2 font-mono text-[9.5px] uppercase tracking-[0.14em] text-ink-faint">
@@ -220,8 +220,8 @@ export function GuideCard({
         </div>
       ) : null}
       <div className="flex items-baseline justify-between gap-4">
-        <div className="text-[1rem] font-semibold leading-snug text-white">{guide.label}</div>
-        <span aria-hidden className="shrink-0 text-[#3B82F6] opacity-0 transition group-hover:opacity-100">
+        <div className="text-[1rem] font-semibold leading-snug text-ink">{guide.label}</div>
+        <span aria-hidden className="shrink-0 text-brand opacity-0 transition group-hover:opacity-100">
           →
         </span>
       </div>
@@ -237,7 +237,7 @@ export function RelatedRow({ hrefs }: { hrefs: string[] }) {
     .filter((g): g is GuideItem => g !== undefined)
   if (!items.length) return null
   return (
-    <div className="mt-14 border-t border-white/[0.07] pt-8">
+    <div className="mt-14 border-t border-line pt-8">
       <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-faint">Related guides</div>
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((g) => (

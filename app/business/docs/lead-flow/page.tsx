@@ -124,7 +124,7 @@ export default function LeadFlowGuide() {
             see{' '}
             <Link
               href="/business/docs/team-roles"
-              className="text-white underline decoration-white/30 underline-offset-4 transition hover:decoration-white"
+              className="text-ink underline decoration-white/30 underline-offset-4 transition hover:decoration-white"
             >
               Team and roles
             </Link>{' '}
@@ -144,7 +144,7 @@ export default function LeadFlowGuide() {
         the credit.
       </DocNote>
 
-      <h2 id="faq" className="scroll-mt-24 text-[1.0625rem] font-semibold leading-snug text-white">
+      <h2 id="faq" className="scroll-mt-24 text-[1.0625rem] font-semibold leading-snug text-ink">
         Common questions
       </h2>
       <div className="mt-4">

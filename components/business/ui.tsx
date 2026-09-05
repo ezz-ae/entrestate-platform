@@ -33,7 +33,7 @@ export function Section({
 
 export function Band({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`w-full border-y border-white/[0.07] ${className}`}>
+    <div className={`w-full border-y border-line ${className}`}>
       <div className="mx-auto w-full max-w-[1180px] px-6 py-20 lg:px-10 lg:py-28">{children}</div>
     </div>
   )
@@ -49,7 +49,7 @@ export function Grid({
   className?: string
 }) {
   const map = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-2 lg:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' }
-  return <div className={`grid grid-cols-1 gap-px overflow-hidden ${map[cols]} ${className}`}>{children}</div>
+  return <div className={`grid grid-cols-1 gap-4 overflow-hidden ${map[cols]} ${className}`}>{children}</div>
 }
 
 /* ── Type ───────────────────────────────────────────────────────────────── */
@@ -65,7 +65,7 @@ export function Eyebrow({ children, className = '' }: { children: ReactNode; cla
 export function Display({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h1
-      className={`font-sans font-semibold text-[2.6rem] leading-[1.08] tracking-[-0.02em] text-white sm:text-[3.4rem] lg:text-[4rem] ${className}`}
+      className={`font-sans font-semibold text-[2.6rem] leading-[1.08] tracking-[-0.02em] text-ink sm:text-[3.4rem] lg:text-[4rem] ${className}`}
     >
       {children}
     </h1>
@@ -75,7 +75,7 @@ export function Display({ children, className = '' }: { children: ReactNode; cla
 export function H2({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h2
-      className={`font-sans font-semibold text-[1.9rem] leading-[1.15] tracking-[-0.015em] text-white sm:text-[2.4rem] ${className}`}
+      className={`font-sans font-semibold text-[1.9rem] leading-[1.15] tracking-[-0.015em] text-ink sm:text-[2.4rem] ${className}`}
     >
       {children}
     </h2>
@@ -84,7 +84,7 @@ export function H2({ children, className = '' }: { children: ReactNode; classNam
 
 export function H3({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <h3 className={`text-[1.0625rem] font-semibold leading-snug text-white ${className}`}>{children}</h3>
+    <h3 className={`text-[1.0625rem] font-semibold leading-snug text-ink ${className}`}>{children}</h3>
   )
 }
 
@@ -136,11 +136,11 @@ export function PageHeader({
         <Lede>{lede}</Lede>
       </div>
       {meta?.length ? (
-        <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-5 border-t border-white/[0.07] pt-7">
+        <dl className="mt-10 flex flex-wrap gap-x-12 gap-y-5 border-t border-line pt-7">
           {meta.map(({ k, v }) => (
             <div key={k}>
               <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">{k}</dt>
-              <dd className="mt-1.5 text-[0.9375rem] text-white">{v}</dd>
+              <dd className="mt-1.5 text-[0.9375rem] text-ink">{v}</dd>
             </div>
           ))}
         </dl>
@@ -183,7 +183,7 @@ export function Card({
   className?: string
 }) {
   return (
-    <div className={`bg-surface p-7 outline outline-1 outline-white/[0.07] ${className}`}>
+    <div className={`bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card) ${className}`}>
       {kicker ? <Eyebrow className="mb-3">{kicker}</Eyebrow> : null}
       {title ? <H3 className="mb-3">{title}</H3> : null}
       <div className="text-[0.9375rem] leading-[1.7] text-ink-muted">{children}</div>
@@ -203,13 +203,13 @@ export function SpecTable({
   caption?: string
 }) {
   return (
-    <div className="overflow-hidden outline outline-1 outline-white/[0.07]">
+    <div className="overflow-hidden rounded-2xl border border-line shadow-(--shadow-card)">
       {caption ? (
-        <div className="border-b border-white/[0.07] bg-surface px-6 py-3.5">
+        <div className="border-b border-line bg-surface px-6 py-3.5">
           <Eyebrow>{caption}</Eyebrow>
         </div>
       ) : null}
-      <dl className="divide-y divide-white/[0.06]">
+      <dl className="divide-y divide-line">
         {rows.map(({ k, v }) => (
           <div key={k} className="grid grid-cols-1 gap-1.5 bg-surface px-6 py-4 sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-8">
             <dt className="text-[0.875rem] font-medium text-ink">{k}</dt>
@@ -236,12 +236,12 @@ export function Guardrail({
   items: ReactNode[]
 }) {
   return (
-    <div className="border-l-2 border-[#3B82F6] bg-app py-6 pl-7 pr-6">
-      <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#3B82F6]">{title}</div>
+    <div className="border-l-2 border-brand bg-app py-6 pl-7 pr-6">
+      <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand">{title}</div>
       <ul className="mt-4 space-y-3">
         {items.map((item, i) => (
           <li key={i} className="flex gap-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
-            <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-[#4A5058]" />
+            <span aria-hidden className="mt-[0.62em] h-px w-3 shrink-0 bg-line-strong" />
             <span>{item}</span>
           </li>
         ))}
@@ -257,17 +257,17 @@ export function Steps({
   steps: Array<{ title: string; body: ReactNode; detail?: ReactNode }>
 }) {
   return (
-    <ol className="divide-y divide-white/[0.06] border-y border-white/[0.06]">
+    <ol className="divide-y divide-line border-y border-line">
       {steps.map((s, i) => (
         <li key={s.title} className="grid grid-cols-[2.5rem_1fr] gap-x-5 py-7 sm:grid-cols-[3.5rem_1fr] sm:gap-x-8">
-          <div className="font-mono text-[0.8125rem] tabular-nums text-[#3B82F6]" dir="ltr">
+          <div className="font-mono text-[0.8125rem] tabular-nums text-brand" dir="ltr">
             {String(i + 1).padStart(2, '0')}
           </div>
           <div>
             <H3>{s.title}</H3>
             <div className="mt-2.5 max-w-[68ch] text-[0.9375rem] leading-[1.7] text-ink-muted">{s.body}</div>
             {s.detail ? (
-              <div className="mt-4 border-l border-white/10 pl-5 text-[0.875rem] leading-[1.7] text-[#7C838B]">
+              <div className="mt-4 border-l border-line pl-5 text-[0.875rem] leading-[1.7] text-ink-faint">
                 {s.detail}
               </div>
             ) : null}
@@ -280,12 +280,12 @@ export function Steps({
 
 export function Stat({ value, label, note }: { value: string; label: string; note?: string }) {
   return (
-    <div className="bg-surface p-7 outline outline-1 outline-white/[0.07]">
-      <div className="font-mono text-[2rem] leading-none tabular-nums text-white" dir="ltr">
+    <div className="bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card)">
+      <div className="font-mono text-[2rem] leading-none tabular-nums text-ink" dir="ltr">
         {value}
       </div>
       <div className="mt-3 text-[0.875rem] font-medium text-ink">{label}</div>
-      {note ? <div className="mt-1.5 text-[0.8125rem] leading-relaxed text-[#7C838B]">{note}</div> : null}
+      {note ? <div className="mt-1.5 text-[0.8125rem] leading-relaxed text-ink-faint">{note}</div> : null}
     </div>
   )
 }
@@ -293,8 +293,8 @@ export function Stat({ value, label, note }: { value: string; label: string; not
 /** A pull-out that carries one idea the page is built around. */
 export function Callout({ children }: { children: ReactNode }) {
   return (
-    <div className="border-y border-white/[0.07] py-10">
-      <p className="font-sans font-semibold text-[1.5rem] leading-[1.45] tracking-[-0.01em] text-white sm:text-[1.75rem]">
+    <div className="border-y border-line py-10">
+      <p className="font-sans font-semibold text-[1.5rem] leading-[1.45] tracking-[-0.01em] text-ink sm:text-[1.75rem]">
         {children}
       </p>
     </div>
@@ -307,7 +307,7 @@ export function TextLink({ href, children }: { href: string; children: ReactNode
   return (
     <Link
       href={href}
-      className="text-white underline decoration-[#3B82F6]/50 underline-offset-[5px] transition hover:decoration-[#3B82F6]"
+      className="text-ink underline decoration-brand/50 underline-offset-[5px] transition hover:decoration-brand"
     >
       {children}
     </Link>
@@ -324,11 +324,11 @@ export function ButtonLink({
   variant?: 'primary' | 'ghost'
 }) {
   const base =
-    'inline-flex items-center gap-2 px-6 py-3 text-[0.875rem] font-semibold transition'
+    'inline-flex items-center gap-2 rounded-xl px-6 py-3 text-[0.875rem] font-semibold transition'
   const styles =
     variant === 'primary'
-      ? 'bg-[#3B82F6] text-black hover:bg-[#60A5FA]'
-      : 'text-white outline outline-1 outline-white/20 hover:outline-white/40'
+      ? 'bg-brand text-brand-ink hover:bg-brand-bright'
+      : 'text-ink rounded-2xl border border-line-strong hover:outline-brand/60'
   return (
     <Link href={href} className={`${base} ${styles}`}>
       {children}
@@ -342,16 +342,16 @@ export function NextPages({ items }: { items: Array<{ href: string; label: strin
   return (
     <Section className="py-16 lg:py-24">
       <Eyebrow className="mb-8">Continue</Eyebrow>
-      <div className="grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((i) => (
           <Link
             key={i.href}
             href={i.href}
-            className="group bg-surface p-7 outline outline-1 outline-white/[0.07] transition hover:bg-[#131926]"
+            className="group bg-surface p-7 rounded-2xl border border-line shadow-(--shadow-card) transition hover:bg-surface-2"
           >
             <div className="flex items-baseline justify-between gap-4">
               <H3>{i.label}</H3>
-              <span aria-hidden className="text-[#3B82F6] opacity-0 transition group-hover:opacity-100">
+              <span aria-hidden className="text-brand opacity-0 transition group-hover:opacity-100">
                 →
               </span>
             </div>

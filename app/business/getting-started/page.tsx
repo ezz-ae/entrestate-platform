@@ -78,7 +78,7 @@ export default function GettingStartedPage() {
         </Holder>
       </Section>
 
-      <Band className="bg-[#0A0E14]">
+      <Band className="bg-surface-2">
         <SectionHeading eyebrow="The trial" title="Day one, honestly." />
         <div className="mt-10">
           <PunchGrid

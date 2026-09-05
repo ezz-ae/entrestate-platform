@@ -20,14 +20,14 @@ function Wordmark() {
   return (
     <Link href="/business" className="group flex items-center gap-2.5" aria-label="Entrestate for Business">
       <span aria-hidden className="flex items-center gap-[3px]">
-        <span className="h-[7px] w-[7px] rounded-[2px] bg-white/40" />
-        <span className="h-[7px] w-[7px] rounded-[2px] bg-white/70" />
-        <span className="h-[7px] w-[7px] rounded-[2px] bg-[#3B82F6]" />
+        <span className="h-[7px] w-[7px] rounded-[2px] bg-ink/" />
+        <span className="h-[7px] w-[7px] rounded-[2px] bg-ink/" />
+        <span className="h-[7px] w-[7px] rounded-[2px] bg-brand" />
       </span>
-      <span className="font-sans text-[1.05rem] font-semibold leading-none tracking-[-0.01em] text-white">
+      <span className="font-sans text-[1.05rem] font-semibold leading-none tracking-[-0.01em] text-ink">
         entrestate
       </span>
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint transition group-hover:text-[#3B82F6]">
+      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint transition group-hover:text-brand">
         Business
       </span>
     </Link>
@@ -57,8 +57,8 @@ function ProductsPanel({ items }: { items: NavItem[] }) {
   const shown = items.find((i) => i.href === active) ?? items[0]
 
   return (
-    <div className="absolute left-0 top-full flex w-[46rem] max-w-[calc(100vw-3rem)] border border-white/[0.09] bg-surface shadow-2xl shadow-black/60">
-      <div className="w-[18rem] shrink-0 border-r border-white/[0.07] p-2">
+    <div className="absolute left-0 top-full flex w-[46rem] max-w-[calc(100vw-3rem)] border border-line bg-surface shadow-2xl shadow-black/60">
+      <div className="w-[18rem] shrink-0 border-r border-line p-2">
         {items.map((i) => (
           <Link
             key={i.href}
@@ -66,10 +66,10 @@ function ProductsPanel({ items }: { items: NavItem[] }) {
             onMouseEnter={() => setActive(i.href)}
             onFocus={() => setActive(i.href)}
             className={`block px-4 py-3 transition ${
-              active === i.href ? 'bg-white/[0.05]' : 'hover:bg-white/[0.03]'
+              active === i.href ? 'bg-surface-2' : 'hover:bg-surface-2'
             }`}
           >
-            <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
+            <div className="text-[0.875rem] font-medium text-ink">{i.label}</div>
             <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
           </Link>
         ))}
@@ -94,7 +94,7 @@ export function BusinessHeader() {
   }, [pathname])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/[0.07] bg-app/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-line bg-app/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-6 lg:px-10">
         <Wordmark />
 
@@ -106,7 +106,7 @@ export function BusinessHeader() {
                 onClick={() => setOpen(open === g.label ? null : g.label)}
                 aria-expanded={open === g.label}
                 className={`px-4 py-2 text-[0.875rem] transition ${
-                  open === g.label ? 'text-white' : 'text-ink-muted hover:text-white'
+                  open === g.label ? 'text-ink' : 'text-ink-muted hover:text-ink'
                 }`}
               >
                 {g.label}
@@ -115,14 +115,14 @@ export function BusinessHeader() {
                 g.label === 'Products' ? (
                   <ProductsPanel items={g.items} />
                 ) : (
-                  <div className="absolute left-0 top-full w-[26rem] border border-white/[0.09] bg-surface p-2 shadow-2xl shadow-black/60">
+                  <div className="absolute left-0 top-full w-[26rem] border border-line bg-surface p-2 shadow-2xl shadow-black/60">
                     {g.items.map((i) => (
                       <Link
                         key={i.href}
                         href={i.href}
-                        className="block px-4 py-3 transition hover:bg-white/[0.04]"
+                        className="block px-4 py-3 transition hover:bg-surface-2"
                       >
-                        <div className="text-[0.875rem] font-medium text-white">{i.label}</div>
+                        <div className="text-[0.875rem] font-medium text-ink">{i.label}</div>
                         <div className="mt-1 text-[0.8125rem] leading-snug text-ink-faint">{i.blurb}</div>
                       </Link>
                     ))}
@@ -136,7 +136,7 @@ export function BusinessHeader() {
           <Link
             href="/business/docs"
             onMouseEnter={() => setOpen(null)}
-            className="px-4 py-2 text-[0.875rem] text-ink-muted transition hover:text-white"
+            className="px-4 py-2 text-[0.875rem] text-ink-muted transition hover:text-ink"
           >
             Learn
           </Link>
@@ -145,13 +145,13 @@ export function BusinessHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/server"
-            className="hidden text-[0.875rem] text-ink-muted transition hover:text-white sm:block"
+            className="hidden text-[0.875rem] text-ink-muted transition hover:text-ink sm:block"
           >
             Sign in
           </Link>
           <Link
             href="/signup"
-            className="bg-[#3B82F6] px-4 py-2 text-[0.8125rem] font-semibold text-black transition hover:bg-[#60A5FA]"
+            className="rounded-lg bg-brand px-4 py-2 text-[0.8125rem] font-semibold text-brand-ink transition hover:bg-brand-bright"
           >
             Start a trial
           </Link>
@@ -160,7 +160,7 @@ export function BusinessHeader() {
             onClick={() => setMobile((v) => !v)}
             aria-label="Menu"
             aria-expanded={mobile}
-            className="p-2 text-white lg:hidden"
+            className="p-2 text-ink lg:hidden"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               {mobile ? <path d="M18 6 6 18M6 6l12 12" /> : <path d="M3 6h18M3 12h18M3 18h18" />}
@@ -170,7 +170,7 @@ export function BusinessHeader() {
       </div>
 
       {mobile ? (
-        <div className="border-t border-white/[0.07] bg-surface lg:hidden">
+        <div className="border-t border-line bg-surface lg:hidden">
           <div className="mx-auto max-h-[70vh] w-full max-w-[1180px] overflow-y-auto px-6 py-6">
             {NAV_GROUPS.map((g) => (
               <div key={g.label} className="mb-7">
@@ -179,7 +179,7 @@ export function BusinessHeader() {
                 </div>
                 <div className="space-y-1">
                   {g.items.map((i) => (
-                    <Link key={i.href} href={i.href} className="block py-2 text-[0.9375rem] text-white">
+                    <Link key={i.href} href={i.href} className="block py-2 text-[0.9375rem] text-ink">
                       {i.label}
                     </Link>
                   ))}
@@ -210,12 +210,12 @@ export function BusinessFooter() {
     },
   ]
   return (
-    <footer className="border-t border-white/[0.07] bg-app">
+    <footer className="border-t border-line bg-app">
       <div className="mx-auto w-full max-w-[1180px] px-6 py-16 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           <div className="col-span-2 sm:col-span-1">
             <Wordmark />
-            <p className="mt-4 max-w-[28ch] text-[0.8125rem] leading-relaxed text-[#7C838B]">
+            <p className="mt-4 max-w-[28ch] text-[0.8125rem] leading-relaxed text-ink-faint">
               Software for real-estate companies in the UAE. Built and run in Dubai.
             </p>
           </div>
@@ -225,7 +225,7 @@ export function BusinessFooter() {
               <ul className="mt-4 space-y-2.5">
                 {c.items.map((i) => (
                   <li key={i.href}>
-                    <Link href={i.href} className="text-[0.875rem] text-ink-muted transition hover:text-white">
+                    <Link href={i.href} className="text-[0.875rem] text-ink-muted transition hover:text-ink">
                       {i.label}
                     </Link>
                   </li>
@@ -234,15 +234,15 @@ export function BusinessFooter() {
             </div>
           ))}
         </div>
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/[0.07] pt-7 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-4 border-t border-line pt-7 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[0.8125rem] text-ink-faint">
             © {new Date().getFullYear()} Entrestate. Dubai, United Arab Emirates.
           </p>
           <div className="flex gap-6">
-            <Link href="/privacy" className="text-[0.8125rem] text-ink-faint transition hover:text-white">
+            <Link href="/privacy" className="text-[0.8125rem] text-ink-faint transition hover:text-ink">
               Privacy
             </Link>
-            <Link href="/terms" className="text-[0.8125rem] text-ink-faint transition hover:text-white">
+            <Link href="/terms" className="text-[0.8125rem] text-ink-faint transition hover:text-ink">
               Terms
             </Link>
           </div>

@@ -30,7 +30,7 @@ import { SAAS_TENANCY, TENANT_BASE_DOMAIN } from '@/lib/tenancy/config'
 import { SUBDOMAIN_RE, RESERVED_SUBDOMAINS } from '@/lib/tenancy/reserved'
 
 const MAX_LOGO_DIM = 256 // px — downscale before upload so the row stays small
-const DEFAULT_ACCENT = '#3B82F6'
+const DEFAULT_ACCENT = 'var(--brand)'
 const TRIAL_DAYS = 14
 
 /** Downscale an uploaded image to a small PNG data URL via canvas. */
@@ -117,7 +117,7 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
 
   if (!SAAS_TENANCY) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-[#07090C] p-6 text-center text-white/70">
+      <div className="flex min-h-[60vh] items-center justify-center bg-app p-6 text-center text-ink/70">
         {t('wl.signup.notEnabled')}
       </div>
     )
@@ -186,8 +186,8 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
   const previewName = company.trim() || t(isRealtor ? 'wl.signup.deskNamePh' : 'wl.signup.companyPh')
   const previewProduct = isRealtor ? 'Meta for Realtors' : product.trim() || t('wl.signup.productPh')
   const subHintByState: Record<SubState, { text: string; tone: string }> = {
-    idle: { text: t('wl.signup.subdomainHint'), tone: 'text-white/40' },
-    checking: { text: t('wl.signup.checking'), tone: 'text-white/40' },
+    idle: { text: t('wl.signup.subdomainHint'), tone: 'text-ink/40' },
+    checking: { text: t('wl.signup.checking'), tone: 'text-ink/40' },
     available: { text: t('wl.signup.available'), tone: 'text-emerald-400' },
     taken: { text: t('wl.signup.taken'), tone: 'text-red-400' },
     reserved: { text: t('wl.signup.reserved'), tone: 'text-red-400' },
@@ -196,25 +196,25 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
   const subHint = subHintByState[subState]
 
   return (
-    <div className="min-h-screen bg-[#07090C] font-sans text-white antialiased [color-scheme:dark]" style={{ ['--wl-accent' as string]: accent }}>
+    <div className="theme-terminal min-h-screen bg-app font-sans text-ink antialiased [color-scheme:dark]" style={{ ['--wl-accent' as string]: accent }}>
       <BusinessHeader />
       <main className="mx-auto grid w-full max-w-5xl grid-cols-1 items-start gap-10 px-6 pb-24 pt-14 md:grid-cols-2 lg:pt-20">
         {/* Created: show the address before the automatic hop onto it. */}
         {createdUrl ? (
           <div className="order-2 md:order-1">
-            <div className="rounded-2xl border border-[#3B82F6]/30 bg-[#0F131A] p-8">
+            <div className="rounded-2xl border border-brand/30 bg-[#0F131A] p-8">
               <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.16em] text-[#34D399]">
                 <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#34D399]" />
                 {t('wl.signup.createdEyebrow')}
               </div>
               <h1 className="mt-4 text-2xl font-semibold tracking-tight">{t('wl.signup.createdTitle')}</h1>
-              <div dir="ltr" className="mt-5 truncate rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 font-mono text-sm text-white">
+              <div dir="ltr" className="mt-5 truncate rounded-lg border border-line bg-surface-2 px-4 py-3 font-mono text-sm text-ink">
                 https://{subdomain.trim()}.{TENANT_BASE_DOMAIN}
               </div>
               <p className="mt-3 text-sm leading-relaxed text-[#94A3B8]">{t('wl.signup.createdNote')}</p>
               <a
                 href={createdUrl}
-                className="mt-6 inline-block rounded-lg bg-[#3B82F6] px-5 py-3 text-sm font-semibold text-white"
+                className="mt-6 inline-block rounded-lg bg-brand px-5 py-3 text-sm font-semibold text-ink"
               >
                 {t('wl.signup.createdOpen')}
               </a>
@@ -223,14 +223,14 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
         ) : (
         <form onSubmit={submit} className="order-2 md:order-1">
           <div className="mb-8">
-            <div className="mb-2 inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white/60">
+            <div className="mb-2 inline-flex items-center rounded-full border border-line px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink/60">
               {t(isRealtor ? 'wl.signup.realtorEyebrow' : 'wl.signup.eyebrow')}
             </div>
             <h1 className="text-3xl font-bold">{t(isRealtor ? 'wl.signup.realtorTitle' : 'wl.signup.title')}</h1>
-            <p className="mt-2 text-sm text-white/60">{t(isRealtor ? 'wl.signup.realtorSubtitle' : 'wl.signup.subtitle')}</p>
+            <p className="mt-2 text-sm text-ink/60">{t(isRealtor ? 'wl.signup.realtorSubtitle' : 'wl.signup.subtitle')}</p>
           </div>
 
-          <label className="mb-1 block text-xs font-medium text-white/60">
+          <label className="mb-1 block text-xs font-medium text-ink/60">
             {t(isRealtor ? 'wl.signup.deskName' : 'wl.signup.company')}
           </label>
           <input
@@ -238,10 +238,10 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
             onChange={(e) => setCompany(e.target.value)}
             placeholder={t(isRealtor ? 'wl.signup.deskNamePh' : 'wl.signup.companyPh')}
             maxLength={40}
-            className="mb-4 w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
+            className="mb-4 w-full rounded-lg border border-line bg-surface-2 px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
           />
 
-          <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.subdomain')}</label>
+          <label className="mb-1 block text-xs font-medium text-ink/60">{t('wl.signup.subdomain')}</label>
           <div className="flex items-center gap-2">
             <input
               value={subdomain}
@@ -249,9 +249,9 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
               placeholder={t('wl.signup.subdomainPh')}
               maxLength={40}
               dir="ltr"
-              className="w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 font-mono text-sm outline-none focus:border-[var(--wl-accent)]"
+              className="w-full rounded-lg border border-line bg-surface-2 px-4 py-3 font-mono text-sm outline-none focus:border-[var(--wl-accent)]"
             />
-            <span dir="ltr" className="whitespace-nowrap font-mono text-xs text-white/50">.{TENANT_BASE_DOMAIN}</span>
+            <span dir="ltr" className="whitespace-nowrap font-mono text-xs text-ink/50">.{TENANT_BASE_DOMAIN}</span>
           </div>
           <p className={`mb-4 mt-1 text-xs ${subHint.tone}`}>{subHint.text}</p>
 
@@ -259,26 +259,26 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
             {/* Realtors don't name a product — theirs is Meta for Realtors. */}
             {isRealtor ? null : (
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.product')}</label>
+                <label className="mb-1 block text-xs font-medium text-ink/60">{t('wl.signup.product')}</label>
                 <input
                   value={product}
                   onChange={(e) => setProduct(e.target.value)}
                   placeholder={t('wl.signup.productPh')}
                   maxLength={24}
-                  className="w-full rounded-lg border border-white/15 bg-white/[0.04] px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
+                  className="w-full rounded-lg border border-line bg-surface-2 px-4 py-3 text-sm outline-none focus:border-[var(--wl-accent)]"
                 />
               </div>
             )}
             <div>
-              <label className="mb-1 block text-xs font-medium text-white/60">{t('wl.signup.accent')}</label>
+              <label className="mb-1 block text-xs font-medium text-ink/60">{t('wl.signup.accent')}</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
                   value={accent}
                   onChange={(e) => setAccent(e.target.value)}
-                  className="h-11 w-14 cursor-pointer rounded-lg border border-white/15 bg-transparent"
+                  className="h-11 w-14 cursor-pointer rounded-lg border border-line bg-transparent"
                 />
-                <span className="font-mono text-xs text-white/50">{accent}</span>
+                <span className="font-mono text-xs text-ink/50">{accent}</span>
               </div>
             </div>
           </div>
@@ -287,12 +287,12 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="rounded-lg border border-white/15 bg-white/[0.04] px-4 py-2 text-sm hover:bg-white/[0.08]"
+              className="rounded-lg border border-line bg-surface-2 px-4 py-2 text-sm hover:bg-surface-2"
             >
               {logo ? t('wl.signup.logoChange') : t('wl.signup.logoUpload')}
             </button>
             {logo ? (
-              <button type="button" onClick={() => setLogo('')} className="text-xs text-white/50 hover:text-white/80">
+              <button type="button" onClick={() => setLogo('')} className="text-xs text-ink/50 hover:text-ink/80">
                 {t('wl.signup.logoRemove')}
               </button>
             ) : null}
@@ -310,13 +310,13 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
             Entrestate account that is signed in, proved by Neon, and the only
             way to make it somebody else is to sign in as somebody else.
           */}
-          <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.02] p-4">
-            <div className="mb-3 text-xs font-medium uppercase tracking-widest text-white/40">
+          <div className="mb-6 rounded-xl border border-line bg-surface-2 p-4">
+            <div className="mb-3 text-xs font-medium uppercase tracking-widest text-ink/40">
               {t('wl.signup.ownerTitle')}
             </div>
-            <p className="text-sm text-white">{signedInAs.name || signedInAs.email}</p>
-            {signedInAs.name ? <p className="mt-0.5 text-xs text-white/50" dir="ltr">{signedInAs.email}</p> : null}
-            <p className="mt-2 text-xs text-white/40">{t('wl.signup.ownerHint')}</p>
+            <p className="text-sm text-ink">{signedInAs.name || signedInAs.email}</p>
+            {signedInAs.name ? <p className="mt-0.5 text-xs text-ink/50" dir="ltr">{signedInAs.email}</p> : null}
+            <p className="mt-2 text-xs text-ink/40">{t('wl.signup.ownerHint')}</p>
           </div>
 
           {error ? <p className="mb-4 text-sm text-red-400">{error}</p> : null}
@@ -324,12 +324,12 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg px-4 py-3 text-sm font-semibold text-white transition disabled:opacity-60"
+            className="w-full rounded-lg px-4 py-3 text-sm font-semibold text-ink transition disabled:opacity-60"
             style={{ background: 'var(--wl-accent)' }}
           >
             {loading ? t('wl.signup.submitting') : t('wl.signup.submit')}
           </button>
-          <p className="mt-3 text-center text-xs text-white/40">
+          <p className="mt-3 text-center text-xs text-ink/40">
             {isRealtor ? t('wl.signup.realtorNote') : t('wl.signup.trialNote', { days: TRIAL_DAYS })}
           </p>
         </form>
@@ -337,11 +337,11 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
 
         {/* Live preview */}
         <div className="order-1 md:order-2">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <div className="mb-4 text-xs font-medium uppercase tracking-widest text-white/40">
+          <div className="rounded-2xl border border-line bg-surface-2 p-6">
+            <div className="mb-4 text-xs font-medium uppercase tracking-widest text-ink/40">
               {t('wl.signup.previewTitle')}
             </div>
-            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0F131A] px-4 py-3">
+            <div className="flex items-center gap-3 rounded-xl border border-line bg-[#0F131A] px-4 py-3">
               {logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={logo} alt="" className="h-6 w-auto max-w-[120px] object-contain" />
@@ -355,20 +355,20 @@ function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
                 </span>
               </span>
             </div>
-            <div dir="ltr" className="mt-3 truncate rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 font-mono text-xs text-white/50">
+            <div dir="ltr" className="mt-3 truncate rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs text-ink/50">
               https://{subdomain.trim() || t('wl.signup.subdomainPh')}.{TENANT_BASE_DOMAIN}
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3">
               {(['previewLeads', 'previewDeals', 'previewRevenue'] as const).map((k) => (
-                <div key={k} className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-                  <div className="text-[10px] uppercase tracking-wide text-white/40">{t(`wl.signup.${k}`)}</div>
+                <div key={k} className="rounded-xl border border-line bg-surface-2 p-3">
+                  <div className="text-[10px] uppercase tracking-wide text-ink/40">{t(`wl.signup.${k}`)}</div>
                   <div className="mt-1 text-lg font-bold" style={{ color: 'var(--wl-accent)' }}>
                     ••
                   </div>
                 </div>
               ))}
             </div>
-            <p className="mt-4 text-xs leading-relaxed text-white/40">{t('wl.signup.previewNote')}</p>
+            <p className="mt-4 text-xs leading-relaxed text-ink/40">{t('wl.signup.previewNote')}</p>
           </div>
         </div>
       </main>

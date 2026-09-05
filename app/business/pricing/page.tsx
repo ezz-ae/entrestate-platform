@@ -123,31 +123,31 @@ export default function PricingPage() {
 
       {/* ── The three columns ───────────────────────────────────────────── */}
       <Section className="pb-20">
-        <div className="grid grid-cols-1 gap-px lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {PLANS.map((p) => (
             <div
               key={p.name}
-              className={`flex flex-col p-8 outline outline-1 ${
+              className={`flex flex-col rounded-2xl border bg-surface p-8 shadow-(--shadow-card) ${
                 p.featured
-                  ? 'bg-app outline-[#3B82F6]/40'
-                  : 'bg-surface outline-white/[0.07]'
+                  ? 'border-brand/40 shadow-(--shadow-glow)'
+                  : 'border-line'
               }`}
             >
               <Eyebrow>{p.who}</Eyebrow>
               <H3 className="mt-4 !text-[1.25rem]">{p.name}</H3>
               <p className="mt-2.5 text-[0.9375rem] leading-[1.65] text-ink-muted">{p.line}</p>
-              <div className="mt-6 border-y border-white/[0.07] py-4">
-                <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#3B82F6]">
+              <div className="mt-6 border-y border-line py-4">
+                <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-brand">
                   {p.basis}
                 </div>
-                <div className="mt-2 text-[0.9375rem] text-white">
+                <div className="mt-2 text-[0.9375rem] text-ink">
                   {p.price ?? 'Talk to us for current pricing.'}
                 </div>
               </div>
               <ul className="mt-6 flex-1 space-y-3">
                 {p.includes.map((i) => (
                   <li key={i} className="flex gap-3 text-[0.875rem] leading-[1.6] text-ink-muted">
-                    <span aria-hidden className="mt-[0.6em] h-px w-2.5 shrink-0 bg-[#4A5058]" />
+                    <span aria-hidden className="mt-[0.6em] h-px w-2.5 shrink-0 bg-line-strong" />
                     <span>{i}</span>
                   </li>
                 ))}
