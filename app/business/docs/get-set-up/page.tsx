@@ -9,11 +9,12 @@ import {
   RelatedRow,
 } from '@/components/business/docs'
 import { Phone, Chat } from '@/components/business/visuals'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'From signup to first lead',
   description:
-    'The first thirty days, week by week — open the workspace, load the stock, put pages live, connect ads, read the month.',
+    'From your address to your first ad, step by step — open the workspace, pick a listing, Rocket Ad, press go, the lead lands owned. No calendar.',
   alternates: { canonical: '/business/docs/get-set-up' },
 }
 
@@ -29,23 +30,23 @@ export default function GetSetUpGuide() {
       <OnPage
         items={[
           { id: 'day-one', label: 'Day one — open your workspace' },
-          { id: 'week-one', label: 'Week one — stock and team' },
-          { id: 'week-two', label: 'Week two — pages live' },
-          { id: 'week-three', label: 'Week three — connect and launch' },
-          { id: 'week-four', label: 'Week four — read the month' },
+          { id: 'stock', label: 'Stock and team' },
+          { id: 'pages', label: 'Pages live' },
+          { id: 'launch', label: 'Connect and launch' },
+          { id: 'report', label: 'Read the report' },
           { id: 'first-lead', label: 'The first lead' },
         ]}
       />
       <div className="mt-6">
-        <Step n={1} id="day-one" title="Day one — open your workspace">
+        <Step n={1} id="day-one" title="Open your workspace">
           <p>
             Sign up with your company name, choose your address, and the workspace opens under
-            your own name with its own records — a fourteen-day trial, no card. Pick your
+            your own name with its own records, the market catalogue already in it. Pick your
             language from the account menu: English, Arabic or Russian. Arabic flips the whole
             interface right-to-left, and your team members each choose their own.
           </p>
         </Step>
-        <Step n={2} id="week-one" title="Week one — load the stock and the team">
+        <Step n={2} id="stock" title="Load the stock and the team">
           <p>
             Add your listings whichever way is fastest: upload developer brochures, paste links,
             paste text, or type them in — every route ends in a review screen before anything is
@@ -59,32 +60,31 @@ export default function GetSetUpGuide() {
             duplicate.
           </p>
         </Step>
-        <Step n={3} id="week-two" title="Week two — put pages live">
+        <Step n={3} id="pages" title="Put pages live">
           <p>
             Create a landing page for each listing you plan to push — one click builds the page
             from the listing&rsquo;s own record, and one button covers every listing still
             without one. Publish the ones that are ready; if you want a manager&rsquo;s hand on
-            what goes public, publishing can require approval from day one. By the end of the
-            week, your stock has somewhere for a paid click to land.
+            what goes public, publishing can require approval from day one. Now your stock has
+            somewhere for a paid click to land.
           </p>
         </Step>
-        <Step n={4} id="week-three" title="Week three — connect Meta and launch">
+        <Step n={4} id="launch" title="Connect Meta and launch — five minutes">
           <p>
             Connect your Meta ad account by pasting its credential — it is tested with the
-            provider before it saves, so a green Connected means it truly works. Until then, the
-            campaign desk shows a clearly labelled demo so you can learn the flow; nothing
-            pretends to be live.
+            provider before it saves, so a green Connected means it truly works. Then open
+            Rocket Ad: give it the brochure or a photo and a daily budget, and it writes the ad
+            and sets the rest.
           </p>
           <p>
-            Before the first campaign, write your first spend rule — a daily ceiling and the
-            conditions under which the machine may move budget. With no rule, it spends nothing
-            on its own. Then launch: the campaign arrives paused, you look at the ad, and you
-            switch it on yourself.
+            The campaign arrives paused: you look at the ad, and you switch it on yourself.
+            Write a spend rule when you want the machine to move budget for you — a daily
+            ceiling and the conditions; with no rule, it moves nothing on its own.
           </p>
         </Step>
-        <Step n={5} id="week-four" title="Week four — read the month">
+        <Step n={5} id="report" title="Read the report">
           <p>
-            Open the month report: spend, leads, deals, what a lead cost, what a deal cost.
+            Open the report whenever you want it: spend, leads, deals, what a lead cost, what a deal cost.
             Decide with numbers — which listing earned more budget, which audience produced, what
             to stop. Leads that wait too long surface on their own: anything two days without
             contact lands in a digest to its owner, and managers see what nobody is working.
@@ -92,19 +92,16 @@ export default function GetSetUpGuide() {
         </Step>
         <Step n={6} id="first-lead" title="The first lead">
           <p>
-            Somewhere in week three or four, it happens without you: an enquiry lands, is
-            recorded first, answered fast, tagged by language, and handed to one agent with a
-            clock running. That path — the four doors in, the duplicate check, the owner — is its
+            Then it happens without you: an enquiry lands, is recorded first, tagged by
+            language, and handed to one agent with a clock running until they answer. That path — the four doors in, the duplicate check, the owner — is its
             own guide, and it is the part of the system your team will live in daily.
           </p>
           <figure className="mt-5">
-            <div className="flex justify-center">
-              <Phone className="w-[250px] sm:w-[270px]">
-                <Chat />
-              </Phone>
+            <div className="mx-auto max-w-[34rem]">
+              <LeadCardCrop />
             </div>
             <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-ink-faint">
-              The first one arrives — answered, tagged by language, owned by an agent.
+              The first one arrives — tagged by language, owned by an agent, on the clock.
             </figcaption>
           </figure>
         </Step>

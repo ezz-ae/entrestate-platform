@@ -3,6 +3,7 @@ import { Section, Display, Lede } from '@/components/business/ui'
 import { Browser, Phone, Chat, MiniCRM, Chapter, NextStep } from '@/components/business/visuals'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'CRM',
@@ -26,16 +27,12 @@ export default function CrmPage() {
             </div>
             <div className="mt-6 max-w-[46ch]">
               <Lede>
-                A lead lands at 2:47am, in Arabic. By 2:48 it has an answer, a language, and an
-                owner.
+                A lead lands at 2:47am, in Arabic. By 2:48 it has an owner, a language tag and a
+                follow-up on the clock — and the person answers.
               </Lede>
             </div>
           </div>
-          <div className="flex justify-center lg:justify-end">
-            <Phone className="w-[250px] sm:w-[280px]">
-              <Chat />
-            </Phone>
-          </div>
+          <LeadCardCrop />
         </div>
       </Section>
 

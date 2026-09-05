@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Section, Band, Eyebrow, Display, H2, Lede, ButtonLink, SectionHeading, TextLink } from '@/components/business/ui'
 import {
-  Browser, Phone, Chat, MiniCampaigns, MiniReport, HeroVisual,
   FeatureTile, TileGrid, PunchGrid, StatBand, NextStep, type GlyphName,
 } from '@/components/business/visuals'
+import { CropReel } from '@/components/business/crop-reel'
+import {
+  RocketAdCrop, VerdictCrop, ReachCrop, AudienceCrop, LandingRowsCrop, AiEditCrop, LeadformCrop, MicrositeCrop, SpendRuleCrop, CompanyCrop,
+} from '@/components/business/crops'
 import { Holder, Keyword, KeywordSub, LearnMore, DownloadCard } from '@/components/business/holders'
 import { PLATFORM, nextInTour } from '@/lib/business/nav'
 import {
@@ -75,7 +78,21 @@ export default function BusinessHome() {
             </div>
             <p className="mt-5 text-[0.8125rem] text-ink-faint">{FULL_SYSTEM_TRIAL_NOTE}</p>
           </div>
-          <HeroVisual variant="home" />
+          {/* The reel: the product's strong options, one at a time, cut large
+              enough to read — never a whole screen in a small frame, never a
+              tool the product does not have. */}
+          <CropReel
+            frames={[
+              { key: 'rocket', caption: 'Rocket Ad — one source, one budget, an ad that starts paused.', node: <RocketAdCrop /> },
+              { key: 'verdict', caption: 'Inventory — every listing scored, one verdict, one next action.', node: <VerdictCrop /> },
+              { key: 'landing', caption: 'Landing pages — one per property, gated on ad readiness.', node: <LandingRowsCrop /> },
+              { key: 'reach', caption: 'Who this reaches — the live targeting, read back from Meta.', node: <ReachCrop /> },
+              { key: 'audience', caption: 'Rated leads become the audience next month’s ads chase.', node: <AudienceCrop /> },
+              { key: 'aiedit', caption: 'Edit any page from the Expert chat. Reversible.', node: <AiEditCrop /> },
+              { key: 'microsite', caption: 'A whole project website, generated in one click.', node: <MicrositeCrop /> },
+              { key: 'company', caption: 'Company-wide leads, deals and commission — the report you send upstairs.', node: <CompanyCrop /> },
+            ]}
+          />
         </div>
       </Section>
 
@@ -103,49 +120,28 @@ export default function BusinessHome() {
         </div>
       </Section>
 
-      {/* ── The pitch, in three holders — the Keywords alone carry it ───── */}
+      {/* ── The pitch, in three holders — the Keywords alone carry it.
+             Each visual is a crop of a real screen; the words claim only
+             what that screen does. ── */}
       <Section className="pb-20 lg:pb-28">
         <div className="space-y-5">
-          <Holder
-            tone="gold"
-            visual={
-              <Browser title="app.yourbrokerage.ae/campaigns">
-                <MiniCampaigns />
-              </Browser>
-            }
-          >
+          <Holder tone="gold" label="Ads Machine · rules" visual={<SpendRuleCrop flush />}>
             <Keyword>Budgets with brakes.</Keyword>
-            <KeywordSub>The machine spends like it&rsquo;s your money — inside rules you wrote.</KeywordSub>
+            <KeywordSub>The machine spends like it&rsquo;s your money — inside rules you wrote. Every move written down, with its reason.</KeywordSub>
             <LearnMore href="/business/docs/spend-rules" />
           </Holder>
 
-          <Holder
-            tone="green"
-            visual={
-              <div className="flex justify-center">
-                <Phone className="w-[240px] sm:w-[270px]">
-                  <Chat />
-                </Phone>
-              </div>
-            }
-          >
-            <Keyword>Leads answered fast.</Keyword>
-            <KeywordSub>At 2:47am a lead asks in Arabic. By 2:48 it&rsquo;s answered and owned.</KeywordSub>
-            <LearnMore href="/business/docs/lead-flow" />
+          <Holder tone="green" label="Leadformer" visual={<LeadformCrop flush />}>
+            <Keyword>A form that talks back.</Keyword>
+            <KeywordSub>No fields. It greets by name, asks what a good salesperson asks, and hands you a lead that already told you everything.</KeywordSub>
+            <LearnMore href="/business/leadformer" />
           </Holder>
 
-          <Holder
-            tone="blue"
-            visual={
-              <Browser title="app.yourbrokerage.ae/reports">
-                <MiniReport />
-              </Browser>
-            }
-          >
+          <Holder tone="blue" label="Audiences" visual={<AudienceCrop flush />}>
             <Keyword>Deals teach targeting.</Keyword>
             <KeywordSub>
-              Next month&rsquo;s ads chase people who look like your buyers — not Meta&rsquo;s first
-              guess.
+              Every rating teaches the machine what to buy. Rated leads become the audience next
+              month&rsquo;s ads chase — not Meta&rsquo;s first guess.
             </KeywordSub>
             <LearnMore href="/business/docs/audiences" />
           </Holder>
@@ -270,7 +266,7 @@ export default function BusinessHome() {
           <div>
             <H2>Start with your own address.</H2>
             <p className="mt-3 text-[0.9375rem] leading-[1.7] text-ink-muted">
-              {FULL_SYSTEM.trialDays} days, no card. Live spend stays off until you connect an ad account.
+              Your first ad in five minutes. Spend runs in your own ad account, inside a cap you wrote.
             </p>
           </div>
           <ButtonLink href={FULL_SYSTEM.startHref}>{FULL_SYSTEM_CTA}</ButtonLink>

@@ -196,9 +196,9 @@ export default function PricingPage() {
             </p>
           </Holder>
           <Holder tone="gold">
-            <Keyword as="h3">The first month.</Keyword>
-            <KeywordSub>Load stock, pages go live, connect Meta, read the report.</KeywordSub>
-            <LearnMore href="/business/docs/get-set-up" label="See the thirty days" />
+            <Keyword as="h3">The first ad, in five minutes.</Keyword>
+            <KeywordSub>Your address, a listing, a budget. Rocket Ad writes it; it launches paused; you press go.</KeywordSub>
+            <LearnMore href="/business/getting-started" label="See the steps" />
           </Holder>
         </HolderRow>
       </Section>

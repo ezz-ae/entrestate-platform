@@ -6,6 +6,7 @@ import {
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { SceneRunAds } from '@/components/business/scenes'
 import { nextInTour } from '@/lib/business/nav'
+import { RocketAdCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'Meta for Realtors',
@@ -53,10 +54,8 @@ export default function MetaForRealtorsPage() {
             />
             <div className="grid">
               <div className="flex justify-center sm:col-start-1 sm:row-start-1 sm:items-end sm:justify-start">
-                <div className="relative z-10 sm:-rotate-2">
-                  <Phone className="w-[240px] sm:w-[255px]">
-                    <Chat />
-                  </Phone>
+                <div className="relative z-10 w-full max-w-[22rem] sm:-rotate-2">
+                  <RocketAdCrop />
                 </div>
               </div>
               <div className="mt-6 min-w-0 sm:col-start-1 sm:row-start-1 sm:mt-0 sm:pb-12 sm:pl-32 lg:pl-40">

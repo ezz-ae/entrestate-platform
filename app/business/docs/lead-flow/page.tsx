@@ -10,6 +10,7 @@ import {
   RelatedRow,
 } from '@/components/business/docs'
 import { Phone, Chat } from '@/components/business/visuals'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'How leads flow',
@@ -42,13 +43,11 @@ export default function LeadFlowGuide() {
       />
 
       <figure className="mt-10">
-        <div className="flex justify-center">
-          <Phone className="w-[250px] sm:w-[270px]">
-            <Chat />
-          </Phone>
+        <div className="mx-auto max-w-[34rem]">
+          <LeadCardCrop />
         </div>
         <figcaption className="mx-auto mt-4 max-w-[38ch] text-center text-[0.8125rem] leading-relaxed text-ink-faint">
-          A new enquiry, answered, tagged by language and handed an owner — the moment it lands.
+          A new enquiry, tagged by language and handed an owner the moment it lands — on the clock until a person answers.
         </figcaption>
       </figure>
 

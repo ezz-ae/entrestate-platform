@@ -17,6 +17,7 @@ import {
 import { Holder, Keyword, KeywordSub, LearnMore, type HolderTone } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { LoopSection } from '@/components/business/loop'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'How it works',
@@ -77,13 +78,7 @@ const STOPS: Array<{
     guide: '/business/docs/lead-flow',
     learn: 'How leads flow',
     tone: 'green',
-    visual: (
-      <div className="flex justify-center">
-        <Phone className="w-[240px] sm:w-[260px]">
-          <Chat />
-        </Phone>
-      </div>
-    ),
+    visual: <LeadCardCrop />,
   },
   {
     title: 'Won or lost.',

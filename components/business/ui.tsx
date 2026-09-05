@@ -65,7 +65,7 @@ export function Eyebrow({ children, className = '' }: { children: ReactNode; cla
 export function Display({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h1
-      className={`font-sans font-semibold text-[2.6rem] leading-[1.08] tracking-[-0.02em] text-ink sm:text-[3.4rem] lg:text-[4rem] ${className}`}
+      className={`font-(family-name:--font-display) font-medium text-[2.6rem] leading-[1.06] tracking-[-0.015em] text-ink sm:text-[3.4rem] lg:text-[4rem] ${className}`}
     >
       {children}
     </h1>

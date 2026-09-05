@@ -8,6 +8,7 @@
  */
 
 import Link from 'next/link'
+import { LeadCardCrop, RocketAdCrop } from '@/components/business/crops'
 import type { ReactNode } from 'react'
 
 /* ── Device frames ──────────────────────────────────────────────────────── */
@@ -88,21 +89,16 @@ export interface ChatMessage {
   lang?: 'ar' | 'en'
 }
 
-/* The 2:47am scene: a lead asks in Arabic, the machine answers as the brand,
-   tags the language and hands the lead an owner. Real shipped behaviour. */
-const DEFAULT_THREAD: ChatMessage[] = [
-  { from: 'lead', text: 'هل شقة الغرفتين في مارينا فيستا ما زالت متاحة؟', time: '2:47 AM', lang: 'ar' },
-  { from: 'agent', text: 'نعم، متاحة — غرفتان، AED 1.9M، جاهزة للمعاينة. أرسل التفاصيل؟', time: '2:48 AM', lang: 'ar' },
-  { from: 'system', text: 'Tagged العربية · assigned to Omar K.' },
-  { from: 'agent', text: 'معاينة الخميس ٤ عصراً أو السبت ١١ صباحاً؟', time: '2:49 AM', lang: 'ar' },
-]
-
+/* A conversation, as a lead experiences it. It has NO default thread: the
+   one it used to carry showed the product answering a WhatsApp enquiry by
+   itself at 2:48am, which the product does not do. A caller supplies a real
+   conversation — the Leadformer form's — or nothing. */
 export function Chat({
-  messages = DEFAULT_THREAD,
-  chip = 'answered in 54s',
-  title = 'Marina Vista — WhatsApp',
+  messages,
+  chip = '',
+  title,
 }: {
-  messages?: ChatMessage[]
+  messages: ChatMessage[]
   /** Small gold annotation pinned top-right of the thread; '' hides it. */
   chip?: string
   title?: string
@@ -818,8 +814,10 @@ export function HeroVisual({ variant }: { variant: 'home' | 'machine' | 'listing
     meta: { title: 'app.yourbrokerage.ae/campaigns', screen: <MiniCampaigns /> },
   }
   const back = browsers[variant]
-  /* 'listing' fronts a landing page in a second browser; the rest front the
-     WhatsApp phone — the Arabic thread is the signature image of the site. */
+  /* 'listing' fronts a landing page in a second browser; the rest front a
+     CROP of a real screen — the lead card for the machine, Rocket Ad for
+     the realtor. The WhatsApp thread that used to sit here showed the
+     product answering a lead by itself, which it does not do. */
   const front =
     variant === 'listing' ? (
       <div className="w-[240px] sm:w-[270px]">
@@ -827,10 +825,10 @@ export function HeroVisual({ variant }: { variant: 'home' | 'machine' | 'listing
           <MiniPage />
         </Browser>
       </div>
+    ) : variant === 'meta' ? (
+      <div className="w-[300px] sm:w-[340px]"><RocketAdCrop /></div>
     ) : (
-      <Phone className="w-[230px] sm:w-[250px]">
-        <Chat />
-      </Phone>
+      <div className="w-[300px] sm:w-[360px]"><LeadCardCrop /></div>
     )
   return (
     <div className="relative isolate">

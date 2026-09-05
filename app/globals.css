@@ -244,6 +244,10 @@ html {
   --brand-bright:       #4f83c9;
   --shadow-card:        0 1px 2px 0 rgb(0 0 0 / 0.35), 0 12px 32px -20px rgb(0 0 0 / 0.55);
   --shadow-glow:        0 24px 80px -48px color-mix(in srgb, var(--brand) 55%, transparent);
+  /* The Terminal's display face — "166 area profiles. Every number is
+   * sourced" is set in this stack. Headlines and holder keywords wear it;
+   * everything else stays Inter, as on the Terminal. */
+  --font-display:       "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
 }
 
 .theme-light {
