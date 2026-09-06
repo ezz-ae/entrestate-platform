@@ -28,9 +28,13 @@ const TONE: Record<HolderTone, { card: string; label: string }> = {
   plain: { card: 'border-line bg-surface', label: 'text-ink-faint' },
 }
 
+/* On a phone the page column already spends 48px on its own margins; a
+   32px holder inset on top of that left a crop about 280px wide and the
+   figures inside it started wrapping mid-word. The holder gives that space
+   back below `sm` and keeps its generous inset from `sm` up. */
 const SIZE_PAD: Record<HolderSize, string> = {
-  lg: 'p-8 lg:p-12',
-  xl: 'p-8 sm:p-12 lg:p-16',
+  lg: 'p-5 sm:p-8 lg:p-12',
+  xl: 'p-6 sm:p-12 lg:p-16',
 }
 
 export function Holder({
