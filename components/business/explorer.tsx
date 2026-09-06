@@ -549,24 +549,35 @@ export function ProductExplorer() {
         className="mt-5"
       >
         <div className="grid items-center gap-6 lg:grid-cols-[7fr_5fr] lg:gap-10">
-          <Browser title={activeTool.title}>
-            {/* All shots stay mounted and crossfade on switch — the frame
-               holds still, only the screen changes, like flipping app tabs. */}
-            <div className="relative aspect-[1600/1000] bg-app">
-              {ALL_TOOLS.map((tool) => (
-                <img
-                  key={tool.id}
-                  src={tool.screen}
-                  alt={tool.alt}
-                  loading="lazy"
-                  aria-hidden={tool.id !== activeTool.id}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out ${
-                    tool.id === activeTool.id ? 'opacity-100' : 'opacity-0'
-                  }`}
-                />
-              ))}
-            </div>
-          </Browser>
+          <div className="min-w-0">
+            <Browser title={activeTool.title}>
+              {/* All shots stay mounted and crossfade on switch — the frame
+                 holds still, only the screen changes, like flipping app tabs.
+                 ON A PHONE the capture is 3200px of application squeezed into
+                 a 340px column: a smudge, and a reader cannot tell a lead row
+                 from a chart. So below `sm` the frame scrolls sideways and the
+                 shot keeps a width a person can read a row at; from `sm` up it
+                 fills the column as before. The page itself never scrolls
+                 sideways — only this frame does. */}
+              <div className="overflow-x-auto overscroll-x-contain">
+                <div className="relative aspect-[1600/1000] w-[760px] bg-app sm:w-full">
+                  {ALL_TOOLS.map((tool) => (
+                    <img
+                      key={tool.id}
+                      src={tool.screen}
+                      alt={tool.alt}
+                      loading="lazy"
+                      aria-hidden={tool.id !== activeTool.id}
+                      className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out ${
+                        tool.id === activeTool.id ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </Browser>
+            <p className="mt-2 text-[0.75rem] text-ink-faint sm:hidden">Drag the screen sideways to read it.</p>
+          </div>
 
           <div className="min-w-0">
             <h3 className="text-[1.75rem] font-semibold leading-[1.08] tracking-[-0.02em] text-ink sm:text-[2.1rem]">

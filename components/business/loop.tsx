@@ -1,77 +1,85 @@
 /**
  * The platform loop — listing → landing → ads → lead → learning → targeting.
  *
- * This is the system's heartbeat, in the client's own words. Six stages on a
- * connected rail; the connector after stage 06 curves back to 01, because the
- * loop-back IS the product: closed deals teach the next campaign's targeting.
- * Everything else on the page is a longer way of saying this diagram.
+ * This is the system's heartbeat. Six stages on a connected rail; the
+ * connector after stage 06 curves back to 01, because the loop-back IS the
+ * product: closed deals teach the next campaign's targeting. Everything else
+ * on the page is a longer way of saying this diagram.
+ *
+ * WHY THERE IS NO SCREENSHOT IN THESE CARDS ANY MORE. Each card used to hold
+ * a real capture zoomed 250–313% and pushed by a hardcoded percentage offset,
+ * so the 16:11 window showed one "readable slab" of it. Those offsets were
+ * measured against the lg row, where a card is a sixth of the page. On a
+ * phone the card is the full column, the same zoom lands somewhere else
+ * entirely, and the slab that showed was whatever happened to be there: half
+ * a table cut mid-column, a paused campaign, an amber warning about a seed
+ * too small for a lookalike, and real developers' project names. The owner's
+ * rule for crops — "make the data good: not one lead in a campaign, nothing
+ * with a warning, no badly written campaign name" — cannot be kept by a
+ * window sliding over a screenshot, because nobody chose what is inside it.
+ *
+ * So a stage card now carries its glyph, its name, its line, and the measure
+ * that stage actually applies, at one size on every screen. The product's
+ * screens are shown where a reader can read them: the crops below, and the
+ * full-width captures with captions on the product pages.
  *
  * Server component on purpose — the loop is static, nothing here needs state.
  */
 import { Fragment } from 'react'
 import { Section, SectionHeading } from '@/components/business/ui'
+import { Glyph, type GlyphName } from '@/components/business/visuals'
 
 type Stage = {
   n: string
   name: string
   line: string
-  shot: string
-  alt: string
-  /** Zoom slab: rendered img width and offsets relative to the card. */
-  zoom?: string
-  x?: string
-  y?: string
+  icon: GlyphName
+  /** The rule this stage applies, in the product's own terms. */
+  measure: string
 }
 
-/* Real product captures. Each shot is the surface that runs its stage. */
 const STAGES: Stage[] = [
   {
     n: '01',
     name: 'Listing',
     line: 'Stock scored and fit to advertise.',
-    shot: '/business/screens/inventory.webp',
-    alt: 'Inventory counters — 21 developers, 621 units — above the first developer group.',
-    zoom: '294%', x: '-38.2%', y: '-36.1%',
+    icon: 'inventory',
+    measure: 'Ad readiness out of 100 · ad-ready starts at 70',
   },
   {
     n: '02',
     name: 'Landing',
     line: 'Every listing gets a page that converts.',
-    shot: '/business/screens/landings.webp',
-    alt: 'Landing page tiles — 15 live across 621 properties, missing pages flagged.',
-    zoom: '294%', x: '-38.2%', y: '-50.8%',
+    icon: 'page',
+    measure: 'A page below the gate cannot carry a campaign',
   },
   {
     n: '03',
     name: 'Ads',
     line: 'Campaigns with caps, launched paused.',
-    shot: '/business/screens/campaigns.webp',
-    alt: 'Campaign rows with delivery badges, spend, leads and cost per lead.',
-    zoom: '313%', x: '-18.8%', y: '-98.2%',
+    icon: 'ads',
+    measure: 'A daily cap, and a person switches it live',
   },
   {
     n: '04',
     name: 'Lead',
-    line: 'Answered fast, owned, in WhatsApp.',
-    shot: '/business/screens/crm-leads.webp',
-    alt: 'The lead book — named leads with heat, stage, project and budget on every row.',
-    zoom: '294%', x: '-8.8%', y: '-167.3%',
+    line: 'Owned on arrival, and on a clock.',
+    icon: 'lead',
+    measure: 'An owner, a language tag, a follow-up time',
   },
   {
     n: '05',
     name: 'Learning',
     line: 'Every rating teaches what to buy.',
-    shot: '/business/screens/audience-lab.webp',
-    alt: 'Audience Lab seed depth — rated leads counted into a lookalike seed.',
-    zoom: '278%', x: '-19.5%', y: '-121.3%',
+    icon: 'gauge',
+    measure: 'Rated 6+ becomes a sellable audience',
   },
   {
     n: '06',
     name: 'Targeting',
     line: 'Audiences from real buyers, not guesses.',
-    shot: '/business/screens/targeting.webp',
-    alt: 'Audience templates priced with expected CPL, budget and leads per week.',
-    zoom: '250%', x: '-17.5%', y: '-127.3%',
+    icon: 'target',
+    measure: 'Language and behaviour — never nationality',
   },
 ]
 
@@ -121,31 +129,20 @@ export function PlatformLoop() {
             <Fragment key={s.n}>
               {i > 0 ? <Connector /> : null}
               {/* mr-5 opens a right gutter on mobile for the green return rail. */}
-              <article className="mr-5 min-w-0 bg-surface rounded-2xl border border-line shadow-(--shadow-card) lg:mr-0 lg:flex-1">
-                <div className="relative aspect-[16/11] overflow-hidden border-b border-line bg-app">
-                  {/* A readable SLAB of the screen, not the whole app
-                     miniaturized: each stage zooms into its own working
-                     region (stat tiles, the table, the cards) so the thumb
-                     shows legible product instead of a smudge. */}
-                  <img
-                    src={s.shot}
-                    alt={s.alt}
-                    loading="lazy"
-                    className="absolute max-w-none"
-                    style={{ width: s.zoom ?? '240%', left: s.x ?? '-6%', top: s.y ?? '-4%' }}
-                  />
+              <article className="mr-5 flex min-w-0 flex-col rounded-2xl border border-line bg-surface p-4 shadow-(--shadow-card) lg:mr-0 lg:flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-brand/30 bg-brand/10 text-brand">
+                    <Glyph name={s.icon} className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="font-mono text-[0.75rem] tabular-nums text-ink-faint" dir="ltr">
+                    {s.n}
+                  </span>
                 </div>
-                <div className="p-4">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-mono text-[0.75rem] tabular-nums text-brand" dir="ltr">
-                      {s.n}
-                    </span>
-                    <h3 className="text-[0.9375rem] font-semibold leading-snug text-ink">
-                      {s.name}
-                    </h3>
-                  </div>
-                  <p className="mt-1.5 text-[0.8125rem] leading-[1.55] text-ink-muted">{s.line}</p>
-                </div>
+                <h3 className="mt-3 text-[0.9375rem] font-semibold leading-snug text-ink">{s.name}</h3>
+                <p className="mt-1.5 text-[0.8125rem] leading-[1.55] text-ink-muted">{s.line}</p>
+                <p className="mt-3 border-t border-line pt-2.5 text-[0.75rem] leading-[1.5] text-ink-faint">
+                  {s.measure}
+                </p>
               </article>
             </Fragment>
           ))}

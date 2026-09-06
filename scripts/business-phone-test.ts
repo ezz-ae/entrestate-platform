@@ -130,6 +130,27 @@ console.log('\n── no hero stacks two layers in one cell ──')
   }
 }
 
+console.log('\n── a screenshot is shown whole, or scrolled — never through a sliding window ──')
+{
+  // The loop's six cards used to hold a capture zoomed 250–313% and pushed by
+  // a hardcoded percentage offset, calibrated against the lg row where a card
+  // is a sixth of the page. On a phone the card is the whole column, the same
+  // offset lands somewhere else, and what showed was whatever happened to be
+  // there — half a table, a paused campaign, an amber warning. Nobody chose
+  // what was inside that window, so no rule about it could be kept.
+  const loop = stripComments(read('components/business/loop.tsx'))
+  check('the loop card carries no zoomed screenshot slab',
+    !/max-w-none/.test(loop) && !/zoom|<img/.test(loop))
+  check('…it carries the stage\'s own measure instead', /measure: string/.test(loop) && /\{s\.measure\}/.test(loop))
+  // The explorer's capture is 3200px of application. Below `sm` it is a smudge
+  // in a 340px column, so the frame scrolls sideways at a width a row can be
+  // read at — the page still never scrolls, only the frame.
+  const explorer = stripComments(read('components/business/explorer.tsx'))
+  check('the explorer frame scrolls sideways on a phone', /overflow-x-auto overscroll-x-contain/.test(explorer))
+  check('…at a width a row is readable at, and full width from sm', /w-\[760px\] bg-app sm:w-full/.test(explorer))
+  check('…and it says so', /Drag the screen sideways to read it/.test(explorer))
+}
+
 if (failures > 0) {
   console.error(`\n${failures} phone rule(s) broken.`)
   process.exit(1)
