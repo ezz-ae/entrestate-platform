@@ -23,10 +23,67 @@
  *
  * Pure — no network. Runs in `pnpm guards`.
  */
+import { inflateSync } from 'node:zlib'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { FULL_SYSTEM, FULL_SYSTEM_CTA, FULL_SYSTEM_PRICE_LINE, FULL_SYSTEM_PRICE_SHORT, FULL_SYSTEM_START_NOTE, WELCOME_CREDIT_AED } from '../lib/business/full-system'
 import { PLATFORM } from '../lib/business/nav'
+
+/**
+ * Every Flate-compressed stream in a PDF, inflated and joined. pdf-lib emits
+ * one content stream per page; a corrupt or non-Flate stream is skipped
+ * rather than thrown, so a future writer change degrades to "no text found"
+ * (which the first check below catches) instead of breaking the suite.
+ */
+function inflateAllStreams(pdf: Buffer): string {
+  const out: string[] = []
+  const marker = Buffer.from('stream')
+  let at = 0
+  for (;;) {
+    const start = pdf.indexOf(marker, at)
+    if (start === -1) break
+    let from = start + marker.length
+    if (pdf[from] === 0x0d) from += 1
+    if (pdf[from] === 0x0a) from += 1
+    const end = pdf.indexOf(Buffer.from('endstream'), from)
+    if (end === -1) break
+    try {
+      out.push(inflateSync(pdf.subarray(from, end)).toString('latin1'))
+    } catch {
+      /* not a Flate stream — nothing to read here */
+    }
+    at = end + 1
+  }
+  return out.join('\n')
+}
+
+/**
+ * The text a PDF actually draws, in drawing order. pdf-lib emits one `Tj` per
+ * positioned run and writes its operands as HEX strings (`<45> Tj`), often a
+ * single character at a time, so both hex and literal `(…)` operands are
+ * collected. Spacing is positional rather than textual, which is why the
+ * comparison below flattens everything to letters and digits: the buyer sees
+ * "AED 999/month", the file contains those characters with no space in it.
+ */
+function pdfText(streams: string): string {
+  const drawn: string[] = []
+  for (const m of streams.matchAll(/(?:<([0-9A-Fa-f\s]*)>|\((?:\\.|[^\\)])*\))\s*Tj/g)) {
+    if (m[1] !== undefined) {
+      const hex = m[1].replace(/\s+/g, '')
+      let word = ''
+      for (let i = 0; i + 1 < hex.length; i += 2) word += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16))
+      drawn.push(word)
+    } else {
+      drawn.push(m[0].slice(m[0].indexOf('(') + 1, m[0].lastIndexOf(')')).replace(/\\([()\\])/g, '$1'))
+    }
+  }
+  return drawn.join('')
+}
+
+function pdfHas(streams: string, phrase: string): boolean {
+  const flat = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, '')
+  return flat(pdfText(streams)).includes(flat(phrase))
+}
 
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
@@ -98,6 +155,33 @@ console.log('\n── the plans page and the one-pager quote the same line ─�
   const constants = stripComments(read('lib/business/full-system.ts'))
   check('the constants module is the only place the number is typed',
     (constants.match(/\b999\b/g) ?? []).length === 1 && /9_588/.test(constants))
+}
+
+console.log('\n── the PDF a buyer downloads says what the site says ──')
+{
+  // THE DISH, NOT THE RECIPE. Everything above checks scripts/build-onepager.ts.
+  // But the site serves public/business/entrestate-one-pager.pdf — a committed
+  // artifact that only changes when a human reruns the script. On 2026-09-05
+  // the script was corrected twice (the 14-day trial line came out, the AED 500
+  // welcome line went in) and the PDF was not rebuilt. So the one artifact
+  // designed to reach a company's owner still read "AED 999/month. 14-day
+  // trial, no card." — an offer lib/business/full-system.ts explicitly forbids
+  // any selling surface from printing, and one the product cannot honour: no
+  // card is ever taken and no trial ever ends.
+  //
+  // pdf-lib writes its content streams Flate-compressed, so the words are not
+  // in the file's bytes. Inflating every stream is the only way to read what
+  // the buyer reads — and reading what the buyer reads is the whole point.
+  const pdf = readFileSync(join(process.cwd(), 'public/business/entrestate-one-pager.pdf'))
+  const text = inflateAllStreams(pdf)
+  check('the PDF has readable text in it', pdfText(text).length > 400, `${pdfText(text).length} chars drawn`)
+  check(`it quotes the current price line (${FULL_SYSTEM_PRICE_SHORT})`, pdfHas(text, FULL_SYSTEM_PRICE_SHORT))
+  check(`it carries the welcome credit (AED ${WELCOME_CREDIT_AED})`, pdfHas(text, `AED ${WELCOME_CREDIT_AED}`))
+  check('it carries the one CTA', pdfHas(text, FULL_SYSTEM_CTA))
+  for (const retired of ['14-day', 'trial', 'no card']) {
+    check(`it does not promise "${retired}"`, !pdfHas(text, retired))
+  }
+  check('it never says the banned word', !saysBanned(pdfText(text)))
 }
 
 console.log('\n── the Team page tells the truth about the door ──')
