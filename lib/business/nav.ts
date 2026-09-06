@@ -17,6 +17,7 @@ export type PreviewKind =
   | 'landing-pages'
   | 'meta-for-realtors'
   | 'leadformer'
+  | 'targetect'
 
 export interface NavItem {
   href: string
@@ -59,6 +60,16 @@ export const PRODUCTS: NavItem[] = [
     preview: 'meta-for-realtors',
     label: 'Meta for Realtors',
     blurb: 'A full system for professional Meta lead ads — our off-plan inventory, your budget, a few clicks.',
+  },
+  {
+    // Targetect — the only product here with its own apex: targetect.com
+    // (BRAND_DOMAINS in lib/tenancy/vendor-host.ts), with a door at
+    // targetect.entrestate.com as well. What it sells is typed in
+    // lib/business/targetect.ts beside the engines that implement it.
+    href: '/business/targetect',
+    preview: 'targetect',
+    label: 'Targetect',
+    blurb: 'Audience planning and analytics — describe the buyer, and find out afterwards which audience produced them.',
   },
   {
     // Leadformer — a door at leadformer.entrestate.com (PRODUCT_DOORS in

@@ -39,7 +39,11 @@ consequences, and they are the product:
 Structurally that is two faces on one database and one AI layer: the public
 storefront and landing pages that capture leads, and the workspace where the
 brokerage runs the business. It is sold as four products on one system — Lead
-Machine, Mega Brokerage Platform, Landing Pages and Meta for Realtors.
+Machine, Mega Brokerage Platform, Landing Pages and Meta for Realtors — and,
+under its own name at [targetect.com](https://targetect.com), as **Targetect**:
+the audience planning and analytics half of those same engines. What Targetect
+claims is listed in `lib/business/targetect.ts` beside the module implementing
+each claim, and `scripts/targetect-test.ts` opens every one of them.
 
 *The commercial argument — who this is for, how it is paid for, and where it
 is going — is [`COMMERCIAL-VISION.md`](COMMERCIAL-VISION.md), deliberately

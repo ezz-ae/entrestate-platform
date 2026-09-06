@@ -1,11 +1,12 @@
 /**
  * WHAT THE VENDOR'S OWN HOSTS ARE ALLOWED TO SERVE.
  *
- * One deployment serves three different kinds of host:
+ * One deployment serves four different kinds of host:
  *
  *   {broker}.entrestate.com   a tenant's instance — the product, their brand
  *   entrestate.com            the vendor's own front door
  *   machine.entrestate.com    a product door, reserved and never a tenant
+ *   targetect.com             another apex we own, whose root is that product
  *
  * Only the first was ever thought about. The other two fell through to the
  * property-marketing site that ships in this codebase, so entrestate.com and
@@ -52,6 +53,40 @@ export const PRODUCT_DOORS: Readonly<Record<string, string>> = {
   // is reserved in reserved.ts so that move stays available.
   leadformer: '/business/leadformer',
   leadform: '/business/leadformer',
+  // Targetect has its own apex (BRAND_DOMAINS below) and a door here as well.
+  // The door is what works the day before DNS does, and it is the address that
+  // keeps working for anyone who learned the product inside the platform.
+  targetect: '/business/targetect',
+}
+
+/**
+ * APEXES THIS COMPANY OWNS THAT ARE NOT entrestate.com.
+ *
+ * Targetect is audience planning and analytics sold under its own name at
+ * targetect.com. An apex of ours that this deployment answers on is precisely
+ * the case this module was written for: entrestate.com and
+ * machine.entrestate.com both fell through to the brokerage property site, so
+ * the front door of the company advertised apartments. A brand domain with no
+ * rule does the same on the first day its DNS lands, and the first person to
+ * see it would be a customer.
+ *
+ * The map is apex → the page its root serves. `www.` is the same host. The
+ * page keeps declaring its canonical /business/... path, so answering from two
+ * hostnames cannot split it in search.
+ *
+ * Dormant with the rest of the module: a deployment that does not serve the
+ * vendor's own hosts is not serving this one either.
+ */
+export const BRAND_DOMAINS: Readonly<Record<string, string>> = {
+  'targetect.com': '/business/targetect',
+}
+
+/** The page a brand apex serves at its root, or null when the host is not one. */
+function brandDomainRoot(rawHost: string): string | null {
+  const host = rawHost.trim().toLowerCase().split(':')[0]
+  if (!host) return null
+  const bare = host.startsWith('www.') ? host.slice(4) : host
+  return BRAND_DOMAINS[bare] ?? null
 }
 
 /**
@@ -182,6 +217,18 @@ export function vendorHostAction(rawHost: string | null | undefined, pathname: s
   if (!SAAS_TENANCY || !rawHost) return { kind: 'pass' }
   // A tenant's instance is governed by the tenancy rules, not these.
   if (tenantSubdomainFromHost(rawHost)) return { kind: 'pass' }
+
+  // One of our own brand apexes: its root IS that product, the vendor surface
+  // behind it stays reachable (sign-in, the workspace, /api), and everything
+  // else comes back to the product rather than to the platform's front page —
+  // somebody who typed targetect.com asked for Targetect, not for a menu.
+  const brand = brandDomainRoot(rawHost)
+  if (brand) {
+    if (pathname === '/' || pathname === '') return { kind: 'rewrite', to: brand }
+    if (isFile(pathname)) return { kind: 'pass' }
+    if (VENDOR_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return { kind: 'pass' }
+    return { kind: 'redirect', to: brand }
+  }
 
   const sub = vendorSubdomain(rawHost)
   if (sub === null) return { kind: 'pass' } // not one of ours (preview URL, custom domain)

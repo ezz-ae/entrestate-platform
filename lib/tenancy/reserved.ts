@@ -48,6 +48,11 @@ export const RESERVED_SUBDOMAINS = new Set([
   // outgrows the vertical it moves out on its own domain, and reserving the
   // name now is what keeps that move possible.
   'leadformer', 'leadform',
+  // Targetect — audience planning and analytics, sold on its own apex
+  // (BRAND_DOMAINS in vendor-host.ts) and reachable here as a door. Reserved
+  // for the same reason as any door: a tenant signing up as the product would
+  // shadow it on the base domain.
+  'targetect',
 ])
 
 /** True when `sub` is a well-formed, non-reserved tenant subdomain. */

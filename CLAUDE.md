@@ -9,6 +9,14 @@ Lead Machine) and **Meta for Realtors**. One deployment serves the vendor's own
 hosts and every customer instance at `{customer}.entrestate.com`, isolated
 schema-per-tenant.
 
+**Targetect** is the same system's audience half sold under its own name —
+smart audience planning and data analytics — and the only product here with
+its own apex, `targetect.com` (`BRAND_DOMAINS` in `lib/tenancy/vendor-host.ts`,
+a door at `targetect.entrestate.com`). It ships no engine of its own: every
+claim it makes is typed in `lib/business/targetect.ts` next to the module that
+implements it and the guard that holds it, and `scripts/targetect-test.ts`
+opens both — a page selling an engine that was renamed fails the build.
+
 ## One rule before your first command: this repo is not `ezz-ae/ORE`
 
 This code began as a fork of `ezz-ae/ORE`, a **client's live deployment** —

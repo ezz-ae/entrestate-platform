@@ -1,9 +1,9 @@
 /**
  * THE FRONT DOOR OF THE COMPANY WAS SELLING APARTMENTS — locked.
  *
- * One deployment answers on three kinds of host: a tenant's instance, the
- * vendor's apex, and the reserved product doors. Only the first was ever
- * routed. The other two fell through to the property-marketing site that
+ * One deployment answers on four kinds of host: a tenant's instance, the
+ * vendor's apex, the reserved product doors, and an apex of ours that is not
+ * entrestate.com at all (targetect.com). Only the first was ever routed. The other two fell through to the property-marketing site that
  * ships in this codebase, so a visitor to entrestate.com — and to
  * machine.entrestate.com, the address printed on the business card — was met
  * with a Dubai property portal: Golden Visa, off-plan, featured listings.
@@ -34,7 +34,7 @@ const show = (a: unknown) => JSON.stringify(a)
 
 async function main(): Promise<void> {
   process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN = 'entrestate.com'
-  const { vendorHostAction, PRODUCT_DOORS } = await import('../lib/tenancy/vendor-host')
+  const { vendorHostAction, PRODUCT_DOORS, BRAND_DOMAINS } = await import('../lib/tenancy/vendor-host')
 
   console.log('\n── the apex is the platform site, not a property portal ──')
   {
@@ -143,6 +143,26 @@ async function main(): Promise<void> {
       deep.kind === 'redirect' && deep.to === '/business', show(deep))
   }
 
+  console.log('\n── an apex of ours that is not entrestate.com ──')
+  {
+    // Targetect is the first product sold on its own domain. The rule that
+    // sends a vendor host to /business would have sent a Targetect visitor to
+    // the platform's menu, and no rule at all would have shown them the
+    // brokerage's apartments — the defect this whole module answers to.
+    const root = vendorHostAction('targetect.com', '/')
+    check('targetect.com/ serves Targetect and keeps the address',
+      root.kind === 'rewrite' && root.to === '/business/targetect', show(root))
+    check('www is the same host',
+      vendorHostAction('www.targetect.com', '/').kind === 'rewrite')
+    check('/business/pricing still opens on it',
+      vendorHostAction('targetect.com', '/business/pricing').kind === 'pass')
+    const deep = vendorHostAction('targetect.com', '/projects')
+    check('the property site is not served there either, and the way back is the product',
+      deep.kind === 'redirect' && deep.to === '/business/targetect', show(deep))
+    check('every brand apex serves a page under /business',
+      Object.values(BRAND_DOMAINS).every((p) => p.startsWith('/business/')), show(BRAND_DOMAINS))
+  }
+
   console.log('\n── a tenant instance is never touched by these rules ──')
   for (const p of ['/', '/projects', '/lp/some-tower', '/freehold-intelligence']) {
     check(`skyline.entrestate.com${p} passes to the tenancy rules`,
@@ -194,7 +214,7 @@ async function main(): Promise<void> {
     const probe = `
       async function main() {
         const { vendorHostAction } = await import(${JSON.stringify(join(process.cwd(), 'lib/tenancy/vendor-host.ts'))})
-        const hosts = ['freeholdproperty.ae', 'ore-git-main-somebody.vercel.app', 'entrestate.com']
+        const hosts = ['freeholdproperty.ae', 'ore-git-main-somebody.vercel.app', 'entrestate.com', 'targetect.com']
         const paths = ['/', '/projects', '/blog']
         const out = []
         for (const h of hosts) for (const p of paths) out.push(h + ' ' + p + ' ' + vendorHostAction(h, p).kind)
@@ -214,9 +234,9 @@ async function main(): Promise<void> {
       try { unlinkSync(probeFile) } catch { /* best effort */ }
     }
 
-    check('the probe ran', lines.length === 9, lines.join(' | '))
+    check('the probe ran', lines.length === 12, lines.join(' | '))
     const wrong = lines.filter((l) => !l.endsWith(' pass'))
-    check('with tenancy off, every host and path is untouched — the apex included',
+    check('with tenancy off, every host and path is untouched — the apex and the brand domain included',
       wrong.length === 0, wrong.join(' | '))
   }
 

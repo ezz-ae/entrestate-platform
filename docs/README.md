@@ -35,7 +35,10 @@ client/vendor separation, the gauntlet, commit style — then the map below.
 market-discovery product every account starts with. `entrestate-platform`
 is the **business** — entrestate.com, the workspace product (CRM, ads
 machines, landing engine, wallet) sold through the App Store, serving the
-vendor's hosts and every `{customer}.entrestate.com` tenant. One account
+vendor's hosts, every `{customer}.entrestate.com` tenant, and one apex of its
+own that is not entrestate.com at all — `targetect.com`, where the audience
+engines are sold as **Targetect** (`lib/business/targetect.ts`, routed by
+`BRAND_DOMAINS` in `lib/tenancy/vendor-host.ts`). One account
 spans both (the shared `.entrestate.com` session), and they speak through
 served APIs — the catalog (`/api/store/catalog`), the account summary
 (`/api/account/summary`), the Terminal session verifier — never through

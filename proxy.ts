@@ -198,9 +198,9 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── The vendor's own hosts ────────────────────────────────────────────────
-  // entrestate.com and its product doors (machine., meta., listing.) are not
-  // brokerages, so they must not answer with the property-marketing site that
-  // ships in this codebase. See lib/tenancy/vendor-host.ts for the rule; it
+  // entrestate.com, its product doors (machine., meta., listing.) and the other
+  // apexes this company owns (targetect.com) are not brokerages, so they must
+  // not answer with the property-marketing site that ships in this codebase. See lib/tenancy/vendor-host.ts for the rule; it
   // returns "pass" for every host when tenancy is switched off, which is every
   // request on the Freehold deployment.
   //
