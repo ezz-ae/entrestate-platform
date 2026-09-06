@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const LOG_ROWS = [
   { time: '09:14', event: 'budget +AED 150 → Marina Vista video — rule: cost/lead < AED 90', amount: '+AED 150' },
   { time: '09:15', event: 'budget −AED 150 → Creekside One carousel — cost/lead AED 212, over rule', amount: '−AED 150' },
-  { time: '11:02', event: 'paused → Harbor Gate launch — daily cap reached', amount: 'AED 0' },
+  { time: '11:02', event: 'paused → Harbor Gate launch — daily cap reached', amount: 'held' },
   { time: '13:40', event: 'Bayview Terraces checked — inside its rules, no change' },
 ]
 

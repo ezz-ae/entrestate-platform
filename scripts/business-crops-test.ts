@@ -125,6 +125,12 @@ console.log('\n── the data is healthy ──')
 {
   const values = [...CROPS.matchAll(/\['([^']+)', '([^']+)'(?:, '([^']+)')?\]/g)].map((m) => m[2])
   check('no tile shows a zero', !values.some((v) => /^(0|AED 0|0%)$/.test(v)), values.filter((v) => /^(0|AED 0|0%)$/.test(v)).join(','))
+  // Nor does a decision-log row. A brake that fired reads "held", not "AED 0":
+  // the row is the proof the cap worked, and a zero beside it reads as a dead
+  // campaign instead.
+  const ledgerFiles = [...walk(join(process.cwd(), 'app/business')), ...walk(join(process.cwd(), 'components/business'))]
+  const ledgers = ledgerFiles.filter((f) => /amount: '(AED )?0(%)?'/.test(readFileSync(f, 'utf8')))
+  check('no decision-log row is worth zero', ledgers.length === 0, ledgers.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
   check('no danger chip is drawn', !/<Chip tone="danger"/.test(CROPS))
   check('no Hold row is drawn', !/verdict: 'Hold'/.test(CROPS))
   check('every listing name is written like a name', [...CROPS.matchAll(/name: '([^']+)'/g)].every((m) => /^[A-Z][A-Za-z]+( [A-Za-z0-9—–-]+)*/.test(m[1])))
