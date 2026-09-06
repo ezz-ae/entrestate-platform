@@ -1,41 +1,47 @@
 /**
- * TARGETECT — where is my audience today?
+ * TARGETECT — target casting.
  *
- * THE SENTENCE THE PRODUCT IS BUILT ON, in the owner's words: "I know Ali is
- * my target, but I need him to register before I can call him — so I target
- * every Ali, Aliaa and Aliiaa. That is what is happening now. We will spot
- * Ali, reach Ali, and touch Aliaa."
+ * THE OWNER'S SENTENCE, and the product is in it: "I cast your audience and
+ * distribute reach depending on the consuming opportunities and recognition
+ * score." Before that one: "I know Ali is my target, but I need him to
+ * register before I can call him — so I target every Ali, Aliaa and Aliiaa.
+ * We will spot Ali, reach Ali, and touch Aliaa."
  *
- * Read it twice, because two different failures are in it.
+ * WHAT IT IS. Targetect builds the sets that come BEFORE a lookalike — the
+ * seeds — inside the account's own ad accounts. It reverses the interests an
+ * account already runs into data sets and customer studies, casts each
+ * resulting audience into one part, and distributes the reach across those
+ * parts by two numbers: how sure we are these are the people you meant
+ * (recognition) and whether they can be reached today at a price worth paying
+ * (opportunity).
  *
- *   1. THE TOLL. A phone number is only earned by a form. So the whole machine
- *      is built backwards: buy a crowd, pay for the crowd, and wait for one of
- *      them to register before anybody may say a word to them.
- *   2. THE CROWD. Since the crowd is the only way through the toll, targeting
- *      becomes name-shaped — everyone who resembles the person you meant. The
- *      resemblance is bought at full price and counted as if it were him.
+ * WHAT IT IS NOT, and this is not modesty — it is the boundary that makes it
+ * safe to install. It is not an agency and not a team. It does not run ads, it
+ * does not touch the budget, and it does not own the audiences it makes: they
+ * are built in YOUR ad account, under your name, and they stay there if
+ * Targetect goes away tomorrow.
  *
- * Targetect is not a better way to buy that crowd. It is the question asked
- * the other way round: not "build me an audience", but WHERE IS HE TODAY —
- * which surface, which moment, what he is doing right now — and then reach
- * him there. The people around him are not deleted and not promoted: Aliaa
- * gets a lighter touch, as Aliaa, and is never counted as Ali.
+ * WHY CASTING IS THE WORD. Ali sits in the doctors set, the Golden Visa set,
+ * the lookalike and the retargeting set. All four bid for him, the account
+ * pays the raised price, and one person is reached four times. Casting gives
+ * every audience ONE part, in one order, and every part excludes the parts
+ * above it — so a person is bought once. lib/meta/audience-overlap.ts already
+ * detects that competition; lib/targetect/casting.ts is the decision that ends
+ * it, and it is the one piece of this product that runs today.
  *
- * IT STANDS ALONE. Targetect is not a fifth Entrestate product and does not
- * belong to the four. Its own name, its own apex (targetect.com), its own
- * paradigm. It shares this deployment the way a young company shares an
- * office — the address is separate, the product is separate, and nothing in
- * the platform's menu sells it. What it pairs with is named below, because a
- * spotted person is worth nothing until somebody speaks to them, and the two
- * things that speak already exist here.
+ * IT STANDS ALONE. Not a fifth Entrestate product and not one of the four: its
+ * own name, its own apex (targetect.com), its own paradigm. It shares this
+ * deployment the way a young company shares an office. What it works beside is
+ * named below — a cast audience is worth nothing until somebody speaks to the
+ * people in it, and the two things that speak already run here.
  *
  * WHAT IS TRUE TODAY IS MARKED. Most of this is `specified`: designed, written
- * down, not built. A product page carrying ten green claims on its first day
- * is the least believable page a reader can be handed, and this repository has
- * a legend for exactly this reason (see README.md). Every claim below states
- * its own status, and scripts/targetect-test.ts refuses the two lies that
- * matter: a shipped claim whose engine does not exist, and a specified claim
- * that reaches the page without saying it is not built yet.
+ * down, not built. A page of ten green ticks on a product's first day is the
+ * least believable thing a reader can be handed, and this repository has a
+ * legend for exactly that (README.md). Every claim below carries its status,
+ * and scripts/targetect-test.ts refuses the two lies that matter: a shipped
+ * claim whose engine does not exist, and a specified claim reaching the page
+ * without saying it is not built yet.
  *
  * Pure data — no I/O, no React. The page renders it; the guard reads it.
  */
@@ -54,39 +60,58 @@ export const TARGETECT = {
 
 /** The whole product in one line, as it is said out loud. */
 export const TARGETECT_PROMISE =
-  'You know it is Ali. To call him, he has to register — so today you buy every Ali, Aliaa and Aliiaa in the city and wait. Targetect spots Ali, reaches Ali, and touches Aliaa as Aliaa.'
+  'I cast your audience and distribute the reach. Ali gets one part and is bought once, instead of being bought in every set you run — and Aliaa gets a part of her own, at her own price.'
 
 /**
- * THE RULE THAT DECIDES WHAT SPOTTING MEANS, and it is a limit, not a feature.
- *
- * A product that resolves a stranger to a named individual from bought data is
- * surveillance wearing a marketing name, and it also breaks: identity brokers
- * get shut, platforms close the door, and the whole thing stops working in a
- * week that nobody chose. Targetect spots a person from what they did WITH YOU
- * — your pages, your forms, your calls, your CRM — and from what the ad
- * platforms genuinely sell. It never buys, brokers, or infers identity from
- * purchased personal data, and it never hands one person's identity to another
- * advertiser. That is the difference between finding your buyer and following
- * a stranger, and it is written here so nobody has to guess later.
+ * The boundary, stated as plainly as the promise. An audience tool that also
+ * runs the ads is an agency with a login, and the account can never leave it.
+ * Targetect writes sets into the customer's own ad account and stops there.
+ */
+export const TARGETECT_NOT =
+  'Not an agency, not a team, and not a thing that runs your ads. Targetect builds the sets inside your own ad accounts, under your name — they are yours the day it arrives and yours the day it leaves.'
+
+/**
+ * THE TWO NUMBERS THE WHOLE ORDER COMES FROM. Named here because the page, the
+ * engine (lib/targetect/casting.ts) and any conversation about a plan have to
+ * mean the same thing by them.
+ */
+export const TARGETECT_SCORES = [
+  {
+    name: 'Recognition',
+    body: 'How sure we are that these are the people you meant — from evidence the account owns: what they did on your pages, in your forms, on your calls, in your CRM. Not a resemblance somebody sold you.',
+  },
+  {
+    name: 'Opportunity',
+    body: 'Whether they can be reached today: impressions available, on a surface that exists, at a price worth paying. A perfect audience with nowhere to run is not a part worth casting.',
+  },
+] as const
+
+/**
+ * The rule that decides what recognition may be built from, and it is a limit
+ * rather than a feature. A product that resolves a stranger to a named person
+ * out of bought data is surveillance wearing a marketing name, and it also
+ * breaks: identity brokers get shut and platforms close doors in weeks nobody
+ * chose. Targetect recognises YOUR people, from what they did with you and
+ * from what the ad platforms genuinely sell.
  */
 export const TARGETECT_IDENTITY_RULE =
-  'Targetect spots a person from what they did with you and from what the platforms actually sell. It never buys or brokers identity data, and one advertiser never sees another’s people.'
+  'Targetect recognises a person from what they did with you and from what the platforms actually sell. It never buys or brokers identity data, and one advertiser never sees another’s people.'
 
 /** The three acts, in the order they happen. */
-export type TargetectAct = 'spot' | 'reach' | 'touch'
+export type TargetectAct = 'study' | 'cast' | 'distribute'
 
 export const TARGETECT_ACTS: Readonly<Record<TargetectAct, { title: string; body: string }>> = {
-  spot: {
-    title: 'Spot',
-    body: 'Find the one person, not the thousand who share his name. The evidence is what he did — the page he came back to, the second enquiry, the question he asked — never a resemblance somebody sold you.',
+  study: {
+    title: 'Study',
+    body: 'The interests and audiences your account already runs are read back into data sets and customer studies: who is really in them, what those people did, and which of them ever produced a buyer. That study is the seed — the thing a lookalike should have been built from in the first place.',
   },
-  reach: {
-    title: 'Reach',
-    body: 'Go to where he is today: the surface he is on now, at the moment he is on it. Registration is a toll, and the whole point is to stop paying it before anyone is allowed to speak.',
+  cast: {
+    title: 'Cast',
+    body: 'Every audience gets one part, in one order, built inside your own ad account. Casting is the word because it is the same decision: this person plays this role, and nobody plays two.',
   },
-  touch: {
-    title: 'Touch',
-    body: 'The people around him are real and they are not him. They get a lighter touch, they are counted as themselves, and the one you meant is never averaged into them.',
+  distribute: {
+    title: 'Distribute',
+    body: 'The reach is shared across the parts by recognition and opportunity, and every part excludes the parts above it. Ali is bought once, at one price, instead of four ad sets bidding for him and the account paying the difference.',
   },
 }
 
@@ -118,73 +143,91 @@ export interface TargetectClaim {
 }
 
 export const TARGETECT_CLAIMS: TargetectClaim[] = [
-  // ── SPOT ───────────────────────────────────────────────────────────────
+  // ── STUDY ──────────────────────────────────────────────────────────────
   {
-    act: 'spot',
-    title: 'The name is not the person',
-    body: 'A name is the weakest thing you know about a buyer and the only thing today’s targeting can hold. Targetect resolves to the one person, and says how it knows.',
+    act: 'study',
+    title: 'Your interests, reversed',
+    body: 'An interest list is a guess written as a target. Read backwards — against the people it actually delivered and what they did next — it becomes a data set and a customer study, which is a different kind of object entirely.',
     status: 'specified',
   },
   {
-    act: 'spot',
-    title: 'What he did',
-    body: 'Time parked on the payment plan, the tab that went idle and was chosen again, how far he read. A person who returns to one property with nobody prompting him has told you more than any interest list can.',
+    act: 'study',
+    title: 'The seed before the lookalike',
+    body: 'A lookalike is only ever as good as the seed it was grown from, and most seeds are a thin export nobody examined. Targetect builds the seed sets, and the lookalike comes after them.',
+    status: 'specified',
+  },
+  {
+    act: 'study',
+    title: 'What they did',
+    body: 'Time parked on the payment plan, the tab that went idle and was chosen again, how far they read. A person who returns to one property with nobody prompting them has told you more than any interest list can — and that is what recognition is built from.',
     status: 'shipped',
     engine: 'lib/freehold/behavioral-telemetry.ts',
     guard: 'scripts/behavioral-telemetry-test.ts',
   },
   {
-    act: 'spot',
+    act: 'study',
     title: 'The second enquiry',
-    body: 'Asking twice about the same kind of home in the same area is a decision being made. Asking about six areas is a browse. The two are read differently and only one of them is escalated.',
+    body: 'Asking twice about the same kind of home in the same area is a decision being made. Asking about six areas is a browse. The two are read differently, and only one of them raises recognition.',
     status: 'shipped',
     engine: 'lib/freehold/intent-convergence.ts',
     guard: 'scripts/intent-convergence-test.ts',
   },
-  // ── REACH ──────────────────────────────────────────────────────────────
+  // ── CAST ───────────────────────────────────────────────────────────────
   {
-    act: 'reach',
-    title: 'Where he is today',
-    body: 'Not a segment he belongs to — the surfaces he is actually reachable on now, and which of them is worth the next dirham.',
-    status: 'specified',
-  },
-  {
-    act: 'reach',
-    title: 'No form first',
-    body: 'The form is the toll that made all of this necessary. Reaching a person before they register is the product; everything else here is in service of it.',
-    status: 'specified',
-  },
-  // ── TOUCH ──────────────────────────────────────────────────────────────
-  {
-    act: 'touch',
-    title: 'Aliaa is a halo',
-    body: 'The near-matches are worth something and they are worth less. They are touched as themselves, on their own budget, and never counted as the person you were looking for.',
-    status: 'specified',
-  },
-  {
-    act: 'touch',
-    title: 'The form that talks back',
-    body: 'Where a spotted person lands: a form with a named member of the sales team inside it, asking one thing at a time in the language the person used.',
-    status: 'partial',
-    engine: 'lib/freehold/visual-sales-team.ts',
-    guard: 'scripts/visual-sales-team-test.ts',
-    missing: 'the conversation runtime — the team, the voices and the caller exist; no endpoint runs the form’s turns yet',
-  },
-  {
-    act: 'touch',
-    title: 'A person on the line',
-    body: 'The call is placed by somebody with a name, a fixed voice and a script, inside consent and calling hours — and never by whoever the lead already turned down.',
+    act: 'cast',
+    title: 'One part each',
+    body: 'Every audience is cast into one part, ordered by recognition times opportunity — multiplied, never averaged, because a set you are sure of with nowhere to run and a cheap crowd nobody recognises are both worth nothing, and an average hides that.',
     status: 'shipped',
-    engine: 'lib/freehold/lead-caller.ts',
-    guard: 'scripts/lead-caller-test.ts',
+    engine: 'lib/targetect/casting.ts',
+    guard: 'scripts/targetect-casting-test.ts',
+  },
+  {
+    act: 'cast',
+    title: 'Built in your account',
+    body: 'The sets are created in your own ad account, under your name. Nothing is rented: if Targetect goes away tomorrow, the audiences it built are still yours and still running.',
+    status: 'partial',
+    engine: 'lib/freehold/audiences.ts',
+    guard: 'scripts/audience-language-test.ts',
+    missing: 'the casting plan is not written to the account yet — what exists creates a custom audience and a lookalike from a rated list, not a cast with its exclusions',
+  },
+  // ── DISTRIBUTE ─────────────────────────────────────────────────────────
+  {
+    act: 'distribute',
+    title: 'Nobody is bought twice',
+    body: 'Each part excludes every part cast above it, so a person who belongs to three of your audiences is reached inside one of them. That exclusion list is the product; a report about overlap is not.',
+    status: 'shipped',
+    engine: 'lib/targetect/casting.ts',
+    guard: 'scripts/targetect-casting-test.ts',
+  },
+  {
+    act: 'distribute',
+    title: 'Nothing starves',
+    body: 'A budget split across more parts than it can carry produces parts that each learn nothing and a report made of noise. The parts that do not fit are held, by name and with a reason, rather than cast into starvation.',
+    status: 'shipped',
+    engine: 'lib/targetect/casting.ts',
+    guard: 'scripts/targetect-casting-test.ts',
+  },
+  {
+    act: 'distribute',
+    title: 'Aliaa gets her own part',
+    body: 'The near-matches are real people and they are not the one you meant. They are cast as themselves, on their own share of the reach, and never counted as him.',
+    status: 'specified',
+  },
+  {
+    act: 'distribute',
+    title: 'It refuses rather than guesses',
+    body: 'No cost per event, no plan. A set the platform will not size is held rather than estimated into existence. A number that arrived from an assumption is worse than no number, because it is spent.',
+    status: 'shipped',
+    engine: 'lib/targetect/casting.ts',
+    guard: 'scripts/targetect-casting-test.ts',
   },
 ]
 
 /**
- * What Targetect works best beside. Spotting a person is worth nothing until
- * someone speaks to them, and both of the things that speak already run in
- * this deployment — which is the whole reason the two products share an
- * address while staying separate names.
+ * What Targetect works best beside. A cast audience is worth nothing until
+ * somebody speaks to the people in it, and both of the things that speak
+ * already run in this deployment — which is the whole reason the two products
+ * share an address while staying separate names.
  */
 export const TARGETECT_PAIRS = [
   {

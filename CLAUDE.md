@@ -12,13 +12,19 @@ schema-per-tenant.
 **Targetect** is not one of them. Separate product, separate name, its own
 apex `targetect.com` (`BRAND_DOMAINS` in `lib/tenancy/vendor-host.ts`, a door
 at `targetect.entrestate.com`, the page at `/targetect` — outside `/business`
-on purpose, and absent from the products menu). Its question is *where is my
-audience today*: spot the person you meant, reach him where he is, touch the
-near-matches as themselves. Most of it is `specified`, not built —
-`lib/targetect/product.ts` carries a status per claim and
-`scripts/targetect-test.ts` refuses both a built claim with no engine and a
-specified claim that reaches the page without saying it is not built yet.
-It works beside Leadformer and the caller, which do ship.
+on purpose, and absent from the products menu). What it does is **target
+casting**: study (interests reversed into data sets), cast (one part per
+audience, in the customer's own ad account), distribute (reach shared by
+recognition × opportunity, each part excluding the ones above it, so a person
+is bought once). It builds audiences; it never runs ads or touches a budget.
+
+`lib/targetect/casting.ts` is the decision and it ships —
+`scripts/targetect-casting-test.ts` holds the exclusion chain, the learning
+floor, and the refusals (an unknown cost casts nothing rather than assuming
+one). Most other claims are `specified`: `lib/targetect/product.ts` carries a
+status per claim, and `scripts/targetect-test.ts` refuses both a built claim
+with no engine and a specified claim reaching the page without saying it is
+not built yet. It works beside Leadformer and the caller, which do ship.
 
 ## One rule before your first command: this repo is not `ezz-ae/ORE`
 

@@ -7,8 +7,10 @@ import {
   TARGETECT_ACTS,
   TARGETECT_CLAIMS,
   TARGETECT_IDENTITY_RULE,
+  TARGETECT_NOT,
   TARGETECT_PAIRS,
   TARGETECT_PROMISE,
+  TARGETECT_SCORES,
   type ClaimStatus,
   type TargetectAct,
   type TargetectClaim,
@@ -45,7 +47,7 @@ const STATUS_TONE: Record<ClaimStatus, string> = {
   specified: 'border-line text-ink-faint',
 }
 
-const ACT_ORDER: TargetectAct[] = ['spot', 'reach', 'touch']
+const ACT_ORDER: TargetectAct[] = ['study', 'cast', 'distribute']
 
 function Claim({ claim }: { claim: TargetectClaim }) {
   return (
@@ -78,9 +80,9 @@ export default function TargetectPage() {
     <>
       {/* ── Hero ────────────────────────────────────────────────────────── */}
       <Section className="pb-14 pt-16 lg:pb-20 lg:pt-24">
-        <Eyebrow>Targetect · building audience</Eyebrow>
+        <Eyebrow>Targetect · target casting</Eyebrow>
         <div className="mt-5 max-w-[52rem]">
-          <Display>Where is your audience today?</Display>
+          <Display>I cast your audience, and distribute the reach.</Display>
         </div>
         <div className="mt-7 max-w-[60ch]">
           <Lede>{TARGETECT_PROMISE}</Lede>
@@ -94,29 +96,54 @@ export default function TargetectPage() {
       {/* ── The problem, in one scene ───────────────────────────────────── */}
       <GlowBand>
         <div className="mx-auto max-w-[64ch] text-center">
-          <H2>To call Ali, Ali has to register.</H2>
+          <H2>Ali is in four of your ad sets. All four are bidding for him.</H2>
           <div className="mt-6">
             <Lede>
-              So the machine is built backwards. You buy a crowd of everyone who
-              resembles him, you pay for the crowd, and you wait for one of them to fill
-              a form before anybody is allowed to say a word. The resemblance costs full
-              price and gets counted as if it were him.
+              He is in the doctors set, the Golden Visa set, the lookalike and the
+              retargeting set. Your own ad sets raise each other’s price, the account
+              pays it, and one person is reached four times as if he were four people.
             </Lede>
           </div>
           <div className="mt-6">
             <Lede>
-              Targetect asks the question the other way round. Not build me an audience —
-              where is he, today.
+              Casting ends that. Every audience gets one part, in one order, and every
+              part excludes the parts above it — so Ali is bought once, and Aliaa is
+              bought as Aliaa.
             </Lede>
           </div>
         </div>
       </GlowBand>
 
+      {/* ── What it is not ──────────────────────────────────────────────── */}
+      <Section className="py-14 lg:py-20">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+          <div>
+            <H2>It builds audiences. It does not run ads.</H2>
+            <div className="mt-5">
+              <Lede>{TARGETECT_NOT}</Lede>
+            </div>
+          </div>
+          <div className="flex flex-col gap-5">
+            {TARGETECT_SCORES.map((sc) => (
+              <div key={sc.name} className="border-l-2 border-brand pl-5">
+                <H3>{sc.name}</H3>
+                <p className="mt-2 max-w-[52ch] text-[0.9375rem] leading-[1.65] text-ink-muted">{sc.body}</p>
+              </div>
+            ))}
+            <p className="max-w-[52ch] text-[0.875rem] leading-[1.6] text-ink-faint">
+              The two are multiplied, never averaged: an audience you are sure of with
+              nowhere to run and a cheap crowd nobody recognises are both worth nothing,
+              and an average hides it.
+            </p>
+          </div>
+        </div>
+      </Section>
+
       {/* ── Spot · Reach · Touch ────────────────────────────────────────── */}
       <div id="what-exists">
       <Section className="py-16 lg:py-24">
         <div className="max-w-[46rem]">
-          <H2>Spot him. Reach him. Touch the rest as themselves.</H2>
+          <H2>Study the audience. Cast it. Distribute the reach.</H2>
           <div className="mt-5">
             <Lede>
               Three acts, and each claim below says whether it is built, half built, or

@@ -43,14 +43,20 @@ Machine, Mega Brokerage Platform, Landing Pages and Meta for Realtors.
 
 One more product shares this deployment without belonging to that family:
 **Targetect** ([targetect.com](https://targetect.com), served at `/targetect`).
-It asks a different question — *where is my audience today* — because a phone
-number is only earned by a form, so today a buyer named Ali is reached by
-buying every Ali and Aliaa in the city and waiting. Most of it is specified
-rather than built, and the page says so beside each claim: the list lives in
-`lib/targetect/product.ts` with a status per claim, and
+It does **target casting** — it reverses the interests an account already runs
+into data sets and customer studies, builds the seed sets inside the customer's
+own ad account, and distributes the reach across them by two numbers,
+recognition and opportunity. The disease it treats: one buyer sits in four of
+your ad sets, all four bid for him, and the account pays the raised price to
+reach one person four times. Casting gives every audience one part and makes
+each part exclude the ones above it, so a person is bought once
+(`lib/targetect/casting.ts`, guard `scripts/targetect-casting-test.ts`).
+
+Most of the rest is specified rather than built, and the page says so beside
+each claim: `lib/targetect/product.ts` carries a status per claim, and
 `scripts/targetect-test.ts` fails the build both when a claim marked built has
 no engine and when a claim that is only specified reaches the page without
-saying so.
+saying so. Targetect does not run ads and does not touch a budget.
 
 *The commercial argument — who this is for, how it is paid for, and where it
 is going — is [`COMMERCIAL-VISION.md`](COMMERCIAL-VISION.md), deliberately

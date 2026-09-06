@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN = 'entrestate.com'
   const {
     TARGETECT, TARGETECT_ACTS, TARGETECT_CLAIMS, TARGETECT_PAIRS,
-    TARGETECT_PROMISE, TARGETECT_IDENTITY_RULE,
+    TARGETECT_PROMISE, TARGETECT_IDENTITY_RULE, TARGETECT_NOT,
   } = await import('../lib/targetect/product')
   const { PRODUCTS, ALL_BUSINESS_ROUTES } = await import('../lib/business/nav')
 
@@ -123,8 +123,27 @@ async function main(): Promise<void> {
     const claims = shown.filter((t) => FIGURE.test(t))
     check('no cost, percentage or multiple is claimed anywhere on the page', claims.length === 0, claims.join(' | '))
 
-    check('all three acts carry claims — spot, reach and touch',
+    check('all three acts carry claims — study, cast and distribute',
       Object.keys(TARGETECT_ACTS).every((a) => TARGETECT_CLAIMS.some((c) => c.act === a)))
+
+    // The product is named after one decision. If nothing shipped points at
+    // it, the name is a slogan.
+    const casting = TARGETECT_CLAIMS.filter((c) => c.engine === 'lib/targetect/casting.ts')
+    check('the casting decision the product is named after is one of the built claims',
+      casting.length > 0 && casting.every((c) => c.status === 'shipped'), show(casting.map((c) => c.title)))
+
+    check('the page says what Targetect refuses to be, and what the two scores mean',
+      page.includes('TARGETECT_NOT') && page.includes('TARGETECT_SCORES') &&
+      TARGETECT_NOT.toLowerCase().includes('not an agency'))
+
+    // The page tells readers the cast is computed and not yet written to an ad
+    // account. The orphan sweep says the same thing to the next developer. If
+    // one of them stops saying it, they disagree about what exists.
+    const written = TARGETECT_CLAIMS.find((c) => c.title === 'Built in your account')
+    check('“built in your account” is honest about the half that is missing',
+      written?.status === 'partial' && (written.missing ?? '').length > 20, show(written?.status))
+    check('…and the orphan sweep records the same gap for the casting engine',
+      read('scripts/no-orphan-modules-test.ts').includes("'lib/targetect/casting.ts':"))
   }
 
   console.log('\n── it stands alone: its own address, and not in anybody’s menu ──')

@@ -55,6 +55,17 @@ const DORMANT: Record<string, string> = {
   'lib/freehold/visual-sales-routing.ts':
     'waiting on the Leadformer conversation runtime — no endpoint runs the form turns yet',
 
+  // Target casting: the decision that gives each audience one part and makes
+  // every part exclude the ones above it, so a person is bought once. The
+  // decision is complete and guarded (scripts/targetect-casting-test.ts); what
+  // does not exist is the writer that pushes a cast — the sets and their
+  // exclusions — into an ad account. Listed here rather than left silent
+  // because a casting engine nothing calls is exactly the shape this sweep
+  // exists to catch, and Targetect's own page says the same thing to readers:
+  // the plan is built, the write is not.
+  'lib/targetect/casting.ts':
+    'the cast is computed and nothing writes it to an ad account yet — no surface builds sets from a CastPlan',
+
   // ── Found by this guard on the day it was written ───────────────────────────
   //
   // These are not blessed. Each is a real answer to a real question that
