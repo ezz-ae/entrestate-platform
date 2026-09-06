@@ -71,9 +71,13 @@ export default function LeadMachinePage() {
         <div className="mx-auto max-w-[62ch] text-center">
           <H2>2:47am. A lead asks in Arabic.</H2>
           <div className="mt-6">
+            {/* Not "it has an answer": the system does not answer the lead.
+                By 2:48 it has routed it, tagged the language and started the
+                clock — and Omar answers. Same wording as /business/platform/crm
+                and the lead card crop, so the claim is one claim. */}
             <Lede>
-              By 2:48 it has an answer, an owner and a viewing proposed. Omar K. wakes to a named
-              lead.
+              By 2:48 it has an owner, a language tag and a follow-up on the clock. Omar K. wakes
+              to a named lead and calls it back.
             </Lede>
           </div>
         </div>
@@ -94,7 +98,7 @@ export default function LeadMachinePage() {
           </Holder>
 
           <Holder tone="blue" label="CRM · new lead" visual={<LeadCardCrop flush />}>
-            <Keyword>Leads answered fast.</Keyword>
+            <Keyword>Owned on arrival.</Keyword>
             <KeywordSub>Every lead lands owned, tied to the exact ad that produced it.</KeywordSub>
             <LearnMore href="/business/docs/lead-flow" label="See how leads flow" />
           </Holder>

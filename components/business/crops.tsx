@@ -226,7 +226,7 @@ export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
           <div key={l} className="rounded-xl border border-line bg-surface-2 px-3 py-2.5">
             <div className="text-[11px] text-ink-muted">{l}</div>
             <div className="mt-1 font-mono text-[1.15rem] leading-none tabular-nums text-ink" dir="ltr">{v}</div>
-            <div className="mt-1 text-[10px] text-ink-faint">{s}</div>
+            <div className="mt-1 text-[11px] text-ink-faint">{s}</div>
           </div>
         ))}
       </div>
@@ -248,7 +248,7 @@ export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
               <span className="h-1 w-24 overflow-hidden rounded-full bg-surface-3">
                 <span className="block h-full rounded-full bg-brand" style={{ width: `${r.ready}%` }} />
               </span>
-              <span className="font-mono text-[10px] text-ink-faint">{r.ready}% ad ready</span>
+              <span className="font-mono text-[11px] text-ink-faint">{r.ready}% ad ready</span>
             </div>
           </div>
         ))}
@@ -359,7 +359,7 @@ export function LeadformCrop({ flush = false }: { flush?: boolean } = {}) {
           <span aria-hidden className="h-7 w-7 rounded-full bg-[linear-gradient(135deg,#d9a042,#d46b47)]" />
           <div className="min-w-0 leading-tight">
             <div className="text-[12px] font-semibold text-ink">yourbrokerage</div>
-            <div className="text-[10px] text-ink-faint">Sponsored</div>
+            <div className="text-[11px] text-ink-faint">Sponsored</div>
           </div>
         </div>
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-[linear-gradient(160deg,#d9a042_0%,#d46b47_45%,#3a3140_100%)]">
@@ -496,7 +496,7 @@ export function CompanyCrop({ flush = false }: { flush?: boolean } = {}) {
               <Chip tone="positive">Live</Chip>
             </div>
             <div className="mt-2 font-mono text-[1.15rem] leading-none tabular-nums text-ink" dir="ltr">{v}</div>
-            <div className="mt-1 text-[10px] text-ink-faint">{s}</div>
+            <div className="mt-1 text-[11px] text-ink-faint">{s}</div>
           </div>
         ))}
       </div>

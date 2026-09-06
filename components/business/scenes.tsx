@@ -73,7 +73,9 @@ const SCENE_CSS = [
 
 /* ── Shared wrapper ─────────────────────────────────────────────────────── */
 
-const MONO = 'font-mono text-[9px] uppercase tracking-[0.14em]'
+/* 10px is the floor: the canvas is a fixed 340px, so what is set here is
+   what a phone renders — there is no breakpoint to grow at. */
+const MONO = 'font-mono text-[10px] uppercase tracking-[0.14em]'
 
 function Scene({
   title,
@@ -132,7 +134,7 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
   return (
     <Scene
       className={className}
-      title="A project card appears, a daily budget is capped, the campaign goes live, and a WhatsApp lead is answered in 54 seconds."
+      title="A project card appears, a daily budget is capped, the campaign goes live, and the lead it produces lands owned one minute later."
     >
       <div className="relative mx-auto w-full max-w-[340px]">
         {/* beat 4: the lead lands — drops in like a notification */}
@@ -144,10 +146,13 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
             <p className={`mt-0.5 text-right ${MONO} text-ink/40`}>2:47 AM</p>
           </div>
           <div className="bscene-in-e mt-1.5 flex justify-end">
+            {/* NOT "answered in 54s". The product does not answer the lead;
+                it routes it and starts the clock, and a person answers. The
+                same correction the crops and the CRM pages already carry. */}
             <span
               className={`rounded-full bg-brand/15 px-2 py-0.5 ${MONO} text-brand-bright ring-1 ring-brand/25`}
             >
-              answered in 54s
+              owned by 2:48 · Omar K.
             </span>
           </div>
         </div>
@@ -182,14 +187,14 @@ export function SceneRunAds({ className = '' }: { className?: string }) {
               <p className="truncate text-[10px] font-semibold tracking-tight text-ink">
                 Narenj Villas — Leads
               </p>
-              <span className={`shrink-0 rounded-full bg-[#34D399]/15 px-1.5 py-px ${MONO} text-[8px] text-[#34D399] ring-1 ring-[#34D399]/25`}>
+              <span className={`shrink-0 rounded-full bg-[#34D399]/15 px-1.5 py-px ${MONO} text-[10px] text-[#34D399] ring-1 ring-[#34D399]/25`}>
                 On
               </span>
             </div>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
               <div className="bscene-bar h-full w-[78%] rounded-full bg-brand" />
             </div>
-            <p className="mt-1.5 font-mono text-[9px] tabular-nums text-ink-faint">
+            <p className="mt-1.5 font-mono text-[10px] tabular-nums text-ink-faint">
               AED 212 spent · 4 leads · AED 53/lead
             </p>
           </div>
@@ -242,7 +247,7 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
           </div>
           <div className="bscene-p2 mt-2 flex items-center justify-between">
             <span className="h-2 w-16 rounded-full bg-surface-2" />
-            <span className="font-mono text-[9px] tabular-nums text-ink-muted">AED 540K</span>
+            <span className="font-mono text-[10px] tabular-nums text-ink-muted">AED 540K</span>
           </div>
           <div className="bscene-p3 mt-2 grid grid-cols-3 gap-2">
             <span className="h-10 rounded-md bg-surface-2" />
@@ -252,7 +257,7 @@ export function SceneChatBuilds({ className = '' }: { className?: string }) {
           <div className="bscene-p4 mt-2 space-y-1.5">
             <span className="block h-6 rounded-md bg-surface-2 ring-1 ring-line" />
             <span className="block h-6 rounded-md bg-surface-2 ring-1 ring-line" />
-            <span className="flex h-7 items-center justify-center gap-1.5 rounded-md bg-[#34D399]/20 text-[9px] font-semibold text-[#34D399]">
+            <span className="flex h-7 items-center justify-center gap-1.5 rounded-md bg-[#34D399]/20 text-[10px] font-semibold text-[#34D399]">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
                 <path d="M21 11.5a8.5 8.5 0 01-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1121 11.5z" />
               </svg>
@@ -317,14 +322,14 @@ export function SceneOneClickStory({ className = '' }: { className?: string }) {
         <div className="w-[96px] sm:w-[120px]">
           <div className="bscene-story relative aspect-[9/16] overflow-hidden rounded-xl ring-1 ring-line shadow-[0_24px_60px_-24px_rgba(0,0,0,0.8)]">
             <div className="absolute inset-0 bg-gradient-to-b from-[#2A4A73] via-[#16283F] to-[#0A0E14]" />
-            <span className={`absolute left-2 top-2 rounded bg-black/40 px-1 py-px ${MONO} text-[8px] text-ink/60`}>
+            <span className={`absolute left-2 top-2 rounded bg-black/40 px-1 py-px ${MONO} text-[10px] text-ink/60`}>
               9:16
             </span>
             <div className="absolute inset-x-0 bottom-0 p-2">
-              <p className="text-[9px] font-semibold tracking-tight text-ink">Narenj Villas</p>
-              <p className="font-mono text-[8px] tabular-nums text-ink/60">AED 540K</p>
+              <p className="text-[10px] font-semibold tracking-tight text-ink">Narenj Villas</p>
+              <p className="font-mono text-[10px] tabular-nums text-ink/60">AED 540K</p>
               <div className="mt-1.5 flex justify-center">
-                <span className="rounded-full bg-surface-3 px-2 py-0.5 text-[8px] text-ink">
+                <span className="rounded-full bg-surface-3 px-2 py-0.5 text-[10px] text-ink">
                   ↑ Swipe up
                 </span>
               </div>

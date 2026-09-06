@@ -103,10 +103,22 @@ console.log('\n── nothing the product does not do ──')
   check('visuals draws no screen any more — only the frame, the log and the reading path',
     !/Mini(CRM|Campaigns|Inventory|Page|Report)|HeroVisual|export function (Phone|Chat)\(/.test(visuals))
   check('…and it no longer needs a crop to front a mock', !/from '@\/components\/business\/crops'/.test(visuals))
-  const answered = files.filter((f) => /By 2:48 it(’|')s answered|it has an answer, a language|answered fast, tagged/.test(readFileSync(f, 'utf8')))
+  const answered = files.filter((f) => /By 2:48 it(’|')s answered|it has an answer|answered fast, tagged|Leads answered fast/.test(stripComments(readFileSync(f, 'utf8'))))
   check('no page claims the product answers the lead itself', answered.length === 0, answered.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
   check('the crops never say the product answers a WhatsApp', !/answers? (on|the) WhatsApp|auto-?repl/i.test(CROPS))
   check('the lead card says the person answers', /the person answers/.test(CROPS))
+  // The story scenes carried the claim after every page had dropped it: a
+  // badge reading "answered in 54s" and a scene title saying a WhatsApp lead
+  // is answered in 54 seconds. The product routes the lead and starts the
+  // clock; the person answers.
+  const scenes = stripComments(read('components/business/scenes.tsx'))
+  check('no scene says the lead was answered by the product',
+    !/answered in \d+s|is answered in/.test(scenes))
+  check('…the scene says what happens instead — owned, with a name on it', /owned by 2:48 · Omar K\./.test(scenes))
+  // The scene canvas is a fixed 340px on every screen, so its type size is
+  // what a phone renders — there is no breakpoint for it to grow at.
+  const belowTen = [...scenes.matchAll(/text-\[([0-9.]+)px\]/g)].map((m) => Number(m[1])).filter((n) => n < 10)
+  check('nothing on a scene is set below 10px', belowTen.length === 0, belowTen.join(', '))
 }
 
 console.log('\n── the data is healthy ──')

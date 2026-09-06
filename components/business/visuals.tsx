@@ -69,10 +69,10 @@ export function Browser({
 
 function MiniHeader({ label, right }: { label: string; right?: string }) {
   return (
-    <div className="flex items-baseline justify-between border-b border-line px-3 py-2">
-      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">{label}</span>
+    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-line px-3.5 py-2.5">
+      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">{label}</span>
       {right ? (
-        <span className="font-mono text-[9px] tabular-nums text-ink-faint" dir="ltr">
+        <span className="font-mono text-[11px] tabular-nums text-ink-faint" dir="ltr">
           {right}
         </span>
       ) : null}
@@ -89,18 +89,30 @@ export interface LedgerRow {
   amount?: string
 }
 
+/**
+ * The decision log — the reason written before the money moves.
+ *
+ * It used to be set at 9–10px with the event `truncate`d, because it was
+ * drawn to sit inside a browser frame beside the mock screens. Those are
+ * gone, this is not: the log is the argument ("no rule, no spend"), and a
+ * sentence cut at "budget +AED 150 → Marina Vista video — rul…" makes it
+ * instead of making it. So the row now reads at crop size and WRAPS: the
+ * whole reason, on a phone, without a horizontal scroll.
+ */
 export function Ledger({ rows, className = '' }: { rows: LedgerRow[]; className?: string }) {
   return (
-    <div className={`overflow-hidden rounded-lg bg-chrome ring-1 ring-line ${className}`}>
+    <div className={`overflow-hidden rounded-xl bg-chrome ring-1 ring-line ${className}`}>
       <MiniHeader label="Decision log" right="written before spend" />
       <div className="divide-y divide-line" dir="ltr">
         {rows.map((r, i) => (
-          <div key={i} className="flex items-baseline gap-3 px-3.5 py-2 font-mono">
-            <span className="shrink-0 text-[9px] tabular-nums text-[#565C64]">{r.time}</span>
-            <span className="min-w-0 flex-1 truncate text-[10px] text-ink-muted">{r.event}</span>
-            {r.amount ? (
-              <span className="shrink-0 text-[10px] tabular-nums text-brand">{r.amount}</span>
-            ) : null}
+          <div key={i} className="px-3.5 py-3 font-mono">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="shrink-0 text-[11px] tabular-nums text-ink-faint">{r.time}</span>
+              {r.amount ? (
+                <span className="shrink-0 text-[12px] tabular-nums text-brand">{r.amount}</span>
+              ) : null}
+            </div>
+            <p className="mt-1 text-[12.5px] leading-[1.5] text-ink-muted">{r.event}</p>
           </div>
         ))}
       </div>
