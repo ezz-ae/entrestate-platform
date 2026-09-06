@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { Section, Eyebrow, Display, Lede, SectionHeading, ButtonLink } from '@/components/business/ui'
 import {
-  Browser, MiniPage, StepRail, PunchGrid, StatBand, GlowBand, NextStep,
+  Browser, StepRail, PunchGrid, StatBand, GlowBand, NextStep,
 } from '@/components/business/visuals'
+import { CropReel } from '@/components/business/crop-reel'
+import { AiEditCrop, LandingRowsCrop, MicrositeCrop } from '@/components/business/crops'
 import { SceneChatBuilds } from '@/components/business/scenes'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
@@ -88,31 +90,18 @@ export default function LandingPagesPage() {
             </p>
           </div>
 
-          <div className="relative isolate">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.07),transparent_65%)]"
-            />
-            <div className="grid">
-              <div className="min-w-0 sm:col-start-1 sm:row-start-1 sm:pb-10 sm:pr-28 lg:pr-36">
-                <div className="sm:-rotate-1">
-                  <Browser title="skyline.entrestate.com/inventory/landing-pages">
-                    <Shot
-                      src="/business/screens/landings.webp"
-                      alt="The landing-page list — counters for live, pending, draft and missing pages, a banner naming the projects with no page, then project rows badged Live."
-                    />
-                  </Browser>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-center sm:col-start-1 sm:row-start-1 sm:mt-0 sm:items-end sm:justify-end">
-                <div className="w-[220px] sm:w-[250px] sm:rotate-2">
-                  <Browser title="yourbrokerage.ae/marina-vista-2br">
-                    <MiniPage />
-                  </Browser>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Crops, one at a time, at reading size. The collage here laid a
+              240px mock landing page over a whole screenshot — on a phone the
+              two rotated layers sat on top of each other, and neither was
+              readable at any width. The real captures stay below, in the
+              holders, where each one is captioned and full width. */}
+          <CropReel
+            frames={[
+              { key: 'rows', caption: 'A page per property, and how ad-ready each one is.', node: <LandingRowsCrop /> },
+              { key: 'edit', caption: 'Change any page from the chat — reversible from the chat.', node: <AiEditCrop /> },
+              { key: 'microsite', caption: 'Or a whole project website, on its own address.', node: <MicrositeCrop /> },
+            ]}
+          />
         </div>
       </Section>
 

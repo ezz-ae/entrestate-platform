@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { Section, Display, Lede } from '@/components/business/ui'
-import { Browser, Phone, Chat, MiniCRM, Chapter, NextStep } from '@/components/business/visuals'
+import { Chapter, NextStep } from '@/components/business/visuals'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
-import { LeadCardCrop } from '@/components/business/crops'
+import { CompanyCrop, LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'CRM',
@@ -42,11 +42,8 @@ export default function CrmPage() {
         <div className="space-y-5">
           <Holder
             tone="gold"
-            visual={
-              <Browser title="app.yourbrokerage.ae/crm">
-                <MiniCRM />
-              </Browser>
-            }
+            label="Management · company"
+            visual={<CompanyCrop flush />}
           >
             <Keyword>Owned on arrival.</Keyword>
             <KeywordSub>

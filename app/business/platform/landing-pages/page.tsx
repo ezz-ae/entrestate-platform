@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Section, Display, Lede } from '@/components/business/ui'
 import { Holder, Keyword, KeywordSub, HolderRow, LearnMore } from '@/components/business/holders'
-import { Browser, MiniPage, Chapter, NextStep, StatBand } from '@/components/business/visuals'
+import { Chapter, NextStep, StatBand } from '@/components/business/visuals'
+import { LandingRowsCrop } from '@/components/business/crops'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -25,11 +26,7 @@ export default function LandingPagesPage() {
               <Lede>Every listing gets its own page, built from the record. In three languages.</Lede>
             </div>
           </div>
-          <div className="mx-auto w-full max-w-[340px] lg:mx-0 lg:justify-self-end">
-            <Browser title="yourbrokerage.ae/lp/marina-vista-2br">
-              <MiniPage />
-            </Browser>
-          </div>
+          <LandingRowsCrop />
         </div>
       </Section>
 

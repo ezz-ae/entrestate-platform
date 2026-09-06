@@ -92,15 +92,26 @@ console.log('\n── nothing in the panel is a claim about results ──')
 
 console.log('\n── one demo, one wording ──')
 {
-  const page = read('app/business/leadformer/page.tsx')
+  // The wording now lives in ONE place — LeadformCrop, which the product page
+  // renders — and the menu quotes it. Two copies of a demo conversation drift;
+  // this one already had, and the copy that stayed behind opened with "Hi —
+  // I'm the form", the line the owner called weird.
+  const crop = read('components/business/crops.tsx')
   const lines = [
-    "Hi — I'm the form. What should I call you?",
+    'Welcome — before I show you the plans, what should I call you?',
     'Nice to meet you, Mohamed. Buying to live in, or to invest?',
   ]
   for (const line of lines) {
-    check(`the page and the menu use the same line: "${line.slice(0, 34)}…"`,
-      page.includes(line) && previewSrc.includes(line))
+    check(`the crop and the menu use the same line: "${line.slice(0, 34)}…"`,
+      crop.includes(line) && previewSrc.includes(line))
   }
+  // Comments are stripped first: both files explain in a comment WHY the old
+  // line is gone, and an explanation of a banned line is not the banned line.
+  const noComments = (src: string) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1')
+  check('nobody says "I am the form" any more',
+    !/I(’|')m the form/.test(noComments(previewSrc)) &&
+    !/I(’|')m the form/.test(noComments(read('app/business/leadformer/page.tsx'))))
 }
 
 console.log('\n── the panel is decoration, the link is the meaning ──')

@@ -235,12 +235,15 @@ function MetaForRealtors() {
 /* ── Leadformer — the form that answers back ─────────────────────────────── */
 
 function Leadformer() {
-  // Verbatim from app/business/leadformer/page.tsx — one demo, one wording.
+  // Verbatim from LeadformCrop in components/business/crops.tsx — one demo,
+  // one wording. It used to open "Hi — I'm the form", which the owner called
+  // weird: the form is a member of the Visual Sales Team, and she opens the
+  // way she does on the product page.
   const turns = [
-    { from: 'agent', text: "Hi — I'm the form. What should I call you?" },
+    { from: 'agent', text: 'Welcome — before I show you the plans, what should I call you?' },
     { from: 'lead', text: 'Mohamed' },
     { from: 'agent', text: 'Nice to meet you, Mohamed. Buying to live in, or to invest?' },
-    { from: 'lead', text: 'Investment — something with good yield' },
+    { from: 'lead', text: 'To invest — good yield' },
   ] as const
   return (
     <Frame>

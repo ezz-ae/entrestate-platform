@@ -8,7 +8,7 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniReport } from '@/components/business/visuals'
+import { CompanyCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'Reading the money',
@@ -68,10 +68,8 @@ export default function ReportsGuide() {
             dash and says what to do — it does not print a placeholder percentage. The month
             report ties it together: spend into leads into deals, and what each step cost.
           </p>
-          <div className="mt-4 max-w-[28rem]">
-            <Browser title="app.yourcompany.com/finance">
-              <MiniReport />
-            </Browser>
+          <div className="mt-4 max-w-[34rem]">
+            <CompanyCrop />
           </div>
         </Step>
         <Step n={4} id="agent-cash" title="Agent cash">

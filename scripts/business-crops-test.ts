@@ -20,6 +20,9 @@
  *     reduced motion stops it;
  *   · the home's hero is the reel and its holders are crops; the form that
  *     talks back replaced the answered-fast claim;
+ *   · the eight mock screens are DELETED, not shrunk — MiniCRM, MiniCampaigns,
+ *     MiniInventory, MiniPage, MiniReport, Phone, Chat and the HeroVisual
+ *     collage that stacked two of them — and no page may import one back;
  *   · no client, no company, no real domain — only yourbrokerage.ae.
  *
  * Pure — no network. Runs in `pnpm guards`.
@@ -88,11 +91,18 @@ console.log('\n── nothing the product does not do ──')
 {
   const visuals = stripComments(read('components/business/visuals.tsx'))
   check('the default WhatsApp thread is gone from visuals', !/DEFAULT_THREAD|answered in 54s/.test(visuals))
-  check('Chat requires a real conversation — messages is not optional', /messages: ChatMessage\[\]/.test(visuals) && !/messages\?: ChatMessage/.test(visuals))
-  check('HeroVisual fronts a crop, never the phone thread', !/<Chat\b/.test(visuals) && /LeadCardCrop|RocketAdCrop/.test(visuals))
+  // The eight mock screens are not fixed, they are deleted: a whole app
+  // screen redrawn at 8px is a claim nobody can read, and a claim nobody
+  // can read is one nobody can check. The site shows crops of one real
+  // screen, or a full-width capture with a caption — nothing in between.
   const files = [...walk(join(process.cwd(), 'app/business')), ...walk(join(process.cwd(), 'components/business'))]
-  const bare = files.filter((f) => /<Chat\s*\/>/.test(stripComments(readFileSync(f, 'utf8'))))
-  check('no page renders <Chat /> without its own thread', bare.length === 0, bare.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
+  for (const mock of ['MiniCRM', 'MiniCampaigns', 'MiniInventory', 'MiniPage', 'MiniReport', 'HeroVisual', 'ChatMessage']) {
+    const carriers = files.filter((f) => new RegExp(`\\b${mock}\\b`).test(stripComments(readFileSync(f, 'utf8'))))
+    check(`${mock} is gone from the site`, carriers.length === 0, carriers.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
+  }
+  check('visuals draws no screen any more — only the frame, the log and the reading path',
+    !/Mini(CRM|Campaigns|Inventory|Page|Report)|HeroVisual|export function (Phone|Chat)\(/.test(visuals))
+  check('…and it no longer needs a crop to front a mock', !/from '@\/components\/business\/crops'/.test(visuals))
   const answered = files.filter((f) => /By 2:48 it(’|')s answered|it has an answer, a language|answered fast, tagged/.test(readFileSync(f, 'utf8')))
   check('no page claims the product answers the lead itself', answered.length === 0, answered.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
   check('the crops never say the product answers a WhatsApp', !/answers? (on|the) WhatsApp|auto-?repl/i.test(CROPS))

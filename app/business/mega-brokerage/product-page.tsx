@@ -9,8 +9,10 @@
  */
 import { Section, Eyebrow, Display, Lede, SectionHeading, ButtonLink } from '@/components/business/ui'
 import {
-  Browser, MiniPage, StepRail, PunchGrid, StatBand, GlowBand, NextStep,
+  Browser, StepRail, PunchGrid, StatBand, GlowBand, NextStep,
 } from '@/components/business/visuals'
+import { CropReel } from '@/components/business/crop-reel'
+import { CompanyCrop, LandingRowsCrop, MicrositeCrop, VerdictCrop } from '@/components/business/crops'
 import { PlatformLoop } from '@/components/business/loop'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
@@ -78,25 +80,19 @@ export function MegaBrokerageProductPage() {
               aria-hidden
               className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.07),transparent_65%)]"
             />
-            <div className="grid">
-              <div className="min-w-0 sm:col-start-1 sm:row-start-1 sm:pb-10 sm:pr-28 lg:pr-36">
-                <div className="sm:-rotate-1">
-                  <Browser title="skyline.entrestate.com">
-                    <Shot
-                      src="/business/screens/desk.webp"
-                      alt="The workspace home — three items needing attention, lead counters, and projects flagged as missing a landing page."
-                    />
-                  </Browser>
-                </div>
-              </div>
-              <div className="mt-6 flex justify-center sm:col-start-1 sm:row-start-1 sm:mt-0 sm:items-end sm:justify-end">
-                <div className="w-[220px] sm:w-[250px] sm:rotate-2">
-                  <Browser title="yourbrokerage.ae/marina-vista-2br">
-                    <MiniPage />
-                  </Browser>
-                </div>
-              </div>
-            </div>
+            {/* The catalogue, a project's own site, the page list, the company
+                report — the four things a brokerage buys this for, one at a
+                time and at reading size. The mock landing page that used to
+                sit over the screenshot here was 220px wide and said nothing
+                the words above it had not already said. */}
+            <CropReel
+              frames={[
+                { key: 'microsite', caption: 'A whole project website, on your own address.', node: <MicrositeCrop /> },
+                { key: 'rows', caption: 'A page per property, and whether it is fit to advertise.', node: <LandingRowsCrop /> },
+                { key: 'verdict', caption: 'One catalogue, one verdict per listing.', node: <VerdictCrop /> },
+                { key: 'company', caption: 'Company-wide leads, deals and commission.', node: <CompanyCrop /> },
+              ]}
+            />
           </div>
         </div>
       </Section>
@@ -109,11 +105,8 @@ export function MegaBrokerageProductPage() {
           <Holder
             tone="gold"
             size="xl"
-            visual={
-              <Browser title="yourbrokerage.ae/marina-vista-2br" className="mx-auto w-full max-w-[380px] lg:mx-0">
-                <MiniPage />
-              </Browser>
-            }
+            label="Web Studio · project microsites"
+            visual={<MicrositeCrop flush />}
           >
             <Keyword size="xl">Your address, not theirs.</Keyword>
             <KeywordSub>

@@ -1,15 +1,8 @@
 import type { Metadata } from 'next'
 import { Section, Display, Lede, Eyebrow } from '@/components/business/ui'
 import { Holder, Keyword, KeywordSub, HolderRow, LearnMore } from '@/components/business/holders'
-import {
-  Browser,
-  MiniCampaigns,
-  Chapter,
-  NextStep,
-  Ledger,
-  PunchGrid,
-  GlowBand,
-} from '@/components/business/visuals'
+import { Chapter, NextStep, Ledger, PunchGrid, GlowBand } from '@/components/business/visuals'
+import { RocketAdCrop } from '@/components/business/crops'
 import { nextInTour } from '@/lib/business/nav'
 
 export const metadata: Metadata = {
@@ -36,9 +29,7 @@ export default function AdvertisingPage() {
               </Lede>
             </div>
           </div>
-          <Browser title="app.yourbrokerage.ae/campaigns">
-            <MiniCampaigns />
-          </Browser>
+          <RocketAdCrop />
         </div>
       </Section>
 

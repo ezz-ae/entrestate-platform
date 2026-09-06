@@ -8,7 +8,6 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniCRM } from '@/components/business/visuals'
 import { Clip } from '@/components/business/clip'
 
 export const metadata: Metadata = {

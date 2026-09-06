@@ -24,6 +24,9 @@
  *   5. THE PAGE KEEPS ITS MARGINS ON A PHONE. The section gutter and the
  *      holder inset both step down below `sm`, because they stack: gutter
  *      + holder + crop padding was 96px of chrome on a 390px screen.
+ *   6. NO HERO STACKS TWO LAYERS IN ONE GRID CELL. The rotated collage —
+ *      a crop over a whole screenshot — has no phone layout: below `sm`
+ *      the layers land on each other. Every product hero is a CropReel.
  *
  * Pure — no network. Runs in `pnpm guards`.
  */
@@ -102,6 +105,28 @@ console.log('\n── 6. rows that cannot fit, wrap ──')
     ['the reach rows stack their label', /flex flex-col gap-0\.5 bg-surface-2\/60[^"]*sm:flex-row/],
   ] as const) {
     check(`${what} wraps`, re.test(CROPS))
+  }
+}
+
+console.log('\n── no hero stacks two layers in one cell ──')
+{
+  // Four product heroes used to overlap a crop and a whole screenshot in one
+  // grid cell, each rotated a degree or two. That reads on a laptop and
+  // collapses on a phone: below `sm` the two layers land on top of each
+  // other, and the screen underneath was 8px type at any width. Each of
+  // those heroes is now a CropReel — one crop at a time, at reading size.
+  const HERO_PAGES = [
+    'app/business/page.tsx',
+    'app/business/lead-machine/page.tsx',
+    'app/business/leadformer/page.tsx',
+    'app/business/meta-for-realtors/page.tsx',
+    'app/business/landing-pages/page.tsx',
+    'app/business/mega-brokerage/product-page.tsx',
+  ]
+  for (const rel of HERO_PAGES) {
+    const src = stripComments(read(rel))
+    check(`${rel.split('/').slice(2).join('/')} leads with the reel`, /<CropReel/.test(src))
+    check(`…and stacks nothing behind it`, !/sm:col-start-1 sm:row-start-1/.test(src) && !/sm:-?rotate-[12]/.test(src))
   }
 }
 
