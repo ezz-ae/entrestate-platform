@@ -20,6 +20,9 @@
  *     reduced motion stops it;
  *   · the home's hero is the reel and its holders are crops; the form that
  *     talks back replaced the answered-fast claim;
+ *   · the eight mock screens are DELETED, not shrunk — MiniCRM, MiniCampaigns,
+ *     MiniInventory, MiniPage, MiniReport, Phone, Chat and the HeroVisual
+ *     collage that stacked two of them — and no page may import one back;
  *   · no client, no company, no real domain — only yourbrokerage.ae.
  *
  * Pure — no network. Runs in `pnpm guards`.
@@ -88,21 +91,46 @@ console.log('\n── nothing the product does not do ──')
 {
   const visuals = stripComments(read('components/business/visuals.tsx'))
   check('the default WhatsApp thread is gone from visuals', !/DEFAULT_THREAD|answered in 54s/.test(visuals))
-  check('Chat requires a real conversation — messages is not optional', /messages: ChatMessage\[\]/.test(visuals) && !/messages\?: ChatMessage/.test(visuals))
-  check('HeroVisual fronts a crop, never the phone thread', !/<Chat\b/.test(visuals) && /LeadCardCrop|RocketAdCrop/.test(visuals))
+  // The eight mock screens are not fixed, they are deleted: a whole app
+  // screen redrawn at 8px is a claim nobody can read, and a claim nobody
+  // can read is one nobody can check. The site shows crops of one real
+  // screen, or a full-width capture with a caption — nothing in between.
   const files = [...walk(join(process.cwd(), 'app/business')), ...walk(join(process.cwd(), 'components/business'))]
-  const bare = files.filter((f) => /<Chat\s*\/>/.test(stripComments(readFileSync(f, 'utf8'))))
-  check('no page renders <Chat /> without its own thread', bare.length === 0, bare.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
-  const answered = files.filter((f) => /By 2:48 it(’|')s answered|it has an answer, a language|answered fast, tagged/.test(readFileSync(f, 'utf8')))
+  for (const mock of ['MiniCRM', 'MiniCampaigns', 'MiniInventory', 'MiniPage', 'MiniReport', 'HeroVisual', 'ChatMessage']) {
+    const carriers = files.filter((f) => new RegExp(`\\b${mock}\\b`).test(stripComments(readFileSync(f, 'utf8'))))
+    check(`${mock} is gone from the site`, carriers.length === 0, carriers.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
+  }
+  check('visuals draws no screen any more — only the frame, the log and the reading path',
+    !/Mini(CRM|Campaigns|Inventory|Page|Report)|HeroVisual|export function (Phone|Chat)\(/.test(visuals))
+  check('…and it no longer needs a crop to front a mock', !/from '@\/components\/business\/crops'/.test(visuals))
+  const answered = files.filter((f) => /By 2:48 it(’|')s answered|it has an answer|answered fast, tagged|Leads answered fast/.test(stripComments(readFileSync(f, 'utf8'))))
   check('no page claims the product answers the lead itself', answered.length === 0, answered.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
   check('the crops never say the product answers a WhatsApp', !/answers? (on|the) WhatsApp|auto-?repl/i.test(CROPS))
   check('the lead card says the person answers', /the person answers/.test(CROPS))
+  // The story scenes carried the claim after every page had dropped it: a
+  // badge reading "answered in 54s" and a scene title saying a WhatsApp lead
+  // is answered in 54 seconds. The product routes the lead and starts the
+  // clock; the person answers.
+  const scenes = stripComments(read('components/business/scenes.tsx'))
+  check('no scene says the lead was answered by the product',
+    !/answered in \d+s|is answered in/.test(scenes))
+  check('…the scene says what happens instead — owned, with a name on it', /owned by 2:48 · Omar K\./.test(scenes))
+  // The scene canvas is a fixed 340px on every screen, so its type size is
+  // what a phone renders — there is no breakpoint for it to grow at.
+  const belowTen = [...scenes.matchAll(/text-\[([0-9.]+)px\]/g)].map((m) => Number(m[1])).filter((n) => n < 10)
+  check('nothing on a scene is set below 10px', belowTen.length === 0, belowTen.join(', '))
 }
 
 console.log('\n── the data is healthy ──')
 {
   const values = [...CROPS.matchAll(/\['([^']+)', '([^']+)'(?:, '([^']+)')?\]/g)].map((m) => m[2])
   check('no tile shows a zero', !values.some((v) => /^(0|AED 0|0%)$/.test(v)), values.filter((v) => /^(0|AED 0|0%)$/.test(v)).join(','))
+  // Nor does a decision-log row. A brake that fired reads "held", not "AED 0":
+  // the row is the proof the cap worked, and a zero beside it reads as a dead
+  // campaign instead.
+  const ledgerFiles = [...walk(join(process.cwd(), 'app/business')), ...walk(join(process.cwd(), 'components/business'))]
+  const ledgers = ledgerFiles.filter((f) => /amount: '(AED )?0(%)?'/.test(readFileSync(f, 'utf8')))
+  check('no decision-log row is worth zero', ledgers.length === 0, ledgers.map((f) => f.replace(process.cwd() + '/', '')).join(', '))
   check('no danger chip is drawn', !/<Chip tone="danger"/.test(CROPS))
   check('no Hold row is drawn', !/verdict: 'Hold'/.test(CROPS))
   check('every listing name is written like a name', [...CROPS.matchAll(/name: '([^']+)'/g)].every((m) => /^[A-Z][A-Za-z]+( [A-Za-z0-9—–-]+)*/.test(m[1])))

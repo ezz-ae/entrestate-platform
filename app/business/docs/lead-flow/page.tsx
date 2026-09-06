@@ -9,7 +9,6 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Phone, Chat } from '@/components/business/visuals'
 import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {

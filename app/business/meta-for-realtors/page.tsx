@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Section, Eyebrow, Display, Lede, SectionHeading, ButtonLink } from '@/components/business/ui'
 import {
-  Browser, Phone, Chat, MiniCampaigns, Ledger, StatBand, StepRail, PunchGrid, GlowBand, NextStep,
+  Ledger, StatBand, StepRail, PunchGrid, GlowBand, NextStep,
 } from '@/components/business/visuals'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { SceneRunAds } from '@/components/business/scenes'
 import { nextInTour } from '@/lib/business/nav'
-import { RocketAdCrop } from '@/components/business/crops'
+import { CreativeSuiteCrop, ReachCrop, RocketAdCrop, SpendRuleCrop } from '@/components/business/crops'
+import { CropReel } from '@/components/business/crop-reel'
 
 export const metadata: Metadata = {
   title: 'Meta for Realtors',
@@ -46,27 +47,18 @@ export default function MetaForRealtorsPage() {
             </p>
           </div>
 
-          {/* Phone leads the collage: this product is bought and run from a phone. */}
-          <div className="relative isolate">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-x-10 -inset-y-14 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.07),transparent_65%)]"
-            />
-            <div className="grid">
-              <div className="flex justify-center sm:col-start-1 sm:row-start-1 sm:items-end sm:justify-start">
-                <div className="relative z-10 w-full max-w-[22rem] sm:-rotate-2">
-                  <RocketAdCrop />
-                </div>
-              </div>
-              <div className="mt-6 min-w-0 sm:col-start-1 sm:row-start-1 sm:mt-0 sm:pb-12 sm:pl-32 lg:pl-40">
-                <div className="sm:rotate-1">
-                  <Browser title="omar.entrestate.com/campaigns">
-                    <MiniCampaigns />
-                  </Browser>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* One crop at a time, at reading size. The collage that was here
+              overlapped a crop with a whole campaigns screen in a browser
+              frame; on a phone the two rotated layers stacked into each
+              other and the screen behind was 8px type either way. */}
+          <CropReel
+            frames={[
+              { key: 'rocket', caption: 'Give it a source and a budget. The ad starts paused.', node: <RocketAdCrop /> },
+              { key: 'reach', caption: 'Who this reaches — read back from Meta, not guessed.', node: <ReachCrop /> },
+              { key: 'rules', caption: 'The brake you wrote, and the move it allowed.', node: <SpendRuleCrop /> },
+              { key: 'creative', caption: 'Every design tool that makes the ad, in one place.', node: <CreativeSuiteCrop /> },
+            ]}
+          />
         </div>
       </Section>
 
@@ -75,14 +67,11 @@ export default function MetaForRealtorsPage() {
         <Holder
           tone="gold"
           size="xl"
-          visual={
-            <Browser title="omar.entrestate.com/campaigns">
-              <MiniCampaigns />
-            </Browser>
-          }
+          label="Ads · live campaign"
+          visual={<ReachCrop flush />}
         >
           <Keyword size="xl">Watch it work.</Keyword>
-          <KeywordSub>What each ad spent, how many leads, what a lead costs — one screen.</KeywordSub>
+          <KeywordSub>Where the money is pointed, right now — read back from Meta, not from what you meant to set.</KeywordSub>
           <LearnMore href="/business/docs/launch-a-campaign" label="Learn how a launch runs" />
         </Holder>
 

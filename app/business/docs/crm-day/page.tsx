@@ -9,7 +9,7 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniCRM } from '@/components/business/visuals'
+import { LeadCardCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'Working the day',
@@ -41,11 +41,10 @@ export default function CrmDayGuide() {
       />
 
       <figure className="mt-10">
-        <Browser title="app.yourcompany.com/crm">
-          <MiniCRM />
-        </Browser>
+        <LeadCardCrop />
         <figcaption className="mt-4 text-[0.8125rem] leading-relaxed text-ink-faint">
-          The pipeline: every open lead, its stage, its value in AED, and how long it has waited.
+          A lead as the day starts with it: who it is, which ad produced it, the language it
+          asked in, the person who owns it, and the hour the clock allows.
         </figcaption>
       </figure>
 

@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
 import { Section, Eyebrow, Display, H2, Lede, ButtonLink, Mono } from '@/components/business/ui'
-import {
-  Browser, Chat, GlowBand, NextStep, MiniCRM,
-  PunchGrid, StatBand,
-} from '@/components/business/visuals'
+import { GlowBand, NextStep, PunchGrid, StatBand } from '@/components/business/visuals'
+import { AudienceCrop, LeadCardCrop, LeadformCrop } from '@/components/business/crops'
+import { CropReel } from '@/components/business/crop-reel'
 import { Holder, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { SALES_TEAM, totalRate, READINESS_THRESHOLD } from '@/lib/freehold/visual-sales-team'
@@ -31,16 +30,10 @@ export const metadata: Metadata = {
   alternates: { canonical: '/business/leadformer' },
 }
 
-/* The form, as the lead experiences it: no fields — a conversation that happens
-   to collect everything a form would have asked for. */
-const FORM_THREAD = [
-  { from: 'agent' as const, text: "Hi — I'm the form. What should I call you?", time: '9:02 PM' },
-  { from: 'lead' as const, text: 'Mohamed', time: '9:02 PM' },
-  { from: 'agent' as const, text: 'Nice to meet you, Mohamed. Buying to live in, or to invest?', time: '9:02 PM' },
-  { from: 'lead' as const, text: 'Investment — something with good yield', time: '9:03 PM' },
-  { from: 'system' as const, text: 'Intent: investor · yield-led — Saeed takes over' },
-  { from: 'agent' as const, text: 'Then Marina Vista is the one to see — 6.8% projected. Shall I put you on a call now?', time: '9:03 PM' },
-]
+/* The thread that used to sit here — "Hi — I'm the form. What should I call
+   you?" — is gone with the transcript that showed it. The owner: "'Hi, I'm
+   the form' is weird, and the chat way is not clear." LeadformCrop shows the
+   same four moments where they actually happen: over the ad, on the phone. */
 
 export default function LeadformerPage() {
   const next = nextInTour('/business/leadformer')!
@@ -69,9 +62,18 @@ export default function LeadformerPage() {
               <ButtonLink href="/business/pricing" variant="ghost">See pricing</ButtonLink>
             </div>
           </div>
-          <Browser title="marina-heights.ae/enquire">
-            <Chat messages={FORM_THREAD} title="Leadform — Marina Heights" chip="no fields" />
-          </Browser>
+          {/* The form, seen where it happens: a phone showing a feed with our
+              ad in it and the form's pop-up moving through greeting, question,
+              answer and the call it books. The page used to show a chat
+              transcript in a browser frame — the owner: "a chat as a picture
+              pulls nobody any more." */}
+          <CropReel
+            frames={[
+              { key: 'form', caption: 'The form asks the way a person would — one thing at a time.', node: <LeadformCrop /> },
+              { key: 'lead', caption: 'What it hands you: a lead with an owner, a language and a clock.', node: <LeadCardCrop /> },
+              { key: 'audience', caption: 'Every rating teaches the machine what to buy next month.', node: <AudienceCrop /> },
+            ]}
+          />
         </div>
       </Section>
 
@@ -93,11 +95,8 @@ export default function LeadformerPage() {
         <div className="flex flex-col gap-4 lg:gap-5">
           <Holder
             tone="green"
-            visual={
-              <Browser title="marina-heights.ae/enquire">
-                <Chat messages={FORM_THREAD} title="Leadform — Marina Heights" chip="" />
-              </Browser>
-            }
+            label="Leadformer"
+            visual={<LeadformCrop flush />}
           >
             <Keyword>No fields. A conversation.</Keyword>
             <KeywordSub>
@@ -115,11 +114,8 @@ export default function LeadformerPage() {
 
           <Holder
             tone="blue"
-            visual={
-              <Browser title="app.yourbrokerage.ae/crm">
-                <MiniCRM />
-              </Browser>
-            }
+            label="CRM · new lead"
+            visual={<LeadCardCrop flush />}
           >
             <Keyword>The lead arrives already qualified.</Keyword>
             <KeywordSub>

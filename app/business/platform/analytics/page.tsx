@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Section, Display, Lede, ButtonLink } from '@/components/business/ui'
-import { Browser, MiniReport, Ledger, Chapter, NextStep } from '@/components/business/visuals'
+import { Ledger, Chapter, NextStep } from '@/components/business/visuals'
+import { CompanyCrop } from '@/components/business/crops'
 import { Holder, HolderRow, Keyword, KeywordSub, LearnMore } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
@@ -57,9 +58,7 @@ export default function AnalyticsPage() {
               </ButtonLink>
             </div>
           </div>
-          <Browser title="app.yourbrokerage.ae/analytics">
-            <MiniReport />
-          </Browser>
+          <CompanyCrop />
         </div>
       </Section>
 

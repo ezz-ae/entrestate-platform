@@ -1,23 +1,18 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { Section, Eyebrow, Display, Lede, ButtonLink, SectionHeading } from '@/components/business/ui'
-import {
-  Browser,
-  Phone,
-  Chat,
-  MiniInventory,
-  MiniPage,
-  MiniCampaigns,
-  MiniCRM,
-  MiniReport,
-  PunchGrid,
-  GlowBand,
-  NextStep,
-} from '@/components/business/visuals'
+import { PunchGrid, GlowBand, NextStep } from '@/components/business/visuals'
 import { Holder, Keyword, KeywordSub, LearnMore, type HolderTone } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { LoopSection } from '@/components/business/loop'
-import { LeadCardCrop } from '@/components/business/crops'
+import {
+  AudienceCrop,
+  CompanyCrop,
+  LandingRowsCrop,
+  LeadCardCrop,
+  RocketAdCrop,
+  VerdictCrop,
+} from '@/components/business/crops'
 import { FULL_SYSTEM, FULL_SYSTEM_CTA } from '@/lib/business/full-system'
 
 export const metadata: Metadata = {
@@ -28,7 +23,16 @@ export const metadata: Metadata = {
 }
 
 /* Each stop: a Keyword, one line, the screen that proves it, and one door
-   into its guide. The Keywords alone must read as the whole path. */
+   into its guide. The Keywords alone must read as the whole path.
+
+   The screen is a CROP of the real thing, flush inside the holder. It used
+   to be a whole app screen shrunk into a browser frame — six units and four
+   pipeline columns at 8px, unreadable on a laptop and gone on a phone. The
+   owner: "screenshots of a whole screen in a 3×6 cm frame — nothing is
+   readable, and even if it were, what would he read?" A crop answers the
+   line above it and nothing else: the score and the verdict for "load the
+   stock", the ad that starts paused for "launch, paused", the lookalike
+   the closed deals seeded for "deals teach targeting". */
 const STOPS: Array<{
   title: string
   sub: string
@@ -43,11 +47,7 @@ const STOPS: Array<{
     guide: '/business/docs/inventory',
     learn: 'How scoring works',
     tone: 'plain',
-    visual: (
-      <Browser title="app.yourbrokerage.ae/inventory">
-        <MiniInventory />
-      </Browser>
-    ),
+    visual: <VerdictCrop flush />,
   },
   {
     title: 'Page per listing.',
@@ -55,11 +55,7 @@ const STOPS: Array<{
     guide: '/business/docs/landing-pages',
     learn: 'How the gate works',
     tone: 'blue',
-    visual: (
-      <Browser title="yourbrokerage.ae/marina-vista-2br" className="mx-auto w-full max-w-[300px]">
-        <MiniPage />
-      </Browser>
-    ),
+    visual: <LandingRowsCrop flush />,
   },
   {
     title: 'Launch, paused.',
@@ -67,11 +63,7 @@ const STOPS: Array<{
     guide: '/business/docs/launch-a-campaign',
     learn: 'How launching works',
     tone: 'gold',
-    visual: (
-      <Browser title="app.yourbrokerage.ae/campaigns">
-        <MiniCampaigns />
-      </Browser>
-    ),
+    visual: <RocketAdCrop flush />,
   },
   {
     title: 'Leads land owned.',
@@ -79,7 +71,7 @@ const STOPS: Array<{
     guide: '/business/docs/lead-flow',
     learn: 'How leads flow',
     tone: 'green',
-    visual: <LeadCardCrop />,
+    visual: <LeadCardCrop flush />,
   },
   {
     title: 'Won or lost.',
@@ -87,11 +79,7 @@ const STOPS: Array<{
     guide: '/business/docs/crm-day',
     learn: 'How the day runs',
     tone: 'plain',
-    visual: (
-      <Browser title="app.yourbrokerage.ae/crm">
-        <MiniCRM />
-      </Browser>
-    ),
+    visual: <CompanyCrop flush />,
   },
   {
     title: 'Deals teach targeting.',
@@ -99,11 +87,7 @@ const STOPS: Array<{
     guide: '/business/docs/audiences',
     learn: 'How audiences learn',
     tone: 'gold',
-    visual: (
-      <Browser title="app.yourbrokerage.ae/reports">
-        <MiniReport />
-      </Browser>
-    ),
+    visual: <AudienceCrop flush />,
   },
 ]
 

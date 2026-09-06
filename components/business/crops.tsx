@@ -18,6 +18,15 @@
  * does not do is a lie with a border on it; scripts/business-crops-test.ts
  * keeps the WhatsApp-answering scene out and the words honest.
  *
+ * ON THE PHONE. A crop inside a holder inside the page column has about
+ * 280px to live in. Four figures across, five section chips across, a
+ * sentence and a chip on one line — each of those was drawn for a desktop
+ * column and squeezed to unreadable on a phone, or pushed the card past the
+ * screen. Every grid below now starts narrow and widens at `sm`, every
+ * button row wraps, and the one fixed width (the phone mock in the lead
+ * form) is capped at the column. scripts/business-crops-test.ts keeps it
+ * that way.
+ *
  * Pure presentational — server-renderable; the reel that cycles them is the
  * client piece (components/business/crop-reel.tsx).
  */
@@ -104,7 +113,7 @@ export function RocketAdCrop({ flush = false }: { flush?: boolean } = {}) {
           </div>
         ))}
       </div>
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className={LABEL}>Per day</span>
         <span className="flex flex-1 items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-[13px]">
           <span className="text-ink-faint">AED</span>
@@ -141,9 +150,9 @@ export function ReachCrop({ flush = false }: { flush?: boolean } = {}) {
     >
       <div className="divide-y divide-line overflow-hidden rounded-xl border border-line">
         {rows.map(([k, v]) => (
-          <div key={k} className="flex items-baseline justify-between gap-6 bg-surface-2/60 px-3.5 py-2.5">
-            <span className={LABEL}>{k}</span>
-            <span className="text-end text-[13px] text-ink">{v}</span>
+          <div key={k} className="flex flex-col gap-0.5 bg-surface-2/60 px-3.5 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+            <span className={`${LABEL} shrink-0`}>{k}</span>
+            <span className="text-[13px] text-ink sm:text-end">{v}</span>
           </div>
         ))}
       </div>
@@ -160,7 +169,7 @@ export function AudienceCrop({ flush = false }: { flush?: boolean } = {}) {
       title="Form portfolio value"
       sub="Every rating teaches the machine what to buy and what to stop buying — and rated 6+ leads become sellable audiences."
     >
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {[
           ['852', 'Leads in CRM'],
           ['293', 'Rated'],
@@ -183,7 +192,7 @@ export function AudienceCrop({ flush = false }: { flush?: boolean } = {}) {
           <div className="text-[11px] text-ink-muted">All contactable leads</div>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between gap-3 text-[13px]">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[13px]">
         <span className="flex items-center gap-2 text-ink">
           <span aria-hidden className="grid h-4 w-4 place-items-center rounded border border-brand bg-brand text-[10px] text-brand-ink">✓</span>
           Build a Lookalike on top
@@ -217,7 +226,7 @@ export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
           <div key={l} className="rounded-xl border border-line bg-surface-2 px-3 py-2.5">
             <div className="text-[11px] text-ink-muted">{l}</div>
             <div className="mt-1 font-mono text-[1.15rem] leading-none tabular-nums text-ink" dir="ltr">{v}</div>
-            <div className="mt-1 text-[10px] text-ink-faint">{s}</div>
+            <div className="mt-1 text-[11px] text-ink-faint">{s}</div>
           </div>
         ))}
       </div>
@@ -231,7 +240,7 @@ export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
               </div>
               <div className="flex shrink-0 gap-1.5">
                 <Btn>Campaign</Btn>
-                <Btn>Edit</Btn>
+                <span className="hidden sm:inline-flex"><Btn>Edit</Btn></span>
               </div>
             </div>
             <div className="mt-1 text-[12px] text-ink-faint">{r.where}</div>
@@ -239,7 +248,7 @@ export function LandingRowsCrop({ flush = false }: { flush?: boolean } = {}) {
               <span className="h-1 w-24 overflow-hidden rounded-full bg-surface-3">
                 <span className="block h-full rounded-full bg-brand" style={{ width: `${r.ready}%` }} />
               </span>
-              <span className="font-mono text-[10px] text-ink-faint">{r.ready}% ad ready</span>
+              <span className="font-mono text-[11px] text-ink-faint">{r.ready}% ad ready</span>
             </div>
           </div>
         ))}
@@ -343,14 +352,14 @@ export function LeadformCrop({ flush = false }: { flush?: boolean } = {}) {
         .lf-stage:nth-child(3) { animation-delay: 7s } .lf-stage:nth-child(4) { animation-delay: 10.5s }
         @media (prefers-reduced-motion: reduce) { .lf-stage { animation: none } .lf-stage:nth-child(4) { opacity: 1 } }
       `}</style>
-      <div className="mx-auto w-full max-w-[19rem] overflow-hidden rounded-[2rem] border border-line-strong bg-surface-2 shadow-(--shadow-card)">
+      <div className="mx-auto w-full max-w-[17rem] overflow-hidden rounded-[2rem] border border-line-strong bg-surface-2 shadow-(--shadow-card) sm:max-w-[19rem]">
         {/* the feed */}
         <div className="border-b border-line px-4 py-3 text-center font-mono text-[10px] uppercase tracking-[0.18em] text-ink-faint">Feed</div>
         <div className="flex items-center gap-2.5 px-3.5 py-2.5">
           <span aria-hidden className="h-7 w-7 rounded-full bg-[linear-gradient(135deg,#d9a042,#d46b47)]" />
           <div className="min-w-0 leading-tight">
             <div className="text-[12px] font-semibold text-ink">yourbrokerage</div>
-            <div className="text-[10px] text-ink-faint">Sponsored</div>
+            <div className="text-[11px] text-ink-faint">Sponsored</div>
           </div>
         </div>
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-[linear-gradient(160deg,#d9a042_0%,#d46b47_45%,#3a3140_100%)]">
@@ -399,7 +408,7 @@ export function LeadCardCrop({ flush = false }: { flush?: boolean } = {}) {
           </div>
           <Chip tone="positive">Hot</Chip>
         </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2 mt-3 sm:grid-cols-3">
           {[['Language', 'العربية'], ['Owner', 'Omar K.'], ['Follow-up', 'Call within 1h']].map(([k, v]) => (
             <div key={k} className="rounded-lg border border-line bg-surface px-2.5 py-2">
               <div className={LABEL}>{k}</div>
@@ -407,7 +416,7 @@ export function LeadCardCrop({ flush = false }: { flush?: boolean } = {}) {
             </div>
           ))}
         </div>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           <Btn primary>Call</Btn>
           <Btn>WhatsApp</Btn>
           <Btn>Reassign</Btn>
@@ -423,7 +432,7 @@ export function LeadCardCrop({ flush = false }: { flush?: boolean } = {}) {
 export function MicrositeCrop({ flush = false }: { flush?: boolean } = {}) {
   return (
     <CropFrame flush={flush} kicker="Web Studio · project microsites" title="Generate a full multi-section website for any project" sub="Its own address, from the record you already have.">
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
         <div className="min-w-0">
           <div className="truncate text-[13px] font-semibold text-ink">Creekside One</div>
           <div className="mt-0.5 truncate font-mono text-[11px] text-ink-faint" dir="ltr">yourbrokerage.ae/projects/creekside-one</div>
@@ -433,7 +442,7 @@ export function MicrositeCrop({ flush = false }: { flush?: boolean } = {}) {
           <Btn>Publish</Btn>
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-5 gap-1.5">
+      <div className="mt-3 grid grid-cols-3 gap-1.5 sm:grid-cols-5">
         {['Hero', 'Key facts', 'Payment plan', 'Location', 'Gallery', 'Market', 'ROI', 'FAQ', 'Enquire', 'Footer'].map((s) => (
           <div key={s} className="rounded-lg border border-line bg-surface-2 px-2 py-2 text-center text-[11px] text-ink-muted">{s}</div>
         ))}
@@ -456,7 +465,7 @@ export function CreativeSuiteCrop({ flush = false }: { flush?: boolean } = {}) {
   ]
   return (
     <CropFrame flush={flush} kicker="Creative Studio" title="Every design tool in one place">
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {tools.map(([n, s]) => (
           <div key={n} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5">
             <div className="text-[13px] font-semibold text-ink">{n}</div>
@@ -487,7 +496,7 @@ export function CompanyCrop({ flush = false }: { flush?: boolean } = {}) {
               <Chip tone="positive">Live</Chip>
             </div>
             <div className="mt-2 font-mono text-[1.15rem] leading-none tabular-nums text-ink" dir="ltr">{v}</div>
-            <div className="mt-1 text-[10px] text-ink-faint">{s}</div>
+            <div className="mt-1 text-[11px] text-ink-faint">{s}</div>
           </div>
         ))}
       </div>
@@ -510,14 +519,14 @@ export function SpendRuleCrop({ flush = false }: { flush?: boolean } = {}) {
     <CropFrame flush={flush} kicker="Ads Machine · rules" title="No rule, no spend" sub="Money moves only inside limits a person wrote. Every automatic move is written down with its reason.">
       <div className="space-y-2">
         <div className="rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-[13px] text-ink">If <span className="font-mono">cost per lead</span> rises above <span className="font-mono">AED 150</span></span>
             <Chip tone="neutral">Pause</Chip>
           </div>
           <div className="mt-1 text-[12px] text-ink-faint">Withheld until 3 leads of evidence — a swing on one delivery is noise, not a signal.</div>
         </div>
         <div className="rounded-xl border border-line bg-surface-2/60 px-3.5 py-3">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-[13px] text-ink">If <span className="font-mono">cost per lead</span> stays under <span className="font-mono">AED 90</span> for 3 days</span>
             <Chip tone="positive">Scale +20%</Chip>
           </div>

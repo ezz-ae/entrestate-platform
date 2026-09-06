@@ -8,7 +8,7 @@ import {
   FAQItem,
   RelatedRow,
 } from '@/components/business/docs'
-import { Browser, MiniInventory } from '@/components/business/visuals'
+import { VerdictCrop } from '@/components/business/crops'
 
 export const metadata: Metadata = {
   title: 'Stock and scores',
@@ -87,10 +87,8 @@ export default function InventoryGuide() {
             like &ldquo;No landing page — paid traffic would be wasted.&rdquo; A separate Missed
             list surfaces strong-return listings that still have no page.
           </p>
-          <div className="mt-4 max-w-[28rem]">
-            <Browser title="app.yourcompany.com/inventory">
-              <MiniInventory />
-            </Browser>
+          <div className="mt-4 max-w-[34rem]">
+            <VerdictCrop />
           </div>
         </Step>
         <Step n={5} id="opportunity" title="Which listing deserves the next dirham">
