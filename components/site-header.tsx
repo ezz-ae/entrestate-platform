@@ -70,7 +70,10 @@ export function SiteHeader() {
 
   // "/business" is the platform site — it carries its own header and speaks to
   // operators, not property buyers, so the property nav stays off it.
-  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business", "/signup", "/ctrl", "/portal"]
+  // "/targetect" is a product of ours on its own domain (targetect.com). It is
+  // not the brokerage's site and not the platform site: it carries its own
+  // header in app/targetect/layout.tsx, so the property nav stays off it.
+  const commandPaths = ["/ads-studio", "/notebook", "/cloud", "/agent-network", "/reports", "/settings", "/business", "/signup", "/ctrl", "/portal", "/targetect"]
   const isMarketCommandPath = pathname === "/market" || /^\/market\/p-/.test(pathname || "")
   if (pathname?.startsWith("/crm") || pathname === "/chat" || isMarketCommandPath || commandPaths.some((path) => pathname === path || pathname?.startsWith(`${path}/`))) {
     return null

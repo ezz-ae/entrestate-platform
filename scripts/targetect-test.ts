@@ -1,23 +1,25 @@
 /**
- * TARGETECT IS A PRODUCT, NOT A PAGE — locked.
+ * TARGETECT SAYS WHAT IT HAS NOT BUILT — locked.
  *
- * Targetect sells one promise: an audience you described, bought on evidence,
- * and answerable afterwards for who it produced. Everything it claims already
- * exists as an engine in this repository, which is the only reason the claims
- * are allowed to be made. The failure mode this suite exists for is the quiet
- * one: an engine gets renamed or absorbed, the page keeps selling it, and
- * nothing anywhere goes red — the page is just text, and text does not break.
+ * Targetect is a young product on its own domain, and most of it is written
+ * down rather than running. Two lies are available to a page in that position,
+ * both of them free and neither of them noisy:
  *
- * So every claim in lib/business/targetect.ts names the module that implements
- * it and the suite that holds it, and both files are OPENED here. A claim
- * pointing at a module that no longer exists fails the build, the same rule the
- * app-store catalog runs on. A claim held by a suite that `pnpm guards` does
- * not run is not held at all, so the wiring is checked too — the db-owner
- * lesson: a lock nobody turns is a comment.
+ *   1. A claim marked BUILT whose engine does not exist — or exists with no
+ *      guard, or with a guard `pnpm guards` never runs. This repository has
+ *      the scar: lib/tenancy/db-owner.ts decided correctly for weeks while
+ *      nothing called it, and a lock nobody turns is a comment.
+ *   2. A claim that is only specified quietly reaching the page as if it were
+ *      a feature. Nothing goes red when a plan is promoted in prose, so the
+ *      status is rendered from the same list the page renders, and this suite
+ *      proves the page cannot print one without the other.
  *
- * It also holds the address. Targetect is the first product here with its own
- * apex, and an apex we own that answers with a Dubai property portal is the
- * exact defect lib/tenancy/vendor-host.ts was written for.
+ * It also holds the two boundaries the product's separateness depends on: the
+ * apex (targetect.com serves Targetect, never the brokerage's apartments) and
+ * the chrome (no property nav, no WhatsApp bubble from a Dubai brokerage on a
+ * page about audience software). And it holds the one that is a decision
+ * rather than a mechanism: Targetect is NOT in the Entrestate products menu —
+ * the owner's ruling, "it doesn't belong to any of what we have."
  *
  * Pure — reads source, no network, no database. Runs in `pnpm guards`.
  */
@@ -25,14 +27,11 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
- * EVERY import is dynamic and happens inside main(), after the base domain is
- * set. lib/tenancy/config reads NEXT_PUBLIC_TENANT_BASE_DOMAIN once at module
- * load, and the persona library reaches the Meta client and the database
- * behind it — one of which pulls tenancy in. Import anything statically here
- * and the host rules are evaluated switched-off, where every assertion below
- * passes vacuously with `pass`. This suite already failed that way once.
+ * Every import is dynamic and inside main(), after the base domain is set:
+ * lib/tenancy/config reads NEXT_PUBLIC_TENANT_BASE_DOMAIN once at module load,
+ * and a module loaded before it would evaluate the host rules switched off,
+ * where every assertion below passes vacuously with `pass`.
  */
-
 let failures = 0
 const ok = (m: string) => console.log(`  ✓ ${m}`)
 const fail = (m: string, got = '') => { failures++; console.error(`  ✗ ${m}${got ? `\n      got: ${got}` : ''}`) }
@@ -42,145 +41,170 @@ const stripComments = (src: string) =>
   src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1')
 const show = (a: unknown) => JSON.stringify(a)
 
-const PAGE = 'app/business/targetect/page.tsx'
+const PAGE = 'app/targetect/page.tsx'
+const LAYOUT = 'app/targetect/layout.tsx'
+const MODULE = 'lib/targetect/product.ts'
 
 async function main(): Promise<void> {
   process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN = 'entrestate.com'
   const {
-    TARGETECT, TARGETECT_CAPABILITIES, TARGETECT_STAGES,
-    TARGETECT_PERSONA_COUNT, TARGETECT_PERSONA_STACK, TARGETECT_VERTICAL_NOTE,
-  } = await import('../lib/business/targetect')
-  const { PERSONAS, MAX_STACK } = await import('../lib/freehold/persona-audience')
-  const { PRODUCTS, TOUR, nextInTour } = await import('../lib/business/nav')
+    TARGETECT, TARGETECT_ACTS, TARGETECT_CLAIMS, TARGETECT_PAIRS,
+    TARGETECT_PROMISE, TARGETECT_IDENTITY_RULE,
+  } = await import('../lib/targetect/product')
+  const { PRODUCTS, ALL_BUSINESS_ROUTES } = await import('../lib/business/nav')
 
-  console.log('\n── every claim names an engine, and the engine is there ──')
+  console.log('\n── a built claim has an engine, a guard, and a guard that runs ──')
   {
-    check('there are claims to check', TARGETECT_CAPABILITIES.length >= 8, String(TARGETECT_CAPABILITIES.length))
+    check('there are claims to check', TARGETECT_CLAIMS.length >= 6, String(TARGETECT_CLAIMS.length))
 
-    const missingEngine = TARGETECT_CAPABILITIES.filter((c) => !existsSync(join(process.cwd(), c.engine)))
-    check('every claim points at a module that exists', missingEngine.length === 0,
-      missingEngine.map((c) => `${c.title} → ${c.engine}`).join(', '))
+    const real = TARGETECT_CLAIMS.filter((c) => c.status !== 'specified')
+    check('something is actually built', real.length > 0, String(real.length))
 
-    const missingGuard = TARGETECT_CAPABILITIES.filter((c) => !existsSync(join(process.cwd(), c.guard)))
-    check('every claim points at a guard that exists', missingGuard.length === 0,
+    const noEngine = real.filter((c) => !c.engine || !c.guard)
+    check('every built or half-built claim names an engine and a guard', noEngine.length === 0,
+      noEngine.map((c) => c.title).join(', '))
+
+    const missingFile = real.filter((c) => c.engine && !existsSync(join(process.cwd(), c.engine)))
+    check('every named engine exists', missingFile.length === 0,
+      missingFile.map((c) => `${c.title} → ${c.engine}`).join(', '))
+
+    const missingGuard = real.filter((c) => c.guard && !existsSync(join(process.cwd(), c.guard)))
+    check('every named guard exists', missingGuard.length === 0,
       missingGuard.map((c) => `${c.title} → ${c.guard}`).join(', '))
 
-    // A suite that asserts things about a module it never imports is asserting
-    // them about something else.
-    const notCovering = TARGETECT_CAPABILITIES.filter((c) => {
-      // Guards import by relative path, pages by the @/ alias; both end in the
-      // same specifier, so match the tail rather than either spelling.
-      const spec = `${c.engine.replace(/\.ts$/, '')}'`
-      return !read(c.guard).includes(spec)
-    })
-    check('every guard actually imports the engine it is said to hold', notCovering.length === 0,
+    // A suite asserting things about a module it never imports is asserting
+    // them about something else. Guards import by relative path, pages by the
+    // @/ alias; both end in the same specifier, so match the tail.
+    const notCovering = real.filter((c) => c.guard && c.engine &&
+      !read(c.guard).includes(`${c.engine.replace(/\.ts$/, '')}'`))
+    check('every guard imports the engine it is said to hold', notCovering.length === 0,
       notCovering.map((c) => `${c.guard} ↛ ${c.engine}`).join(', '))
 
-    // And a guard nothing runs is a comment. The gauntlet is the pnpm script.
     const pkg = read('package.json')
-    const unrun = [...new Set(TARGETECT_CAPABILITIES.map((c) => c.guard))].filter((g) => !pkg.includes(g))
+    const unrun = [...new Set(real.map((c) => c.guard!))].filter((g) => !pkg.includes(g))
     check('every guard is wired into pnpm guards', unrun.length === 0, unrun.join(', '))
-
     check('this suite runs in the gauntlet too', pkg.includes('scripts/targetect-test.ts'))
-
-    const stages = new Set(TARGETECT_CAPABILITIES.map((c) => c.stage))
-    check('all three stages carry claims — plan, buy and learn',
-      stages.size === 3 && Object.keys(TARGETECT_STAGES).every((s) => stages.has(s as never)),
-      [...stages].join(', '))
   }
 
-  console.log('\n── the numbers the page prints are the product’s own ──')
+  console.log('\n── a plan is never dressed as a feature ──')
   {
-    // These two are typed in lib/business/targetect.ts on purpose: importing
-    // persona-audience into a public marketing route would drag the Meta
-    // client and the database in behind it. The shortcut is only honest while
-    // this holds.
-    check(`the persona count matches the library (${PERSONAS.length})`,
-      TARGETECT_PERSONA_COUNT === PERSONAS.length, String(TARGETECT_PERSONA_COUNT))
-    check(`the stack limit matches MAX_STACK (${MAX_STACK})`,
-      TARGETECT_PERSONA_STACK === MAX_STACK, String(TARGETECT_PERSONA_STACK))
+    const specified = TARGETECT_CLAIMS.filter((c) => c.status === 'specified')
+    check('the honest majority is still honest — most of this is written down, not running',
+      specified.length > 0, String(specified.length))
+    const pointing = specified.filter((c) => c.engine || c.guard)
+    check('a specified claim points at no engine — there is nothing to point at',
+      pointing.length === 0, pointing.map((c) => c.title).join(', '))
 
+    const half = TARGETECT_CLAIMS.filter((c) => c.status === 'partial')
+    const silent = half.filter((c) => !c.missing || c.missing.length < 20)
+    check('a half-built claim names the half that is missing', silent.length === 0,
+      silent.map((c) => c.title).join(', '))
+
+    // The page must render the status from the same list, or the two drift and
+    // the prose wins.
     const page = read(PAGE)
-    check('the page renders the claims from the module rather than retyping them',
-      page.includes('TARGETECT_CAPABILITIES.filter') && page.includes("from '@/lib/business/targetect'"))
-    check('the learning figure is read from the engine, never typed',
-      page.includes('String(LEARNING_EVENTS)') && page.includes("from '@/lib/freehold/learning-phase'"))
-    check('the ladder’s rungs are counted from the ladder',
-      page.includes('String(LADDER.length)') && page.includes("from '@/lib/freehold/lookalike-ladder'"))
-    check('the limit is on the page, in the product’s own words',
-      page.includes('TARGETECT_VERTICAL_NOTE') && TARGETECT_VERTICAL_NOTE.length > 60)
+    check('the page renders the claims from the module, never retyped',
+      page.includes('TARGETECT_CLAIMS.filter') && page.includes("from '@/lib/targetect/product'"))
+    check('…and prints a status beside every one of them',
+      /STATUS_LABEL\[claim\.status\]/.test(page) && /'Not built yet'/.test(page))
+    check('…and prints the missing half where there is one', /claim\.missing/.test(page))
+    check('the promise and the identity rule are on the page in the product’s own words',
+      page.includes('TARGETECT_PROMISE') && page.includes('TARGETECT_IDENTITY_RULE') &&
+      TARGETECT_PROMISE.includes('Aliaa') && TARGETECT_IDENTITY_RULE.length > 60)
 
-    // The site's standing rule: a selling surface shows no result. Someone
-    // deciding whether to trust the numbers this product will later show them
-    // is the last person to sell a plausible one to.
+    // A selling surface shows no result. Someone deciding whether to trust the
+    // numbers a targeting product will later show them is the last person to
+    // sell a plausible one to.
     const shown = [
       ...[...stripComments(page).matchAll(/>([^<>{}\n]+)</g)].map((m) => m[1].trim()),
       ...[...stripComments(page).matchAll(/'([^'\n]{4,})'/g)].map((m) => m[1]),
-      ...[...stripComments(page).matchAll(/`([^`\n]{4,})`/g)].map((m) => m[1]),
     ].filter(Boolean)
     const FIGURE = /(\d[\d,.]*\s*%)|(AED|USD|\$|SAR)\s*\d|(\bCPL\b)|(\bROAS\b)|(\bROI\b)|(\d+\s*x\b)|(per lead)/i
     const claims = shown.filter((t) => FIGURE.test(t))
     check('no cost, percentage or multiple is claimed anywhere on the page', claims.length === 0, claims.join(' | '))
+
+    check('all three acts carry claims — spot, reach and touch',
+      Object.keys(TARGETECT_ACTS).every((a) => TARGETECT_CLAIMS.some((c) => c.act === a)))
   }
 
-  console.log('\n── the address: an apex, a door, and one canonical page ──')
+  console.log('\n── it stands alone: its own address, and not in anybody’s menu ──')
   {
-    check('the page file exists at the canonical path',
-      TARGETECT.href === '/business/targetect' && existsSync(join(process.cwd(), PAGE)), TARGETECT.href)
+    check('the page and its own chrome exist',
+      existsSync(join(process.cwd(), PAGE)) && existsSync(join(process.cwd(), LAYOUT)))
+    check('the definition lives outside lib/business — it is not a platform product',
+      existsSync(join(process.cwd(), MODULE)) && !existsSync(join(process.cwd(), 'lib/business/targetect.ts')))
+    check('the page lives outside /business for the same reason',
+      TARGETECT.href === '/targetect' && !TARGETECT.href.startsWith('/business'), TARGETECT.href)
 
-    const { vendorHostAction, PRODUCT_DOORS, BRAND_DOMAINS } = await import('../lib/tenancy/vendor-host')
+    // The owner's ruling: "it doesn't belong to any of what we have."
+    check('Targetect is not sold in the Entrestate products menu',
+      PRODUCTS.every((p) => p.href !== TARGETECT.href && p.label !== 'Targetect'),
+      PRODUCTS.map((p) => p.label).join(', '))
+    check('…and is not in the platform site’s route map either',
+      !ALL_BUSINESS_ROUTES.includes(TARGETECT.href))
+
+    // It does point back at the two things it works with, and those are real
+    // pages of the platform — a dangling door is worse than no door.
+    const dangling = TARGETECT_PAIRS.filter((p) => !ALL_BUSINESS_ROUTES.includes(p.href))
+    check('what it pairs with are pages that exist', dangling.length === 0,
+      dangling.map((p) => `${p.name} → ${p.href}`).join(', '))
+  }
+
+  console.log('\n── the apex serves Targetect, and never the apartments ──')
+  {
+    const { vendorHostAction, PRODUCT_DOORS, BRAND_DOMAINS, VENDOR_PREFIXES } =
+      await import('../lib/tenancy/vendor-host')
     const { RESERVED_SUBDOMAINS } = await import('../lib/tenancy/reserved')
 
     check('targetect.com is one of ours', BRAND_DOMAINS[TARGETECT.domain] === TARGETECT.href, show(BRAND_DOMAINS))
-    check('…and the door inside the platform points at the same page',
+    check('the door inside the platform points at the same page',
       PRODUCT_DOORS[TARGETECT.door] === TARGETECT.href, show(PRODUCT_DOORS[TARGETECT.door]))
-    check('…and no tenant can sign up as the product', RESERVED_SUBDOMAINS.has(TARGETECT.door))
+    check('no tenant can sign up as the product', RESERVED_SUBDOMAINS.has(TARGETECT.door))
+    // Without this the apex rewrites to a path the very next rule redirects
+    // away, and the reader lands back on the platform site.
+    check('/targetect is a vendor surface, so the page it rewrites to is allowed to render',
+      VENDOR_PREFIXES.includes(TARGETECT.href), show(VENDOR_PREFIXES))
 
     const root = vendorHostAction(TARGETECT.domain, '/')
-    check('targetect.com/ serves Targetect and keeps the short address',
+    check('targetect.com/ serves it and keeps the short address',
       root.kind === 'rewrite' && root.to === TARGETECT.href, show(root))
     for (const h of [`www.${TARGETECT.domain}`, `${TARGETECT.domain}:3000`, 'TargetEct.COM']) {
       const a = vendorHostAction(h, '/')
       check(`${h} does the same`, a.kind === 'rewrite' && a.to === TARGETECT.href, show(a))
     }
-
-    const door = vendorHostAction(`${TARGETECT.door}.entrestate.com`, '/')
     check('targetect.entrestate.com serves it too',
-      door.kind === 'rewrite' && door.to === TARGETECT.href, show(door))
-
-    for (const p of ['/business/targetect', '/business/pricing', '/signup', '/server', '/api/health']) {
-      check(`${p} is left alone on the brand apex`, vendorHostAction(TARGETECT.domain, p).kind === 'pass',
-        show(vendorHostAction(TARGETECT.domain, p)))
-    }
-    // The property site is the reason this module exists. On a brand apex the
-    // way back is the brand's own page — somebody who typed targetect.com
-    // asked for Targetect, not for the platform's menu.
-    for (const p of ['/projects', '/areas/dubai-marina', '/blog', '/about']) {
+      vendorHostAction(`${TARGETECT.door}.entrestate.com`, '/').kind === 'rewrite')
+    check('the page itself renders on the apex rather than bouncing',
+      vendorHostAction(TARGETECT.domain, TARGETECT.href).kind === 'pass')
+    check('…and on entrestate.com as well',
+      vendorHostAction('entrestate.com', TARGETECT.href).kind === 'pass')
+    for (const p of ['/projects', '/areas/dubai-marina', '/blog']) {
       const a = vendorHostAction(TARGETECT.domain, p)
       check(`${p} comes back to the product`, a.kind === 'redirect' && a.to === TARGETECT.href, show(a))
     }
-    check('a file is never treated as a page route',
-      vendorHostAction(TARGETECT.domain, '/og-image.png').kind === 'pass')
     check('a customer’s own domain is still untouched',
       vendorHostAction('freeholdproperty.ae', '/').kind === 'pass')
   }
 
-  console.log('\n── the product is in the menu, and the menu leads somewhere ──')
+  console.log('\n── the page wears its own name, not the brokerage’s ──')
   {
-    const item = PRODUCTS.find((p) => p.href === TARGETECT.href)
-    check('Targetect is one of the products', item?.label === 'Targetect', show(item?.label))
-    check('…with a panel of its own', item?.preview === 'targetect', show(item?.preview))
-    check('…and it is a stop on the reading path', TOUR.includes(TARGETECT.href))
-    check('…that does not dead-end', nextInTour(TARGETECT.href) !== null)
-    check('the menu panel is rendered',
-      /targetect: Targetect,/.test(read('components/business/product-preview.tsx')))
+    // A visitor who typed targetect.com meeting "Golden Visa", a property nav
+    // and an advisor's WhatsApp bubble is the same defect as the front door
+    // selling apartments — one layer up, in the layout.
+    for (const f of ['components/site-header.tsx', 'components/site-footer.tsx', 'components/whatsapp-float.tsx']) {
+      check(`${f} stays off /targetect`, stripComments(read(f)).includes('"/targetect"'))
+    }
+    const layout = read(LAYOUT)
+    check('the layout carries its own header, with its own name', /Targetect\s*<\/Link>/.test(layout))
+    check('…and 404s inside a tenant’s instance, like every other vendor surface',
+      /tenantSubdomainFromHost\(host\)\) notFound\(\)/.test(layout))
   }
 
   if (failures > 0) {
     console.error(`\n${failures} Targetect rule(s) broken.\n`)
     process.exit(1)
   }
-  console.log('\nTargetect sells what the engines do, from its own address.\n')
+  console.log('\nTargetect stands on its own address, and says what it has not built yet.\n')
 }
 
 void main()

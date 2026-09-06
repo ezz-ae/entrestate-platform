@@ -9,13 +9,16 @@ Lead Machine) and **Meta for Realtors**. One deployment serves the vendor's own
 hosts and every customer instance at `{customer}.entrestate.com`, isolated
 schema-per-tenant.
 
-**Targetect** is the same system's audience half sold under its own name —
-smart audience planning and data analytics — and the only product here with
-its own apex, `targetect.com` (`BRAND_DOMAINS` in `lib/tenancy/vendor-host.ts`,
-a door at `targetect.entrestate.com`). It ships no engine of its own: every
-claim it makes is typed in `lib/business/targetect.ts` next to the module that
-implements it and the guard that holds it, and `scripts/targetect-test.ts`
-opens both — a page selling an engine that was renamed fails the build.
+**Targetect** is not one of them. Separate product, separate name, its own
+apex `targetect.com` (`BRAND_DOMAINS` in `lib/tenancy/vendor-host.ts`, a door
+at `targetect.entrestate.com`, the page at `/targetect` — outside `/business`
+on purpose, and absent from the products menu). Its question is *where is my
+audience today*: spot the person you meant, reach him where he is, touch the
+near-matches as themselves. Most of it is `specified`, not built —
+`lib/targetect/product.ts` carries a status per claim and
+`scripts/targetect-test.ts` refuses both a built claim with no engine and a
+specified claim that reaches the page without saying it is not built yet.
+It works beside Leadformer and the caller, which do ship.
 
 ## One rule before your first command: this repo is not `ezz-ae/ORE`
 

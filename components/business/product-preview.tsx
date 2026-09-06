@@ -273,66 +273,12 @@ function Leadformer() {
   )
 }
 
-/* ── Targetect — the description, the dial, and what came back ──────────── */
-
-/**
- * The one product on its own apex, so the panel has to say what it is in a
- * glance: a person described in words, a single dial deciding how hard those
- * words bind, and afterwards the count of what that audience actually
- * produced. The counts are BARS, not figures — the same rule as every other
- * panel here, and doubly so for the product whose whole promise is that a
- * number arrives with its evidence.
- */
-function Targetect() {
-  const traits = ['Expat family', 'Arabic', 'Upgrading', 'Mortgage', 'Actively looking']
-  const outcome: Array<[string, string]> = [
-    ['Leads', '86%'],
-    ['Qualified', '54%'],
-    ['Closed', '22%'],
-  ]
-  return (
-    <Frame>
-      <Tag>A person, a dial, and what came back</Tag>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {traits.map((t, i) => (
-          <Chip key={t} accent={i === 0}>{t}</Chip>
-        ))}
-      </div>
-      <div className="mt-3.5 border border-line bg-app/40 p-2.5">
-        <div className="flex items-baseline justify-between">
-          <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">Strictness</span>
-          <span className="font-mono text-[9px] text-ink-muted">Defining traits bind</span>
-        </div>
-        <div aria-hidden className="mt-2 h-[3px] w-full bg-surface-2">
-          <span className="block h-full w-1/2 bg-brand" />
-        </div>
-        <div className="mt-1.5 flex justify-between font-mono text-[8.5px] text-ink-faint">
-          <span>Every trait a hint</span>
-          <span>Every trait true</span>
-        </div>
-      </div>
-      <div className="mt-3 border-t border-line pt-2.5">
-        <Tag>What this audience produced</Tag>
-        <div className="mt-2 space-y-1.5">
-          {outcome.map(([label, w]) => (
-            <div key={label} className="flex items-center gap-2">
-              <span className="w-16 shrink-0 font-mono text-[9px] uppercase tracking-[0.12em] text-ink-faint">{label}</span>
-              <Bar w={w} dim={label === 'Closed'} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </Frame>
-  )
-}
-
 const PREVIEWS: Record<PreviewKind, () => React.JSX.Element> = {
   'lead-machine': LeadMachine,
   'mega-brokerage': MegaBrokerage,
   'landing-pages': LandingPages,
   'meta-for-realtors': MetaForRealtors,
   leadformer: Leadformer,
-  targetect: Targetect,
 }
 
 export function ProductPreview({ kind }: { kind: PreviewKind }) {

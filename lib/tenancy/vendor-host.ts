@@ -6,7 +6,7 @@
  *   {broker}.entrestate.com   a tenant's instance — the product, their brand
  *   entrestate.com            the vendor's own front door
  *   machine.entrestate.com    a product door, reserved and never a tenant
- *   targetect.com             another apex we own, whose root is that product
+ *   targetect.com             another apex we own — a separate product, /targetect
  *
  * Only the first was ever thought about. The other two fell through to the
  * property-marketing site that ships in this codebase, so entrestate.com and
@@ -54,9 +54,11 @@ export const PRODUCT_DOORS: Readonly<Record<string, string>> = {
   leadformer: '/business/leadformer',
   leadform: '/business/leadformer',
   // Targetect has its own apex (BRAND_DOMAINS below) and a door here as well.
-  // The door is what works the day before DNS does, and it is the address that
-  // keeps working for anyone who learned the product inside the platform.
-  targetect: '/business/targetect',
+  // The door is what works the day before DNS does. Its page is /targetect and
+  // NOT /business/targetect: /business is the Entrestate platform site, and
+  // Targetect is a separate product with a separate name that happens to share
+  // this deployment.
+  targetect: '/targetect',
 }
 
 /**
@@ -78,7 +80,7 @@ export const PRODUCT_DOORS: Readonly<Record<string, string>> = {
  * vendor's own hosts is not serving this one either.
  */
 export const BRAND_DOMAINS: Readonly<Record<string, string>> = {
-  'targetect.com': '/business/targetect',
+  'targetect.com': '/targetect',
 }
 
 /** The page a brand apex serves at its root, or null when the host is not one. */
@@ -133,6 +135,13 @@ export const VENDOR_PREFIXES = [
   '/privacy',
   '/terms',
   '/api',
+  // Targetect — a product of ours on its own apex (BRAND_DOMAINS above), whose
+  // page sits outside /business because it is not one of the platform's
+  // products. Listed here so it is reachable on entrestate.com too, and so the
+  // rule that sends everything else to /business cannot bounce the page the
+  // brand apex is rewriting TO — that would be an infinite argument between two
+  // rules, and the reader would see the property site win it.
+  '/targetect',
 ]
 
 /**

@@ -34,7 +34,7 @@ const show = (a: unknown) => JSON.stringify(a)
 
 async function main(): Promise<void> {
   process.env.NEXT_PUBLIC_TENANT_BASE_DOMAIN = 'entrestate.com'
-  const { vendorHostAction, PRODUCT_DOORS, BRAND_DOMAINS } = await import('../lib/tenancy/vendor-host')
+  const { vendorHostAction, PRODUCT_DOORS, BRAND_DOMAINS, VENDOR_PREFIXES } = await import('../lib/tenancy/vendor-host')
 
   console.log('\n── the apex is the platform site, not a property portal ──')
   {
@@ -126,8 +126,13 @@ async function main(): Promise<void> {
     check('leadformer. serves Leadformer without changing the address',
       leadformer.kind === 'rewrite' && leadformer.to === '/business/leadformer', show(leadformer))
 
-    check('every door points at a page under /business',
-      Object.values(PRODUCT_DOORS).every((p) => p.startsWith('/business/')), show(PRODUCT_DOORS))
+    // Every door but one is an Entrestate product page. The exception is
+    // Targetect: a separate product with a separate name, whose page sits at
+    // /targetect for that reason — so the rule is "a door opens a vendor
+    // surface", not "a door opens /business".
+    check('every door points at a page this deployment serves on its own hosts',
+      Object.values(PRODUCT_DOORS).every((p) => p.startsWith('/business/') || VENDOR_PREFIXES.includes(p)),
+      show(PRODUCT_DOORS))
 
     // A door's name must be unclaimable, or a tenant could sign up as the
     // product and shadow it. Every door is reserved, checked as a set so a new
@@ -151,16 +156,21 @@ async function main(): Promise<void> {
     // brokerage's apartments — the defect this whole module answers to.
     const root = vendorHostAction('targetect.com', '/')
     check('targetect.com/ serves Targetect and keeps the address',
-      root.kind === 'rewrite' && root.to === '/business/targetect', show(root))
+      root.kind === 'rewrite' && root.to === '/targetect', show(root))
     check('www is the same host',
       vendorHostAction('www.targetect.com', '/').kind === 'rewrite')
+    check('the page it rewrites to is allowed to render, rather than bouncing back',
+      vendorHostAction('targetect.com', '/targetect').kind === 'pass')
     check('/business/pricing still opens on it',
       vendorHostAction('targetect.com', '/business/pricing').kind === 'pass')
     const deep = vendorHostAction('targetect.com', '/projects')
     check('the property site is not served there either, and the way back is the product',
-      deep.kind === 'redirect' && deep.to === '/business/targetect', show(deep))
-    check('every brand apex serves a page under /business',
-      Object.values(BRAND_DOMAINS).every((p) => p.startsWith('/business/')), show(BRAND_DOMAINS))
+      deep.kind === 'redirect' && deep.to === '/targetect', show(deep))
+    // Every brand apex must land on a page this deployment actually serves,
+    // and it is deliberately NOT under /business: those are the Entrestate
+    // platform's own products, and a brand domain is a different company name.
+    check('every brand apex points at a real vendor surface',
+      Object.values(BRAND_DOMAINS).every((p) => VENDOR_PREFIXES.includes(p)), show(BRAND_DOMAINS))
   }
 
   console.log('\n── a tenant instance is never touched by these rules ──')
