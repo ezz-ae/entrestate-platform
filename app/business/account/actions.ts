@@ -8,10 +8,11 @@ import { getLeadershipLeadRecipients, sendSystemEmail } from '@/lib/transactiona
 import { SAAS_TENANCY } from '@/lib/tenancy/config'
 import { createWorkspaceForAccount } from '@/lib/tenancy/account-workspace'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
-import { headers } from 'next/headers'
-import { redeemCode, type Human } from '@/lib/account-credit'
+import { cookies, headers } from 'next/headers'
+import { grantWelcomeCredit, redeemCode, type Human } from '@/lib/account-credit'
 import { redeemCampaignCode } from '@/lib/coupon-campaigns'
 import { offerOfCode } from '@/lib/business/offers'
+import { SIGNUP_PLAN_COOKIE } from '@/app/signup/start/route'
 
 /** The device and the network behind this request — for the once-per-human rule. */
 export async function humanFromHeaders(): Promise<Human> {
@@ -129,9 +130,36 @@ export async function createWorkspace(formData: FormData): Promise<void> {
   if (!subdomain) redirect('/business/account?workspace=invalid_subdomain')
   if (!company) redirect('/business/account?workspace=company_required')
 
-  const result = await createWorkspaceForAccount({ subdomain, company, user }).catch(() => null)
+  // WHICH PRODUCT THEY CAME TO BUY, REMEMBERED ACROSS THE TERMINAL ROUND TRIP.
+  // This is the page a stranger reaches after signing up: /business/meta-for-realtors
+  // → /signup?plan=realtor → the Terminal → /me → here. Without the plan the
+  // tenant row gets 'account' (lib/tenancy/account-workspace.ts), which
+  // lib/freehold/credit-identity.ts has no credit identity for, so
+  // /api/freehold/credits/topup answers 403 and the realtor cannot buy the
+  // tokens the page sold them. app/signup/start/route.ts writes the plan down
+  // before the hop; this reads it back.
+  const jar = await cookies()
+  const plan = jar.get(SIGNUP_PLAN_COOKIE)?.value === 'realtor' ? ('realtor' as const) : undefined
+
+  const result = await createWorkspaceForAccount({
+    subdomain,
+    company,
+    user,
+    ...(plan ? { brand: { plan } } : {}),
+  }).catch(() => null)
+  // Used or not, the memory is spent: it must not colour a workspace created
+  // next week from the same browser.
+  jar.delete(SIGNUP_PLAN_COOKIE)
   if (!result) redirect('/business/account?workspace=store_unreachable')
   if (!result.ok) redirect(`/business/account?workspace=${result.reason}`)
+
+  // "AED 500 on your account when you start" — this is when they start. The
+  // credit used to be minted on first view of this page and then wait for the
+  // buyer to type it into the Redeem form, which meant the buyer who took the
+  // advertised path never got it. See grantWelcomeCredit for the full why.
+  // Never blocks the redirect: the workspace is the thing they came for.
+  const account = await ensureBusinessAccount(user)
+  if (account) await grantWelcomeCredit(account, await humanFromHeaders())
 
   redirect(result.claimUrl)
 }
