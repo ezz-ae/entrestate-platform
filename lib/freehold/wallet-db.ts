@@ -371,15 +371,34 @@ const mapRequest = (r: Record<string, unknown>): CoinRequest => ({
   createdAt: String(r.created_at),
 })
 
-export async function listRequests(state?: RequestState): Promise<CoinRequest[]> {
+/**
+ * The top-up requests, newest first. `walletId` NARROWS THE QUERY, it does not
+ * filter the answer.
+ *
+ * This used to take only a state, and lib/account-wallet.ts `readAccountWallet`
+ * asked for every pending request in the deployment and then kept the ones
+ * belonging to this wallet. With `LIMIT 100` across all wallets, the hundred
+ * newest pending requests are somebody else's the moment the queue is busy:
+ * a person requests AED 5,000, is told "Top-up recorded", refreshes, and the
+ * "waiting for the team's confirmation" line is gone — so they request it
+ * again. The page was reading a global list through a keyhole.
+ *
+ * The admin desk still calls this with no walletId, and still gets the last
+ * hundred across the deployment, which is what a queue screen wants.
+ */
+export async function listRequests(state?: RequestState, walletId?: string): Promise<CoinRequest[]> {
   await ensureRequestSchema()
+  const clauses: string[] = []
+  const params: string[] = []
+  if (state) { params.push(state); clauses.push(`state = $${params.length}`) }
+  if (walletId) { params.push(walletId); clauses.push(`wallet_id = $${params.length}`) }
   const rows = await query(
     `SELECT id, wallet_id, amount, reason, state, requested_by, decided_by,
             decided_at::text, transfer_id, created_at::text
        FROM freehold_wallet_requests
-      ${state ? 'WHERE state = $1' : ''}
+      ${clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''}
       ORDER BY created_at DESC LIMIT 100`,
-    state ? [state] : [],
+    params,
   )
   return rows.map(mapRequest)
 }

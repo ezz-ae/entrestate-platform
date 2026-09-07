@@ -67,7 +67,7 @@ export default async function StoreStartPage({
         />
         <div className="flex flex-wrap items-center gap-6">
           <a
-            href={`${TERMINAL_URL}/login`}
+            href={`${TERMINAL_URL}/login?next=${encodeURIComponent('https://entrestate.com/business/store')}`}
             className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink"
           >
             Open your account on the Terminal

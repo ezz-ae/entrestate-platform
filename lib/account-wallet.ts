@@ -74,15 +74,17 @@ export async function readAccountWallet(account: BusinessAccount): Promise<Accou
   const wallet = await ensureAccountWallet(account)
   if (!wallet) return null
   try {
-    const pending = await runWithDefaultSchema(() => listRequests('pending'))
+    // Asked FOR THIS WALLET, not asked for everyone's and filtered after: the
+    // query is capped at 100 rows, so once a hundred newer pending requests
+    // exist anywhere in the deployment, this account's own request falls off
+    // the end and the page stops admitting it is waiting. See listRequests.
+    const pending = await runWithDefaultSchema(() => listRequests('pending', wallet.id))
     return {
       id: wallet.id,
       accountNo: wallet.accountNo,
       balanceAed: filsToAed(wallet.balance),
       heldAed: filsToAed(wallet.held),
-      pendingRequests: pending
-        .filter((r) => r.walletId === wallet.id)
-        .map((r) => ({ id: r.id, amountAed: filsToAed(r.amount), createdAt: r.createdAt })),
+      pendingRequests: pending.map((r) => ({ id: r.id, amountAed: filsToAed(r.amount), createdAt: r.createdAt })),
     }
   } catch {
     return {

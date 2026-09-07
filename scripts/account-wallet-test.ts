@@ -91,6 +91,53 @@ console.log('\n── the surface and the words ──')
   check('phase 3 is on the record with the adapters ruling', foundation.includes('Delivered 2026-08-31 — `lib/account-wallet.ts`') && foundation.includes('FEEDERS'))
 }
 
+console.log('\n── one account means one set of numbers, on both surfaces ──')
+{
+  // The account page shows TWO amounts: "On your account" — the credit
+  // ledger, where the AED 500 the site promises actually lands — and
+  // "Ads wallet". /api/account/summary sent only the wallet, so the
+  // Terminal's account home could only render "Ads wallet AED 0.00" for a
+  // person who had just seen AED 500 here. Same account, and the number the
+  // whole offer is about did not exist on the surface the owner calls the
+  // account.
+  const summary = stripComments(read('app/api/account/summary/route.ts'))
+  check('the summary reads the credit ledger, not only the wallet',
+    /readAccountCredit\(account\)/.test(summary) && /readAccountWallet\(account\)/.test(summary))
+  check('…and sends the balance the account page calls "On your account"',
+    /credit: \{\s*balanceAed: credit\.balanceAed/.test(summary))
+  check('…with the pockets, so the Terminal names them in the same words',
+    /pockets: credit\.pockets\.map/.test(summary))
+  check('the account page still reads the same two figures',
+    /"On your account", v: credit \? `AED \$\{credit\.balanceAed\}`/.test(read('app/business/account/page.tsx')))
+}
+
+console.log('\n── a pending top-up is this wallet\'s, not the deployment\'s ──')
+{
+  // `listRequests('pending')` is capped at 100 rows across ALL wallets, and
+  // readAccountWallet filtered by wallet AFTER that cap. Once a hundred newer
+  // pending requests exist anywhere, this account's own request falls off the
+  // end: the person is told "Top-up recorded", refreshes, sees no pending
+  // line, and asks for the money again.
+  const db = stripComments(read('lib/freehold/wallet-db.ts'))
+  check('listRequests can narrow to one wallet in SQL',
+    /export async function listRequests\(state\?: RequestState, walletId\?: string\)/.test(db) && /wallet_id = \$\$\{params\.length\}/.test(db.replace(/\$\{params\.length\}/g, '$${params.length}')))
+  const wallet = stripComments(read('lib/account-wallet.ts'))
+  check('the account wallet asks for its own', /listRequests\('pending', wallet\.id\)/.test(wallet))
+  check('…and no longer filters a global list in memory', !/\.filter\(\(r\) => r\.walletId === wallet\.id\)/.test(wallet))
+}
+
+console.log('\n── signing in comes back to where it was clicked ──')
+{
+  for (const [rel, back] of [
+    ['app/business/account/page.tsx', 'https://entrestate.com/business/account'],
+    ['app/business/store/start/page.tsx', 'https://entrestate.com/business/store'],
+  ] as const) {
+    const src = stripComments(read(rel))
+    check(`${rel} hands the Terminal a return address`, src.includes(`/login?next=$\{encodeURIComponent('${back}')}`.replace('\\', '')) || src.includes(`encodeURIComponent('${back}')`))
+    check(`${rel}: …and no bare /login remains`, !/`\$\{TERMINAL_URL\}\/login`/.test(src))
+  }
+}
+
 if (failures > 0) {
   console.error(`\n${failures} account-wallet rule(s) broken.`)
   process.exit(1)

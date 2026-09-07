@@ -25,6 +25,7 @@ import { NextResponse } from 'next/server'
 import { getTerminalUser } from '@/lib/terminal-session'
 import { ensureBusinessAccount, listAccountApps } from '@/lib/terminal-account'
 import { readAccountWallet } from '@/lib/account-wallet'
+import { readAccountCredit } from '@/lib/account-credit'
 import { STORE, BILLING_LABELS } from '@/lib/freehold/app-store'
 import { SAAS_TENANCY } from '@/lib/tenancy/config'
 import { workspacesForAccount } from '@/lib/tenancy/account-workspace'
@@ -39,7 +40,16 @@ export async function GET() {
   const account = await ensureBusinessAccount(user)
   if (!account) return NextResponse.json({ error: 'Account unavailable' }, { status: 503 })
 
-  const [wallet, apps, workspaces] = await Promise.all([
+  const [credit, wallet, apps, workspaces] = await Promise.all([
+    // THE HEADLINE FIGURE, WHICH THIS ENDPOINT USED TO OMIT. The account page
+    // shows TWO amounts: "On your account" — the credit ledger, where the
+    // AED 500 the site promises actually lands — and "Ads wallet", the Ads
+    // Coin balance. Only the wallet was ever sent, so a person who redeemed
+    // the welcome credit on entrestate.com saw AED 500 there and
+    // "Ads wallet AED 0.00" on the Terminal's account home. Same account,
+    // and the number the whole offer is about did not exist on the surface
+    // the owner calls the account.
+    readAccountCredit(account),
     readAccountWallet(account),
     listAccountApps(account.id),
     // The workspaces this account owns, so the Terminal's /me can offer the
@@ -51,6 +61,14 @@ export async function GET() {
   return NextResponse.json(
     {
       account: { name: account.name, email: account.email },
+      // Display strings the ledger produced — the Terminal renders, never
+      // recomputes. `pockets` names what each part of the balance may be
+      // spent on, so the Terminal can say it in the same words this platform
+      // does instead of inventing its own.
+      credit: {
+        balanceAed: credit.balanceAed,
+        pockets: credit.pockets.map((p) => ({ scope: p.scope, label: p.label, amountAed: p.amountAed })),
+      },
       wallet: wallet
         ? {
             accountNo: wallet.accountNo,
