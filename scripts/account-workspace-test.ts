@@ -309,9 +309,23 @@ console.log('\n── there is exactly one way a workspace is born ──')
   check('…and never posts a password', !/password/.test(client))
 
   const page = stripComments(read('app/signup/page.tsx'))
+  const start = stripComments(read('app/signup/start/route.ts'))
+  // The stranger now leaves through /signup/start, which writes down which
+  // product they clicked before the hop. Without it, /business/meta-for-realtors
+  // → /signup?plan=realtor lost the plan at this redirect, the workspace was
+  // created as 'account', and /api/freehold/credits/topup answered 403 — the
+  // realtor could not buy the tokens the page had just sold them.
   check('a stranger on /signup is sent to the Terminal to be created, once',
-    /if \(!user\) redirect\(TERMINAL_SIGNUP\)/.test(page) && page.includes('terminal.entrestate.com/signup'))
-  check('…and the return lands on /me, a relative path the Terminal will honour', page.includes('next=%2Fme'))
+    /if \(!user\) redirect\(askedFor === 'realtor' \? '\/signup\/start\?plan=realtor' : '\/signup\/start'\)/.test(page) &&
+    start.includes('terminal.entrestate.com/signup'))
+  check('…and the return lands on /me, a relative path the Terminal will honour', start.includes('next=%2Fme'))
+  check('…carrying the product they clicked, in a cookie the round trip survives',
+    /askedFor === 'realtor' \? '\/signup\/start\?plan=realtor'/.test(page) &&
+    /sameSite: 'lax'/.test(start) && /httpOnly: true/.test(start))
+  check('…and only the one word may be remembered', /plan === 'realtor'/.test(start) && !/searchParams\.get\('plan'\)\s*\)?\s*,/.test(start))
+  check('the account page honours it and then spends it',
+    /SIGNUP_PLAN_COOKIE/.test(stripComments(read('app/business/account/actions.ts'))) &&
+    /jar\.delete\(SIGNUP_PLAN_COOKIE\)/.test(stripComments(read('app/business/account/actions.ts'))))
 
   const claim = stripComments(read('app/api/wl/claim/route.ts'))
   check('the claim route does not mint a platform identity for a Neon person',

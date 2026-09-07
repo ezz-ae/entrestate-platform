@@ -150,6 +150,33 @@ console.log('\n── the words: money, never points; credit, never a trial ─�
   }
 }
 
+console.log('\n── the credit lands where the copy says it lands ──')
+{
+  // "AED 500 on your account when you start" appears three times on
+  // /business/pricing and inside FULL_SYSTEM_START_NOTE, and the advertised
+  // path is /business/pricing → /signup → the workspace → the tenant host.
+  // The credit used to be MINTED on first view of /business/account — a page
+  // that path never visits — and then had to be typed into a Redeem form. So
+  // the buyer who did exactly what the page told them to do got nothing.
+  // Both doors that provision a workspace now grant it.
+  const credit = stripComments(read('lib/account-credit.ts'))
+  check('there is one function that mints and lands it together',
+    /export async function grantWelcomeCredit\(account: BusinessAccount, human: Human\)/.test(credit))
+  check('…and it goes through the same once-per-human rules, not around them',
+    /issueOfferCode\(account, 'welcome', human\)/.test(credit) && /redeemCode\(account, issued\.code, human\)/.test(credit))
+  check('…and it cannot throw a workspace away — it catches and reports',
+    /catch \(err\) \{[\s\S]{0,160}return \{ ok: false, reason: 'failed' \}/.test(credit))
+
+  for (const rel of ['app/api/wl/signup/route.ts', 'app/business/account/actions.ts']) {
+    const door = stripComments(read(rel))
+    check(`${rel} grants it once the workspace exists`, /grantWelcomeCredit\(/.test(door))
+    // The grant must come AFTER provisioning succeeded: a credit for a
+    // workspace that failed to be created is a credit for nothing.
+    const provisioned = door.indexOf('createWorkspaceForAccount')
+    check(`${rel}: …after provisioning, never before`, provisioned > -1 && door.indexOf('grantWelcomeCredit(') > provisioned)
+  }
+}
+
 if (failures > 0) {
   console.error(`\n${failures} credit rule(s) broken.`)
   process.exit(1)

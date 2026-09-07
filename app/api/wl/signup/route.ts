@@ -32,6 +32,8 @@ import { TENANT_LOGO_MAX_BYTES } from '@/lib/tenancy/store'
 import { createWorkspaceForAccount, type WorkspaceBrand } from '@/lib/tenancy/account-workspace'
 import { getTerminalUser } from '@/lib/terminal-session'
 import { checkRateLimit } from '@/lib/freehold/rate-limit'
+import { ensureBusinessAccount } from '@/lib/terminal-account'
+import { grantWelcomeCredit } from '@/lib/account-credit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -101,6 +103,23 @@ export async function POST(req: NextRequest) {
   if (!result.ok) {
     const status = result.reason === 'email_unverified' ? 403 : result.reason === 'store_unreachable' ? 502 : 400
     return NextResponse.json({ error: result.reason }, { status })
+  }
+
+  // "AED 500 on your account when you start." This is the advertised path —
+  // /business/pricing → /signup → here — and until now it was the one path
+  // that did NOT grant the credit: it was minted on first view of
+  // /business/account, a page this buyer has no reason to open, and then had
+  // to be typed into a Redeem form. See grantWelcomeCredit in
+  // lib/account-credit.ts. Awaited but never fatal: a workspace that exists
+  // matters more than a credit that posts, and the code can still be redeemed
+  // by hand from the account page.
+  const account = await ensureBusinessAccount(user).catch(() => null)
+  if (account) {
+    const grant = await grantWelcomeCredit(account, {
+      userAgent: req.headers.get('user-agent') ?? '',
+      address: ip,
+    })
+    if (!grant.ok) console.warn('[wl/signup] welcome credit not granted', { reason: grant.reason })
   }
 
   // Land them on THEIR host. The claim URL is a credential (a signed token in

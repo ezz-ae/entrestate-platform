@@ -63,21 +63,26 @@ type SubState = 'idle' | 'checking' | 'available' | 'taken' | 'reserved' | 'inva
 
 export type SignedInAs = { name: string | null; email: string }
 
-export default function SignupClient({ signedInAs }: { signedInAs: SignedInAs }) {
+export default function SignupClient({ signedInAs, plan }: { signedInAs: SignedInAs; plan?: 'realtor' | 'company' }) {
   return (
     <I18nProvider>
       {/* useSearchParams inside — Next wants a Suspense boundary above it. */}
       <Suspense fallback={null}>
-        <SignupForm signedInAs={signedInAs} />
+        <SignupForm signedInAs={signedInAs} plan={plan} />
       </Suspense>
     </I18nProvider>
   )
 }
 
-function SignupForm({ signedInAs }: { signedInAs: SignedInAs }) {
+function SignupForm({ signedInAs, plan }: { signedInAs: SignedInAs; plan?: 'realtor' | 'company' }) {
   const t = useT()
   // The realtor door is the same form told a different story — see file header.
-  const isRealtor = useSearchParams().get('plan') === 'realtor'
+  // The page resolves the plan on the server, because a stranger's ?plan=
+  // does not survive the Terminal round trip and comes back in a cookie
+  // instead (app/signup/start/route.ts). The URL still wins when it says so,
+  // which keeps a shared link working.
+  const fromUrl = useSearchParams().get('plan')
+  const isRealtor = fromUrl === 'realtor' || (fromUrl === null && plan === 'realtor')
   const [company, setCompany] = useState('')
   const [subdomain, setSubdomain] = useState('')
   const [subState, setSubState] = useState<SubState>('idle')

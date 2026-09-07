@@ -133,6 +133,48 @@ function amountsFor(offer: Offer, standing: AccountStanding): { systemAed: numbe
   return { systemAed: offer.systemAed, adsAed: offer.adsAed }
 }
 
+/* ── the welcome credit, on the path that promises it ───────────────────── */
+
+/**
+ * GRANT THE WELCOME CREDIT AT THE MOMENT THE COPY PROMISES IT.
+ *
+ * Three places on /business/pricing say "AED 500 on your account when you
+ * start", and it is the second half of the site's one CTA — FULL_SYSTEM_CTA
+ * is "Start with your own address" and FULL_SYSTEM_START_NOTE names the
+ * credit. But the code was only ever MINTED by app/business/account/page.tsx,
+ * on first view, and the buyer then had to type it into a Redeem form. The
+ * advertised path does not go through that page: /business/pricing →
+ * /signup → the workspace → `{sub}.entrestate.com`. So the buyer who did
+ * exactly what the page told them to do never got the credit, and the AED 500
+ * sat unminted on a page they had no reason to open.
+ *
+ * "When you start" is when the workspace is provisioned, so this is called by
+ * both doors that provision one — app/api/wl/signup/route.ts and the account
+ * page's own createWorkspace action — and it mints AND lands the credit in one
+ * step. Nothing about the once-per-human rule is relaxed: issueOfferCode still
+ * refuses a human who has the offer on another account, and redeemCode still
+ * refuses a second landing for the same account, device+network or address.
+ * A second workspace therefore grants nothing, which is the intent.
+ *
+ * It never throws and never blocks provisioning: a workspace that exists is
+ * worth more than a credit that posts, and the credit can still be redeemed
+ * by hand from the account page if this failed.
+ */
+export async function grantWelcomeCredit(account: BusinessAccount, human: Human): Promise<RedeemOutcome> {
+  try {
+    const issued = await issueOfferCode(account, 'welcome', human)
+    if (!issued.ok) {
+      // 'human_already_has_one' has no RedeemOutcome of its own; from the
+      // account's side the offer is simply already spoken for.
+      return { ok: false, reason: issued.reason === 'human_already_has_one' ? 'already_claimed' : issued.reason }
+    }
+    return await redeemCode(account, issued.code, human)
+  } catch (err) {
+    console.error('[account-credit] welcome grant failed', err)
+    return { ok: false, reason: 'failed' }
+  }
+}
+
 /* ── issuing ────────────────────────────────────────────────────────────── */
 
 export type IssueOutcome =
