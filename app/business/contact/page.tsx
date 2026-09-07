@@ -4,6 +4,8 @@ import { NextStep } from '@/components/business/visuals'
 import { Holder } from '@/components/business/holders'
 import { nextInTour } from '@/lib/business/nav'
 import { BRAND } from '@/lib/freehold/brand'
+import { FULL_SYSTEM_PRICE_LINE } from '@/lib/business/full-system'
+import { TOKEN_PRICE_AED } from '@/lib/freehold/credits-shared'
 import { ContactForm } from './_form'
 
 export const metadata: Metadata = {
@@ -69,11 +71,18 @@ export default function ContactPage() {
           caption="Already answered"
           rows={[
             {
+              // THE PRICE IS PUBLIC, SO THIS PAGE SAYS IT. This answer read
+              // "Talk to us for current pricing" while /business/pricing —
+              // one click away, and linked from the same sentence — printed
+              // the number. A hesitant buyer checking the FAQ was told the
+              // figure they had just read was not the figure. Both now read
+              // the same constants, so neither can drift from the other.
               k: 'What does it cost?',
               v: (
                 <>
-                  Talk to us for current pricing. The platform bills monthly; Meta for Realtors
-                  runs on tokens as you run ads. See <TextLink href="/business/pricing">Plans</TextLink>.
+                  {FULL_SYSTEM_PRICE_LINE} for the full system. Meta for Realtors runs on tokens
+                  instead — AED {TOKEN_PRICE_AED} per token, as you run ads, no monthly fee. See{' '}
+                  <TextLink href="/business/pricing">Plans</TextLink>.
                 </>
               ),
             },
