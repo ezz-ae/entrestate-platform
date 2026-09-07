@@ -75,7 +75,7 @@ export default async function BusinessAccountPage({
           title="One account carries all of it."
           lede="Market discovery comes with the Terminal account; the wallet, the apps and the workspace attach to that same account. Sign in on the Terminal and this page fills itself in."
         />
-        <a href={`${TERMINAL_URL}/login`} className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink">
+        <a href={`${TERMINAL_URL}/login?next=${encodeURIComponent('https://entrestate.com/business/account')}`} className="rounded-xl bg-brand px-6 py-3 text-[0.9375rem] font-semibold text-ink">
           Sign in on the Terminal
         </a>
       </Section>
@@ -221,13 +221,24 @@ export default async function BusinessAccountPage({
 
             {!user.emailVerified ? (
               <>
+                {/* NAME THE INBOX. This said "your email" and linked to the
+                    Terminal account with "Confirm it on the Terminal →",
+                    which reads like there is a button there to press. There
+                    is not: the confirmation is a message the sign-in sends,
+                    and confirming it is done in that message. A person who
+                    goes looking for a button finds none, comes back, and is
+                    still blocked — with no idea which of their addresses is
+                    waiting. So the address is printed, and the sentence says
+                    where the step actually happens. */}
                 <H3>One step before the workspace.</H3>
                 <P className="mt-3">
-                  The workspace is tied to your email, so the email has to be confirmed first. Open the verification
-                  message from the Terminal, then come back — the form is waiting here.
+                  The workspace is tied to{" "}
+                  <span className="font-medium text-ink">{user.email ?? "your email"}</span>, so that address has to be
+                  confirmed first. The confirmation message was sent when you signed up — open it from that inbox, then
+                  come back. The form is waiting here.
                 </P>
                 <a href={`${TERMINAL_URL}/account`} className="mt-6 inline-block text-[0.875rem] font-medium text-brand">
-                  Confirm it on the Terminal →
+                  See the account on the Terminal →
                 </a>
               </>
             ) : workspaces.length > 0 ? (
