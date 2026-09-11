@@ -315,13 +315,32 @@ console.log('\n── there is exactly one way a workspace is born ──')
   // → /signup?plan=realtor lost the plan at this redirect, the workspace was
   // created as 'account', and /api/freehold/credits/topup answered 403 — the
   // realtor could not buy the tokens the page had just sold them.
-  check('a stranger on /signup is sent to the Terminal to be created, once',
-    /if \(!user\) redirect\(askedFor === 'realtor' \? '\/signup\/start\?plan=realtor' : '\/signup\/start'\)/.test(page) &&
+  // THE STRANGER'S PATH MOVED, AND THE RULE DID NOT. It used to be an instant
+  // redirect out of this page. The owner's ruling on the order — "the system
+  // gets built in front of him, and then a box appears saying your email" —
+  // put Onestate in front of it instead, so a stranger now plays the setup on
+  // /signup and is handed off at the END by app/api/onestate/keep. What has
+  // not changed, and is what these checks are really for: this page still
+  // mints no identity, the Terminal is still the only place one is born, and
+  // the product the buyer clicked still survives the hop in a cookie.
+  const keepRoute = stripComments(read('app/api/onestate/keep/route.ts'))
+  check('a stranger on /signup meets the setup, and is still created only in the Terminal',
+    /if \(!user\) return <Onestate/.test(page) &&
+    keepRoute.includes('terminal.entrestate.com/signup') &&
     start.includes('terminal.entrestate.com/signup'))
-  check('…and the return lands on /me, a relative path the Terminal will honour', start.includes('next=%2Fme'))
+  check('…and the return lands on /me, a relative path the Terminal will honour',
+    start.includes('next=%2Fme') && keepRoute.includes('next=%2Fme'))
   check('…carrying the product they clicked, in a cookie the round trip survives',
-    /askedFor === 'realtor' \? '\/signup\/start\?plan=realtor'/.test(page) &&
+    /plan === 'realtor'/.test(keepRoute) &&
+    /sameSite: 'lax'/.test(keepRoute) && /httpOnly: true/.test(keepRoute) &&
     /sameSite: 'lax'/.test(start) && /httpOnly: true/.test(start))
+  // The check is for a FIELD, not for the word: the setup's own copy promises
+  // "No password — not now, not later", and a guard that fails on the sentence
+  // explaining its rule is the fourth time this repository has made that
+  // mistake. What must not exist is somewhere to type one.
+  check('…and the setup itself has nowhere to type a password',
+    !/type=["']password["']|autoComplete=["'][^"']*password/i.test(
+      stripComments(read('components/onestate/onestate.tsx'))))
   check('…and only the one word may be remembered', /plan === 'realtor'/.test(start) && !/searchParams\.get\('plan'\)\s*\)?\s*,/.test(start))
   check('the account page honours it and then spends it',
     /SIGNUP_PLAN_COOKIE/.test(stripComments(read('app/business/account/actions.ts'))) &&

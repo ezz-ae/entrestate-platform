@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { SAAS_TENANCY } from '@/lib/tenancy/config'
 import { getTerminalUser } from '@/lib/terminal-session'
 import SignupClient from './signup-client'
+import Onestate from '@/components/onestate/onestate'
 import { SIGNUP_PLAN_COOKIE } from './start/route'
 
 /**
@@ -42,7 +43,20 @@ export default async function SignupPage({
   const askedFor = Array.isArray(params.plan) ? params.plan[0] : params.plan
 
   const user = await getTerminalUser()
-  if (!user) redirect(askedFor === 'realtor' ? '/signup/start?plan=realtor' : '/signup/start')
+
+  /**
+   * A STRANGER PLAYS THE SETUP FIRST — the owner's ruling on the order:
+   * "the first thing they should have once they open the system is AI
+   * conversation, their one — this makes it theirs", and the identity box
+   * comes only "once the system is built in front of him".
+   *
+   * So the instant redirect to the Terminal is gone from the stranger's path.
+   * They meet Onestate, and it is Onestate that hands them off at the end,
+   * with what it learned written into a cookie (app/api/onestate/keep).
+   * /signup/start stays exactly where it was for every other caller — the
+   * realtor door, and anyone arriving with a plan already decided.
+   */
+  if (!user) return <Onestate plan={askedFor === 'realtor' ? 'realtor' : 'company'} />
 
   // The plan the buyer clicked: this visit's parameter first, then what
   // /signup/start remembered across the Terminal round trip.
